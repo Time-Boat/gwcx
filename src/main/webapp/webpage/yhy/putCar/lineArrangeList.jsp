@@ -79,7 +79,7 @@
 	 }  */
 	 
 	 function putTicket(id,lineId){
- 		createwindow("放票记录", "lineArrangeController.do?addorupdate&id="+id+"&lineId="+lineId,"600px","400px");
+ 		createwindow("线路放票", "lineArrangeController.do?addorupdate&id="+id+"&lineId="+lineId,"700px","400px");
  	}
 	 
 </script>
@@ -98,11 +98,11 @@
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="线路id" field="lineId" width="120"></t:dgCol>
    <t:dgCol title="线路名称" field="name" width="120"></t:dgCol>
-   <t:dgCol title="发车时间" field="departDate" width="120"></t:dgCol>
-   <%-- <t:dgCol title="线路排班状态" field="arrangeStatus" width="120"></t:dgCol>
-   <t:dgCol title="司机id" field="driverId" width="120"></t:dgCol>
-   <t:dgCol title="车牌id" field="licencePlateId" width="120"></t:dgCol> --%>
    <t:dgCol title="线路负责人" field="director" width="120"></t:dgCol>
+   <t:dgCol title="发车时间" field="departDate" width="120"></t:dgCol>
+   <%-- <t:dgCol title="线路排班状态" field="arrangeStatus" width="120"></t:dgCol> --%>
+   <t:dgCol title="司机" field="driverName" width="120"></t:dgCol>
+   <t:dgCol title="车牌" field="licencePlate" width="120"></t:dgCol>
    <t:dgCol title="备注" field="remark" width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
    <%-- <t:dgDelOpt title="删除" url="lineArrangeController.do?del&id={id}" /> --%>

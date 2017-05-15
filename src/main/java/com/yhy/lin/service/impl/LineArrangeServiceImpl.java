@@ -54,7 +54,7 @@ public class LineArrangeServiceImpl extends CommonServiceImpl implements LineArr
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select * from lineinfo_line_arrange_view  " + queryCondition.toString());
+	    sql.append("select * from lineinfo_line_arrange_view  " + queryCondition.toString() + " order by start_date desc ");
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -66,6 +66,8 @@ public class LineArrangeServiceImpl extends CommonServiceImpl implements LineArr
 							,new Db2Page("name", "name")
 							,new Db2Page("director", "director")
 							,new Db2Page("remark", "remark")
+							,new Db2Page("licencePlate", "licence_plate")
+							,new Db2Page("driverName", "driver_name")
 					};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -73,7 +75,7 @@ public class LineArrangeServiceImpl extends CommonServiceImpl implements LineArr
 	}
 	
 	//在id为空的情况下操作下的按钮不显示，这里进行转换之后在编辑的时候需要判断一下
-	class MyDataExchangerId2Blank implements IMyDataExchanger {
+	private class MyDataExchangerId2Blank implements IMyDataExchanger {
 		@Override
 		public Object exchange(Object value) {
 			if (value == null) {

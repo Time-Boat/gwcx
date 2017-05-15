@@ -31,9 +31,9 @@ public class LineArrangeEntity implements java.io.Serializable {
 	/**线路排班状态*/
 	private java.lang.String arrangeStatus;
 	/**发车开始日期*/
-	private java.util.Date startDate;
+	private java.sql.Date startDate;
 	/**发车停止日期*/
-	private java.util.Date endDate;
+	private java.sql.Date endDate;
 	/**司机id*/
 	private java.lang.String driverId;
 	/**车牌id*/
@@ -164,7 +164,7 @@ public class LineArrangeEntity implements java.io.Serializable {
 	 *@return: java.sql.Date  发车开始日期
 	 */
 	@Column(name ="START_DATE",nullable=true)
-	public java.util.Date getStartDate(){
+	public java.sql.Date getStartDate(){
 		return this.startDate;
 	}
 
@@ -172,7 +172,7 @@ public class LineArrangeEntity implements java.io.Serializable {
 	 *方法: 设置java.sql.Date
 	 *@param: java.sql.Date  发车开始日期
 	 */
-	public void setStartDate(java.util.Date startDate){
+	public void setStartDate(java.sql.Date startDate){
 		this.startDate = startDate;
 	}
 	/**
@@ -180,7 +180,7 @@ public class LineArrangeEntity implements java.io.Serializable {
 	 *@return: java.sql.Date  发车停止日期
 	 */
 	@Column(name ="END_DATE",nullable=true)
-	public java.util.Date getEndDate(){
+	public java.sql.Date getEndDate(){
 		return this.endDate;
 	}
 
@@ -188,7 +188,7 @@ public class LineArrangeEntity implements java.io.Serializable {
 	 *方法: 设置java.sql.Date
 	 *@param: java.sql.Date  发车停止日期
 	 */
-	public void setEndDate(java.util.Date endDate){
+	public void setEndDate(java.sql.Date endDate){
 		this.endDate = endDate;
 	}
 	/**

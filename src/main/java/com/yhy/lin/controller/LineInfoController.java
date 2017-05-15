@@ -82,10 +82,10 @@ public class LineInfoController extends BaseController {
 		JSONObject jObject = null;
 		if (StringUtil.isNotEmpty(search)) {
 			jObject = lineInfoService.getDatagrid(lineInfos, beginTime, endTime, dataGrid, lstartTime_begin,
-					lstartTime_end, lendTime_begin, lendTime_end, linetype);
+					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ");
 		} else {
 			jObject = lineInfoService.getDatagrid3(lineInfos, beginTime, endTime, dataGrid, lstartTime_begin,
-					lstartTime_end, lendTime_begin, lendTime_end, linetype);
+					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ");
 		}
 		responseDatagrid(response, jObject);
 	}

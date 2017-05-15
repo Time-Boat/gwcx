@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
@@ -93,6 +94,7 @@ public class TransferOrderController extends BaseController{
 		if(StringUtil.isNotEmpty(ids)){
 			List<String> orderIds = extractIdListByComma(ids);
 			List<Order_LineCarDiverEntity> list = new ArrayList<Order_LineCarDiverEntity>();
+			List<TransferorderEntity> tList = new ArrayList<TransferorderEntity>();
 		        for(int i=0;i<orderIds.size();i++){
 		        	Order_LineCarDiverEntity order_LineCarDiver = new Order_LineCarDiverEntity();
 		        	order_LineCarDiver.setId(orderIds.get(i));
@@ -100,8 +102,16 @@ public class TransferOrderController extends BaseController{
 		        	order_LineCarDiver.setLicencePlateId(licencePlateId);
 		        	order_LineCarDiver.setDriverId(driverId);
 		        	list.add(order_LineCarDiver);
+		        	
+		        	//修改订单状态
+		        	TransferorderEntity tfd = new TransferorderEntity();
+		        	tfd = systemService.getEntity(TransferorderEntity.class, orderIds.get(i));
+		        	tfd.setOrderStatus(2);
+		        	tList.add(tfd);
 		        }
 		        systemService.saveAllEntitie(list);
+		        systemService.saveAllEntitie(tList);
+		        
 		        message="站点挂接成功";
 		        j.setSuccess(true);
 		}

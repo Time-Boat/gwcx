@@ -34,6 +34,8 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import java.net.URI;
+import java.sql.Date;
+
 import org.springframework.http.MediaType;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -110,7 +112,7 @@ public class LineArrangeController extends BaseController {
 //		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
 		JSONObject jObject = lineArrangeService.getDatagrid(dataGrid);
-
+		
 		responseDatagrid(response, jObject);
 
 	}
@@ -148,6 +150,12 @@ public class LineArrangeController extends BaseController {
 		lineArrange.setLineId(lineId);
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		
+		String dd = request.getParameter("J_DepDate");
+		String ed = request.getParameter("J_EndDate");
+		
+		lineArrange.setStartDate(Date.valueOf(dd));
+		lineArrange.setEndDate(Date.valueOf(ed));
 		
 		String prevLicencePlateId = request.getParameter("prevLicencePlateId");
 		String curLicencePlateId = request.getParameter("licencePlateId");

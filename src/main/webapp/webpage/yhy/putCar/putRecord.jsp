@@ -131,7 +131,7 @@
 		});
 		
 		var tJson = eval('(' + $('#tickets').val() + ')');
-		console.log(tJson);
+		//console.log(tJson);
 		//$("#calendar").fullCalendar('addEventSource',  [{title:'add',start:new Date(),end:d}] );
 		for(var i=0;i<tJson.length;i++){
 			$("#calendar").fullCalendar('addEventSource',  [{title:'已售票数：'+tJson[i].count,start:new Date(tJson[i].tDate),end:d}] );
@@ -149,10 +149,11 @@
 	});
 	
 	function putTicket(value){
-		alert(1);
+		console.log(1);
 	}
 	
 </script>
+
 <!-- 选择开始时间和结束时间的日历 -->
 <script>
 YUI({
@@ -266,8 +267,8 @@ YUI({
         	
         	var d3 = (d2 - d1)/1000 / 60 / 60 /24;
         	
-        	console.log(d2-d1);
-        	console.log(d3);
+        	//console.log(d2-d1);
+        	//console.log(d3);
         	
         	if(d3++ < 0){
         		d3 = 0;
@@ -370,10 +371,10 @@ YUI({
 						</div>
 	        			<div class="f-label" id="putTicket" >您选择了0个放票日期</div>
 	        			<div class="f-label" >放票数量：${lineArrangeViewPage.seat}张/辆</div>
-	        			<div class="f-label" >票价（元）</div>
-						<div>
+	        			<div class="f-label" >票价${lineArrangeViewPage.ticketPrice}（元）</div>
+						<%-- <div>
 							<input type="text" class="f-text" name="ticketPrice" value="${lineArrangeViewPage.ticketPrice}" onkeyup="this.value=this.value.replace(/\D/g,'')" onafterpaste="this.value=this.value.replace(/\D/g,'')" />
-						</div>
+						</div> --%>
 						<input id="J_Search" type="hidden" value="跳转时间"  />
 					</div>
 				</div>

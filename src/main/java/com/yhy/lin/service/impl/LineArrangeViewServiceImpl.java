@@ -17,6 +17,7 @@ import java.util.Map;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.common.service.impl.CommonServiceImpl.IMyDataExchanger;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 
@@ -58,18 +59,21 @@ public class LineArrangeViewServiceImpl extends CommonServiceImpl implements Lin
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select * from lineinfo_line_arrange_view  " + queryCondition.toString());
+	    sql.append("select * from lineinfo_line_arrange_view  " + queryCondition.toString()  );
 		
 		System.out.println(sql.toString());
-		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
+		List<Map<String, Object>> mapList = findForJdbc(sql.toString() + " order by period_start desc ", dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 					Db2Page[] db2Pages = {
-							new Db2Page("id", "id")
+							new Db2Page("id", "id", new LvMyDataExchangerId2Blank())
 							,new Db2Page("lineId", "lineId")
 							,new Db2Page("departDate", "depart_date")
 							,new Db2Page("name", "name")
 							,new Db2Page("director", "director")
 							,new Db2Page("remark", "remark")
+							,new Db2Page("periodStart", "period_start")
+							,new Db2Page("periodEnd", "period_end")
+							,new Db2Page("ticketPrice", "ticket_price")
 					};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -126,5 +130,15 @@ public class LineArrangeViewServiceImpl extends CommonServiceImpl implements Lin
 		
 	}
 	
-	
+	//在id为空的情况下操作下的按钮不显示，这里进行转换之后在编辑的时候需要判断一下
+	private class LvMyDataExchangerId2Blank implements IMyDataExchanger {
+		@Override
+		public Object exchange(Object value) {
+			if (value == null) {
+				return "lvId";
+			} else {
+				return value;
+			}
+		}
+	}
 }

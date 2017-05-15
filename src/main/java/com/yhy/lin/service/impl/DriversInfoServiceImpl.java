@@ -4,7 +4,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.service.DriversInfoServiceI;
-import com.yhy.lin.service.impl.LineArrangeServiceImpl.MyDataExchangerId2Blank;
 
 import net.sf.json.JSONObject;
 
@@ -13,8 +12,6 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
-import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 
 @Service("driversInfoService")
