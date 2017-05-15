@@ -1,0 +1,115 @@
+package com.yhy.lin.service.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
+import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.StringUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.service.BusStopInfoServiceI;
+
+import net.sf.json.JSONObject;
+
+@Service("BusStopInfoServiceI")
+@Transactional
+public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStopInfoServiceI{
+	@Autowired
+	private JdbcDao jdbcDao;
+	
+	//根据线路lineInfoId，拿到对应线路的站点信息  
+	@Override
+	public JSONObject getDatagrid3(String lineInfoId, DataGrid dataGrid){
+		String sqlWhere = getSqlWhere(lineInfoId);
+		
+		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
+		String sqlCnt = "select count(*) from busstopinfo a inner join line_busstop b on a.id=b.busStopsId  inner join  lineinfo c on b.lineId = c.id ";
+		if (!sqlWhere.isEmpty()) {
+			sqlCnt += " where" + sqlWhere;
+		}
+		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		
+		// 取出当前页的数据 
+		String sql = "select a.id as id,b.id as line_busstopId  ,a.name,b.siteOrder,a.status,b.arrivalTime from busstopinfo a inner join line_busstop b on a.id=b.busStopsId  inner join  lineinfo c on b.lineId = c.id ";
+		if (!sqlWhere.isEmpty()) {
+			sql += " where" + sqlWhere;
+		}
+		sql +=" order by b.siteOrder is NULL,b.siteOrder ";
+		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
+
+		// 将结果集转换成页面上对应的数据集
+		Db2Page[] db2Pages = {
+				new Db2Page("id","id")
+				,new Db2Page("line_busstopId", "line_busstopId", null)
+				,new Db2Page("name", "name", null)
+				,new Db2Page("siteOrder", "siteOrder", null)
+				,new Db2Page("status", "status", null)
+				,new Db2Page("arrivalTime", "arrivalTime", null)
+		};
+		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+		return jObject;
+	}
+	public String getSqlWhere(String lineInfoId){
+		StringBuffer sqlWhere = new StringBuffer(" a.deleteFlag='0' ");
+		
+		if(StringUtil.isNotEmpty(lineInfoId)){
+			sqlWhere.append(" and  b.lineId = '"+lineInfoId+"' ");
+		}
+		return sqlWhere.toString();
+	}
+	
+	//根据线路lineInfoId，拿到对应线路的未挂接的站点信息   
+	@Override
+	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType){
+		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType);
+		
+		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
+		String sqlCnt = "select count(*) from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL ";
+		if (!sqlWhere.isEmpty()) {
+			sqlCnt +=  sqlWhere;
+		}
+		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		
+		// 取出当前页的数据 
+		String sql = "select a.id ,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL";
+		if (!sqlWhere.isEmpty()) {
+			sql +=  sqlWhere;
+		}
+		System.out.println(sql.toString());
+		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
+		// 将结果集转换成页面上对应的数据集
+		Db2Page[] db2Pages = {
+				new Db2Page("id","id")
+				,new Db2Page("name", "name", null)
+				,new Db2Page("stopLocation", "stopLocation", null)
+				,new Db2Page("createTime", "createTime", null)
+				,new Db2Page("createPeople", "createPeople", null)
+				,new Db2Page("remark", "remark", null)
+		};
+		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+		return jObject;
+	}
+	
+	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType){
+		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' "); 
+		
+		//线路类型
+		if(StringUtil.isNotEmpty(lineType)){
+			sqlWhere.append(" and  a.status != '"+lineType+"' ");
+		}
+		
+		if(StringUtil.isNotEmpty(busStopInfo.getName())){
+			sqlWhere.append(" and  a.name like '%"+busStopInfo.getName()+"%'");
+		}
+		if(StringUtil.isNotEmpty(busStopInfo.getStopLocation())){
+			sqlWhere.append(" and  a.stopLocation like '%"+busStopInfo.getStopLocation()+"%'");
+		}
+		return sqlWhere.toString();
+	}
+	
+}
