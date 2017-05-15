@@ -17,13 +17,38 @@
 		//关闭当前弹出框
 		frameElement.api.close();
     }//@ sourceURL=test.js
+    
+    function checkDepartTime(){
+    	var date1 = $('#startDate').val();
+    	var date2 = $('#slDate').val();
+    	date1 = Date.parse(new Date(date1.replace(/-/g, "/")));  
+    	
+    	var date3 = date2 - date1/1000;  //时间差的毫秒数
+    	console.log(date3);
+    	if(date3 > 0){
+    		var leave1=date3%(24*3600);    //计算天数后剩余的毫秒数
+    		var hours=Math.floor(leave1/(3600));
+    		
+    		console.log(hours);
+    		if(hours < 1){
+    			return true;
+    		}
+    		tip("相隔时间不能超过1个小时");
+    	}else{
+    		tip("时间必须早于订单的出发时间");
+    	}
+    	
+    	return false;
+    }
+    
 	</script> 
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid  formid="transferOrderListInfo"  dialog="true" usePlugin="password" layout="table" action="transferOrderController.do?saveCarAndDriver" callback="@Override noteSubmitCallback" >
+<t:formvalid  formid="transferOrderListInfo"  dialog="true" usePlugin="password" layout="table" beforeSubmit="checkDepartTime()" action="transferOrderController.do?saveCarAndDriver" callback="@Override noteSubmitCallback" >
 
 	<%--  <input id="ids" name="ids"  value="${ids}">  --%>
 	 <input id="id" name="id"  hidden="true"  value="${ids}">
+	 <input id="slDate" hidden="true" value="${slDate}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 			<tr>
 				<td align="center" colspan="2"> 
@@ -122,8 +147,9 @@
 <script type="text/javascript">
 	$("#licencePlateName").click(function(){
 		var startTime = $("#startDate").val();
-		var endTime = $("#endDate").val();
-		if(startTime!=""&&endTime!=""){
+		//var endTime = $("#endDate").val();
+		//if(startTime!=""&&endTime!=""){
+		if(startTime!=""){
 			 	$.dialog.setting.zIndex = 9999;
 			    $.dialog({content: 'url:transferOrderController.do?addCar', zIndex: 2100, lock: true, width:1000, height:600, opacity: 0.4, button: [
 			        {name:'确定',  

@@ -6,7 +6,7 @@
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 	<t:datagrid name="transferOrderList" title="接送订单处理" autoLoadData="true" actionUrl="transferOrderController.do?datagrid" fitColumns="true"
-			    idField="id" fit="true" queryMode="group" checkbox="true">
+			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" replace="接机_0,送机_1,接火车 _2,送火车_3" query="true" align="center"></t:dgCol>
@@ -44,20 +44,28 @@
 		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
 
-	//安排车辆司机     里面可以做一个ajax请求，判断选中的订单是不是在同一条线路上
+	//安排车辆司机 
 	function editCarAndDriver(title,url,id,width,height){
 		var ids = '';
 		var rows = $("#transferOrderList").datagrid("getSelections");
-		//var lineId = rows[0].lineId;
+		var lineId = rows[0].lineId;
+		var ds = rows[0].orderStartime;
 		for(var i=0;i<rows.length;i++){
 			
 			//判断选中的订单是不是在同一条线路上
-			/* if(lineId == rows[i].lineId){
+			if(lineId == rows[i].lineId){
 				lineId = rows[i].lineId;
 			}else{
 				tip('请选择同一条线路');
 				return;
-			} */
+			}
+			if(i != 0){
+				//console.log(better_time(ds,rows[i].orderStartime));
+				if(!better_time(ds,rows[i].orderStartime)){
+					tip('批量处理的订单相差时间不能超过1个小时');
+					return;
+				}
+			}
 			
 			ids+=rows[i].id;
 			ids+=',';
@@ -67,7 +75,8 @@
 			tip('请选择项目');
 			return;
 		}
-		url += '&ids='+ids;
+		url += '&ids='+ids+'&slDate='+(slDate/1000);
+		//console.log(url);
 		createwindow(title,url,width,height);
 		/* $("#function-transferOrderAdd").panel(
 			{
@@ -75,6 +84,49 @@
 				href: url
 			}
 		); */
-	} 
+	}
+	
+	//把最小的时间发到后台，在新增填写发车时间的时候和这个最小时间进行比较
+	var slDate = '';
+	
+	function better_time(strDateStart,strDateEnd){
+		var date1 = Date.parse(new Date(strDateStart.replace(/-/g, "/")));  
+		var date2 = Date.parse(new Date(strDateEnd.replace(/-/g, "/")));    
+		//console.log(date1);
+		//console.log(date2);
+		var date3 = date2 - date1;  //时间差的毫秒数
+		
+		if(date3 >= 0){
+			slDate = date1;
+		}else{
+			slDate = date2;
+		}
+		
+		date3 = Math.abs(date3);
+		
+		//console.log(date3);
+		
+		//计算出相差天数
+		var days=Math.floor(date3/(24*3600*1000));
+		
+		//计算出小时数
+
+		var leave1=date3%(24*3600*1000);    //计算天数后剩余的毫秒数
+		var hours=Math.floor(leave1/(3600*1000));
+		//计算相差分钟数
+		var leave2=leave1%(3600*1000);        //计算小时数后剩余的毫秒数
+		var minutes=Math.floor(leave2/(60*1000));
+		//计算相差秒数
+		var leave3=leave2%(60*1000);      //计算分钟数后剩余的毫秒数
+		var seconds=Math.round(leave3/1000);
+		//console.log(" 相差 "+days+"天 "+hours+"小时 "+minutes+" 分钟"+seconds+" 秒");
+		
+		if(days == 0 && hours == 0){
+			return true;
+		}
+		
+	  	return false;
+	}
+	
 </script>
  

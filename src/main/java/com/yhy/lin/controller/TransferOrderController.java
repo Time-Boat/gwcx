@@ -65,10 +65,14 @@ public class TransferOrderController extends BaseController{
 	@RequestMapping(params="editCarAndDriver")
 	public ModelAndView editCarAndDriver(HttpServletRequest request,HttpServletResponse response){
 		String ids = request.getParameter("ids");
-		System.out.println(ids);
+		
+		String slDate = request.getParameter("slDate");
+		
+//		System.out.println(ids);
 		//1、根据id查询到对应订单的所有线路，后台进行判断，如果是同一条线路，允许多条订单同时操作，否则给信息提示
 		if(StringUtil.isNotEmpty(ids)){
 			request.setAttribute("ids", ids);
+			request.setAttribute("slDate", slDate);
 		}
 		return new ModelAndView("yhy/transferOrder/transferOrderAdd");
 	}
@@ -89,7 +93,6 @@ public class TransferOrderController extends BaseController{
 		if(StringUtil.isNotEmpty(ids)){
 			List<String> orderIds = extractIdListByComma(ids);
 			List<Order_LineCarDiverEntity> list = new ArrayList<Order_LineCarDiverEntity>();
-			StringBuffer sql = new StringBuffer();
 		        for(int i=0;i<orderIds.size();i++){
 		        	Order_LineCarDiverEntity order_LineCarDiver = new Order_LineCarDiverEntity();
 		        	order_LineCarDiver.setId(orderIds.get(i));
@@ -97,7 +100,7 @@ public class TransferOrderController extends BaseController{
 		        	order_LineCarDiver.setLicencePlateId(licencePlateId);
 		        	order_LineCarDiver.setDriverId(driverId);
 		        	list.add(order_LineCarDiver);
-		        }	
+		        }
 		        systemService.saveAllEntitie(list);
 		        message="站点挂接成功";
 		        j.setSuccess(true);

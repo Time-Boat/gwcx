@@ -110,6 +110,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		
 		return sqlWhere.toString();
 	}
+	
 	@Override
 	public JSONObject getDatagrid(LineInfoEntity lineInfo,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType){
 		String sqlWhere = getSqlWhere2(lineInfo,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType);
@@ -160,6 +161,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
 	}
+	
 	public String getSqlWhere2(LineInfoEntity lineInfo,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType){
