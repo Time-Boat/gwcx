@@ -27,7 +27,7 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	private String phoneNumber;
 	/**验票员权限*/
 	private String jurisdiction;
-	/**备用字段*/
+	/**验票员业务类型*/
 	private String status;
 	/**创建时间*/
 	private Date createDate;

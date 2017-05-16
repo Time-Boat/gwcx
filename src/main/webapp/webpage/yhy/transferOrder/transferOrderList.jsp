@@ -65,6 +65,8 @@
 					tip('批量处理的订单相差时间不能超过1个小时');
 					return;
 				}
+			}else{
+				slDate = Date.parse(new Date(rows[i].orderStartime.replace(/-/g, "/"))); 
 			}
 			
 			ids+=rows[i].id;

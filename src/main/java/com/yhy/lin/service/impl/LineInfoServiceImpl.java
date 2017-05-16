@@ -201,26 +201,27 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid2(LineInfoEntity lineInfos,DataGrid dataGrid){
+	public JSONObject getDatagrid2(LineInfoEntity lineInfos, DataGrid dataGrid, String ywlx){
 		
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from lineinfo a where a.deleteFlag='0' ";
+		String sqlCnt = "select count(*) from lineinfo a where a.deleteFlag='0' and type " + ywlx + " ";
 		if(StringUtil.isNotEmpty(lineInfos.getName())){
 			sqlCnt +=" and a.name like '%"+lineInfos.getName()+"%'";
 		}
+		
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		 sql.append("select a.id,a.name ");
-		 sql.append(" from lineinfo a  where 1=1 ");
-		 if(StringUtil.isNotEmpty(lineInfos.getName())){
-			 sql.append(" and a.name like '%"+lineInfos.getName()+"%'");
+		sql.append("select a.id,a.name ");
+		sql.append(" from lineinfo a  where type " + ywlx + " and a.deleteFlag='0' ");
+		if(StringUtil.isNotEmpty(lineInfos.getName())){
+			sql.append(" and a.name like '%"+lineInfos.getName()+"%'");
 		}
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
-				new Db2Page("id")
-				,new Db2Page("name", "name", null)
+			new Db2Page("id")
+			,new Db2Page("name", "name", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;

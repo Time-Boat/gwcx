@@ -120,7 +120,7 @@ public class LineArrangeViewController extends BaseController {
 		
 		String dd = request.getParameter("J_DepDate");
 		String ed = request.getParameter("J_EndDate");
-		String tp = request.getParameter("ticketPrice");
+		//String tp = request.getParameter("ticketPrice");
 		String aId = request.getParameter("aId");
 		
 		String message = null;
@@ -133,7 +133,7 @@ public class LineArrangeViewController extends BaseController {
 				
 				t.setPeriodStart(Date.valueOf(dd));
 				t.setPeriodEnd(Date.valueOf(ed));
-				t.setTicketPrice(new BigDecimal(tp));
+				//t.setTicketPrice(new BigDecimal(tp));
 				
 				lineArrangeViewService.saveOrUpdate(t);
 				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);

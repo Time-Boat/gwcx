@@ -201,7 +201,7 @@ YUI({
             sDepDate = oDepDate.get('value'),
             sEndDate = oEndDate.get('value'), 
             aMessage = ['请选择出发日期', '请选择返程日期', '返程时间不能早于出发时间，请重新选择', '日期格式错误'],
-            iError   = -1;   
+            iError   = -1;
             switch(!0) {
                 case !sDepDate:
                     oDepDate.focus();
@@ -227,9 +227,25 @@ YUI({
             if(iError > -1) {
                 this.set('message', aMessage[iError]).showMessage();   
                 formStatus = false;
-            }
-            else {
-            	formStatus = true;
+            } else {
+            	var startDate = $('#startDate').val();
+                var endDate = $('#endDate').val();
+                var d1 = new Date(startDate.replace(/\-/g, "\/"));  
+                var d2 = new Date(endDate.replace(/\-/g, "\/"));  
+                
+                var d3 = new Date($('#J_DepDate').val().replace(/\-/g, "\/"));  
+                var d4 = new Date($('#J_EndDate').val().replace(/\-/g, "\/"));  
+                
+                //console.log('d1:'+d1+'  d2:'+d2+'  d3:'+d3+'  d4:'+d4);
+                
+                if(d3 >= d1 && d4 <= d2){
+	            	formStatus = true;
+                }else{
+                	oDepDate.focus();
+                	this.set('message', '放票日期必须在排班日期之内(排班日期：'+startDate.split(' ')[0]+'至'+endDate.split(' ')[0]+')').showMessage();
+	                formStatus = false;
+                }
+                console.log(formStatus);
             }
     }, oCal);
 });
@@ -340,6 +356,8 @@ YUI({
 		</div>
 		<input type='hidden' id='periodEnd' value='${lineArrangeViewPage.periodEnd}' />
 		<input type='hidden' id='periodStart' value='${lineArrangeViewPage.periodStart}' />
+		<input id="startDate" name="startDate" value="${lineArrangeViewPage.startDate}" type="hidden" />
+		<input id="endDate" name="endDate" value="${lineArrangeViewPage.endDate}" type="hidden" />
 		<input type='text' id='tickets' value="${tickets}" />
 	</div>
 	<div class="calendarWrapper">

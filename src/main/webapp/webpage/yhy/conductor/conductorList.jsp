@@ -14,8 +14,8 @@
 	<t:dgCol title="年龄" sortable="true" editor="numberbox" field="age" align="center" width="80"></t:dgCol>
 	<t:dgCol title="电话号码" sortable="false" field="phoneNumber" query="true" align="center"  width="120"></t:dgCol>
 	<t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center" width="200"></t:dgCol>
-	<t:dgCol title="验票线路" field="jurisdiction"  align="center" width="60" query="true"></t:dgCol>
-	
+	<t:dgCol title="验票线路" field="jurisdiction"  align="center" width="200" query="true"></t:dgCol>
+	<t:dgCol title="业务类型" field="status" dictionary="carBType" query="true" align="center" width="120"></t:dgCol>
 	<t:dgToolBar operationCode="add" title="录入" icon="icon-add" url="conductorController.do?addorupdate" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="编辑" icon="icon-edit" url="conductorController.do?addorupdate" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="50"></t:dgCol>

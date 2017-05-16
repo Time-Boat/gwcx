@@ -24,6 +24,8 @@
     	date1 = Date.parse(new Date(date1.replace(/-/g, "/")));  
     	
     	var date3 = date2 - date1/1000;  //时间差的毫秒数
+    	console.log(date1);
+    	console.log(date2);
     	console.log(date3);
     	if(date3 > 0){
     		var leave1=date3%(24*3600);    //计算天数后剩余的毫秒数

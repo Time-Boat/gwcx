@@ -10,8 +10,12 @@
 			//$.dialog.setting.zIndex = getzIndex(); 
 			
 			//var orgIds = $("#orgIds").val();
-			
-			$.dialog({content: 'url:conductorController.do?conductorTolinesList', zIndex: 2100, title: '线路列表', lock: true, width: '400px', height: '480px', opacity: 0.4, button: [
+			var s = $('#status option:selected').val();
+			if(s == '' || s == null){
+				tip("请先选择业务类型");
+				return;
+			}
+			$.dialog({content: 'url:conductorController.do?conductorTolinesList&ywlx='+s, zIndex: 2100, title: '线路列表', lock: true, width: '400px', height: '480px', opacity: 0.4, button: [
 			   {name: '<t:mutiLang langKey="common.confirm"/>', callback: callbackSelect, focus: true},
 			   {name: '<t:mutiLang langKey="common.cancel"/>', callback: function (){}}
 		   ]}).zindex();
@@ -71,9 +75,13 @@
 			<td class="value"><t:dictSelect field="sex" typeGroupCode="sex" hasLabel="false" defaultVal="${conductor.sex}" datatype="*"></t:dictSelect> <span class="Validform_checktip"></span></td>
 		</tr>
 		<tr>
+			<td align="right"><label class="Validform_label"> 业务类型: </label></td>
+			<td class="value"><t:dictSelect id="status" field="status" typeGroupCode="carBType" hasLabel="false" defaultVal="${conductor.status}" datatype="*"></t:dictSelect> <span class="Validform_checktip"></span></td>
+		</tr>
+		<tr>
 			<td align="right"><label class="Validform_label"> 验票线路: </label></td>
 			<td class="value" align="center">
-				<textarea  id="jurisdiction" name="jurisdiction" cols="60" readonly="readonly" datatype="*" rows="2">${conductor.jurisdiction}</textarea>
+				<textarea  id="jurisdiction" name="jurisdiction" cols="60" style="margin: 0px; width: 416px; height: 66px;" readonly="readonly" datatype="*" rows="2">${conductor.jurisdiction}</textarea>
 				<a href="#" class="easyui-linkbutton" plain="true" icon="icon-search" id="departSearch" onclick="openDepartmentSelect()">选择线路</a>
 				
 				<span class="Validform_checktip"></span>

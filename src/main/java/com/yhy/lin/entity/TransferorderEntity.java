@@ -12,12 +12,17 @@ import org.jeecgframework.core.common.entity.IdEntity;
 @Entity
 @Table(name="transferorder")
 public class TransferorderEntity extends IdEntity implements java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private String  orderId;//订单id
 	private Integer orderType;//订单类型 0:接机  1:送机  2:接火车 3:送火车
 	private Integer orderStatus;//订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
 	private String  orderFlightnumber;//航班号
-	private String  orderStartingstation;//起点站
-	private String  orderTerminusstation;//终点站
+	private String  orderStartingStationId;//起点站
+	private String  orderTerminusStationId;//终点站
 	private String  orderStartime;//发车时间
 	private Date orderExpectedarrival;//预计到达时间
 	private BigDecimal  orderUnitprice;//单价
@@ -69,20 +74,22 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	public void setOrderFlightnumber(String orderFlightnumber) {
 		this.orderFlightnumber = orderFlightnumber;
 	}
-	@Column(name = "order_startingstation")
-	public String getOrderStartingstation() {
-		return orderStartingstation;
+	
+	@Column(name = "order_starting_station_id")
+	public String getOrderStartingStationId() {
+		return orderStartingStationId;
 	}
-	public void setOrderStartingstation(String orderStartingstation) {
-		this.orderStartingstation = orderStartingstation;
+	public void setOrderStartingStationId(String orderStartingStationId) {
+		this.orderStartingStationId = orderStartingStationId;
 	}
-	@Column(name = "order_terminusstation")
-	public String getOrderTerminusstation() {
-		return orderTerminusstation;
+	@Column(name = "order_terminus_station_id")
+	public String getOrderTerminusStationId() {
+		return orderTerminusStationId;
 	}
-	public void setOrderTerminusstation(String orderTerminusstation) {
-		this.orderTerminusstation = orderTerminusstation;
+	public void setOrderTerminusStationId(String orderTerminusStationId) {
+		this.orderTerminusStationId = orderTerminusStationId;
 	}
+	
 	@Column(name = "order_startime")
 	public String getOrderStartime() {
 		return orderStartime;

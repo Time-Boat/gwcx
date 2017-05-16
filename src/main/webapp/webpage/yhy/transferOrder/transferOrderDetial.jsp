@@ -80,7 +80,7 @@
 			<tr> 
 			<tr>
 				<td align="right">
-					<label class="Validform_label">费用单价(人/元)：</label>
+					<label class="Validform_label">费用单价(元/人)：</label>
 				</td>
 				<td class="value">						  
 					<input  class="inputxt" id="orderUnitprice" name="orderUnitprice" value="${tView.orderUnitprice}">  

@@ -100,20 +100,20 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if(StringUtil.isNotEmpty(transferorder.getOrderStatus())){
 			sql.append(" and  a.order_status ='"+transferorder.getOrderStatus()+"'");
 		}
-		//起点站
-		if(StringUtil.isNotEmpty(transferorder.getOrderStartingstation())){
-			sql.append(" and  a.order_startingstation like '%"+transferorder.getOrderStartingstation()+"%'");
+		//起点站id
+		if(StringUtil.isNotEmpty(transferorder.getOrderStartingStationId())){
+			sql.append(" and  a.order_startingstation = '"+transferorder.getOrderStartingStationId()+"'");
 		}
-		//终点站
-		if(StringUtil.isNotEmpty(transferorder.getOrderTerminusstation())){
-			sql.append(" and  a.order_terminusstation like '%"+transferorder.getOrderTerminusstation()+"%'");
+		//终点站id
+		if(StringUtil.isNotEmpty(transferorder.getOrderTerminusStationId())){
+			sql.append(" and  a.order_terminusstation = '"+transferorder.getOrderTerminusStationId()+"'");
 		}
 		
 		//申请人
 		if(StringUtil.isNotEmpty(transferorder.getOrderContactsname())){
 			sql.append(" and  a.order_contactsname like '%"+transferorder.getOrderContactsname()+"%'");
 		}
-		sql.append(" order by a.order_startime desc ");
+		sql.append(" order by a.order_startime asc ");
 		
 		return sql.toString();
 	}
