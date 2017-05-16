@@ -78,6 +78,7 @@ public class CarInfoController extends BaseController {
 	@RequestMapping(params = "datagrid")
 	public void datagrid(CarInfoEntity carInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		
+		//没写注释，忘记是干嘛用的了。。
 		String userCar = request.getParameter("userCar");
 		String lpId = request.getParameter("lpId");
 		String operation = request.getParameter("operation");

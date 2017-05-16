@@ -21,18 +21,25 @@
     function checkDepartTime(){
     	var date1 = $('#startDate').val();
     	var date2 = $('#slDate').val();
-    	date1 = Date.parse(new Date(date1.replace(/-/g, "/")));  
+    	date1 = Date.parse(new Date(date1));  
     	
     	var date3 = date2 - date1/1000;  //时间差的毫秒数
-    	console.log(date1);
-    	console.log(date2);
-    	console.log(date3);
-    	if(date3 > 0){
+    	//console.log('date1:'+date1);
+    	//console.log('date2:'+date2);
+    	//console.log('date3:'+date3);
+    	if(date3 >= 0){
     		var leave1=date3%(24*3600);    //计算天数后剩余的毫秒数
     		var hours=Math.floor(leave1/(3600));
     		
-    		console.log(hours);
-    		if(hours < 1){
+    		//计算相差分钟数
+    		var leave2=leave1%(3600)        //计算小时数后剩余的毫秒数
+    		var minutes=Math.floor(leave2/(60))
+    		//计算相差秒数
+    		var leave3=leave2%(60)      //计算分钟数后剩余的毫秒数
+    		var seconds=Math.round(leave3)
+    		
+    		//console.log(hours+"--"+minutes+"--"+seconds);
+    		if(hours < 1 || (hours==1 && minutes==0 && seconds==0)){
     			return true;
     		}
     		tip("相隔时间不能超过1个小时");

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,8 @@ import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.entity.LineInfoEntity;
+import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -57,7 +60,7 @@ public class AppInterfaceController extends BaseController {
 	@Autowired
 	private SystemService systemService;
 
-	//登录接口
+	// 登录接口
 	@RequestMapping(params = "appLogin")
 	public void AppLogin(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -68,17 +71,17 @@ public class AppInterfaceController extends BaseController {
 		JSONObject data = new JSONObject();
 
 		try {
-//			String mobile = request.getParameter("mobile");// 用户名
-//			String code = request.getParameter("code");// 验证码
+			// String mobile = request.getParameter("mobile");// 用户名
+			// String code = request.getParameter("code");// 验证码
 
 			String param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
-			
-//			param = param.replaceAll(":null", ":\"\"");
+
+			// param = param.replaceAll(":null", ":\"\"");
 			JSONObject jsondata = JSONObject.fromObject(param);
 			String mobile = jsondata.getString("mobile");
 			String code = jsondata.getString("code");
-			
+
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
 				if (StringUtil.isNotEmpty(code)) {
@@ -90,20 +93,21 @@ public class AppInterfaceController extends BaseController {
 						int m = compareDate(DateUtils.getDate(), date, 'm');
 						// 30分钟的有效期验证
 						if (m < 30 && user.getStatus().equals("0") && code.equals(user.getSecurityCode())) {
-							
+
 							String sql = "";
 							String curTime = getCurTime();
 							String token = "";
-							
-							//把token的修改时间拿出来与当前时间进行比较              登录的时候不用比较。。。
-							//int d = compareDate(DateUtils.getDate(), user.getTokenUpdateTime(), 'd');
-							
-							//如果小于一个月就进行只修改token的更新时间
-							if(StringUtil.isNotEmpty(user.getToken())){
+
+							// 把token的修改时间拿出来与当前时间进行比较 登录的时候不用比较。。。
+							// int d = compareDate(DateUtils.getDate(),
+							// user.getTokenUpdateTime(), 'd');
+
+							// 如果小于一个月就进行只修改token的更新时间
+							if (StringUtil.isNotEmpty(user.getToken())) {
 								token = user.getToken();
 								sql = "update car_customer set status = '1', token_update_time = '" + curTime
 										+ "' where phone = '" + mobile + "' ";
-							}else{
+							} else {
 								// 生成token
 								token = generateToken(user.getCustomerId(), user.getPhone());
 								sql = "update car_customer set status = '1', token_update_time = '" + curTime
@@ -186,7 +190,7 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	//短信发送接口
+	// 短信发送接口
 	@RequestMapping(params = "getSmscode")
 	public void getSmscode(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -259,42 +263,60 @@ public class AppInterfaceController extends BaseController {
 
 	}
 
-	//接送机订单
+	// 接送机订单
 	@RequestMapping(params = "createOrder")
-	public void createOrder(HttpServletRequest request, HttpServletResponse response){
+	public void createOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
 
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
-		
+
 		String param;
 		try {
 			param = AppUtil.inputToStr(request);
-		
+
 			System.out.println("前端传递参数：" + param);
-			
+
 			Gson g = new Gson();
 			TransferorderEntity t = g.fromJson(param, TransferorderEntity.class);
+			String sId = t.getOrderStartingStationId();// 起始站
+			String eId = t.getOrderTerminusStationId();// 终点站
+
+			List<Line_busStopEntity> list = null;
+			// 如果是接机或者接火车
+			if ("0".equals(t.getOrderType()) || "2".equals(t.getOrderType())) {
+				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
+			} else { //送机
+				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
+			}
 			
+			String lId = list.get(0).getLineId();
+			List<LineInfoEntity> lList = systemService.findListbySql("select name from lineinfo");
+			if (lList.size() > 0) {
+				t.setLineName(lList.get(0).getName());
+			}
+			t.setLineId(lId);
+			t.setLineName(lId);
 			
+			systemService.save(t);
 			
-//			JSONObject jsondata = JSONObject.fromObject(param);
-//			String mobile = jsondata.getString("mobile");
-//			String code = jsondata.getString("code");
-		
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = "添加成功";
 		} catch (IOException e) {
+			statusCode = AppGlobals.APP_FAILED;
+			msg = "系统异常";
 			e.printStackTrace();
 		}
-		
+
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data.toString());
 
 		responseOutWrite(response, returnJsonObj);
 	}
-	
+
 	/**
 	 * 计算两个时间之间的差值，根据标志的不同而不同
 	 * 
@@ -363,5 +385,5 @@ public class AppInterfaceController extends BaseController {
 		}
 		return sb.toString();
 	}
-	
+
 }

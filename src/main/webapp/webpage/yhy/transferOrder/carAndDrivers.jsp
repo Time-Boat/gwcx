@@ -3,7 +3,7 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <div class="easyui-layout" fit="true">
   <div region="center" style="padding:0px;border:0px">
-  <t:datagrid name="carInfoList" title="车辆信息" actionUrl="carInfoController.do?datagrid" idField="id" fit="true">
+  <t:datagrid name="carInfoList" title="车辆信息" actionUrl="carInfoController.do?datagrid&businessType=1" idField="id" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="编号" field="driverId" hidden="true"></t:dgCol>
    <t:dgCol title="车牌号" field="licencePlate"   width="120"></t:dgCol>

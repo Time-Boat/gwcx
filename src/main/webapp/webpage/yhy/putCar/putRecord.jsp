@@ -228,16 +228,15 @@ YUI({
                 this.set('message', aMessage[iError]).showMessage();   
                 formStatus = false;
             } else {
-            	var startDate = $('#startDate').val();
-                var endDate = $('#endDate').val();
-                var d1 = new Date(startDate.replace(/\-/g, "\/"));  
-                var d2 = new Date(endDate.replace(/\-/g, "\/"));  
+            	var startDate = $('#startDate').val().split(' ')[0];
+                var endDate = $('#endDate').val().split(' ')[0];
+                var d1 = new Date(startDate);  
+                var d2 = new Date(endDate);  
                 
-                var d3 = new Date($('#J_DepDate').val().replace(/\-/g, "\/"));  
-                var d4 = new Date($('#J_EndDate').val().replace(/\-/g, "\/"));  
+                var d3 = new Date($('#J_DepDate').val().split(' ')[0]);  
+                var d4 = new Date($('#J_EndDate').val().split(' ')[0]);  
                 
                 //console.log('d1:'+d1+'  d2:'+d2+'  d3:'+d3+'  d4:'+d4);
-                
                 if(d3 >= d1 && d4 <= d2){
 	            	formStatus = true;
                 }else{

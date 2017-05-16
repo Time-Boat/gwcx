@@ -66,7 +66,11 @@
 					return;
 				}
 			}else{
-				slDate = Date.parse(new Date(rows[i].orderStartime.replace(/-/g, "/"))); 
+				/* console.log(rows[i].orderStartime);
+				console.log(rows[i].orderStartime);
+				console.log(new Date(rows[i].orderStartime));
+				console.log(Date.parse(new Date(rows[i].orderStartime))); */
+				slDate = Date.parse(new Date(rows[i].orderStartime)); 
 			}
 			
 			ids+=rows[i].id;
@@ -77,6 +81,8 @@
 			tip('请选择项目');
 			return;
 		}
+		console.log(slDate);
+		
 		url += '&ids='+ids+'&slDate='+(slDate/1000);
 		//console.log(url);
 		createwindow(title,url,width,height);
@@ -92,8 +98,8 @@
 	var slDate = '';
 	
 	function better_time(strDateStart,strDateEnd){
-		var date1 = Date.parse(new Date(strDateStart.replace(/-/g, "/")));  
-		var date2 = Date.parse(new Date(strDateEnd.replace(/-/g, "/")));    
+		var date1 = Date.parse(new Date(strDateStart));  
+		var date2 = Date.parse(new Date(strDateEnd));    
 		//console.log(date1);
 		//console.log(date2);
 		var date3 = date2 - date1;  //时间差的毫秒数
@@ -106,7 +112,7 @@
 		
 		date3 = Math.abs(date3);
 		
-		//console.log(date3);
+		console.log(date3);
 		
 		//计算出相差天数
 		var days=Math.floor(date3/(24*3600*1000));

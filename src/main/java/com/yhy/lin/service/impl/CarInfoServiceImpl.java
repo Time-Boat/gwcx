@@ -29,7 +29,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType) {
 		
-		StringBuffer queryCondition = new StringBuffer(" where 1=1 ");
+		StringBuffer queryCondition = new StringBuffer(" where delete_flag = '0' ");
 		if(StringUtil.isNotEmpty(userCar)){
 			queryCondition.append(" and c.status = '" + userCar + "' ");
 			if(StringUtil.isNotEmpty(lpId)){

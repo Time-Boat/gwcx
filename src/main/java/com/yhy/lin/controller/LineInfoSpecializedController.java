@@ -52,7 +52,7 @@ public class LineInfoSpecializedController extends BaseController{
 		String lstartTime_end = request.getParameter("lstartTime_end");
 		String lendTime_begin = request.getParameter("lendTime_begin");
 		String lendTime_end = request.getParameter("lendTime_end");
-		//因为调用的方法一样，所以在外层来处理
+		//因为调用的方法一样，所以在外层来处理...   忘记是啥意思了。。。
 		linetype = " >='"+linetype+"' ";
 		JSONObject jObject  = lineInfoService.getDatagrid3(lineInfos,beginTime,endTime,dataGrid,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,linetype);
         responseDatagrid(response, jObject);

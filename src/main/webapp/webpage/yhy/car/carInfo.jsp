@@ -80,7 +80,15 @@
 						</label>
 					</td>
 					<td class="value">
-						<t:dictSelect field="status" typeGroupCode="carType" hasLabel="false" defaultVal="${carInfoPage.status}" datatype="*"></t:dictSelect>	
+						<c:choose>
+							<c:when test="${carInfoPage.status != null}">
+								<t:dictSelect field="status" typeGroupCode="carType" hasLabel="false" defaultVal="${carInfoPage.status}" readonly="readonly" datatype="*"></t:dictSelect>	
+							</c:when>
+							<c:otherwise>
+								<t:dictSelect field="status" typeGroupCode="carType" hasLabel="false" defaultVal="${carInfoPage.status}" datatype="*"></t:dictSelect>	
+							</c:otherwise>
+						</c:choose>
+						
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

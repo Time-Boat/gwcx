@@ -99,8 +99,8 @@ public class APIHttpClient {
 //        arry.add(j);  
         
         JsonObject j = new JsonObject();  
-        j.addProperty("orderStartingstationid", "11111");  
-        j.addProperty("orderTerminusstationid", "22222");  
+        j.addProperty("orderStartingstationid", "402882f45b897e24015b89b27adf0010");  
+        j.addProperty("orderTerminusstationid", "402882f45b897e24015b89b2d55b0013");  
         j.addProperty("orderStartime", "2011-01-01");  
         j.addProperty("orderUnitprice", 111);  
         j.addProperty("orderNumbers", "20");  

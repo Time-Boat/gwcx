@@ -35,7 +35,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sqlCnt += sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_startingstation,a.order_terminusstation,");
+		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_numberPeople,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
@@ -52,8 +52,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				,new Db2Page("orderType", "order_type", null)
 				,new Db2Page("orderStatus", "order_status", null)
 				,new Db2Page("orderFlightnumber", "order_flightnumber", null)
-				,new Db2Page("orderStartingstation", "order_startingstation", null)
-				,new Db2Page("orderTerminusstation", "order_terminusstation", null)
+				,new Db2Page("orderStartingstation", "order_starting_station_id", null)
+				,new Db2Page("orderTerminusstation", "order_terminus_station_id", null)
 				,new Db2Page("orderStartime", "order_startime", null)
 				,new Db2Page("orderExpectedarrival", "order_expectedarrival", null)
 				,new Db2Page("orderUnitprice", "order_unitprice", null)
@@ -102,11 +102,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		//起点站id
 		if(StringUtil.isNotEmpty(transferorder.getOrderStartingStationId())){
-			sql.append(" and  a.order_startingstation = '"+transferorder.getOrderStartingStationId()+"'");
+			sql.append(" and  a.order_starting_station_id = '"+transferorder.getOrderStartingStationId()+"'");
 		}
 		//终点站id
 		if(StringUtil.isNotEmpty(transferorder.getOrderTerminusStationId())){
-			sql.append(" and  a.order_terminusstation = '"+transferorder.getOrderTerminusStationId()+"'");
+			sql.append(" and  a.order_terminus_station_id = '"+transferorder.getOrderTerminusStationId()+"'");
 		}
 		
 		//申请人
@@ -122,12 +122,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Override
 	public TransferorderView getDetail(String id){
 		StringBuffer sql = new  StringBuffer();
-		/*sql.append("select a.id,a.order_id as orderId,a.order_type as orderType,a.order_status as orderStatus,a.order_flightnumber as orderFlightnumber,a.order_startingstation as orderStartingstation,a.order_terminusstation as orderTerminusstation,");
+		/*sql.append("select a.id,a.order_id as orderId,a.order_type as orderType,a.order_status as orderStatus,a.order_flightnumber as orderFlightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime as orderStartime,a.order_expectedarrival as orderExpectedarrival,a.order_unitprice as orderUnitprice,a.order_numbers as orderNumbers,a.order_paytype as orderPaytype,a.order_contactsname as orderContactsname,");
 		sql.append("a.order_contactsmobile as orderContactsmobile,a.order_paystatus as orderPaystatus,a.order_trainnumber as orderTrainnumber,a.order_numberPeople as orderNumberPeople,a.order_totalPrice as orderTotalPrice,d.name as driverName,d.phoneNumber as driverMobile,c.licence_plate as licencePlate,c.status as CarStatus,a.applicationTime ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
 		*/
-		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_startingstation,a.order_terminusstation,");
+		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_numberPeople,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
