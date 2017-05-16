@@ -28,15 +28,15 @@
 				<span class="Validform_checktip"></span> 
 			</td>
 		</tr>
-		<%-- <tr>
+		<tr>
 			<td align="right">
-				<label class="Validform_label">站点状态: </label>
+				<label class="Validform_label">站点类型: </label>
 			</td>
 			<td class="value">
-				<t:dictSelect field="status" typeGroupCode="lineStatus" hasLabel="false" defaultVal="${busStopInfo.status}" datatype="*"></t:dictSelect>	
+				<t:dictSelect field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" datatype="*"></t:dictSelect>	
 				<span class="Validform_checktip"></span>
 			</td>
-		</tr> --%>
+		</tr>
 		<tr>
 			<td align="right">
 				<label class="Validform_label"> 站点备注: </label>

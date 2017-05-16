@@ -18,6 +18,9 @@ import org.hibernate.annotations.GenericGenerator;
 @Entity
 @Table(name="busstopinfo")
 public class BusStopInfoEntity implements java.io.Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	/**主键id*/
 	private String id;
 	/**站点名称*/
@@ -39,8 +42,9 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	/**站点地址*/
 	private String stopLocation;
 	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
-	private String hangingStatus;
-	
+//	private String hangingStatus;
+	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
+	private String stationType;
 	
 	//主键生成策略：uuid 采用128位的uuid算法生成主键，uuid被编码为一个32位16进制数字的字符串。占用空间大（字符串类型）。   
 	@Id
@@ -116,13 +120,20 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	public void setStopLocation(String stopLocation) {
 		this.stopLocation = stopLocation;
 	}
-	@Column(name="hangingStatus",nullable=true,length=10)
-	public String getHangingStatus() {
-		return hangingStatus;
+//	@Column(name="hangingStatus",nullable=true,length=10)
+//	public String getHangingStatus() {
+//		return hangingStatus;
+//	}
+//	public void setHangingStatus(String hangingStatus) {
+//		this.hangingStatus = hangingStatus;
+//	}
+	
+	@Column(name="STATION_TYPE",nullable=true,length=10)
+	public String getStationType() {
+		return stationType;
 	}
-	public void setHangingStatus(String hangingStatus) {
-		this.hangingStatus = hangingStatus;
+	public void setStationType(String stationType) {
+		this.stationType = stationType;
 	}
 	
-
 }

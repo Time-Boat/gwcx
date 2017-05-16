@@ -56,9 +56,6 @@ public class BusStopInfoController extends BaseController {
 		return new ModelAndView("yhy/busStop/busStopInfoList2");
 	}
 	
-	
-	
-	
 	@RequestMapping(params="datagrid")
 	public void datagrid(BusStopInfoEntity busStopInfo,HttpServletRequest request,HttpServletResponse response,DataGrid dataGrid){
 		CriteriaQuery cq = new CriteriaQuery(BusStopInfoEntity.class, dataGrid);
@@ -69,10 +66,6 @@ public class BusStopInfoController extends BaseController {
 		this.busStopInfoService.getDataGridReturn(cq, true);
 		TagUtil.datagrid(response, dataGrid);
 	}
-	
-	
-
-	
 	
 	/**
 	 * 删除
@@ -245,8 +238,6 @@ public class BusStopInfoController extends BaseController {
 		        systemService.updateBySqlString("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
 		        
 		        systemService.saveAllEntitie(list);
-		        
-		        
 		        message="站点挂接成功";
 	        }catch (Exception e) {
 	        	message = "站点挂接失败";
@@ -254,8 +245,5 @@ public class BusStopInfoController extends BaseController {
 	        j.setMsg(message);
         return j;
     }
-	
-	
-	
-
+    
 }

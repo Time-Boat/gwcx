@@ -3,6 +3,7 @@ package com.yhy.lin.app.controller;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -286,22 +288,30 @@ public class AppInterfaceController extends BaseController {
 
 			List<Line_busStopEntity> list = null;
 			// 如果是接机或者接火车
-			if ("0".equals(t.getOrderType()) || "2".equals(t.getOrderType())) {
+			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE == t.getOrderType() || AppGlobals.TRAIN_TO_DESTINATION_TYPE == t.getOrderType()) {
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
-			} else { //送机
+				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
+			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE == t.getOrderType() || AppGlobals.DESTINATION_TO_TRAIN_TYPE == t.getOrderType()) { // 送机
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
+				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
 			}
 			
 			String lId = list.get(0).getLineId();
-			List<LineInfoEntity> lList = systemService.findListbySql("select name from lineinfo");
+			List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
 			if (lList.size() > 0) {
-				t.setLineName(lList.get(0).getName());
+				t.setLineName(lList.get(0));
 			}
+			
 			t.setLineId(lId);
-			t.setLineName(lId);
+			t.setApplicationTime(getDate());
+			t.setOrderType(1);
+
+			//order_paystatus
+			//order_numberPeople
+			//是不是要新增起点名称和终点名称两个字段
 			
 			systemService.save(t);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = "添加成功";
 		} catch (IOException e) {
@@ -316,7 +326,47 @@ public class AppInterfaceController extends BaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
+	// 获取站点信息  
+	@RequestMapping(params = "getStationList")
+	public void getStationList(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
 
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+
+		String param;
+		try {
+			
+			String stationType = request.getParameter("stationType");  //0 所有站点，1火车站，2飞机场，3后台系统增加站点
+			
+			// 如果是接机或者接火车
+			if (StringUtil.isNotEmpty(stationType)) {
+				
+			}else{
+				statusCode = "001";
+				msg = "stationType参数不能为空";
+			}
+			
+			systemService.save(t);
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = "添加成功";
+		} catch (IOException e) {
+			statusCode = AppGlobals.APP_FAILED;
+			msg = "系统异常";
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
 	/**
 	 * 计算两个时间之间的差值，根据标志的不同而不同
 	 * 
@@ -351,9 +401,14 @@ public class AppInterfaceController extends BaseController {
 		return 0;
 	}
 
-	// 获取当前时间
+	// 获取当前时间(字符串)
 	public String getCurTime() {
 		return DateUtils.date2Str(DateUtils.datetimeFormat);
+	}
+
+	// 获取当前时间(Date)
+	public Date getDate() {
+		return DateUtils.getDate();
 	}
 
 	// 生成token

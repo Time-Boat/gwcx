@@ -26,7 +26,7 @@
 		<t:dgCol title="支付状态" field="orderPaystatus"  replace="已付款_0,退款中_1,已退款_2,未付款_3" align="center"></t:dgCol>
 		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
 		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
-		<t:dgCol title="所属线路id" field="lineId" align="center"></t:dgCol>
+		<%-- <t:dgCol title="所属线路id" field="lineId" align="center"></t:dgCol> --%>
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>

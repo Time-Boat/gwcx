@@ -98,14 +98,20 @@ public class APIHttpClient {
 //        j.addProperty("code", "9999");  
 //        arry.add(j);  
         
-        JsonObject j = new JsonObject();  
-        j.addProperty("orderStartingstationid", "402882f45b897e24015b89b27adf0010");  
-        j.addProperty("orderTerminusstationid", "402882f45b897e24015b89b2d55b0013");  
-        j.addProperty("orderStartime", "2011-01-01");  
+        //接送机订单测试
+        JsonObject j = new JsonObject();
+        j.addProperty("orderType", "0");  
+        j.addProperty("orderStartingStationId", "402882f45b897e24015b89b27adf0010");  
+        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b2d55b0013");  
+        j.addProperty("orderStartime", "2011-01-01 11:12:13");  
+        j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
         j.addProperty("orderUnitprice", 111);  
         j.addProperty("orderNumbers", "20");  
         j.addProperty("orderContactsname", "33333");  
         j.addProperty("orderContactsmobile", "15527916902");  
+        j.addProperty("orderFlightnumber", "");  
+        j.addProperty("orderTrainnumber", "Z-15");  
+        j.addProperty("orderPaytype", "1"); 
         
         System.out.println(ac.post(j.toString()));  
     }  
