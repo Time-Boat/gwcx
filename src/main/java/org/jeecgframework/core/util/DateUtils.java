@@ -118,7 +118,6 @@ public class DateUtils extends PropertyEditorSupport {
 		Date date = str2Date(str, date_sdf);
 		return new Timestamp(date.getTime());
 	}
-	
 	/**
 	 * 字符串转换成日期
 	 * @param str

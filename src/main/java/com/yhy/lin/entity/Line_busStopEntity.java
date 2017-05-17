@@ -9,6 +9,9 @@ import org.jeecgframework.core.common.entity.IdEntity;
 @Entity
 @Table(name="line_busstop")
 public class Line_busStopEntity extends IdEntity implements java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	/**线路id*/
 	private String lineId;
 	/**站点id*/

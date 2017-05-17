@@ -16,13 +16,13 @@ public interface AppGlobals {
 
 	/** 订单类型 */
 	/** 接机 */
-	public static final Integer AIRPORT_TO_DESTINATION_TYPE = 0;
+	public static final String AIRPORT_TO_DESTINATION_TYPE = "0";
 	/** 送机 */
-	public static final Integer DESTINATION_TO_AIRPORT_TYPE = 1;
+	public static final String DESTINATION_TO_AIRPORT_TYPE = "1";
 	/** 接火车 */
-	public static final Integer TRAIN_TO_DESTINATION_TYPE = 2;
+	public static final String TRAIN_TO_DESTINATION_TYPE = "2";
 	/** 送火车 */
-	public static final Integer DESTINATION_TO_TRAIN_TYPE = 3;
+	public static final String DESTINATION_TO_TRAIN_TYPE = "3";
 
 	/** 班车 */
 	/** 包车 */

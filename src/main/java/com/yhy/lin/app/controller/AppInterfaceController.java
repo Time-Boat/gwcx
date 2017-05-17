@@ -38,6 +38,7 @@ import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -288,10 +289,10 @@ public class AppInterfaceController extends BaseController {
 
 			List<Line_busStopEntity> list = null;
 			// 如果是接机或者接火车
-			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE == t.getOrderType() || AppGlobals.TRAIN_TO_DESTINATION_TYPE == t.getOrderType()) {
+			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE == (t.getOrderType()+"") || AppGlobals.TRAIN_TO_DESTINATION_TYPE == (t.getOrderType()+"")) {
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
-			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE == t.getOrderType() || AppGlobals.DESTINATION_TO_TRAIN_TYPE == t.getOrderType()) { // 送机
+			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE == (t.getOrderType()+"") || AppGlobals.DESTINATION_TO_TRAIN_TYPE == (t.getOrderType()+"")) { // 送机
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
 			}
@@ -337,24 +338,48 @@ public class AppInterfaceController extends BaseController {
 		String statusCode = "";
 		JSONObject data = new JSONObject();
 
-		String param;
 		try {
 			
-			String stationType = request.getParameter("stationType");  //0 所有站点，1火车站，2飞机场，3后台系统增加站点
+			String serveType = request.getParameter("serveType");  //出行服务类型    0：接机     1：送机      2：接火车     3：送货车
+			String stationId = request.getParameter("stationId");      //起点或终点id
 			
 			// 如果是接机或者接火车
-			if (StringUtil.isNotEmpty(stationType)) {
+			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
+//				List<BusStopInfoEntity> list = systemService.findByProperty(BusStopInfoEntity.class, "station_type", stationType);
 				
+				switch(serveType){
+					case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:     //接机
+						
+						List<Map<String,Object>> lineList = systemService.findForJdbc(
+								"select lf.id,lf.name,lf.price,lf.lineTimes from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
+								+ "where busStopsId=? and siteOrder=?", stationId,"0");
+						for(Map<String,Object> a : lineList){
+							a.get("id");
+							a.get("name");
+							a.get("price");
+							a.get("lineTimes");
+							
+							List<BusStopInfoEntity> stationList = systemService.findHql(" from BusStopInfoEntity where busStopsId=? and siteOrder='0' ", stationId);
+						}
+						
+						
+						break;
+					case AppGlobals.DESTINATION_TO_AIRPORT_TYPE:	 //送机
+						break;
+					case AppGlobals.TRAIN_TO_DESTINATION_TYPE:		 //接火车
+						break;
+					case AppGlobals.DESTINATION_TO_TRAIN_TYPE:	 	 //送火车
+						break;
+				}
+				
+				
+				statusCode = AppGlobals.APP_SUCCESS;
+				msg = "添加成功";
 			}else{
 				statusCode = "001";
-				msg = "stationType参数不能为空";
+				msg = "参数不能为空";
 			}
-			
-			systemService.save(t);
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = "添加成功";
-		} catch (IOException e) {
+		} catch (Exception e) {
 			statusCode = AppGlobals.APP_FAILED;
 			msg = "系统异常";
 			e.printStackTrace();

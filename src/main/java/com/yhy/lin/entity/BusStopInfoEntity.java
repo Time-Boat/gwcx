@@ -43,7 +43,7 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	private String stopLocation;
 	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
 //	private String hangingStatus;
-	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
+	/**站点类型  */
 	private String stationType;
 	
 	//主键生成策略：uuid 采用128位的uuid算法生成主键，uuid被编码为一个32位16进制数字的字符串。占用空间大（字符串类型）。   

@@ -22,7 +22,8 @@ public class MakeOrderNum {
 	 * 每毫秒生成订单号数量最大值
 	 */
 	private static int maxPerMSECSize = 1000;
-
+	
+	/**订单号生成前缀*/
 	// 接机
 	public static final String AIRPORT_TO_DESTINATION_ORDER = "JA";
 	// 送机
