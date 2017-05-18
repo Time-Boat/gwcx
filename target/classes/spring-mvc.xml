@@ -117,6 +117,8 @@
 						<value>app.do?getSmscode</value>
 						<value>app.do?appLogin</value>
 						<value>app.do?createOrder</value>
+						<value>app.do?getStationList</value>
+						
 					</list>
 				</property>
 			</bean>

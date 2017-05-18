@@ -47,10 +47,13 @@ public class BusStopInfoController extends BaseController {
 	@Autowired
 	private BusStopInfoServiceI busStopInfoService;
 	
+	//班车站点
 	@RequestMapping(params="busStopInfoList")
 	public ModelAndView stopList(HttpServletRequest request){
 		return new ModelAndView("yhy/busStop/busStopInfoList");
 	}
+	
+	//接送机
 	@RequestMapping(params="busStopInfoList2")
 	public ModelAndView stopList2(HttpServletRequest request){
 		return new ModelAndView("yhy/busStop/busStopInfoList2");

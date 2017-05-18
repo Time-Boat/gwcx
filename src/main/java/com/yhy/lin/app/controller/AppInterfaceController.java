@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,8 @@ import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
+import com.yhy.lin.app.entity.AppLineStationInfoEntity;
+import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
@@ -289,28 +292,30 @@ public class AppInterfaceController extends BaseController {
 
 			List<Line_busStopEntity> list = null;
 			// 如果是接机或者接火车
-			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE == (t.getOrderType()+"") || AppGlobals.TRAIN_TO_DESTINATION_TYPE == (t.getOrderType()+"")) {
+			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE == (t.getOrderType() + "")
+					|| AppGlobals.TRAIN_TO_DESTINATION_TYPE == (t.getOrderType() + "")) {
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
-			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE == (t.getOrderType()+"") || AppGlobals.DESTINATION_TO_TRAIN_TYPE == (t.getOrderType()+"")) { // 送机
+			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE == (t.getOrderType() + "")
+					|| AppGlobals.DESTINATION_TO_TRAIN_TYPE == (t.getOrderType() + "")) { // 送机
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
 			}
-			
+
 			String lId = list.get(0).getLineId();
 			List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
 			if (lList.size() > 0) {
 				t.setLineName(lList.get(0));
 			}
-			
+
 			t.setLineId(lId);
 			t.setApplicationTime(getDate());
 			t.setOrderType(1);
 
-			//order_paystatus
-			//order_numberPeople
-			//是不是要新增起点名称和终点名称两个字段
-			
+			// order_paystatus
+			// order_numberPeople
+			// 是不是要新增起点名称和终点名称两个字段
+
 			systemService.save(t);
 
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -327,8 +332,8 @@ public class AppInterfaceController extends BaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
-	
-	// 获取站点信息  
+
+	// 获取线路站点信息
 	@RequestMapping(params = "getStationList")
 	public void getStationList(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -339,43 +344,62 @@ public class AppInterfaceController extends BaseController {
 		JSONObject data = new JSONObject();
 
 		try {
-			
-			String serveType = request.getParameter("serveType");  //出行服务类型    0：接机     1：送机      2：接火车     3：送货车
-			String stationId = request.getParameter("stationId");      //起点或终点id
-			
+			// 出行服务类型 0：接机 1：送机 2：接火车 3：送货车
+			String serveType = request.getParameter("serveType");
+			// 起点或终点id
+			String stationId = request.getParameter("stationId");
+
 			// 如果是接机或者接火车
 			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
-//				List<BusStopInfoEntity> list = systemService.findByProperty(BusStopInfoEntity.class, "station_type", stationType);
+
+				List<AppLineStationInfoEntity> lList = new ArrayList<AppLineStationInfoEntity>();
+				List<AppStationInfoEntity> sList = new ArrayList<AppStationInfoEntity>();
 				
-				switch(serveType){
-					case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:     //接机
-						
-						List<Map<String,Object>> lineList = systemService.findForJdbc(
-								"select lf.id,lf.name,lf.price,lf.lineTimes from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-								+ "where busStopsId=? and siteOrder=?", stationId,"0");
-						for(Map<String,Object> a : lineList){
-							a.get("id");
-							a.get("name");
-							a.get("price");
-							a.get("lineTimes");
-							
-							List<BusStopInfoEntity> stationList = systemService.findHql(" from BusStopInfoEntity where busStopsId=? and siteOrder='0' ", stationId);
-						}
-						
-						
-						break;
-					case AppGlobals.DESTINATION_TO_AIRPORT_TYPE:	 //送机
-						break;
-					case AppGlobals.TRAIN_TO_DESTINATION_TYPE:		 //接火车
-						break;
-					case AppGlobals.DESTINATION_TO_TRAIN_TYPE:	 	 //送火车
-						break;
+//				String 
+				
+				switch (serveType) {
+				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE: // 接机
+					
+					
+					break;
+				case AppGlobals.DESTINATION_TO_AIRPORT_TYPE: // 送机
+					
+					break;
+				case AppGlobals.TRAIN_TO_DESTINATION_TYPE: // 接火车
+					break;
+				case AppGlobals.DESTINATION_TO_TRAIN_TYPE: // 送火车
+					break;
 				}
 				
+				List<Map<String, Object>> lineList = systemService.findForJdbc(
+						"select lf.id,lf.name,lf.price,lf.lineTimes from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
+								+ "where busStopsId=? and siteOrder=?",
+						stationId, "0");
+				for (Map<String, Object> a : lineList) {
+					
+					AppLineStationInfoEntity asi = new AppLineStationInfoEntity();
+					
+					asi.setId(a.get("id") + "");
+					asi.setName(a.get("name") + "");
+					asi.setPrice(a.get("price") + "");
+					asi.setLineTimes(a.get("lineTimes") + "");
+					lList.add(asi);
+
+					List<AppStationInfoEntity> stationList = systemService
+							.findHql("from AppStationInfoEntity where lineId=? and siteOrder!=? ", asi.getId(), 0);
+
+					// 不知道出了什么问题 lineId没改动 下面手动的去改变一下
+					for (AppStationInfoEntity b : stationList) {
+						b.setLineId(asi.getId());
+					}
+					sList.addAll(stationList);
+				}
+				data.put("lineInfo", lList);
+				data.put("stationInfo", sList);
 				
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = "添加成功";
-			}else{
+			} else {
 				statusCode = "001";
 				msg = "参数不能为空";
 			}
@@ -391,7 +415,7 @@ public class AppInterfaceController extends BaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
-	
+
 	/**
 	 * 计算两个时间之间的差值，根据标志的不同而不同
 	 * 
