@@ -118,6 +118,9 @@
 						<value>app.do?appLogin</value>
 						<value>app.do?createOrder</value>
 						<value>app.do?getStationList</value>
+						<value>app.do?getCitys</value>
+						
+						<value>app.do?getPTStation</value>
 						
 					</list>
 				</property>

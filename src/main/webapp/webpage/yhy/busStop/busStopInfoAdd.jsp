@@ -39,6 +39,22 @@
 		</tr>
 		<tr>
 			<td align="right">
+				<label class="Validform_label"> 选择线路城市: </label>
+			</td>
+			<td class="value">
+				<select name="city">
+						<option value="">--请选择城市--</option>
+						<c:forEach var="c" items="${cities}">
+							<option value="${c.cityId}" <c:if test="${busStopInfo.cityId == c.cityId}" >selected="selected"</c:if>  >
+								${c.cityName}
+							</option>
+						</c:forEach>
+				</select> 
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
 				<label class="Validform_label"> 站点备注: </label>
 			</td>
 			<td class="value">

@@ -6,7 +6,7 @@
 <title>新增验票员</title>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 </head>
-<body style="overflow-y: hidden" scroll="no">
+<body style="" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?save">
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
@@ -107,6 +107,23 @@
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 选择线路城市: </label>
+			</td>
+			<td class="value">
+				<select name="city" datatype="*">
+						<option value="">--请选择城市--</option>
+						<c:forEach var="c" items="${cities}" >
+							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if> >
+								${c.cityName}
+							</option>
+						</c:forEach>
+				</select> 
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		
 		
 		<%-- <tr>
 			<td align="right">

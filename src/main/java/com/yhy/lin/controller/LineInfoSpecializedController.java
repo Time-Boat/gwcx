@@ -16,7 +16,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.LineInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -72,7 +74,9 @@ public class LineInfoSpecializedController extends BaseController{
 			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
 			req.setAttribute("lineInfo", lineInfo);
 		}
-		List<TSDepart>  list = systemService.findByProperty(TSDepart.class, "orgType", "4");
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
+		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
 		if(list.size()>0){
 			req.setAttribute("list", list);
 		}

@@ -1,5 +1,6 @@
 package com.yhy.lin.service.impl;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +22,56 @@ import net.sf.json.JSONObject;
 public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStopInfoServiceI{
 	@Autowired
 	private JdbcDao jdbcDao;
+	@Override
+	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid){
+		String sqlWhere = getBusSqlWhere(busStopInfo);
+		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
+		String sqlCnt = "select count(*) from busstopinfo a ";
+		if (!sqlWhere.isEmpty()) {
+			sqlCnt += " where" + sqlWhere;
+		}
+		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		// 取出当前页的数据 
+		String sql = "select * from busstopinfo a ";
+		if (!sqlWhere.isEmpty()) {
+			sql += " where" + sqlWhere;
+		}
+		
+		//排序
+		if(StringUtil.isNotEmpty(dataGrid.getSort()) && StringUtil.isNotEmpty(dataGrid.getOrder()) ){
+			sql += " order by " + dataGrid.getSort() + " " + dataGrid.getOrder();
+		}
+		
+		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
+		// 将结果集转换成页面上对应的数据集
+				Db2Page[] db2Pages = {
+						new Db2Page("id","id")
+						,new Db2Page("name", "name", null)
+						,new Db2Page("remark", "remark", null)
+						,new Db2Page("status", "status", null)	
+						,new Db2Page("createTime", "createTime", null)
+						,new Db2Page("createPeople", "createPeople", null)
+						,new Db2Page("stopLocation", "stopLocation", null)
+						,new Db2Page("stationType", "stationType", null)
+						,new Db2Page("cityId", "cityId", null)
+						,new Db2Page("cityName", "cityName", null)
+				};
+		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+		return jObject;
+	}
+
+	public String getBusSqlWhere(BusStopInfoEntity busStopInfo) {
+		StringBuffer sqlWhere = new StringBuffer(" a.deleteFlag='0' ");
+
+		if (StringUtil.isNotEmpty(busStopInfo.getName())) {
+			
+			sqlWhere.append(" and  a.name like '%"+busStopInfo.getName()+"%'");
+		}
+		if (StringUtil.isNotEmpty(busStopInfo.getCityName())) {
+			sqlWhere.append(" and  a.cityName like '%" + busStopInfo.getCityName() + "%' ");
+		}
+		return sqlWhere.toString();
+	}
 	
 	//根据线路lineInfoId，拿到对应线路的站点信息  
 	@Override
@@ -40,6 +91,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 			sql += " where" + sqlWhere;
 		}
 		sql +=" order by b.siteOrder is NULL,b.siteOrder ";
+		
 		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
 
 		// 将结果集转换成页面上对应的数据集
@@ -65,10 +117,11 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	
 	//根据线路lineInfoId，拿到对应线路的未挂接的站点信息   
 	@Override
-	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType){
-		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType);
+	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType,String cityId){
+		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType,cityId);
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
+		//where c.lineId is NULL 这个条件是为了不重复添加站点
 		String sqlCnt = "select count(*) from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL ";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt +=  sqlWhere;
@@ -95,9 +148,11 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return jObject;
 	}
 	
-	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType){
+	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,String cityId){
 		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' "); 
-		
+		if(StringUtil.isNotEmpty(cityId)){
+			sqlWhere.append(" and  a.cityId = '"+cityId+"' ");
+		}
 		//线路类型
 		if(StringUtil.isNotEmpty(lineType)){
 			sqlWhere.append(" and  a.status != '"+lineType+"' ");

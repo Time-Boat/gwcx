@@ -28,8 +28,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
 import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
+
+import net.sf.json.JSONObject;
 
 /**
  * 站点信息管理
@@ -61,13 +65,15 @@ public class BusStopInfoController extends BaseController {
 	
 	@RequestMapping(params="datagrid")
 	public void datagrid(BusStopInfoEntity busStopInfo,HttpServletRequest request,HttpServletResponse response,DataGrid dataGrid){
-		CriteriaQuery cq = new CriteriaQuery(BusStopInfoEntity.class, dataGrid);
+		/*CriteriaQuery cq = new CriteriaQuery(BusStopInfoEntity.class, dataGrid);
 	    //查询出来所有逻辑为删除的 
 		//cq.eq("deleteFlag", Globals.Delete_Normal);
 		//查询条件组装器
 		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, busStopInfo,request.getParameterMap());
 		this.busStopInfoService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		TagUtil.datagrid(response, dataGrid);*/
+		JSONObject jObject = busStopInfoService.getDatagrid(busStopInfo, dataGrid);
+		responseDatagrid(response, jObject);
 	}
 	
 	/**
@@ -134,8 +140,6 @@ public class BusStopInfoController extends BaseController {
 		return j;
 	}
 	
-	
-	
 	/**
 	 * 去站点添加页面
 	 * 
@@ -150,6 +154,8 @@ public class BusStopInfoController extends BaseController {
 			busStopInfo = busStopInfoService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
 			req.setAttribute("busStopInfo", busStopInfo);
 		}
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/busStop/busStopInfoAdd");
 	}
 	
@@ -163,6 +169,14 @@ public class BusStopInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		busStopInfo.setDeleteFlag((short)0);
 		busStopInfo.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
+		String cityId = request.getParameter("city");
+		if(StringUtil.isNotEmpty(cityId)){
+			CitiesEntity listCity = systemService.findUniqueByProperty(CitiesEntity.class, "cityId", cityId);
+			if (StringUtil.isNotEmpty(listCity)) {
+				busStopInfo.setCityId(cityId);
+				busStopInfo.setCityName(listCity.getCity());
+			}
+		}
 		if(StringUtil.isNotEmpty(busStopInfo.getId())){
 			try{
 				BusStopInfoEntity l = busStopInfoService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
@@ -238,7 +252,11 @@ public class BusStopInfoController extends BaseController {
 		        }
 		        //原设定是修改站点的挂接状态，占时不适用   (为啥不适用呢...)
 		        System.out.println("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
-		        systemService.updateBySqlString("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
+		        StringBuffer updateSql = new StringBuffer("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+") ");
+		        //只有站点类型是普通站点的时候，才修改它的状态，让其只能在一条线路中使用
+		        //如果是机场站点或者火车站点，则可以重复使用
+		        updateSql.append(" and station_type = '0' ");
+		        systemService.updateBySqlString(updateSql.toString());
 		        
 		        systemService.saveAllEntitie(list);
 		        message="站点挂接成功";

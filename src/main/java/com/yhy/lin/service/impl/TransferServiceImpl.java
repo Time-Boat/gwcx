@@ -7,6 +7,7 @@ import java.util.Map;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,15 +31,18 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		String sqlWhere = getWhere(transferorder,fc_begin,fc_end,ddTime_begin,ddTime_end);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id  ";
+		String sqlCnt = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+				+ " left join driversinfo d on b.driverId =d.id  "
+				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId " ;
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
+		sql.append("select t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_numberPeople,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name ");
-		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
+		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
+				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
 		if (!sqlWhere.isEmpty()){
 			sql.append(sqlWhere);
 		}
@@ -79,7 +83,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	public String  getWhere(TransferorderEntity transferorder,String fc_begin,String fc_end,String ddTime_begin,String ddTime_end){
-		StringBuffer sql = new StringBuffer(" where 1=1 ");
+		
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
+		StringBuffer sql = new StringBuffer(" where 1=1 and t.org_code like '" + orgCode + "%' ");
+		
 		//发车时间
 		if(StringUtil.isNotEmpty(fc_begin)&&StringUtil.isNotEmpty(fc_end)){
 			sql.append(" and a.order_startime between '"+fc_begin+"' and '"+fc_end+"'");

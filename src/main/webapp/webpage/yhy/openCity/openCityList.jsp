@@ -8,7 +8,7 @@
    <t:dgCol title="省名称" field="provinceName" width="120"></t:dgCol>
    <t:dgCol title="城市名称" field="cityName" width="120"></t:dgCol>
    <t:dgCol title="城市开通业务id" field="cityBusiness" width="120"></t:dgCol>
-   <t:dgCol title="城市开通状态" field="state" width="120" dictionary="openCity" ></t:dgCol>
+   <t:dgCol title="城市开通状态" field="status" width="120" dictionary="openCity" ></t:dgCol>
    <t:dgCol title="备注" field="remark"   width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
    <t:dgDelOpt title="删除" url="openCityController.do?del&id={id}" />

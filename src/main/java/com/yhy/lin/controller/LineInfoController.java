@@ -23,10 +23,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.alibaba.druid.pool.vendor.SybaseExceptionSorter;
 import com.google.gson.Gson;
 import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
 import com.yhy.lin.service.LineInfoServiceI;
 
@@ -190,6 +193,9 @@ public class LineInfoController extends BaseController {
 			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
 			req.setAttribute("lineInfo", lineInfo);
 		}
+		//获取已开通的城市列表
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
 		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
 		if (list.size() > 0) {
 			req.setAttribute("list", list);
@@ -209,6 +215,14 @@ public class LineInfoController extends BaseController {
 		lineInfo.setDepartId(ResourceUtil.getSessionUserName().getCurrentDepart().getId());
 		lineInfo.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
 		String settledCompanyId = request.getParameter("settledCompany");// 合作公司的id
+		String cityId = request.getParameter("city");
+		if(StringUtil.isNotEmpty(cityId)){
+			List<CitiesEntity> listCity = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
+			if (StringUtil.isNotEmpty(listCity)) {
+				lineInfo.setCityId(cityId);
+				lineInfo.setCityName(listCity.get(0).getCity());
+			}
+		}
 		if (StringUtil.isNotEmpty(settledCompanyId)) {
 			TSDepart t = systemService.getEntity(TSDepart.class, settledCompanyId);
 			if (StringUtil.isNotEmpty(t)) {
@@ -303,9 +317,13 @@ public class LineInfoController extends BaseController {
 	public void nullTobusStopInfoList(BusStopInfoEntity busStopInfo, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
 		String lineInfoId = request.getParameter("lineInfoId");
-		String lineType = request.getParameter("lineType");
-		JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType);
-		responseDatagrid(response, jObject);
+		if(StringUtil.isNotEmpty(lineInfoId)){
+			LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
+			String lineType = request.getParameter("lineType");
+			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType,lineInfo.getCityId());
+			responseDatagrid(response, jObject);
+		}
+		
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package com.yhy.lin.app.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,13 +8,24 @@ import java.util.List;
 * @author Administrator
 * @date 2017年5月17日 下午2:23:03
 */
-public class AppLineStationInfoEntity {
+public class AppLineStationInfoEntity implements Serializable{
 
+	private static final long serialVersionUID = 1L;
+	
 	private String id;
 	private String name;
 	private String price;
 	private String lineTimes;
+	private String stationType;
 	
+	public String getStationType() {
+		return stationType;
+	}
+
+	public void setStationType(String stationType) {
+		this.stationType = stationType;
+	}
+
 	public String getId() {
 		return id;
 	}

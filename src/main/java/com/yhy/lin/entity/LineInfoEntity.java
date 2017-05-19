@@ -61,6 +61,11 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	//入驻公司姓名
 	private String  settledCompanyName;
 	
+
+	private String  cityId;
+	
+	private String  cityName;
+	
 	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
@@ -209,6 +214,20 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	}
 	public void setSettledCompanyName(String settledCompanyName) {
 		this.settledCompanyName = settledCompanyName;
+	}
+	@Column(name = "cityId" )
+	public String getCityId() {
+		return cityId;
+	}
+	public void setCityId(String cityId) {
+		this.cityId = cityId;
+	}
+	@Column(name = "cityName")
+	public String getCityName() {
+		return cityName;
+	}
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
 	}
 	
 	

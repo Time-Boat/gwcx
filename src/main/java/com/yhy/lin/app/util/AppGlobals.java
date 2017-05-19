@@ -11,18 +11,23 @@ public interface AppGlobals {
 	/** app 返回状态 */
 	/** 返回成功 */
 	public static final String APP_SUCCESS = "000";
+	/** 请求成功消息 */
+	public static final String APP_SUCCESS_MSG = "请求成功";
 	/** 系统异常 */
-	public static final String APP_FAILED = "999";
-
+	public static final String SYSTEM_ERROR = "999";
+	/** 系统异常消息 */
+	public static final String SYSTEM_ERROR_MSG = "系统异常";
+	
+	
 	/** 订单类型 */
 	/** 接机 */
-	public static final String AIRPORT_TO_DESTINATION_TYPE = "0";
+	public static final String AIRPORT_TO_DESTINATION_TYPE = "2";
 	/** 送机 */
-	public static final String DESTINATION_TO_AIRPORT_TYPE = "1";
+	public static final String DESTINATION_TO_AIRPORT_TYPE = "3";
 	/** 接火车 */
-	public static final String TRAIN_TO_DESTINATION_TYPE = "2";
+	public static final String TRAIN_TO_DESTINATION_TYPE = "4";
 	/** 送火车 */
-	public static final String DESTINATION_TO_TRAIN_TYPE = "3";
+	public static final String DESTINATION_TO_TRAIN_TYPE = "5";
 
 	/** 班车 */
 	/** 包车 */

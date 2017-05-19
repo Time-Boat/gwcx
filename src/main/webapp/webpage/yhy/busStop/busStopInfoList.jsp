@@ -11,8 +11,9 @@
 	<t:dgCol title="站点名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="站点地址" field="stopLocation"  align="center" width="120"></t:dgCol>
 	<%-- <t:dgCol title="状态" field="status" replace="启用_0,禁用_1" align="center" query="true"  width="60"></t:dgCol> --%>
-	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center" width="200"></t:dgCol>
+	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"  align="center" width="200"></t:dgCol>
 	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
+	<t:dgCol title="所在城市" field="cityName" query="true" align="center"></t:dgCol>
 	<t:dgCol title="备注" field="remark" align="center" width="80"></t:dgCol>
 	<t:dgToolBar operationCode="add" title="添加站点" icon="icon-add" url="busStopInfoController.do?addorupdate" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="修改站点" icon="icon-edit" url="busStopInfoController.do?addorupdate" funname="update"></t:dgToolBar>

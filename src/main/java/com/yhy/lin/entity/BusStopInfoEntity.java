@@ -43,19 +43,12 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	private String stopLocation;
 	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
 //	private String hangingStatus;
-	/**站点类型  */
+	/**站点类型  0 普通站点      1 火车站点       2机场站点*/
 	private String stationType;
 	
-	/**站点所属城市*/
-	private String stationCity;
+	private String  cityId;
 	
-	@Column(name="station_city_id",nullable=true,length=50)
-	public String getStationCity() {
-		return stationCity;
-	}
-	public void setStationCity(String stationCity) {
-		this.stationCity = stationCity;
-	}
+	private String  cityName;
 	
 	//主键生成策略：uuid 采用128位的uuid算法生成主键，uuid被编码为一个32位16进制数字的字符串。占用空间大（字符串类型）。   
 	@Id
@@ -147,5 +140,21 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	public void setStationType(String stationType) {
 		this.stationType = stationType;
 	}
+	@Column(name="cityId")
+	public String getCityId() {
+		return cityId;
+	}
+	public void setCityId(String cityId) {
+		this.cityId = cityId;
+	}
+	@Column(name="cityName")
+	public String getCityName() {
+		return cityName;
+	}
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+	
+	
 	
 }

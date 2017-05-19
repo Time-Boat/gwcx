@@ -37,7 +37,7 @@ public class OpenCityEntity implements java.io.Serializable {
 	/**城市开通业务id*/
 	private java.lang.String cityBusiness;
 	/**城市开通状态*/
-	private java.lang.String state;
+	private java.lang.String status;
 	/**备注*/
 	private java.lang.String remark;
 	
@@ -145,17 +145,17 @@ public class OpenCityEntity implements java.io.Serializable {
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  城市开通状态
 	 */
-	@Column(name ="STATE",nullable=true,length=1)
-	public java.lang.String getState(){
-		return this.state;
+	@Column(name ="STATUS",nullable=true,length=1)
+	public java.lang.String getStatus(){
+		return this.status;
 	}
 
 	/**
 	 *方法: 设置java.lang.String
 	 *@param: java.lang.String  城市开通状态
 	 */
-	public void setState(java.lang.String state){
-		this.state = state;
+	public void setStatus(java.lang.String status){
+		this.status = status;
 	}
 	/**
 	 *方法: 取得java.lang.String

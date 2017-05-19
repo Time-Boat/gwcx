@@ -34,10 +34,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		 sql.append("select a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
+		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
 		 		+ "a.endY,a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
 		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName ");
-		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID where 1=1 ");
+		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId where 1=1 ");
 		 
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -67,6 +67,9 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("lineTimes", "lineTimes", null)
 				,new Db2Page("settledCompanyId", "settledCompanyId", null)
 				,new Db2Page("settledCompanyName", "settledCompanyName", null)
+				,new Db2Page("city", "city", null)
+				,new Db2Page("cityId", "cityId", null)
+				
 				
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

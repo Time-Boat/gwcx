@@ -3,7 +3,6 @@ package com.yhy.lin.app.controller;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -23,9 +22,7 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -41,9 +38,8 @@ import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
-import com.yhy.lin.entity.BusStopInfoEntity;
-import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -98,8 +94,9 @@ public class AppInterfaceController extends BaseController {
 						Date date = user.getCodeUpdateTime();
 						int m = compareDate(DateUtils.getDate(), date, 'm');
 						// 30分钟的有效期验证
-						if (m < 30 && user.getStatus().equals("0") && code.equals(user.getSecurityCode())) {
-
+						// if (m < 30 && user.getStatus().equals("0") &&
+						// code.equals(user.getSecurityCode())) {
+						if (m > 30 && user.getStatus().equals("1") && code.equals(user.getSecurityCode())) { // 测试
 							String sql = "";
 							String curTime = getCurTime();
 							String token = "";
@@ -140,19 +137,6 @@ public class AppInterfaceController extends BaseController {
 							// }
 							// if (user != null &&
 							// user.getPassword().equals(pwd) && sign != null) {
-							//
-							// // 修改登陆用户手机类型
-							// try {
-							// // 登陆手机类型
-							// if (StringUtil.Null2Blank(OSType).length() > 0) {
-							// // String sql = "update t_s_user set
-							// // OSType='" +
-							// // OSType + "' where id='" +
-							// // user.getId() + "'";
-							// // infService.executeSql(sql);
-							// }
-							// } catch (Exception e) {
-							// }
 
 							// 添加登陆日志
 							// String message = "app手机用户: " + user.getUserName()
@@ -162,6 +146,11 @@ public class AppInterfaceController extends BaseController {
 
 							msg = "登录成功!";
 							data.put("token", token);
+							data.put("userId", user.getUserId());
+							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+							data.put("phone", user.getPhone());
 							statusCode = AppGlobals.APP_SUCCESS;
 						} else {
 							msg = "验证码不正确！";
@@ -182,7 +171,7 @@ public class AppInterfaceController extends BaseController {
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = "登陆异常";
-			statusCode = AppGlobals.APP_FAILED;
+			statusCode = AppGlobals.SYSTEM_ERROR;
 		}
 
 		returnJsonObj.put("code", statusCode);
@@ -292,12 +281,12 @@ public class AppInterfaceController extends BaseController {
 
 			List<Line_busStopEntity> list = null;
 			// 如果是接机或者接火车
-			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE == (t.getOrderType() + "")
-					|| AppGlobals.TRAIN_TO_DESTINATION_TYPE == (t.getOrderType() + "")) {
+			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")
+					|| AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")) {
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
-			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE == (t.getOrderType() + "")
-					|| AppGlobals.DESTINATION_TO_TRAIN_TYPE == (t.getOrderType() + "")) { // 送机
+			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType() + "")
+					|| AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType() + "")) { // 送机||送火车
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
 			}
@@ -312,17 +301,82 @@ public class AppInterfaceController extends BaseController {
 			t.setApplicationTime(getDate());
 			t.setOrderType(1);
 
-			// order_paystatus
-			// order_numberPeople
+			// order_paystatus 支付类型
+			// order_numberPeople 支付人数
 			// 是不是要新增起点名称和终点名称两个字段
+			// 订单的城市要不要加一个
 
 			systemService.save(t);
 
 			statusCode = AppGlobals.APP_SUCCESS;
-			msg = "添加成功";
+			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (IOException e) {
-			statusCode = AppGlobals.APP_FAILED;
-			msg = "系统异常";
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (data.size() > 0) {
+			returnJsonObj.put("data", data.toString());
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	// 获取机场站点或者火车站站点信息
+	@RequestMapping(params = "getPTStation")
+	public void getPTStation(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+
+		try {
+			//2： 接机            3：送机          4：接火车         5：送火车
+			String serveType = request.getParameter("serveType");
+			// 所属城市
+			String cityId = request.getParameter("cityId");
+			
+			if (StringUtil.isNotEmpty(serveType) ) {
+
+				List<AppStationInfoEntity> lList = new ArrayList<AppStationInfoEntity>();
+				
+				//查找指定类型的线路
+				List<Map<String, Object>> lineList = systemService.findForJdbc(
+						" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y "
+								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
+								+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 group by lb.busStopsId "
+								, cityId, serveType, getStationType(serveType));
+				
+				for (Map<String, Object> a : lineList) {
+					AppStationInfoEntity asi = new AppStationInfoEntity();
+					asi.setId(a.get("id") + "");
+					asi.setName(a.get("name") + "");
+					asi.setLineId(a.get("lineId") + "");
+					asi.setStopLocation(AppUtil.Null2Blank(a.get("stopLocation") + ""));
+					asi.setX(AppUtil.Null2Blank(a.get("x") + ""));
+					asi.setY(AppUtil.Null2Blank(a.get("y") + ""));
+					
+					lList.add(asi);
+				}
+
+				data.put("PTStation", lList);
+
+				statusCode = AppGlobals.APP_SUCCESS;
+				msg = AppGlobals.APP_SUCCESS_MSG;
+			} else {
+				statusCode = "001";
+				msg = "参数不能为空";
+			}
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
 
@@ -344,45 +398,49 @@ public class AppInterfaceController extends BaseController {
 		JSONObject data = new JSONObject();
 
 		try {
-			// 出行服务类型 0：接机 1：送机 2：接火车 3：送货车
+			// 出行服务类型 2：接机 3：送机 4：接火车 5：送火车
 			String serveType = request.getParameter("serveType");
 			// 起点或终点id
 			String stationId = request.getParameter("stationId");
+			// 所属城市
+			String cityId = request.getParameter("cityId");
 
 			// 如果是接机或者接火车
 			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
 
 				List<AppLineStationInfoEntity> lList = new ArrayList<AppLineStationInfoEntity>();
 				List<AppStationInfoEntity> sList = new ArrayList<AppStationInfoEntity>();
-				
-//				String 
-				
+
 				switch (serveType) {
 				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE: // 接机
-					
-					
+
 					break;
 				case AppGlobals.DESTINATION_TO_AIRPORT_TYPE: // 送机
-					
+
 					break;
 				case AppGlobals.TRAIN_TO_DESTINATION_TYPE: // 接火车
+					
 					break;
 				case AppGlobals.DESTINATION_TO_TRAIN_TYPE: // 送火车
+					
 					break;
 				}
 				
+				// 查出所有起点的线路id信息
 				List<Map<String, Object>> lineList = systemService.findForJdbc(
-						"select lf.id,lf.name,lf.price,lf.lineTimes from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-								+ "where busStopsId=? and siteOrder=?",
-						stationId, "0");
+						" select lf.id,lf.name,lf.price,lf.lineTimes,bi.station_type "
+								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
+								+ " where busStopsId=? and lf.cityId=? and lf.deleteFlag=0 and bi.deleteFlag=0 ",
+						stationId, cityId);
 				for (Map<String, Object> a : lineList) {
-					
+
 					AppLineStationInfoEntity asi = new AppLineStationInfoEntity();
-					
+
 					asi.setId(a.get("id") + "");
 					asi.setName(a.get("name") + "");
-					asi.setPrice(a.get("price") + "");
-					asi.setLineTimes(a.get("lineTimes") + "");
+					asi.setPrice(AppUtil.Null2Blank(a.get("price") + ""));
+					asi.setLineTimes(AppUtil.Null2Blank(a.get("lineTimes") + ""));
+					asi.setStationType(a.get("station_type") + "");
 					lList.add(asi);
 
 					List<AppStationInfoEntity> stationList = systemService
@@ -396,16 +454,16 @@ public class AppInterfaceController extends BaseController {
 				}
 				data.put("lineInfo", lList);
 				data.put("stationInfo", sList);
-				
+
 				statusCode = AppGlobals.APP_SUCCESS;
-				msg = "添加成功";
+				msg = AppGlobals.APP_SUCCESS_MSG;
 			} else {
 				statusCode = "001";
 				msg = "参数不能为空";
 			}
 		} catch (Exception e) {
-			statusCode = AppGlobals.APP_FAILED;
-			msg = "系统异常";
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
 
@@ -414,6 +472,134 @@ public class AppInterfaceController extends BaseController {
 		returnJsonObj.put("data", data.toString());
 
 		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 获取开通业务城市列表 */
+	@RequestMapping(params = "getCitys")
+	public void getCitys(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		// JSONObject data = new JSONObject();
+		List<OpenCityEntity> oList = null;
+		try {
+			oList = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (oList != null && oList.size() > 0) {
+			returnJsonObj.put("data", oList);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 获取用户订单详情 */
+	@RequestMapping(params = "getOrderDetail")
+	public void getOrderDetail(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+		List<OpenCityEntity> oList = null;
+		try {
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (oList != null && oList.size() > 0) {
+			returnJsonObj.put("data", oList);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 获取用户订单列表 get */
+	@RequestMapping(params = "getOrderList")
+	public void getOrderList(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+		List<OpenCityEntity> oList = null;
+		try {
+			String token = request.getParameter("token");
+			String userId = request.getParameter("userId");
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (oList != null && oList.size() > 0) {
+			returnJsonObj.put("data", oList);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 站点类型转换 
+	 * 	线路类型 转 站点类型
+	 */
+	public String getStationType(String lineType){
+		//
+		switch (lineType) {
+		case "2":
+		case "3":
+			return "2";
+		case "4":
+		case "5":
+			return "5";
+		default:
+			return lineType;
+		}
+	}
+	
+	/** 验证token是否有效 */
+	public boolean checkToken(String token) {
+
+		CarCustomerEntity cc = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
+		if (cc == null)
+			return false;
+
+		Date date = cc.getTokenUpdateTime();
+		int day = compareDate(date, new Date(), 'd');
+		if (day <= 30)
+			return true;
+
+		return false;
 	}
 
 	/**
@@ -429,7 +615,7 @@ public class AppInterfaceController extends BaseController {
 	 */
 	public static int compareDate(Date d1, Date d2, char flag) {
 
-		long diff = d1.getTime() - d2.getTime();
+		long diff = Math.abs(d1.getTime() - d2.getTime());
 
 		if (flag == 'd') {
 			return (int) (diff / 24 * 3600 * 1000);

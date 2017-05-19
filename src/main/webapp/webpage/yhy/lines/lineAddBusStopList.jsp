@@ -67,9 +67,9 @@ function delZd(id,line_busstopId){
 					var obj = eval('(' + data + ')');
 					//alert(obj.msg);
 					tip(obj.msg);
+					$('#roleUserList').datagrid('reload');
 				}
 			);		
-  			$('#roleUserList').datagrid('reload');
 	    }
 	});
 	

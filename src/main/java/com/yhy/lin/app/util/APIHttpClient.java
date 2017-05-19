@@ -18,11 +18,15 @@ import com.google.gson.JsonObject;
 public class APIHttpClient {  
   
     // 接口地址 
+	//登录接口
+	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
 	//订单接口地址
-    //private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+    private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
     //线路站点信息地址
-    private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
-    
+    //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
+    //获取机场站点或者火车站站点信息
+	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getPTStation";
+	
     private Log logger = LogFactory.getLog(this.getClass());  
     private static final String pattern = "yyyy-MM-dd HH:mm:ss:SSS";  
     private HttpClient httpClient = null;  
@@ -96,19 +100,20 @@ public class APIHttpClient {
   
     public static void main(String[] args) {  
     	//线路站点信息测试
-      	apiURL += "&serveType=0&stationId=402882f45b897e24015b89b1e26d000a";
+      	apiURL += "&serveType=2&cityId=520100";
       	
         APIHttpClient ac = new APIHttpClient(apiURL);  
         JsonArray arry = new JsonArray();  
         JsonObject j = new JsonObject();  
+        //登录接口
 //        j.addProperty("mobile", "15527916902");  
-//        j.addProperty("code", "9999");  
+//        j.addProperty("code", "1325");  
 //        arry.add(j);  
         
         //接送机订单测试
 //        j.addProperty("orderType", "0");  
-//        j.addProperty("orderStartingStationId", "402882f45b897e24015b89b27adf0010");  
-//        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b2d55b0013");  
+//        j.addProperty("orderStartingStationId", "2c9a500d5bf61df2015bf6b91b85003c");  
+//        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b1e26d000a");  
 //        j.addProperty("orderStartime", "2011-01-01 11:12:13");  
 //        j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
 //        j.addProperty("orderUnitprice", 111);  

@@ -29,7 +29,6 @@ public class AppStationInfoEntity implements java.io.Serializable {
 	private String y;
 	/**站点地址*/
 	private String stopLocation;
-	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
 	
 	/**线路id*/
 	private String lineId;

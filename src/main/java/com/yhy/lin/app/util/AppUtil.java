@@ -100,4 +100,31 @@ public class AppUtil {
 		return param;
 	}
 	
+	/**
+	 * 将值为null的字符串转为空字符串
+	 *
+	 * @param srcString
+	 *            Description of the Parameter
+	 * @return Description of the Return Value
+	 */
+	public static String Null2Blank(String srcString) {
+		if (srcString == null || srcString.trim().equals("") || srcString.trim().equalsIgnoreCase("null")) {
+			return "";
+		} else {
+			return srcString.trim();
+		}
+	}
+	
+	//null转0
+	public static float StrToZero(String srcString) {
+		float f = 0;
+		if (Null2Blank(srcString).length() > 0) {
+			try {
+				f = Float.parseFloat(srcString);
+			} catch (Exception e) {
+			}
+		}
+		return f;
+	}
+	
 }

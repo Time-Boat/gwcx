@@ -41,14 +41,14 @@
   	            		$("#cityId").append($("<option value='"+data[i].cityId+"'>"+data[i].city+"</option>")); 
   	            	}
   	            }
-  	            console.log($('#cityId option:selected').text());
-  	            changeCity();
+  	            //console.log($('#cityId option:selected').text());
   	      }
   	     }); 
   	}
   
   	function changeCity(){
   		$('#cityName').val($('#cityId option:selected').text());
+  		console.log($('#cityId option:selected').text());
   	}
   	
   </script>
@@ -94,7 +94,7 @@
 					<td class="value">
 						<%-- <input class="inputxt" id="cityId" name="cityId" ignore="ignore"
 							   value="${openCityPage.cityName}"> --%>
-					    <select id="cityId" name="cityId" datatype="*" >
+					    <select id="cityId" name="cityId" datatype="*" onchange="changeCity();">
 							<option value="">---请选择城市----</option>
 							<c:forEach items="${cities}" var="c" >
 								<option value="${c.cityId}" <c:if test="${c.cityId == openCityPage.cityId}" >selected="selected"</c:if> >${c.city}</option>
@@ -168,7 +168,7 @@
 						</label>
 					</td>
 					<td class="value">
-					    <t:dictSelect field="state" typeGroupCode="openCity" hasLabel="false" defaultVal="${openCityPage.state}" datatype="*"></t:dictSelect>	
+					    <t:dictSelect field="status" typeGroupCode="openCity" hasLabel="false" defaultVal="${openCityPage.status}" datatype="*"></t:dictSelect>	
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
