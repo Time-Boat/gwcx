@@ -23,7 +23,9 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -34,6 +36,7 @@ import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import com.yhy.lin.app.entity.AppLineStationInfoEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
+import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
@@ -42,6 +45,8 @@ import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
+
+import freemarker.template.utility.DateUtil;
 
 /**
  * Description : 接口处理类
@@ -284,12 +289,16 @@ public class AppInterfaceController extends BaseController {
 			// 如果是接机或者接火车
 			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")
 					|| AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")) {
+				
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
+				
 			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType() + "")
 					|| AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType() + "")) { // 送机||送火车
+				
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
 				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
+				
 			}
 
 			String lId = list.get(0).getLineId();
@@ -301,10 +310,7 @@ public class AppInterfaceController extends BaseController {
 			t.setLineId(lId);
 			t.setApplicationTime(getDate());
 			t.setOrderType(1);
-
-			// order_paystatus 支付类型
-			// order_numberPeople 支付人数
-			// 是不是要新增起点名称和终点名称两个字段
+			
 			// 订单的城市要不要加一个
 
 			systemService.save(t);
@@ -514,7 +520,7 @@ public class AppInterfaceController extends BaseController {
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
-		List<OpenCityEntity> oList = null;
+		List<Map<String,Object>> list = null;
 		try {
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
@@ -529,7 +535,15 @@ public class AppInterfaceController extends BaseController {
 				maxPageItem = "15";
 			}
 			
+			list = systemService.findForJdbcParam(
+					"select id,order_status,order_starting_station_name,order_terminus_station_name,order_totalPrice,order_numbers,order_startime "
+					+ " from transferorder where user_id=? ", Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId); 
 			
+			
+			for(Map<String,Object> map : list){
+				Date date = (Date) map.get("order_startime");
+				map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+			}
 			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
@@ -541,8 +555,8 @@ public class AppInterfaceController extends BaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (oList != null && oList.size() > 0) {
-			returnJsonObj.put("data", oList);
+		if (list != null && list.size() > 0) {
+			returnJsonObj.put("data", list);
 		} else {
 			returnJsonObj.put("data", "");
 		}
@@ -559,7 +573,10 @@ public class AppInterfaceController extends BaseController {
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
-		List<OpenCityEntity> oList = null;
+		
+		String token = request.getParameter("token");
+		String userId = request.getParameter("orderId");
+		
 		try {
 
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -572,11 +589,7 @@ public class AppInterfaceController extends BaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (oList != null && oList.size() > 0) {
-			returnJsonObj.put("data", oList);
-		} else {
-			returnJsonObj.put("data", "");
-		}
+		returnJsonObj.put("data", "");
 
 		responseOutWrite(response, returnJsonObj);
 	}

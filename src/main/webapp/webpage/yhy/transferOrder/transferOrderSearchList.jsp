@@ -13,7 +13,7 @@
 		<t:dgCol title="申请人手机号" field="orderContactsmobile" align="center"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
-		<t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol>
+		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 	    <t:dgCol title="单价(元/人)" field="orderUnitprice" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="申请时间" field="applicationTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>

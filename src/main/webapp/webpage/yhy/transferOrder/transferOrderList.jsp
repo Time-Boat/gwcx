@@ -16,7 +16,7 @@
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
 		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
-		<t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol>
+		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<t:dgCol title="单价(人/元)" field="orderUnitprice" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>

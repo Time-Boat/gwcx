@@ -19,7 +19,7 @@ public class TransferorderView implements java.io.Serializable {
 	private String  orderContactsmobile;//联系人手机号
 	private String  orderPaystatus;//支付状态 0：已付款，1：退款中 2：已退款 3:：未付款
 	private String  orderTrainnumber;//火车车次
-	private String orderNumberPeople;//人数
+//	private String orderNumberPeople;//人数
 	private String  orderTotalPrice;//总价
 	
 	private Date applicationTime;//申请时间
@@ -123,12 +123,12 @@ public class TransferorderView implements java.io.Serializable {
 	public void setOrderTrainnumber(String orderTrainnumber) {
 		this.orderTrainnumber = orderTrainnumber;
 	}
-	public String getOrderNumberPeople() {
-		return orderNumberPeople;
-	}
-	public void setOrderNumberPeople(String orderNumberPeople) {
-		this.orderNumberPeople = orderNumberPeople;
-	}
+//	public String getOrderNumberPeople() {
+//		return orderNumberPeople;
+//	}
+//	public void setOrderNumberPeople(String orderNumberPeople) {
+//		this.orderNumberPeople = orderNumberPeople;
+//	}
 	public String getOrderTotalPrice() {
 		return orderTotalPrice;
 	}

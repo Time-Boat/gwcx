@@ -87,10 +87,10 @@
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="right">
-					<label class="Validform_label">人数：</label>
+					<label class="Validform_label">人数(不需要)：</label>
 				</td>
 				<td class="value">
-					<input  class="inputxt" id="orderNumberPeople" name="orderNumberPeople" value="${tView.orderNumberPeople}">  		
+					<%-- <input  class="inputxt" id="orderNumberPeople" name="orderNumberPeople" value="${tView.orderNumberPeople}"> --%>  		
 					<span class="Validform_checktip"></span>
 				</td>
 			<tr>

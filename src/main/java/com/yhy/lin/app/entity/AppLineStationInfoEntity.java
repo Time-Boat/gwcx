@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
-* Description : 
+* Description : app站点信息
 * @author Administrator
 * @date 2017年5月17日 下午2:23:03
 */

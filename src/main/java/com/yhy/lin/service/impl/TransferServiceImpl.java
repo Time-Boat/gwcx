@@ -40,7 +40,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		sql.append("select t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
-		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_numberPeople,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name ");
+		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
 				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
 		if (!sqlWhere.isEmpty()){
@@ -67,7 +67,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				,new Db2Page("orderContactsmobile", "order_contactsmobile", null)
 				,new Db2Page("orderPaystatus", "order_paystatus", null)
 				,new Db2Page("orderTrainnumber", "order_trainnumber", null)
-				,new Db2Page("orderNumberPeople", "order_numberPeople", null)	
 				,new Db2Page("orderTotalPrice", "order_totalPrice", null)
 				,new Db2Page("name", "name", null)
 				,new Db2Page("phoneNumber", "phoneNumber", null)
@@ -132,12 +131,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		StringBuffer sql = new  StringBuffer();
 		/*sql.append("select a.id,a.order_id as orderId,a.order_type as orderType,a.order_status as orderStatus,a.order_flightnumber as orderFlightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime as orderStartime,a.order_expectedarrival as orderExpectedarrival,a.order_unitprice as orderUnitprice,a.order_numbers as orderNumbers,a.order_paytype as orderPaytype,a.order_contactsname as orderContactsname,");
-		sql.append("a.order_contactsmobile as orderContactsmobile,a.order_paystatus as orderPaystatus,a.order_trainnumber as orderTrainnumber,a.order_numberPeople as orderNumberPeople,a.order_totalPrice as orderTotalPrice,d.name as driverName,d.phoneNumber as driverMobile,c.licence_plate as licencePlate,c.status as CarStatus,a.applicationTime ");
+		sql.append("a.order_contactsmobile as orderContactsmobile,a.order_paystatus as orderPaystatus,a.order_trainnumber as orderTrainnumber,a.order_totalPrice as orderTotalPrice,d.name as driverName,d.phoneNumber as driverMobile,c.licence_plate as licencePlate,c.status as CarStatus,a.applicationTime ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
 		*/
 		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_id,a.order_terminus_station_id,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
-		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_numberPeople,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime ");
+		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
 
 		sql.append(" where a.id='"+id+"'");
@@ -165,14 +164,13 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				transferorderView.setOrderContactsmobile(String.valueOf(obj[13]));
 				transferorderView.setOrderPaystatus(String.valueOf(obj[14]));
 				transferorderView.setOrderTrainnumber(String.valueOf(obj[15]));
-				transferorderView.setOrderNumberPeople(String.valueOf(obj[16]));
-				transferorderView.setOrderTotalPrice(String.valueOf(obj[17]));
-				transferorderView.setDriverName(String.valueOf(obj[18]));
-				transferorderView.setDriverMobile(String.valueOf(obj[19]));
-				transferorderView.setLicencePlate(String.valueOf(obj[20]));
-				transferorderView.setCarStatus(String.valueOf(obj[21]));
-				if(obj[22]!=null){
-					transferorderView.setApplicationTime(sdf.parse(obj[22].toString()));
+				transferorderView.setOrderTotalPrice(String.valueOf(obj[16]));
+				transferorderView.setDriverName(String.valueOf(obj[17]));
+				transferorderView.setDriverMobile(String.valueOf(obj[18]));
+				transferorderView.setLicencePlate(String.valueOf(obj[19]));
+				transferorderView.setCarStatus(String.valueOf(obj[20]));
+				if(obj[21]!=null){
+					transferorderView.setApplicationTime(sdf.parse(obj[21].toString()));
 				}
 			}catch (Exception e) {	
 			}

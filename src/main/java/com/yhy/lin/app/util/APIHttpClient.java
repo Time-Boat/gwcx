@@ -69,7 +69,7 @@ public class APIHttpClient {
                 // 建立一个NameValuePair数组，用于存储欲传送的参数  
                 method.addHeader("Content-type","application/json; charset=utf-8");  
                 method.setHeader("Accept", "application/json");  
-                method.setEntity(new StringEntity(parameters));  
+                method.setEntity(new StringEntity(parameters,"utf-8"));  
                 startTime = System.currentTimeMillis();  
   
                 HttpResponse response = httpClient.execute(method);  
@@ -119,18 +119,19 @@ public class APIHttpClient {
         j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b1e26d000a");  
         j.addProperty("orderStartime", "2011-01-01 11:12:13");  
         j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
-        j.addProperty("orderUnitprice", 111);  
-        j.addProperty("orderNumbers", "20");  
+        j.addProperty("orderUnitprice", "20");  
+        j.addProperty("orderNumbers", "3");  
         j.addProperty("orderContactsname", "33333");  
         j.addProperty("orderContactsmobile", "15527916902");  
-        j.addProperty("orderFlightnumber", "");  
+        j.addProperty("orderFlightnumber", "");
+        j.addProperty("orderStatus", "1");
         j.addProperty("orderTrainnumber", "Z-15");  
         j.addProperty("orderPaytype", "1"); 
-        j.addProperty("order_paystatus", "0");  
-        j.addProperty("order_numberPeople", "2"); 
-        
-        
-        
+        j.addProperty("orderPaystatus", "0");  
+        j.addProperty("orderTerminusStationName", "测试终点"); 
+        j.addProperty("orderStartingStationName", "测试起点"); 
+        j.addProperty("userId", "4028820d5beb1c38015beb3fa78b0002"); 
+        j.addProperty("orderTotalPrice", "60"); 
       	
         System.out.println(ac.post(j.toString()));  
     }  
