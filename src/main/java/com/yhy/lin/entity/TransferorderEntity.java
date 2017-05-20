@@ -17,7 +17,7 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private String orderId;// 订单id
+	private String orderId;// 订单号
 	private Integer orderType;// 订单类型 0:接机 1:送机 2:接火车 3:送火车
 	private Integer orderStatus;// 订单状态
 								// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。

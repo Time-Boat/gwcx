@@ -16,7 +16,14 @@ public class AppUserOrderEntity {
 	private String orderTerminusStationId;// 终点站
 	private BigDecimal orderTotalPrice;// 总价
 	private Integer orderStatus;// 订单状态    0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
+	private String orderId;// 订单编号
 	
+	public String getOrderId() {
+		return orderId;
+	}
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
 	public String getId() {
 		return id;
 	}

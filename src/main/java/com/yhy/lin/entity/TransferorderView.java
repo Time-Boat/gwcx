@@ -10,6 +10,8 @@ public class TransferorderView implements java.io.Serializable {
 	private String  orderFlightnumber;//航班号
 	private String  orderStartingstation;//起点站
 	private String  orderTerminusstation;//终点站
+	private String  orderStartingstationName;//起点站名称
+	private String  orderTerminusstationName;//终点站名称
 	private Date  orderStartime;//发车时间
 	private String orderExpectedarrival;//预计到达时间
 	private String  orderUnitprice;//单价
@@ -24,7 +26,6 @@ public class TransferorderView implements java.io.Serializable {
 	
 	private Date applicationTime;//申请时间
 	
-	
 	private String lineId;
 	private String lineName;
 	
@@ -32,6 +33,7 @@ public class TransferorderView implements java.io.Serializable {
 	private String driverMobile;//司机手机号
 	private String licencePlate;//车牌号
 	private String carStatus;//车辆状态
+	
 	public String getId() {
 		return id;
 	}
@@ -74,7 +76,20 @@ public class TransferorderView implements java.io.Serializable {
 	public void setOrderTerminusstation(String orderTerminusstation) {
 		this.orderTerminusstation = orderTerminusstation;
 	}
- 
+	
+	public String getOrderStartingstationName() {
+		return orderStartingstationName;
+	}
+	public void setOrderStartingstationName(String orderStartingstationName) {
+		this.orderStartingstationName = orderStartingstationName;
+	}
+	public String getOrderTerminusstationName() {
+		return orderTerminusstationName;
+	}
+	public void setOrderTerminusstationName(String orderTerminusstationName) {
+		this.orderTerminusstationName = orderTerminusstationName;
+	}
+	
 	public String getOrderExpectedarrival() {
 		return orderExpectedarrival;
 	}

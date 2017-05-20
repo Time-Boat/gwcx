@@ -264,7 +264,7 @@ public class AppInterfaceController extends BaseController {
 
 	}
 
-	// 接送机订单上传
+	// 订单支付
 	@RequestMapping(params = "createOrder")
 	public void createOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -282,6 +282,7 @@ public class AppInterfaceController extends BaseController {
 
 			Gson g = new Gson();
 			TransferorderEntity t = g.fromJson(param, TransferorderEntity.class);
+			
 			String sId = t.getOrderStartingStationId();// 起始站
 			String eId = t.getOrderTerminusStationId();// 终点站
 
@@ -415,6 +416,7 @@ public class AppInterfaceController extends BaseController {
 			String cityId = request.getParameter("cityId");
 			//token
 			String token = request.getParameter("token");
+			
 			// 
 			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
 
@@ -519,7 +521,6 @@ public class AppInterfaceController extends BaseController {
 
 		String msg = "";
 		String statusCode = "";
-		JSONObject data = new JSONObject();
 		List<Map<String,Object>> list = null;
 		try {
 			String token = request.getParameter("token");
@@ -536,7 +537,7 @@ public class AppInterfaceController extends BaseController {
 			}
 			
 			list = systemService.findForJdbcParam(
-					"select id,order_status,order_starting_station_name,order_terminus_station_name,order_totalPrice,order_numbers,order_startime "
+					"select id,order_status,order_id,order_starting_station_name,order_terminus_station_name,order_totalPrice,order_numbers,order_startime "
 					+ " from transferorder where user_id=? ", Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId); 
 			
 			
@@ -564,7 +565,7 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 获取用户订单详情 */
+	/** 获取用户订单详情页/修改订单 */
 	@RequestMapping(params = "getOrderDetail")
 	public void getOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -572,13 +573,29 @@ public class AppInterfaceController extends BaseController {
 
 		String msg = "";
 		String statusCode = "";
-		JSONObject data = new JSONObject();
 		
 		String token = request.getParameter("token");
-		String userId = request.getParameter("orderId");
+		String orderId = request.getParameter("orderId");
+
+		List<Map<String,Object>> list = null;
 		
 		try {
-
+			list = systemService.findForJdbc(
+					"select a.id,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id, "
+					+ "	a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime, "
+					+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone "
+					+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+					+ " left join driversinfo d on b.driverId = d.id where a.id=? "
+					, orderId);
+			
+			for(Map<String,Object> map : list){
+				Date date = (Date) map.get("order_startime");
+				map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+				
+				Date date1 = (Date) map.get("applicationTime");
+				map.put("applicationTime", DateUtils.date2Str(date1,DateUtils.datetimeFormat));
+			}
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -589,10 +606,83 @@ public class AppInterfaceController extends BaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", "");
+		if (list != null && list.size() > 0) {
+			returnJsonObj.put("data", list);
+		} else {
+			returnJsonObj.put("data", "");
+		}
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
+	/** 如果订单id不为空，说明是未支付订单继续支付/取消订单/确认完成    的订单,只需要改变一下状态就可以了 */
+	//三个状态单独拿出写三个接口     太困了，睡觉了。。。
+	@RequestMapping(params = "changeOrderStatus")
+	public void changeOrderStatus(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		
+		String token = request.getParameter("token");
+		String orderId = request.getParameter("orderId");
+
+		List<Map<String,Object>> list = null;
+		
+		try {
+			list = systemService.findForJdbc(
+					"select a.id,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id, "
+					+ "	a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime, "
+					+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone "
+					+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+					+ " left join driversinfo d on b.driverId = d.id where a.id=? "
+					, orderId);
+			
+			for(Map<String,Object> map : list){
+				Date date = (Date) map.get("order_startime");
+				map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+				
+				Date date1 = (Date) map.get("applicationTime");
+				map.put("applicationTime", DateUtils.date2Str(date1,DateUtils.datetimeFormat));
+			}
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (list != null && list.size() > 0) {
+			returnJsonObj.put("data", list);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	/** 
+	 * 	参数检测是否为空    (封装一个统一的参数检测为空的方法，后面在做吧)
+	 */
+//	public String checkParameter(JSONObject returnJsonObj, Object ...objects){
+//		for(Object i : objects){
+//			
+//		}
+//		returnJsonObj.put("msg", "缺少参数:" + );
+//		returnJsonObj.put("code", statusCode);
+//		if (list != null && list.size() > 0) {
+//			returnJsonObj.put("data", list);
+//		} else {
+//			returnJsonObj.put("data", "");
+//		}
+//
+//		responseOutWrite(response, returnJsonObj);
+//	}
 	
 	/** 站点类型转换 
 	 * 	线路类型 转 站点类型
