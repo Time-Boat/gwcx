@@ -16,15 +16,15 @@ public class AppLineStationInfoEntity implements Serializable{
 	private String name;
 	private String price;
 	private String lineTimes;
-	private String stationType;
-	
-	public String getStationType() {
-		return stationType;
-	}
-
-	public void setStationType(String stationType) {
-		this.stationType = stationType;
-	}
+//	private String stationType;
+//	
+//	public String getStationType() {
+//		return stationType;
+//	}
+//
+//	public void setStationType(String stationType) {
+//		this.stationType = stationType;
+//	}
 
 	public String getId() {
 		return id;

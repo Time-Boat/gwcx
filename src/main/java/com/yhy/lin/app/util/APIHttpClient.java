@@ -100,8 +100,11 @@ public class APIHttpClient {
   
     public static void main(String[] args) {  
     	//线路站点信息测试
-      	apiURL += "&serveType=2&cityId=520100";
+//      apiURL += "&serveType=2&cityId=520100";
       	
+      	//线路站点信息地址
+    	//apiURL += "&serveType=2&cityId=520100&stationId=2c9a500d5bf61df2015bf6b91b85003c";
+    	
         APIHttpClient ac = new APIHttpClient(apiURL);  
         JsonArray arry = new JsonArray();  
         JsonObject j = new JsonObject();  
@@ -111,18 +114,21 @@ public class APIHttpClient {
 //        arry.add(j);  
         
         //接送机订单测试
-//        j.addProperty("orderType", "0");  
-//        j.addProperty("orderStartingStationId", "2c9a500d5bf61df2015bf6b91b85003c");  
-//        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b1e26d000a");  
-//        j.addProperty("orderStartime", "2011-01-01 11:12:13");  
-//        j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
-//        j.addProperty("orderUnitprice", 111);  
-//        j.addProperty("orderNumbers", "20");  
-//        j.addProperty("orderContactsname", "33333");  
-//        j.addProperty("orderContactsmobile", "15527916902");  
-//        j.addProperty("orderFlightnumber", "");  
-//        j.addProperty("orderTrainnumber", "Z-15");  
-//        j.addProperty("orderPaytype", "1"); 
+        j.addProperty("orderType", "2");  
+        j.addProperty("orderStartingStationId", "2c9a500d5bf61df2015bf6b91b85003c");  
+        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b1e26d000a");  
+        j.addProperty("orderStartime", "2011-01-01 11:12:13");  
+        j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
+        j.addProperty("orderUnitprice", 111);  
+        j.addProperty("orderNumbers", "20");  
+        j.addProperty("orderContactsname", "33333");  
+        j.addProperty("orderContactsmobile", "15527916902");  
+        j.addProperty("orderFlightnumber", "");  
+        j.addProperty("orderTrainnumber", "Z-15");  
+        j.addProperty("orderPaytype", "1"); 
+        j.addProperty("order_paystatus", "0");  
+        j.addProperty("order_numberPeople", "2"); 
+        
         
         
       	

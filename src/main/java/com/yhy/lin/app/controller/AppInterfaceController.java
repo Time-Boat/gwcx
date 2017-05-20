@@ -5,6 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -258,7 +259,7 @@ public class AppInterfaceController extends BaseController {
 
 	}
 
-	// 接送机订单
+	// 接送机订单上传
 	@RequestMapping(params = "createOrder")
 	public void createOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -267,7 +268,7 @@ public class AppInterfaceController extends BaseController {
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
-
+		
 		String param;
 		try {
 			param = AppUtil.inputToStr(request);
@@ -342,8 +343,10 @@ public class AppInterfaceController extends BaseController {
 			String serveType = request.getParameter("serveType");
 			// 所属城市
 			String cityId = request.getParameter("cityId");
+			//token
+			String token = request.getParameter("token");
 			
-			if (StringUtil.isNotEmpty(serveType) ) {
+			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(cityId)) {
 
 				List<AppStationInfoEntity> lList = new ArrayList<AppStationInfoEntity>();
 				
@@ -392,11 +395,11 @@ public class AppInterfaceController extends BaseController {
 	public void getStationList(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
-
+		
 		try {
 			// 出行服务类型 2：接机 3：送机 4：接火车 5：送火车
 			String serveType = request.getParameter("serveType");
@@ -404,56 +407,50 @@ public class AppInterfaceController extends BaseController {
 			String stationId = request.getParameter("stationId");
 			// 所属城市
 			String cityId = request.getParameter("cityId");
-
-			// 如果是接机或者接火车
+			//token
+			String token = request.getParameter("token");
+			// 
 			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
 
 				List<AppLineStationInfoEntity> lList = new ArrayList<AppLineStationInfoEntity>();
-				List<AppStationInfoEntity> sList = new ArrayList<AppStationInfoEntity>();
-
-				switch (serveType) {
-				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE: // 接机
-
-					break;
-				case AppGlobals.DESTINATION_TO_AIRPORT_TYPE: // 送机
-
-					break;
-				case AppGlobals.TRAIN_TO_DESTINATION_TYPE: // 接火车
-					
-					break;
-				case AppGlobals.DESTINATION_TO_TRAIN_TYPE: // 送火车
-					
-					break;
-				}
 				
-				// 查出所有起点的线路id信息
+				// 根据起点id城市查找线路信息
 				List<Map<String, Object>> lineList = systemService.findForJdbc(
-						" select lf.id,lf.name,lf.price,lf.lineTimes,bi.station_type "
-								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
-								+ " where busStopsId=? and lf.cityId=? and lf.deleteFlag=0 and bi.deleteFlag=0 ",
+						" select lf.id,lf.name,lf.price,lf.lineTimes "
+								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
+								+ " where busStopsId=? and lf.cityId=? and lf.deleteFlag=0  ",
 						stationId, cityId);
+				
+				StringBuffer sbf = new StringBuffer();
 				for (Map<String, Object> a : lineList) {
-
+					
 					AppLineStationInfoEntity asi = new AppLineStationInfoEntity();
-
+					
 					asi.setId(a.get("id") + "");
 					asi.setName(a.get("name") + "");
 					asi.setPrice(AppUtil.Null2Blank(a.get("price") + ""));
 					asi.setLineTimes(AppUtil.Null2Blank(a.get("lineTimes") + ""));
-					asi.setStationType(a.get("station_type") + "");
+//					asi.setStationType(a.get("station_type") + "");
 					lList.add(asi);
-
-					List<AppStationInfoEntity> stationList = systemService
-							.findHql("from AppStationInfoEntity where lineId=? and siteOrder!=? ", asi.getId(), 0);
-
-					// 不知道出了什么问题 lineId没改动 下面手动的去改变一下
-					for (AppStationInfoEntity b : stationList) {
-						b.setLineId(asi.getId());
-					}
-					sList.addAll(stationList);
+					
+					sbf.append("'");
+					sbf.append(asi.getId());
+					sbf.append("',");
+//					// 不知道出了什么问题 lineId没改动 下面手动的去改变一下
+//					for (AppStationInfoEntity b : stationList) {
+//						b.setLineId(asi.getId());
+//					}
 				}
+				String t = getStationType(serveType);
+				if(sbf.length() > 0)
+					sbf.deleteCharAt(sbf.length()-1);
+				
+				//查询指定id线路中的所有站点
+				List<AppStationInfoEntity> stationList = systemService
+						.findHql("from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", 0);
+				
 				data.put("lineInfo", lList);
-				data.put("stationInfo", sList);
+				data.put("stationInfo", stationList);
 
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
@@ -480,6 +477,8 @@ public class AppInterfaceController extends BaseController {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
 
+		String token = request.getParameter("token");
+		
 		String msg = "";
 		String statusCode = "";
 		// JSONObject data = new JSONObject();
@@ -487,6 +486,51 @@ public class AppInterfaceController extends BaseController {
 		try {
 			oList = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (oList != null && oList.size() > 0) {
+			returnJsonObj.put("data", oList);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 获取用户订单列表 get */
+	@RequestMapping(params = "getOrderList")
+	public void getOrderList(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+		List<OpenCityEntity> oList = null;
+		try {
+			String token = request.getParameter("token");
+			String userId = request.getParameter("userId");
+			
+			String pageNo = request.getParameter("pageNo");
+			if(!StringUtil.isNotEmpty(pageNo)){
+				pageNo = "1";
+			}
+			
+			String maxPageItem = request.getParameter("maxPageItem");
+			if(!StringUtil.isNotEmpty(maxPageItem)){
+				maxPageItem = "15";
+			}
+			
+			
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -536,40 +580,7 @@ public class AppInterfaceController extends BaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
-
-	/** 获取用户订单列表 get */
-	@RequestMapping(params = "getOrderList")
-	public void getOrderList(HttpServletRequest request, HttpServletResponse response) {
-		AppUtil.responseUTF8(response);
-		JSONObject returnJsonObj = new JSONObject();
-
-		String msg = "";
-		String statusCode = "";
-		JSONObject data = new JSONObject();
-		List<OpenCityEntity> oList = null;
-		try {
-			String token = request.getParameter("token");
-			String userId = request.getParameter("userId");
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
-		} catch (Exception e) {
-			statusCode = AppGlobals.SYSTEM_ERROR;
-			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
-		}
-
-		returnJsonObj.put("msg", msg);
-		returnJsonObj.put("code", statusCode);
-		if (oList != null && oList.size() > 0) {
-			returnJsonObj.put("data", oList);
-		} else {
-			returnJsonObj.put("data", "");
-		}
-
-		responseOutWrite(response, returnJsonObj);
-	}
-
+	
 	/** 站点类型转换 
 	 * 	线路类型 转 站点类型
 	 */
@@ -581,7 +592,7 @@ public class AppInterfaceController extends BaseController {
 			return "2";
 		case "4":
 		case "5":
-			return "5";
+			return "1";
 		default:
 			return lineType;
 		}
@@ -618,15 +629,15 @@ public class AppInterfaceController extends BaseController {
 		long diff = Math.abs(d1.getTime() - d2.getTime());
 
 		if (flag == 'd') {
-			return (int) (diff / 24 * 3600 * 1000);
+			return (int) (diff / (24 * 3600 * 1000));
 		}
 
 		if (flag == 'h') {
-			return (int) (diff / 3600 * 1000);
+			return (int) (diff / (3600 * 1000));
 		}
 
 		if (flag == 'm') {
-			return (int) (diff / 60 * 1000);
+			return (int) (diff / (60 * 1000));
 		}
 
 		if (flag == 's') {

@@ -85,7 +85,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	public String  getWhere(TransferorderEntity transferorder,String fc_begin,String fc_end,String ddTime_begin,String ddTime_end){
 		
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-		
+		//添加了权限
 		StringBuffer sql = new StringBuffer(" where 1=1 and t.org_code like '" + orgCode + "%' ");
 		
 		//发车时间
