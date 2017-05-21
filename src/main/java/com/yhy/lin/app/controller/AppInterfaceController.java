@@ -36,6 +36,7 @@ import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import com.yhy.lin.app.entity.AppLineStationInfoEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
+import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.UserInfo;
@@ -310,7 +311,7 @@ public class AppInterfaceController extends BaseController {
 
 			t.setLineId(lId);
 			t.setApplicationTime(getDate());
-			t.setOrderType(1);
+			//t.setOrderType(1);
 			
 			// 订单的城市要不要加一个
 
@@ -455,7 +456,7 @@ public class AppInterfaceController extends BaseController {
 				
 				//查询指定id线路中的所有站点
 				List<AppStationInfoEntity> stationList = systemService
-						.findHql("from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", 0);
+						.findHql("from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", t);
 				
 				data.put("lineInfo", lList);
 				data.put("stationInfo", stationList);
@@ -522,9 +523,13 @@ public class AppInterfaceController extends BaseController {
 		String msg = "";
 		String statusCode = "";
 		List<Map<String,Object>> list = null;
+		List<AppUserOrderEntity> list1 = new ArrayList<>();
 		try {
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
+			
+			//订单支付状态      0：已付款，1：退款中 2：已退款 3: 未付款
+			String orderStatus = request.getParameter("orderStatus");  
 			
 			String pageNo = request.getParameter("pageNo");
 			if(!StringUtil.isNotEmpty(pageNo)){
@@ -536,14 +541,31 @@ public class AppInterfaceController extends BaseController {
 				maxPageItem = "15";
 			}
 			
-			list = systemService.findForJdbcParam(
-					"select id,order_status,order_id,order_starting_station_name,order_terminus_station_name,order_totalPrice,order_numbers,order_startime "
-					+ " from transferorder where user_id=? ", Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId); 
+			StringBuffer sql = new StringBuffer();
+			sql.append("select id,order_status,order_id,order_starting_station_name,order_terminus_station_name,order_totalPrice,order_numbers,order_startime "
+					+ " from transferorder where user_id=? ");
 			
+			if(StringUtil.isNotEmpty(orderStatus)){
+				sql.append(" and order_paystatus = '" + orderStatus + "'" );
+			}
+			
+			list = systemService.findForJdbcParam( sql.toString(), Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId); 
 			
 			for(Map<String,Object> map : list){
 				Date date = (Date) map.get("order_startime");
 				map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+				
+				AppUserOrderEntity auo = new AppUserOrderEntity();
+				auo.setId(map.get("id")+"");
+				auo.setOrderId(map.get("order_id")+"");
+				auo.setOrderNumbers(map.get("order_numbers")+"");
+				auo.setOrderStartime(map.get("order_startime")+"");
+				auo.setOrderStartingStationName(map.get("order_starting_station_name")+"");
+				//要做一下为空的判断，这个字段不会为空
+				auo.setOrderStatus(map.get("order_status")+"");
+				auo.setOrderTerminusStationName(map.get("order_terminus_station_name")+"");
+				auo.setOrderTotalPrice(map.get("order_totalPrice")+"");
+				list1.add(auo);
 			}
 			
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -556,8 +578,8 @@ public class AppInterfaceController extends BaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (list != null && list.size() > 0) {
-			returnJsonObj.put("data", list);
+		if (list1 != null && list1.size() > 0) {
+			returnJsonObj.put("data", list1);
 		} else {
 			returnJsonObj.put("data", "");
 		}
@@ -565,7 +587,7 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 获取用户订单详情页/修改订单 */
+	/** 获取用户订单详情页  */
 	@RequestMapping(params = "getOrderDetail")
 	public void getOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -578,6 +600,146 @@ public class AppInterfaceController extends BaseController {
 		String orderId = request.getParameter("orderId");
 
 		List<Map<String,Object>> list = null;
+		AppUserOrderDetailEntity aod = new AppUserOrderDetailEntity();
+		try {
+			
+			list = systemService.findForJdbc(
+					"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name, "
+					+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime, "
+					+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone "
+					+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+					+ " left join driversinfo d on b.driverId = d.id where a.id=? "
+					, orderId);
+			
+			for(Map<String,Object> map : list){
+				Date date = (Date) map.get("order_startime");
+				Date date1 = (Date) map.get("applicationTime");
+				
+				aod.setId(map.get("id")+"");
+				aod.setOrderType(map.get("order_type")+"");
+				aod.setOrderStatus(map.get("order_status")+"");
+				aod.setOrderId(map.get("order_id")+"");
+				aod.setOrderStartingStationName(map.get("order_starting_station_name")+"");
+				aod.setOrderTerminusStationName(map.get("order_terminus_station_name")+"");
+				aod.setOrderTotalPrice(map.get("order_totalPrice")+"");
+				aod.setOrderNumbers(map.get("order_numbers")+"");
+				
+				aod.setOrderStartime(DateUtils.date2Str(date,DateUtils.datetimeFormat));
+				aod.setApplicationTime(DateUtils.date2Str(date1,DateUtils.datetimeFormat));
+				
+				aod.setOrderContactsname(map.get("order_contactsname")+"");
+				aod.setOrderContactsmobile(map.get("order_contactsmobile")+"");
+				aod.setLicencePlate(map.get("licence_plate")+"");
+				aod.setCarType(map.get("car_type")+"");
+				
+				aod.setDriver(map.get("driver_name")+"");
+				aod.setDriverPhone(map.get("driver_phone")+"");
+				
+			}
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+		
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", aod);
+		
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	/** 修改订单 */
+	@RequestMapping(params = "modifyOrder")
+	public void modifyOrder(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		
+		String token = request.getParameter("token");
+		String orderId = request.getParameter("orderId");
+
+//		List<Map<String,Object>> list = null;
+//		List<TransferorderEntity> list = null;
+		TransferorderEntity t = null;
+		try {
+//			list = systemService.findForJdbc(
+//					"select a.id,a.order_type,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id, "
+//					+ "	a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime, "
+//					+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,a.  "
+//					+ " from transferorder where a.id=? "
+//					, orderId);
+			
+			t = systemService.getEntity(TransferorderEntity.class, orderId);
+			
+//			list = systemService.findForJdbc( "select * from transferorder where id=? ", orderId);
+			
+//			Date date = (Date) map.get("order_startime");
+//			map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+//			
+//			Date date1 = (Date) map.get("applicationTime");
+//			map.put("applicationTime", DateUtils.date2Str(date1,DateUtils.datetimeFormat));
+			
+//			for(Map<String,Object> map : list){
+//				Date date = (Date) map.get("order_startime");
+//				map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+//				
+//				Date date1 = (Date) map.get("applicationTime");
+//				map.put("applicationTime", DateUtils.date2Str(date1,DateUtils.datetimeFormat));
+//				
+//				Date date2 = (Date) map.get("order_expectedarrival");
+//				map.put("order_expectedarrival", DateUtils.date2Str(date2,DateUtils.datetimeFormat));
+//			}
+			
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+		
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (t != null) {
+			returnJsonObj.put("data", t);
+			
+			//把json中的日期类型替换成字符串类型
+			Date date = t.getApplicationTime();
+			Date date1 = t.getOrderExpectedarrival();
+			JSONObject str = (JSONObject) returnJsonObj.get("data");
+			str.put("applicationTime",date.toString());
+			str.put("orderExpectedarrival",date1.toString());
+			
+		} else {
+			returnJsonObj.put("data", "");
+		}
+		
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	/** 如果订单id不为空，说明是未支付订单继续支付/取消订单/确认完成    的订单,只需要改变一下状态就可以了 */
+	//三个状态单独拿出写三个接口   
+	//未支付订单继续支付    （放着先）
+	@RequestMapping(params = "continuePayment")
+	public void changeOrderStatus(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		
+		String msg = "";
+		String statusCode = "";
+		
+		String token = request.getParameter("token");
+		String orderId = request.getParameter("orderId");
+		
+		
+		List<Map<String,Object>> list = null;
 		
 		try {
 			list = systemService.findForJdbc(
@@ -587,6 +749,9 @@ public class AppInterfaceController extends BaseController {
 					+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 					+ " left join driversinfo d on b.driverId = d.id where a.id=? "
 					, orderId);
+			
+			
+			
 			
 			for(Map<String,Object> map : list){
 				Date date = (Date) map.get("order_startime");
@@ -615,19 +780,19 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 	
-	/** 如果订单id不为空，说明是未支付订单继续支付/取消订单/确认完成    的订单,只需要改变一下状态就可以了 */
-	//三个状态单独拿出写三个接口     太困了，睡觉了。。。
-	@RequestMapping(params = "changeOrderStatus")
-	public void changeOrderStatus(HttpServletRequest request, HttpServletResponse response) {
+	/** 取消订单   */
+	@RequestMapping(params = "cancelOrder")
+	public void cancelOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
 		
 		String token = request.getParameter("token");
 		String orderId = request.getParameter("orderId");
-
+		
+		
 		List<Map<String,Object>> list = null;
 		
 		try {
@@ -638,6 +803,9 @@ public class AppInterfaceController extends BaseController {
 					+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 					+ " left join driversinfo d on b.driverId = d.id where a.id=? "
 					, orderId);
+			
+			
+			
 			
 			for(Map<String,Object> map : list){
 				Date date = (Date) map.get("order_startime");
@@ -665,6 +833,71 @@ public class AppInterfaceController extends BaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
+	/** 确认完成   */
+	@RequestMapping(params = "completeOrder")
+	public void completeOrder(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		
+		String msg = "";
+		String statusCode = "";
+		
+		String token = request.getParameter("token");
+		String orderId = request.getParameter("orderId");
+		
+		
+		List<Map<String,Object>> list = null;
+		
+		try {
+			list = systemService.findForJdbc(
+					"select a.id,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id, "
+					+ "	a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime, "
+					+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone "
+					+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+					+ " left join driversinfo d on b.driverId = d.id where a.id=? "
+					, orderId);
+			
+			
+			
+			
+			for(Map<String,Object> map : list){
+				Date date = (Date) map.get("order_startime");
+				map.put("order_startime", DateUtils.date2Str(date,DateUtils.datetimeFormat));
+				
+				Date date1 = (Date) map.get("applicationTime");
+				map.put("applicationTime", DateUtils.date2Str(date1,DateUtils.datetimeFormat));
+			}
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (list != null && list.size() > 0) {
+			returnJsonObj.put("data", list);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	/** 
 	 * 	参数检测是否为空    (封装一个统一的参数检测为空的方法，后面在做吧)
