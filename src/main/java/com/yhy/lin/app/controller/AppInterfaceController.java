@@ -34,6 +34,7 @@ import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
+import com.yhy.lin.app.entity.AppCheckTicket;
 import com.yhy.lin.app.entity.AppLineStationInfoEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
@@ -45,6 +46,7 @@ import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
+import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 import freemarker.template.utility.DateUtil;
@@ -274,6 +276,7 @@ public class AppInterfaceController extends BaseController {
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
+		boolean success = false;
 
 		String param;
 		try {
@@ -287,51 +290,62 @@ public class AppInterfaceController extends BaseController {
 			String sId = t.getOrderStartingStationId();// 起始站
 			String eId = t.getOrderTerminusStationId();// 终点站
 
-			List<Line_busStopEntity> list = null;
-			// 如果是接机或者接火车
-			if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")
-					|| AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")) {
+			String startTime = t.getOrderStartime();
 
-				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
-				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
+			// 和当前时间进行比较，出发时间和当前时间不能低于4个小时
+			Date curDate = getDate();
+			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
+			int m = compareDate(curDate, departTime, 'm');
 
-			} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType() + "")
-					|| AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType() + "")) { // 送机||送火车
+			if (m > 240) {
+				msg = "必须提前4个小时才能下订单，无法取消订单";
+				success = false;
+			} else {
+				List<Line_busStopEntity> list = null;
+				// 如果是接机或者接火车
+				if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")
+						|| AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")) {
 
-				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
-				t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
+					list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
+					t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
 
+				} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType() + "")
+						|| AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType() + "")) { // 送机||送火车
+
+					list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
+					t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
+
+				}
+
+				String lId = list.get(0).getLineId();
+				List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
+				if (lList.size() > 0) {
+					t.setLineName(lList.get(0));
+				}
+
+				t.setLineId(lId);
+				t.setApplicationTime(getDate());
+				// t.setOrderType(1);
+
+				// 订单的城市要不要加一个
+
+				systemService.save(t);
+
+				statusCode = AppGlobals.APP_SUCCESS;
+				msg = AppGlobals.APP_SUCCESS_MSG;
+				success = true;
 			}
-
-			String lId = list.get(0).getLineId();
-			List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
-			if (lList.size() > 0) {
-				t.setLineName(lList.get(0));
-			}
-
-			t.setLineId(lId);
-			t.setApplicationTime(getDate());
-			// t.setOrderType(1);
-
-			// 订单的城市要不要加一个
-
-			systemService.save(t);
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (IOException e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
 
+		data.put("success", success);
+
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (data.size() > 0) {
-			returnJsonObj.put("data", data.toString());
-		} else {
-			returnJsonObj.put("data", "");
-		}
+		returnJsonObj.put("data", data.toString());
 
 		responseOutWrite(response, returnJsonObj);
 	}
@@ -544,8 +558,8 @@ public class AppInterfaceController extends BaseController {
 
 			StringBuffer sql = new StringBuffer();
 			sql.append(
-					"select id,order_status,order_id,order_starting_station_name,order_terminus_station_name,order_totalPrice,order_numbers,order_startime "
-							+ " from transferorder where user_id=? ");
+					"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,b.startTime "
+							+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? ");
 
 			if (StringUtil.isNotEmpty(orderStatus)) {
 				sql.append(" and order_paystatus = '" + orderStatus + "'");
@@ -555,14 +569,13 @@ public class AppInterfaceController extends BaseController {
 					Integer.parseInt(maxPageItem), userId);
 
 			for (Map<String, Object> map : list) {
-				Date date = (Date) map.get("order_startime");
-				map.put("order_startime", DateUtils.date2Str(date, DateUtils.datetimeFormat));
+				// Date date = (Date) map.get("startTime");
 
 				AppUserOrderEntity auo = new AppUserOrderEntity();
 				auo.setId(map.get("id") + "");
 				auo.setOrderId(map.get("order_id") + "");
 				auo.setOrderNumbers(map.get("order_numbers") + "");
-				auo.setOrderStartime(map.get("order_startime") + "");
+				auo.setOrderStartime(map.get("startTime") + "");
 				auo.setOrderStartingStationName(map.get("order_starting_station_name") + "");
 				// 要做一下为空的判断，这个字段不会为空
 				auo.setOrderStatus(map.get("order_status") + "");
@@ -595,10 +608,10 @@ public class AppInterfaceController extends BaseController {
 	public void getOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
-
+		
 		String token = request.getParameter("token");
 		String orderId = request.getParameter("orderId");
 
@@ -608,12 +621,13 @@ public class AppInterfaceController extends BaseController {
 
 			list = systemService
 					.findForJdbc("select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name, "
-							+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime, "
-							+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone "
+							+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
+							+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes "
 							+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-							+ " left join driversinfo d on b.driverId = d.id where a.id=? ", orderId);
+							+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id where a.id=? ", orderId);
 
 			for (Map<String, Object> map : list) {
+				//会出现空指针么...
 				Date date = (Date) map.get("order_startime");
 				Date date1 = (Date) map.get("applicationTime");
 
@@ -631,14 +645,29 @@ public class AppInterfaceController extends BaseController {
 
 				aod.setOrderContactsname(map.get("order_contactsname") + "");
 				aod.setOrderContactsmobile(map.get("order_contactsmobile") + "");
-				aod.setLicencePlate(map.get("licence_plate") + "");
-				aod.setCarType(map.get("car_type") + "");
+				aod.setLicencePlate(AppUtil.Null2Blank(map.get("licence_plate")+""));
+				aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
 
-				aod.setDriver(map.get("driver_name") + "");
-				aod.setDriverPhone(map.get("driver_phone") + "");
-
+				aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
+				aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
+				
+				//发车时间
+				aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));
+				//线路时长
+				String lineTime = map.get("lineTimes")+"";
+				
+				//在发车时间的基础上加上线路所用时长
+				if(StringUtil.isNotEmpty(lineTime)){
+					double lt = Double.parseDouble(lineTime);
+					
+					long a = (long) (date.getTime() + (lt * 60 * 60 * 1000));
+					
+					aod.setStationEndTime(DateUtils.date2Str(new Date(a), DateUtils.short_time_sdf));
+				}else{
+					aod.setStationEndTime("");
+				}
 			}
-
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -669,18 +698,6 @@ public class AppInterfaceController extends BaseController {
 		// List<TransferorderEntity> list = null;
 		TransferorderEntity t = null;
 		try {
-			// list = systemService.findForJdbc(
-			// "select
-			// a.id,a.order_type,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id,
-			// "
-			// + "
-			// a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime,
-			// "
-			// + "
-			// a.order_contactsname,a.order_contactsmobile,a.applicationTime,a.
-			// "
-			// + " from transferorder where a.id=? "
-			// , orderId);
 
 			param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
@@ -690,31 +707,6 @@ public class AppInterfaceController extends BaseController {
 			String orderId = jsondata.getString("orderId");
 
 			t = systemService.getEntity(TransferorderEntity.class, orderId);
-
-			// list = systemService.findForJdbc( "select * from transferorder
-			// where id=? ", orderId);
-
-			// Date date = (Date) map.get("order_startime");
-			// map.put("order_startime",
-			// DateUtils.date2Str(date,DateUtils.datetimeFormat));
-			//
-			// Date date1 = (Date) map.get("applicationTime");
-			// map.put("applicationTime",
-			// DateUtils.date2Str(date1,DateUtils.datetimeFormat));
-
-			// for(Map<String,Object> map : list){
-			// Date date = (Date) map.get("order_startime");
-			// map.put("order_startime",
-			// DateUtils.date2Str(date,DateUtils.datetimeFormat));
-			//
-			// Date date1 = (Date) map.get("applicationTime");
-			// map.put("applicationTime",
-			// DateUtils.date2Str(date1,DateUtils.datetimeFormat));
-			//
-			// Date date2 = (Date) map.get("order_expectedarrival");
-			// map.put("order_expectedarrival",
-			// DateUtils.date2Str(date2,DateUtils.datetimeFormat));
-			// }
 
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
@@ -745,35 +737,224 @@ public class AppInterfaceController extends BaseController {
 
 	/** 如果订单id不为空，说明是未支付订单继续支付/取消订单/确认完成 的订单,只需要改变一下状态就可以了 */
 	// 三个状态单独拿出写三个接口
-	// 未支付订单继续支付 （放着先）
-	@RequestMapping(params = "continuePayment")
-	public void changeOrderStatus(HttpServletRequest request, HttpServletResponse response) {
+	// 未支付订单继续支付 （废弃）
+	// @RequestMapping(params = "continuePayment")
+	// public void changeOrderStatus(HttpServletRequest request,
+	// HttpServletResponse response) {
+	// AppUtil.responseUTF8(response);
+	// JSONObject returnJsonObj = new JSONObject();
+	//
+	// String msg = "";
+	// String statusCode = "";
+	//
+	// String token = request.getParameter("token");
+	// String orderId = request.getParameter("orderId");
+	//
+	// List<Map<String, Object>> list = null;
+	//
+	// try {
+	// list = systemService.findForJdbc(
+	// "select
+	// a.id,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id,
+	// "
+	// + "
+	// a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime,
+	// "
+	// + "
+	// a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name
+	// as driver_name,d.phoneNumber as driver_phone "
+	// + " from transferorder a left join order_linecardiver b on a.id = b .id
+	// left join car_info c on b.licencePlateId =c.id "
+	// + " left join driversinfo d on b.driverId = d.id where a.id=? ",
+	// orderId);
+	//
+	// for (Map<String, Object> map : list) {
+	// Date date = (Date) map.get("order_startime");
+	// map.put("order_startime", DateUtils.date2Str(date,
+	// DateUtils.datetimeFormat));
+	//
+	// Date date1 = (Date) map.get("applicationTime");
+	// map.put("applicationTime", DateUtils.date2Str(date1,
+	// DateUtils.datetimeFormat));
+	// }
+	//
+	// statusCode = AppGlobals.APP_SUCCESS;
+	// msg = AppGlobals.APP_SUCCESS_MSG;
+	// } catch (Exception e) {
+	// statusCode = AppGlobals.SYSTEM_ERROR;
+	// msg = AppGlobals.SYSTEM_ERROR_MSG;
+	// e.printStackTrace();
+	// }
+	//
+	// returnJsonObj.put("msg", msg);
+	// returnJsonObj.put("code", statusCode);
+	// if (list != null && list.size() > 0) {
+	// returnJsonObj.put("data", list);
+	// } else {
+	// returnJsonObj.put("data", "");
+	// }
+	//
+	// responseOutWrite(response, returnJsonObj);
+	// }
+
+	/** 取消订单 */
+	@RequestMapping(params = "cancelOrder")
+	public void cancelOrder(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		JSONObject obj = new JSONObject();
+		boolean success = false;
+
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		try {
+
+			param = AppUtil.inputToStr(request);
+			System.out.println("前端传递参数：" + param);
+
+			JSONObject jsondata = JSONObject.fromObject(param);
+			String token = jsondata.getString("token");
+			String orderId = jsondata.getString("orderId");
+
+			// 需不需要做时间的判断 在发车2个小时之前才能取消订单 (是需要的...)
+			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
+			// 关联表，获取发车时间 (可以建个视图)
+			Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
+
+			Date curDate = getDate();
+			String sTime = o.getStartTime();
+			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
+			int m = compareDate(curDate, departTime, 'm');
+
+			if (m > 120) {
+				msg = "发车时间超过两个小时，无法取消订单";
+				success = false;
+			} else {
+				// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
+				t.setOrderStatus(3);
+				// 支付状态 0：已付款，1：退款中 2：已退款 3:：未付款
+				t.setOrderPaystatus("1");
+				systemService.updateEntitie(t);
+
+				msg = AppGlobals.APP_SUCCESS_MSG;
+				success = true;
+			}
+			statusCode = AppGlobals.APP_SUCCESS;
+
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		obj.put("success", success);
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", obj);
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 确认完成 */
+	@RequestMapping(params = "completeOrder")
+	public void completeOrder(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		JSONObject data = new JSONObject();
+		boolean success = false;
+
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		try {
+			param = AppUtil.inputToStr(request);
+			System.out.println("前端传递参数：" + param);
+
+			JSONObject jsondata = JSONObject.fromObject(param);
+			String token = jsondata.getString("token");
+			String orderId = jsondata.getString("orderId");
+
+			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
+			// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
+			t.setOrderStatus(0);
+			systemService.updateEntitie(t);
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+			success = true;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		data.put("success", success);
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+	}
+
+	/** 验票界面  */
+	@RequestMapping(params = "checkTicket")
+	public void checkTicket(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
 
 		String msg = "";
 		String statusCode = "";
-
-		String token = request.getParameter("token");
-		String orderId = request.getParameter("orderId");
-
 		List<Map<String, Object>> list = null;
-
+		List<AppCheckTicket> list1 = new ArrayList<>();
 		try {
-			list = systemService.findForJdbc(
-					"select a.id,a.order_status,a.order_id,a.order_unitprice,a.order_starting_station_name,a.order_starting_station_id, "
-							+ "	a.order_terminus_station_name,order_terminus_station_id,a.order_totalPrice,a.order_numbers,a.order_startime, "
-							+ " a.order_contactsname,a.order_contactsmobile,a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone "
-							+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-							+ " left join driversinfo d on b.driverId = d.id where a.id=? ",
-					orderId);
+			String token = request.getParameter("token");
+			String userId = request.getParameter("userId");
+			
+			String pageNo = request.getParameter("pageNo");
+			if (!StringUtil.isNotEmpty(pageNo)) {
+				pageNo = "1";
+			}
+
+			String maxPageItem = request.getParameter("maxPageItem");
+			if (!StringUtil.isNotEmpty(maxPageItem)) {
+				maxPageItem = "15";
+			}
+			
+			StringBuffer sql = new StringBuffer();
+			sql.append(" select a.id,a.order_status,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,b.startTime "  
+				+ " ,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber "
+				+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+				+ " left join driversinfo d on b.driverId =d.id where a.user_id=? and a.order_status='2' and order_paystatus='0' ");
+
+			list = systemService.findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
+					Integer.parseInt(maxPageItem), userId);
 
 			for (Map<String, Object> map : list) {
-				Date date = (Date) map.get("order_startime");
-				map.put("order_startime", DateUtils.date2Str(date, DateUtils.datetimeFormat));
 
-				Date date1 = (Date) map.get("applicationTime");
-				map.put("applicationTime", DateUtils.date2Str(date1, DateUtils.datetimeFormat));
+				AppCheckTicket auo = new AppCheckTicket();
+				auo.setId(map.get("id") + "");
+				auo.setOrderNumbers(map.get("order_numbers") + "");
+				auo.setOrderStartime(map.get("startTime")+"");
+				auo.setOrderStartingStationName(map.get("order_starting_station_name") + "");
+				auo.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
+				// 要做一下为空的判断，这个字段不会为空
+				auo.setOrderStatus(map.get("order_status") + "");
+				auo.setOrderTotalPrice(map.get("order_totalPrice") + "");
+				auo.setLicencePlate(map.get("licence_plate") + "");
+				auo.setCarType(map.get("car_type") + "");
+				auo.setDriver(map.get("driver_name") + "");
+				auo.setDriverPhone(map.get("phoneNumber") + "");
+				
+				list1.add(auo);
 			}
 
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -786,8 +967,8 @@ public class AppInterfaceController extends BaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (list != null && list.size() > 0) {
-			returnJsonObj.put("data", list);
+		if (list1 != null && list1.size() > 0) {
+			returnJsonObj.put("data", list1);
 		} else {
 			returnJsonObj.put("data", "");
 		}
@@ -795,92 +976,7 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 取消订单 */
-	@RequestMapping(params = "cancelOrder")
-	public void cancelOrder(HttpServletRequest request, HttpServletResponse response) {
-		AppUtil.responseUTF8(response);
-		JSONObject returnJsonObj = new JSONObject();
-
-		String msg = "";
-		String statusCode = "";
-
-		String param = "";
-
-		try {
-
-			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
-
-			JSONObject jsondata = JSONObject.fromObject(param);
-			String token = jsondata.getString("token");
-			String orderId = jsondata.getString("orderId");
-
-			// 需不需要做时间的判断 在发车2个小时之前才能取消订单
-
-			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
-			// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
-			t.setOrderStatus(3);
-			// 支付状态 0：已付款，1：退款中 2：已退款 3:：未付款
-			t.setOrderPaystatus("1");
-			systemService.updateEntitie(t);
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
-		} catch (Exception e) {
-			statusCode = AppGlobals.SYSTEM_ERROR;
-			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
-		}
-
-		returnJsonObj.put("msg", msg);
-		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", "");
-
-		responseOutWrite(response, returnJsonObj);
-	}
-
-	/** 确认完成 */
-	@RequestMapping(params = "completeOrder")
-	public void completeOrder(HttpServletRequest request, HttpServletResponse response) {
-		AppUtil.responseUTF8(response);
-		JSONObject returnJsonObj = new JSONObject();
-
-		String msg = "";
-		String statusCode = "";
-
-		String param = "";
-
-		try {
-			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
-
-			JSONObject jsondata = JSONObject.fromObject(param);
-			String token = jsondata.getString("token");
-			String orderId = jsondata.getString("orderId");
-
-			// 需不需要做时间的判断 在发车2个小时之前才能取消订单
-
-			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
-			// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
-			t.setOrderStatus(0);
-			systemService.updateEntitie(t);
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
-		} catch (Exception e) {
-			statusCode = AppGlobals.SYSTEM_ERROR;
-			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
-		}
-
-		returnJsonObj.put("msg", msg);
-		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", "");
-
-		responseOutWrite(response, returnJsonObj);
-	}
-
-	//验票界面
+	
 	
 	
 	/**

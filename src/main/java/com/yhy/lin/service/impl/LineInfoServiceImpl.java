@@ -124,7 +124,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			sqlCnt += " where 1=1 " + sqlWhere;
 		}
 		System.out.println(sqlCnt.toString());
-		Long iCount = getCountForJdbcParam(sqlCnt + " a.type < 2 ", null);
+		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
 		 sql.append("select a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
 		 		+ "a.endY,a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
@@ -135,7 +135,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			sql.append(sqlWhere);
 		}
 		System.out.println(sql.toString());
-		List<Map<String, Object>> mapList = findForJdbc(sql.toString() + " a.type < 2 ", dataGrid.getPage(), dataGrid.getRows());
+		List<Map<String, Object>> mapList = findForJdbc(sql.toString() , dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
 				new Db2Page("id")

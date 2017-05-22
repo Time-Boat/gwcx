@@ -47,6 +47,27 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 
 	private String userId; //用户id
 	
+	private String cityName; //城市名称
+	private String cityId; //城市id
+	
+	@Column(name = "city_name")
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+	
+	@Column(name = "city_id")
+	public String getCityId() {
+		return cityId;
+	}
+
+	public void setCityId(String cityId) {
+		this.cityId = cityId;
+	}
+
 	@Column(name = "user_id")
 	public String getUserId() {
 		return userId;

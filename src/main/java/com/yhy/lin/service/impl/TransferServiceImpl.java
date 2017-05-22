@@ -29,7 +29,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	public JSONObject getDatagrid(TransferorderEntity transferorder,DataGrid dataGrid,
 			String fc_begin,String fc_end,String ddTime_begin,String ddTime_end){
 		String sqlWhere = getWhere(transferorder,fc_begin,fc_end,ddTime_begin,ddTime_end);
+		
 		StringBuffer sql = new StringBuffer();
+		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ " left join driversinfo d on b.driverId =d.id  "
@@ -38,7 +40,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sqlCnt += sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append("select t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_name,a.order_terminus_station_name,");
+		sql.append("select a.city_name,a.city_id,t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_name,a.order_terminus_station_name,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
@@ -74,7 +76,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				,new Db2Page("applicationTime", "applicationTime", null)
 				,new Db2Page("lineId", "line_id", null)
 				,new Db2Page("lineName", "line_name", null)
-
+				,new Db2Page("cityName", "city_name", null)
 				
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
@@ -135,8 +137,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
 		*/
 		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_Name,a.order_terminus_station_Name,");
-		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
-		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime ");
+		sql.append(" a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
+		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime, ");
+		sql.append(" a.city_id,a.city_name ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
 
 		sql.append(" where a.id='"+id+"'");
@@ -172,6 +175,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				if(obj[21]!=null){
 					transferorderView.setApplicationTime(sdf.parse(obj[21].toString()));
 				}
+				transferorderView.setCityId(String.valueOf(obj[22]));
+				transferorderView.setCityName(String.valueOf(obj[23]));
 			}catch (Exception e) {	
 			}
 		}

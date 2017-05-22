@@ -2,6 +2,8 @@ package com.yhy.lin.entity;
 
 import java.util.Date;
 
+import javax.persistence.Column;
+
 public class TransferorderView implements java.io.Serializable {
 	private String id;//主键
 	private String  orderId;//订单id
@@ -33,6 +35,25 @@ public class TransferorderView implements java.io.Serializable {
 	private String driverMobile;//司机手机号
 	private String licencePlate;//车牌号
 	private String carStatus;//车辆状态
+	
+	private String cityName; //城市名称
+	private String cityId; //城市id
+	
+	public String getCityName() {
+		return cityName;
+	}
+
+	public void setCityName(String cityName) {
+		this.cityName = cityName;
+	}
+	
+	public String getCityId() {
+		return cityId;
+	}
+
+	public void setCityId(String cityId) {
+		this.cityId = cityId;
+	}
 	
 	public String getId() {
 		return id;

@@ -21,11 +21,16 @@ public class APIHttpClient {
 	//登录接口
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
 	//订单接口地址
-    private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+    //private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
     //线路站点信息地址
     //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
     //获取机场站点或者火车站站点信息
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getPTStation";
+	//取消订单
+	//private static String apiURL = "http://localhost:8080/gwcx/app.do?cancelOrder";
+	//完成订单
+	private static String apiURL = "http://localhost:8080/gwcx/app.do?completeOrder";
+	
 	
     private Log logger = LogFactory.getLog(this.getClass());  
     private static final String pattern = "yyyy-MM-dd HH:mm:ss:SSS";  
@@ -114,25 +119,30 @@ public class APIHttpClient {
 //        arry.add(j);  
         
         //接送机订单测试
-        j.addProperty("orderType", "2");  
-        j.addProperty("orderStartingStationId", "2c9a500d5bf61df2015bf6b91b85003c");  
-        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b1e26d000a");  
-        j.addProperty("orderStartime", "2011-01-01 11:12:13");  
-        j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
-        j.addProperty("orderUnitprice", "20");  
-        j.addProperty("orderNumbers", "3");  
-        j.addProperty("orderContactsname", "33333");  
-        j.addProperty("orderContactsmobile", "15527916902");  
-        j.addProperty("orderFlightnumber", "");
-        j.addProperty("orderStatus", "1");
-        j.addProperty("orderTrainnumber", "Z-15");  
-        j.addProperty("orderPaytype", "1"); 
-        j.addProperty("orderPaystatus", "0");  
-        j.addProperty("orderTerminusStationName", "测试终点"); 
-        j.addProperty("orderStartingStationName", "测试起点"); 
-        j.addProperty("userId", "4028820d5beb1c38015beb3fa78b0002"); 
-        j.addProperty("orderTotalPrice", "60"); 
+//        j.addProperty("orderType", "2");  
+//        j.addProperty("orderStartingStationId", "2c9a500d5bf61df2015bf6b91b85003c");  
+//        j.addProperty("orderTerminusStationId", "402882f45b897e24015b89b1e26d000a");  
+//        j.addProperty("orderStartime", "2011-01-01 11:12:13");  
+//        j.addProperty("orderExpectedarrival", "2011-01-01 13:12:13");  
+//        j.addProperty("orderUnitprice", "20");  
+//        j.addProperty("orderNumbers", "3");  
+//        j.addProperty("orderContactsname", "33333");  
+//        j.addProperty("orderContactsmobile", "15527916902");  
+//        j.addProperty("orderFlightnumber", "");
+//        j.addProperty("orderStatus", "1");
+//        j.addProperty("orderTrainnumber", "Z-15");  
+//        j.addProperty("orderPaytype", "1"); 
+//        j.addProperty("orderPaystatus", "0");  
+//        j.addProperty("orderTerminusStationName", "测试终点"); 
+//        j.addProperty("orderStartingStationName", "测试起点"); 
+//        j.addProperty("userId", "4028820d5beb1c38015beb3fa78b0002"); 
+//        j.addProperty("orderTotalPrice", "60"); 
       	
+        //取消订单
+		j.addProperty("orderId", "4028b8815c26b59b015c26c92ae80010"); 
+		j.addProperty("token", ""); 
+        
+        
         System.out.println(ac.post(j.toString()));  
     }  
   

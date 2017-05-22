@@ -6,7 +6,7 @@ package com.yhy.lin.app.entity;
  * @author Administrator
  * @date 2017年5月21日 上午1:18:21
  */
-public class AppUserOrderDetailEntity extends AppUserOrderEntity {
+public class AppUserOrderDetailEntity extends AppBaseOrderEntity {
 
 	private String id;
 	
@@ -21,44 +21,32 @@ public class AppUserOrderDetailEntity extends AppUserOrderEntity {
 	private String orderContactsname; // 联系人
 	private String orderContactsmobile; // 联系人手机号
 	private String applicationTime; // 下单时间
-	private String orderStartingStationName;// 起点站
-	private String orderTerminusStationName;// 终点站
-	private String orderStatus;// 订单状态
-								// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
 	private String orderType;// 订单类型 0:接机 1:送机 2:接火车 3:送火车
-	private String orderId;// 订单id
-	private String orderStartime;// 发车时间
-	private String orderNumbers;// 车票数量
-	private String orderTotalPrice;// 总价
-
+	private String orderId;// 订单编号
+	
 	private String licencePlate;// 车牌号
-	private String carType;// 车辆状态
+	private String carType;// 车辆类型
 
-	private String driver;
-	private String driverPhone;
+	private String driver;//司机
+	private String driverPhone;//司机手机号
 
-	public String getOrderStartingStationName() {
-		return orderStartingStationName;
+	private String stationStartTime;   //出发时间
+	private String stationEndTime;     //到达时间
+	
+	public String getStationStartTime() {
+		return stationStartTime;
 	}
 
-	public void setOrderStartingStationName(String orderStartingStationName) {
-		this.orderStartingStationName = orderStartingStationName;
+	public void setStationStartTime(String stationStartTime) {
+		this.stationStartTime = stationStartTime;
 	}
 
-	public String getOrderTerminusStationName() {
-		return orderTerminusStationName;
+	public String getStationEndTime() {
+		return stationEndTime;
 	}
 
-	public void setOrderTerminusStationName(String orderTerminusStationName) {
-		this.orderTerminusStationName = orderTerminusStationName;
-	}
-
-	public String getOrderStatus() {
-		return orderStatus;
-	}
-
-	public void setOrderStatus(String orderStatus) {
-		this.orderStatus = orderStatus;
+	public void setStationEndTime(String stationEndTime) {
+		this.stationEndTime = stationEndTime;
 	}
 
 	public String getOrderType() {
@@ -75,30 +63,6 @@ public class AppUserOrderDetailEntity extends AppUserOrderEntity {
 
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
-	}
-
-	public String getOrderStartime() {
-		return orderStartime;
-	}
-
-	public void setOrderStartime(String orderStartime) {
-		this.orderStartime = orderStartime;
-	}
-
-	public String getOrderNumbers() {
-		return orderNumbers;
-	}
-
-	public void setOrderNumbers(String orderNumbers) {
-		this.orderNumbers = orderNumbers;
-	}
-
-	public String getOrderTotalPrice() {
-		return orderTotalPrice;
-	}
-
-	public void setOrderTotalPrice(String orderTotalPrice) {
-		this.orderTotalPrice = orderTotalPrice;
 	}
 
 	public String getLicencePlate() {
