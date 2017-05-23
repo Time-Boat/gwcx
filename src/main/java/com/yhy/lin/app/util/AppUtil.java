@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
+import sun.misc.BASE64Decoder;
 
 public class AppUtil {
 	// 将Json对象转String类型输出页面
@@ -57,20 +58,16 @@ public class AppUtil {
 
 	//input流转成byte字节数组
 	public static final byte[] readBytes(InputStream is, int contentLen) {
-		try {
-			int a = is.available();
-			String b = a+"";
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 		if (contentLen > 0) {
 			int readLen = 0;
 			int readLengthThisTime = 0;
 			byte[] message = new byte[contentLen];
 			try {
 				while (readLen != contentLen) {
-					readLengthThisTime = is.read(message);
+					
+					//读取的方式不一样会出问题。。。。
+//					readLengthThisTime = is.read(message);
+					readLengthThisTime = is.read(message, readLen, contentLen - readLen);
 					if (readLengthThisTime == -1) {// Should not happen.
 						break;
 					}
@@ -88,9 +85,50 @@ public class AppUtil {
 				}
 			}
 		}
-		
 		return new byte[] {};
 	}
+	
+//	//获取body中的流，将其转换成json字符串
+//	public static String inputToStr(HttpServletRequest request) throws IOException {
+//		request.setCharacterEncoding("UTF-8");
+//		InputStream is = request.getInputStream();
+//		int size = request.getContentLength();
+//		byte[] reqBodyBytes = readBytes(is, size);
+//		String param = new String(reqBodyBytes,"utf-8");
+//		return param;
+//	}
+	
+//	public static final byte[] readBytes(InputStream is, int contentLen) {
+//        if (contentLen > 0) {
+//                int readLen = 0;
+//
+//                int readLengthThisTime = 0;
+//
+//                byte[] message = new byte[contentLen];
+//
+//                try {
+//
+//                        while (readLen != contentLen) {
+//
+//                                readLengthThisTime = is.read(message, readLen, contentLen
+//                                                - readLen);
+//
+//                                if (readLengthThisTime == -1) {// Should not happen.
+//                                        break;
+//                                }
+//
+//                                readLen += readLengthThisTime;
+//                        }
+//
+//                        return message;
+//                } catch (IOException e) {
+//                        // Ignore
+//                        // e.printStackTrace();
+//                }
+//        }
+//
+//        return new byte[] {};
+//}
 	
 	//获取body中的流，将其转换成json字符串
 	public static String inputToStr(HttpServletRequest request) throws IOException {
@@ -98,10 +136,12 @@ public class AppUtil {
 		InputStream is = request.getInputStream();
 		int size = request.getContentLength();
 		byte[] reqBodyBytes = readBytes(is, size);
-		String param = new String(reqBodyBytes,"utf-8");
+		String res = new String(reqBodyBytes);
+		String param = Base64Util.getFromBase64(res);
 		return param;
 	}
-	
+		
+		
 	/**
 	 * 将值为null的字符串转为空字符串
 	 *

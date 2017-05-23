@@ -123,9 +123,13 @@
 						<value>app.do?getPTStation</value>
 						<value>app.do?getOrderDetail</value>
 						
-						<value>app.do?continuePayment</value> <!-- 可能要废弃 -->
+						<value>app.do?continuePayment</value> <!-- 废弃 -->
 						<value>app.do?cancelOrder</value>
 						<value>app.do?completeOrder</value>
+						<value>app.do?feedback</value>
+						
+						<value>app.do?updateUserInfo</value>
+						<value>app.do?getUserInfo</value>
 						
 					</list>
 				</property>

@@ -40,9 +40,11 @@ import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
@@ -976,8 +978,128 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
+	/** 意见反馈 */
+	@RequestMapping(params = "feedback")
+	public void feedback(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		try {
+			param = AppUtil.inputToStr(request);
+			System.out.println("前端传递参数：" + param);
+
+			JSONObject jsondata = JSONObject.fromObject(param);
+			String token = jsondata.getString("token");
+
+			Gson g = new Gson();
+			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
+			t.setCreateTime(getCurTime());
+			t.setId(UUIDGenerator.generate());
+			
+			systemService.save(t);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", "");
+
+		responseOutWrite(response, returnJsonObj);
+	} 
 	
+	/** 用户个人信息 */
+	@RequestMapping(params = "getUserInfo")
+	public void personalInfo(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		try {
+			param = AppUtil.inputToStr(request);
+			System.out.println("前端传递参数：" + param);
+
+			JSONObject jsondata = JSONObject.fromObject(param);
+			String token = jsondata.getString("token");
+
+			Gson g = new Gson();
+			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
+			t.setCreateTime(getCurTime());
+			t.setId(UUIDGenerator.generate());
+			
+			systemService.save(t);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", "");
+
+		responseOutWrite(response, returnJsonObj);
+	} 
 	
+	/** 修改用户个人 */
+	@RequestMapping(params = "updateUserInfo")
+	public void uploadPersonalInfo(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		try {
+			param = AppUtil.inputToStr(request);
+			System.out.println("前端传递参数：" + param);
+			
+			JSONObject jsondata = JSONObject.fromObject(param);
+			String token = jsondata.getString("token");
+			String imagesBaseBM = jsondata.getString("header");
+
+			boolean b = Base64ImageUtil.generateImage(imagesBaseBM, "d:/testa.jpg");
+			
+			Gson g = new Gson();
+			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
+			t.setCreateTime(getCurTime());
+			t.setId(UUIDGenerator.generate());
+			
+			systemService.save(t);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", "");
+
+		responseOutWrite(response, returnJsonObj);
+	} 
 	
 	/**
 	 * 参数检测是否为空 (封装一个统一的参数检测为空的方法，后面在做吧)
