@@ -1,11 +1,11 @@
 package com.yhy.lin.app.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,9 +23,7 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -35,11 +33,13 @@ import com.taobao.api.TaobaoClient;
 import com.taobao.api.request.AlibabaAliqinFcSmsNumSendRequest;
 import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import com.yhy.lin.app.entity.AppCheckTicket;
+import com.yhy.lin.app.entity.AppCustomerEntity;
 import com.yhy.lin.app.entity.AppLineStationInfoEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.util.AppGlobals;
@@ -50,8 +50,6 @@ import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
-
-import freemarker.template.utility.DateUtil;
 
 /**
  * Description : 接口处理类
@@ -280,6 +278,12 @@ public class AppInterfaceController extends BaseController {
 		JSONObject data = new JSONObject();
 		boolean success = false;
 
+		// 记录常用站点id
+		String commonAddrId = "";
+
+		// 订单前缀
+		String orderPrefix = "";
+
 		String param;
 		try {
 			param = AppUtil.inputToStr(request);
@@ -305,19 +309,54 @@ public class AppInterfaceController extends BaseController {
 			} else {
 				List<Line_busStopEntity> list = null;
 				// 如果是接机或者接火车
-				if (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")
-						|| AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType() + "")) {
+				// if
+				// (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType()
+				// + "")
+				// ||
+				// AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType()
+				// + "")) {
+				//
+				// list = systemService.findHql(" from Line_busStopEntity where
+				// busStopsId=? ", eId);
+				// t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
+				// commonAddrId = eId;
+				// } else if
+				// (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType()
+				// + "")
+				// ||
+				// AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType()
+				// + "")) { // 送机||送火车
+				//
+				// list = systemService.findHql(" from Line_busStopEntity where
+				// busStopsId=? ", sId);
+				// t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
+				// commonAddrId = sId;
+				// }
 
-					list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", eId);
-					t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
-
-				} else if (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType() + "")
-						|| AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType() + "")) { // 送机||送火车
-
-					list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", sId);
-					t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
-
+				switch (t.getOrderType() + "") {
+				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
+					commonAddrId = eId;
+					orderPrefix = MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER;
+					break;
+				case AppGlobals.DESTINATION_TO_AIRPORT_TYPE:
+					commonAddrId = sId;
+					orderPrefix = MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER;
+					break;
+				case AppGlobals.TRAIN_TO_DESTINATION_TYPE:
+					commonAddrId = eId;
+					orderPrefix = MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER;
+					break;
+				case AppGlobals.DESTINATION_TO_TRAIN_TYPE:
+					commonAddrId = sId;
+					orderPrefix = MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER;
+					break;
+				default:
+					break;
 				}
+
+				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", commonAddrId);
+				// 生成订单
+				t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
 
 				String lId = list.get(0).getLineId();
 				List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
@@ -329,9 +368,25 @@ public class AppInterfaceController extends BaseController {
 				t.setApplicationTime(getDate());
 				// t.setOrderType(1);
 
-				// 订单的城市要不要加一个
-
 				systemService.save(t);
+
+				CustomerCommonAddrEntity c = null;
+				// 记录常用站点
+				List<CustomerCommonAddrEntity> addrs = systemService.findHql(
+						" from CustomerCommonAddrEntity where user_id=? and station_id=? ", t.getUserId(),
+						commonAddrId);
+				if (addrs.size() > 0) {
+					c = addrs.get(0);
+					c.setCount(c.getCount() + 1);
+				} else {
+					c = new CustomerCommonAddrEntity();
+					c.setCount(1);
+					c.setStationId(commonAddrId);
+					c.setUserId(t.getUserId());
+					c.setId(UUIDGenerator.generate());
+				}
+
+				systemService.save(c);
 
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
@@ -434,7 +489,8 @@ public class AppInterfaceController extends BaseController {
 			// token
 			String token = request.getParameter("token");
 
-			//
+			String userId = request.getParameter("userId");
+
 			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
 
 				List<AppLineStationInfoEntity> lList = new ArrayList<AppLineStationInfoEntity>();
@@ -444,8 +500,8 @@ public class AppInterfaceController extends BaseController {
 						.findForJdbc(
 								" select lf.id,lf.name,lf.price,lf.lineTimes "
 										+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-										+ " where busStopsId=? and lf.cityId=? and lf.deleteFlag=0  ",
-								stationId, cityId);
+										+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0  ",
+								stationId, cityId, serveType);
 
 				StringBuffer sbf = new StringBuffer();
 				for (Map<String, Object> a : lineList) {
@@ -467,17 +523,38 @@ public class AppInterfaceController extends BaseController {
 					// b.setLineId(asi.getId());
 					// }
 				}
-				String t = getStationType(serveType);
+//				String t = getStationType(serveType);
 				if (sbf.length() > 0)
 					sbf.deleteCharAt(sbf.length() - 1);
 
-				// 查询指定id线路中的所有站点
+				// 查询指定id线路中的所有普通站点
 				List<AppStationInfoEntity> stationList = systemService.findHql(
-						"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", t);
+						"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", 0);
 
+				// 常用站点列表
+				// List<CustomerCommonAddrEntity> c =
+				// systemService.findHql("from CustomerCommonAddrEntity where
+				// user_id=? ", userId);
+				List<Map<String, Object>> map = systemService.findForJdbc(
+						"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
+						+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in (" + sbf.toString() + ") and station_type=?",
+						userId, 0);
+				
+				List<AppStationInfoEntity> cList = new ArrayList<>();
+				for (Map<String, Object> c : map) {
+					AppStationInfoEntity addr = new AppStationInfoEntity();
+					addr.setId(c.get("id") + "");
+					addr.setLineId(c.get("lineId") + "");
+					addr.setName(c.get("name") + "");
+					addr.setStopLocation(c.get("stopLocation") + "");
+					addr.setX(c.get("y") + "");
+					addr.setY(c.get("y") + "");
+					cList.add(addr);
+				}
+
+				data.put("addrs", cList);
 				data.put("lineInfo", lList);
 				data.put("stationInfo", stationList);
-
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
 			} else {
@@ -610,10 +687,10 @@ public class AppInterfaceController extends BaseController {
 	public void getOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-		
+
 		String msg = "";
 		String statusCode = "";
-		
+
 		String token = request.getParameter("token");
 		String orderId = request.getParameter("orderId");
 
@@ -621,15 +698,16 @@ public class AppInterfaceController extends BaseController {
 		AppUserOrderDetailEntity aod = new AppUserOrderDetailEntity();
 		try {
 
-			list = systemService
-					.findForJdbc("select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name, "
+			list = systemService.findForJdbc(
+					"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name, "
 							+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
 							+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes "
 							+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-							+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id where a.id=? ", orderId);
+							+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id where a.id=? ",
+					orderId);
 
 			for (Map<String, Object> map : list) {
-				//会出现空指针么...
+				// 会出现空指针么...
 				Date date = (Date) map.get("order_startime");
 				Date date1 = (Date) map.get("applicationTime");
 
@@ -647,29 +725,29 @@ public class AppInterfaceController extends BaseController {
 
 				aod.setOrderContactsname(map.get("order_contactsname") + "");
 				aod.setOrderContactsmobile(map.get("order_contactsmobile") + "");
-				aod.setLicencePlate(AppUtil.Null2Blank(map.get("licence_plate")+""));
+				aod.setLicencePlate(AppUtil.Null2Blank(map.get("licence_plate") + ""));
 				aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
 
 				aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
 				aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
-				
-				//发车时间
+
+				// 发车时间
 				aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));
-				//线路时长
-				String lineTime = map.get("lineTimes")+"";
-				
-				//在发车时间的基础上加上线路所用时长
-				if(StringUtil.isNotEmpty(lineTime)){
+				// 线路时长
+				String lineTime = map.get("lineTimes") + "";
+
+				// 在发车时间的基础上加上线路所用时长
+				if (StringUtil.isNotEmpty(lineTime)) {
 					double lt = Double.parseDouble(lineTime);
-					
+
 					long a = (long) (date.getTime() + (lt * 60 * 60 * 1000));
-					
+
 					aod.setStationEndTime(DateUtils.date2Str(new Date(a), DateUtils.short_time_sdf));
-				}else{
+				} else {
 					aod.setStationEndTime("");
 				}
 			}
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -907,7 +985,7 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 验票界面  */
+	/** 验票界面 */
 	@RequestMapping(params = "checkTicket")
 	public void checkTicket(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -920,7 +998,7 @@ public class AppInterfaceController extends BaseController {
 		try {
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
-			
+
 			String pageNo = request.getParameter("pageNo");
 			if (!StringUtil.isNotEmpty(pageNo)) {
 				pageNo = "1";
@@ -930,12 +1008,13 @@ public class AppInterfaceController extends BaseController {
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "15";
 			}
-			
+
 			StringBuffer sql = new StringBuffer();
-			sql.append(" select a.id,a.order_status,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,b.startTime "  
-				+ " ,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber "
-				+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-				+ " left join driversinfo d on b.driverId =d.id where a.user_id=? and a.order_status='2' and order_paystatus='0' ");
+			sql.append(
+					" select a.id,a.order_status,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,b.startTime "
+							+ " ,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber "
+							+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+							+ " left join driversinfo d on b.driverId =d.id where a.user_id=? and a.order_status='2' and order_paystatus='0' ");
 
 			list = systemService.findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
 					Integer.parseInt(maxPageItem), userId);
@@ -945,7 +1024,7 @@ public class AppInterfaceController extends BaseController {
 				AppCheckTicket auo = new AppCheckTicket();
 				auo.setId(map.get("id") + "");
 				auo.setOrderNumbers(map.get("order_numbers") + "");
-				auo.setOrderStartime(map.get("startTime")+"");
+				auo.setOrderStartime(map.get("startTime") + "");
 				auo.setOrderStartingStationName(map.get("order_starting_station_name") + "");
 				auo.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
 				// 要做一下为空的判断，这个字段不会为空
@@ -955,7 +1034,7 @@ public class AppInterfaceController extends BaseController {
 				auo.setCarType(map.get("car_type") + "");
 				auo.setDriver(map.get("driver_name") + "");
 				auo.setDriverPhone(map.get("phoneNumber") + "");
-				
+
 				list1.add(auo);
 			}
 
@@ -983,7 +1062,7 @@ public class AppInterfaceController extends BaseController {
 	public void feedback(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
 
@@ -1000,9 +1079,9 @@ public class AppInterfaceController extends BaseController {
 			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
 			t.setCreateTime(getCurTime());
 			t.setId(UUIDGenerator.generate());
-			
+
 			systemService.save(t);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -1016,18 +1095,22 @@ public class AppInterfaceController extends BaseController {
 		returnJsonObj.put("data", "");
 
 		responseOutWrite(response, returnJsonObj);
-	} 
-	
+	}
+
 	/** 用户个人信息 */
 	@RequestMapping(params = "getUserInfo")
 	public void personalInfo(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
+		JSONObject data = new JSONObject();
+		
 		String msg = "";
 		String statusCode = "";
 
 		String param = "";
+
+		AppCustomerEntity a = null;
 
 		try {
 			param = AppUtil.inputToStr(request);
@@ -1035,14 +1118,25 @@ public class AppInterfaceController extends BaseController {
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 			String token = jsondata.getString("token");
+			String userId = jsondata.getString("userId");
 
-			Gson g = new Gson();
-			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
-			t.setCreateTime(getCurTime());
-			t.setId(UUIDGenerator.generate());
+			CarCustomerEntity cc = systemService.getEntity(CarCustomerEntity.class, userId);
+
+			a = new AppCustomerEntity();
+			a.setAddress(cc.getAddress());
+			a.setCardNumber(cc.getCardNumber());
+			a.setUserId(cc.getCustomerId());
+			a.setCustomerImg(cc.getCustomerImg());
+			a.setPhone(cc.getPhone());
+			a.setRealName(cc.getRealName());
+			a.setSex(cc.getSex());
 			
-			systemService.save(t);
+			List<Map<String, Object>> map = systemService.findForJdbc(
+					"select b.name,b.stopLocation from customer_common_addr c inner join busstopinfo b on c.station_id=b.id ");
 			
+
+			data.put("addrs", map);
+			data.put("customerInfo", a);
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -1053,11 +1147,11 @@ public class AppInterfaceController extends BaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", "");
+		returnJsonObj.put("data", data.toString());
 
 		responseOutWrite(response, returnJsonObj);
-	} 
-	
+	}
+
 	/** 修改用户个人 */
 	@RequestMapping(params = "updateUserInfo")
 	public void uploadPersonalInfo(HttpServletRequest request, HttpServletResponse response) {
@@ -1072,20 +1166,33 @@ public class AppInterfaceController extends BaseController {
 		try {
 			param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
-			
-			JSONObject jsondata = JSONObject.fromObject(param);
-			String token = jsondata.getString("token");
-			String imagesBaseBM = jsondata.getString("header");
 
-			boolean b = Base64ImageUtil.generateImage(imagesBaseBM, AppGlobals.EXTERNAL_FILE_PATH);
-			
-			Gson g = new Gson();
-			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
-			t.setCreateTime(getCurTime());
-			t.setId(UUIDGenerator.generate());
-			
-			systemService.save(t);
-			
+			JSONObject jsondata = JSONObject.fromObject(param);
+
+			String token = jsondata.getString("token");
+
+			String imagesBaseBM = jsondata.getString("header");
+			String pName = jsondata.getString("imgName");
+			String userId = jsondata.getString("userId");
+
+			String idCard = jsondata.getString("cardNumber");
+			String address = jsondata.getString("address");
+
+			String path = request.getSession().getServletContext().getRealPath("");
+
+			// 获取图片存储路径
+			String imgName = AppGlobals.WEB_FILE_PATH + userId + "_" + System.currentTimeMillis()
+					+ pName.substring(pName.lastIndexOf("."), pName.length());
+
+			boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgName);
+
+			CarCustomerEntity cc = systemService.getEntity(CarCustomerEntity.class, userId);
+			cc.setAddress(address);
+			cc.setCardNumber(idCard);
+			cc.setCustomerImg(imgName);
+
+			systemService.save(cc);
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {
@@ -1099,8 +1206,8 @@ public class AppInterfaceController extends BaseController {
 		returnJsonObj.put("data", "");
 
 		responseOutWrite(response, returnJsonObj);
-	} 
-	
+	}
+
 	/**
 	 * 参数检测是否为空 (封装一个统一的参数检测为空的方法，后面在做吧)
 	 */

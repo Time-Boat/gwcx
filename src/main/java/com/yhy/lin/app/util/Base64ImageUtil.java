@@ -16,7 +16,11 @@ public class Base64ImageUtil {
 		long l = System.currentTimeMillis();
 		System.out.println(strImg.length() / 1024);
 		System.out.println((System.currentTimeMillis() - l));
-		System.out.println(generateImage(strImg,""));
+		try {
+			System.out.println(generateImage(strImg,""));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	// 图片转化成base64字符串
@@ -41,28 +45,24 @@ public class Base64ImageUtil {
 	}
 
 	// base64字符串转化成图片
-	public static boolean generateImage(String imgStr,String imgPath) { // 对字节数组字符串进行Base64解码并生成图片
+	public static boolean generateImage(String imgStr,String imgPath) throws IOException { // 对字节数组字符串进行Base64解码并生成图片
 		if (imgStr == null) // 图像数据为空
 			return false;
 		BASE64Decoder decoder = new BASE64Decoder();
-		try {
-			// Base64解码
-			byte[] b = decoder.decodeBuffer(imgStr);
-			for (int i = 0; i < b.length; ++i) {
-				if (b[i] < 0) {// 调整异常数据
-					b[i] += 256;
-				}
+		// Base64解码
+		byte[] b = decoder.decodeBuffer(imgStr);
+		for (int i = 0; i < b.length; ++i) {
+			if (b[i] < 0) {// 调整异常数据
+				b[i] += 256;
 			}
-			// 生成jpeg图片
-			/*String imgFilePath = "E:/apache-tomcat-7.0.63/webapps/admin/attachment/vop/image/test22.jpg";// 新生成的图片
-			CreateFileUtil.createDir("E:/apache-tomcat-7.0.63/webapps/admin/attachment/vop/image");*/
-			OutputStream out = new FileOutputStream(imgPath);
-			out.write(b);
-			out.flush();
-			out.close();
-			return true;
-		} catch (Exception e) {
-			return false;
 		}
+		// 生成jpeg图片
+		/*String imgFilePath = "E:/apache-tomcat-7.0.63/webapps/admin/attachment/vop/image/test22.jpg";// 新生成的图片
+		CreateFileUtil.createDir("E:/apache-tomcat-7.0.63/webapps/admin/attachment/vop/image");*/
+		OutputStream out = new FileOutputStream(imgPath);
+		out.write(b);
+		out.flush();
+		out.close();
+		return true;
 	}
 }
