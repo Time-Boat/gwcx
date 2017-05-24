@@ -1077,7 +1077,7 @@ public class AppInterfaceController extends BaseController {
 			String token = jsondata.getString("token");
 			String imagesBaseBM = jsondata.getString("header");
 
-			boolean b = Base64ImageUtil.generateImage(imagesBaseBM, "d:/testa.jpg");
+			boolean b = Base64ImageUtil.generateImage(imagesBaseBM, AppGlobals.EXTERNAL_FILE_PATH);
 			
 			Gson g = new Gson();
 			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);

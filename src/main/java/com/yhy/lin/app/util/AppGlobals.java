@@ -32,6 +32,9 @@ public interface AppGlobals {
 	/** 班车 */
 	/** 包车 */
 
+	//web外部的文件存储路径
+	public static final String EXTERNAL_FILE_PATH = "C:\\userImg";
+	
 	/** 阿里大鱼服务器url */
 	public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
 
