@@ -3,11 +3,18 @@ package com.yhy.lin.app.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.jeecgframework.core.util.DateUtils;
+
+import com.yhy.lin.app.entity.CarCustomerEntity;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -217,5 +224,69 @@ public class AppUtil {
             return false;
         }
     }
+    
+    /**
+	 * 参数检测是否为空 (封装一个统一的参数检测为空的方法，后面在做吧)
+	 */
+	// public String checkParameter(JSONObject returnJsonObj, Object
+	// ...objects){
+	// for(Object i : objects){
+	//
+	// }
+	// returnJsonObj.put("msg", "缺少参数:" + );
+	// returnJsonObj.put("code", statusCode);
+	// if (list != null && list.size() > 0) {
+	// returnJsonObj.put("data", list);
+	// } else {
+	// returnJsonObj.put("data", "");
+	// }
+	//
+	// responseOutWrite(response, returnJsonObj);
+	// }
+
+
+	/**
+	 * 计算两个时间之间的差值，根据标志的不同而不同
+	 * 
+	 * @param flag
+	 *            计算标志，表示按照年/月/日/时/分/秒等计算
+	 * @param calSrc
+	 *            减数
+	 * @param calDes
+	 *            被减数
+	 * @return 两个日期之间的差值
+	 */
+	public static int compareDate(Date d1, Date d2, char flag) {
+
+		long diff = Math.abs(d1.getTime() - d2.getTime());
+
+		if (flag == 'd') {
+			return (int) (diff / (24 * 3600 * 1000));
+		}
+
+		if (flag == 'h') {
+			return (int) (diff / (3600 * 1000));
+		}
+
+		if (flag == 'm') {
+			return (int) (diff / (60 * 1000));
+		}
+
+		if (flag == 's') {
+			return (int) (diff / 1000);
+		}
+
+		return 0;
+	}
+
+	// 获取当前时间(字符串)
+	public static String getCurTime() {
+		return DateUtils.date2Str(DateUtils.datetimeFormat);
+	}
+
+	// 获取当前时间(Date)
+	public static Date getDate() {
+		return DateUtils.getDate();
+	}
     
 }

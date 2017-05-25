@@ -12,36 +12,55 @@ import org.hibernate.annotations.GenericGenerator;
 
 /**   
  * @Title: Entity
- * @Description: 用户意见反馈表
+ * @Description: 用户消息提醒列表
  * @author zhangdaihao
- * @date 2017-05-23 10:41:45
+ * @date 2017-05-25 10:11:45
  * @version V1.0   
  *
  */
 @Entity
-@Table(name = "feedback", schema = "")
+@Table(name = "customer_message", schema = "")
 @DynamicUpdate(true)
 @DynamicInsert(true)
 @SuppressWarnings("serial")
-public class FeedbackEntity implements java.io.Serializable {
+public class AppMessageListEntity implements java.io.Serializable {
 	/**id*/
 	private java.lang.String id;
 	/**用户id*/
 	private java.lang.String userId;
-	/**反馈内容*/
+	/**消息内容*/
 	private java.lang.String content;
 	/**创建时间*/
 	private java.lang.String createTime;
-	/**反馈状态（备用）*/
+	/**消息是否被查看过 0：否   1：是*/
 	private java.lang.String status;
-	/**备注（备用）*/
-	private java.lang.String remark;
+	/** 订单id */
+	private java.lang.String orderId;
+	/** 消息类型  0:新增  1:修改   */
+	private java.lang.String msgType;
 	
+	@Column(name ="ORDER_ID",nullable=true,length=32)
+	public java.lang.String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(java.lang.String orderId) {
+		this.orderId = orderId;
+	}
+	
+	@Column(name ="MSG_TYPE",nullable=true,length=1)
+	public java.lang.String getMsgType() {
+		return msgType;
+	}
+
+	public void setMsgType(java.lang.String msgType) {
+		this.msgType = msgType;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  id
 	 */
-	
 	@Id
 	@GeneratedValue(generator = "paymentableGenerator")
 	@GenericGenerator(name = "paymentableGenerator", strategy = "uuid")
@@ -61,7 +80,7 @@ public class FeedbackEntity implements java.io.Serializable {
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  用户id
 	 */
-	@Column(name ="USER_ID",nullable=true,length=20)
+	@Column(name ="USER_ID",nullable=true,length=32)
 	public java.lang.String getUserId(){
 		return this.userId;
 	}
@@ -75,7 +94,7 @@ public class FeedbackEntity implements java.io.Serializable {
 	}
 	/**
 	 *方法: 取得java.lang.String
-	 *@return: java.lang.String  反馈内容
+	 *@return: java.lang.String  消息内容
 	 */
 	@Column(name ="CONTENT",nullable=true,length=300)
 	public java.lang.String getContent(){
@@ -84,7 +103,7 @@ public class FeedbackEntity implements java.io.Serializable {
 
 	/**
 	 *方法: 设置java.lang.String
-	 *@param: java.lang.String  反馈内容
+	 *@param: java.lang.String  消息内容
 	 */
 	public void setContent(java.lang.String content){
 		this.content = content;
@@ -107,7 +126,7 @@ public class FeedbackEntity implements java.io.Serializable {
 	}
 	/**
 	 *方法: 取得java.lang.String
-	 *@return: java.lang.String  反馈状态（备用）
+	 *@return: java.lang.String  消息是否被查看过 0：否   1：是
 	 */
 	@Column(name ="STATUS",nullable=true,length=1)
 	public java.lang.String getStatus(){
@@ -116,25 +135,9 @@ public class FeedbackEntity implements java.io.Serializable {
 
 	/**
 	 *方法: 设置java.lang.String
-	 *@param: java.lang.String  反馈状态（备用）
+	 *@param: java.lang.String  消息是否被查看过 0：否   1：是
 	 */
 	public void setStatus(java.lang.String status){
 		this.status = status;
-	}
-	/**
-	 *方法: 取得java.lang.String
-	 *@return: java.lang.String  备注（备用）
-	 */
-	@Column(name ="REMARK",nullable=true,length=255)
-	public java.lang.String getRemark(){
-		return this.remark;
-	}
-
-	/**
-	 *方法: 设置java.lang.String
-	 *@param: java.lang.String  备注（备用）
-	 */
-	public void setRemark(java.lang.String remark){
-		this.remark = remark;
 	}
 }

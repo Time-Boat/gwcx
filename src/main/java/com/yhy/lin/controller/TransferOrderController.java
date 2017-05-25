@@ -13,11 +13,14 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yhy.lin.entity.LineInfoEntity;
+import com.yhy.lin.app.entity.AppMessageListEntity;
+import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
@@ -32,6 +35,7 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("/transferOrderController")
 public class TransferOrderController extends BaseController{
+	
 	@Autowired
 	private SystemService systemService;
 	
@@ -90,32 +94,19 @@ public class TransferOrderController extends BaseController{
 		String startTime = request.getParameter("startDate");//发车时间
 		String licencePlateId = request.getParameter("licencePlateId");//车牌id
 		String driverId = request.getParameter("driverId");//司机id
-		//线路id暂时保留
-		if(StringUtil.isNotEmpty(ids)){
-			List<String> orderIds = extractIdListByComma(ids);
-			List<Order_LineCarDiverEntity> list = new ArrayList<Order_LineCarDiverEntity>();
-			List<TransferorderEntity> tList = new ArrayList<TransferorderEntity>();
-		        for(int i=0;i<orderIds.size();i++){
-		        	Order_LineCarDiverEntity order_LineCarDiver = new Order_LineCarDiverEntity();
-		        	order_LineCarDiver.setId(orderIds.get(i));
-		        	order_LineCarDiver.setStartTime(startTime);
-		        	order_LineCarDiver.setLicencePlateId(licencePlateId);
-		        	order_LineCarDiver.setDriverId(driverId);
-		        	list.add(order_LineCarDiver);
-		        	
-		        	//修改订单状态
-		        	TransferorderEntity tfd = new TransferorderEntity();
-		        	tfd = systemService.getEntity(TransferorderEntity.class, orderIds.get(i));
-		        	tfd.setOrderStatus(2);
-		        	tList.add(tfd);
-		        }
-		        systemService.saveAllEntitie(list);
-		        systemService.saveAllEntitie(tList);
-		        
-		        message="站点挂接成功";
-		        j.setSuccess(true);
-		}
-		j.setMsg(message);
+		String licencePlateName = request.getParameter("licencePlateName");//车牌号
+		
+		List<String> orderIds = extractIdListByComma(ids);
+		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId, licencePlateName);
+		
+	    if(b){
+	    	message="订单处理成功";
+	    }else{
+	    	message="服务器异常";
+	    }
+	    
+	    j.setSuccess(b);
+	    j.setMsg(message);
 	    return j;
 	}
 	

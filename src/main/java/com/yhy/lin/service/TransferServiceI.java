@@ -1,5 +1,7 @@
 package com.yhy.lin.service;
 
+import java.util.List;
+
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.CommonService;
 
@@ -13,4 +15,6 @@ public interface TransferServiceI extends CommonService{
 	
 	//根据id查询接送机的详细信息
 	public TransferorderView getDetail(String id);
+
+	public boolean saveDriverAndDriver(List<String> orderIds, String startTime, String licencePlateId, String driverId, String licencePlateName);
 }

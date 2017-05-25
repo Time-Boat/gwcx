@@ -1,9 +1,6 @@
 package com.yhy.lin.app.controller;
 
-import java.io.File;
 import java.io.IOException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 
-import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.StringUtil;
@@ -35,6 +31,7 @@ import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 import com.yhy.lin.app.entity.AppCheckTicket;
 import com.yhy.lin.app.entity.AppCustomerEntity;
 import com.yhy.lin.app.entity.AppLineStationInfoEntity;
+import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
@@ -59,7 +56,8 @@ import com.yhy.lin.entity.TransferorderEntity;
  */
 @Controller
 @RequestMapping(value = "/app")
-public class AppInterfaceController extends BaseController {
+public class AppInterfaceController extends AppBaseController {
+
 	/**
 	 * Logger for this class
 	 */
@@ -101,13 +99,13 @@ public class AppInterfaceController extends BaseController {
 
 					if (user != null) {
 						Date date = user.getCodeUpdateTime();
-						int m = compareDate(DateUtils.getDate(), date, 'm');
+						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm');
 						// 30分钟的有效期验证
 						// if (m < 30 && user.getStatus().equals("0") &&
 						// code.equals(user.getSecurityCode())) {
 						if (m > 30 && user.getStatus().equals("1") && code.equals(user.getSecurityCode())) { // 测试
 							String sql = "";
-							String curTime = getCurTime();
+							String curTime = AppUtil.getCurTime();
 							String token = "";
 
 							// 把token的修改时间拿出来与当前时间进行比较 登录的时候不用比较。。。
@@ -239,7 +237,7 @@ public class AppInterfaceController extends BaseController {
 				UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
 
 				// 当前时间
-				String curTime = getCurTime();
+				String curTime = AppUtil.getCurTime();
 				String sql = "";
 				if (user == null) {
 					sql = "insert into car_customer set customer_id='" + UUIDGenerator.generate() + "',phone = '"
@@ -299,9 +297,9 @@ public class AppInterfaceController extends BaseController {
 			String startTime = t.getOrderStartime();
 
 			// 和当前时间进行比较，出发时间和当前时间不能低于4个小时
-			Date curDate = getDate();
+			Date curDate = AppUtil.getDate();
 			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
-			int m = compareDate(curDate, departTime, 'm');
+			int m = AppUtil.compareDate(curDate, departTime, 'm');
 
 			if (m > 240) {
 				msg = "必须提前4个小时才能下订单，无法取消订单";
@@ -365,7 +363,7 @@ public class AppInterfaceController extends BaseController {
 				}
 
 				t.setLineId(lId);
-				t.setApplicationTime(getDate());
+				t.setApplicationTime(AppUtil.getDate());
 				// t.setOrderType(1);
 
 				systemService.save(t);
@@ -496,12 +494,11 @@ public class AppInterfaceController extends BaseController {
 				List<AppLineStationInfoEntity> lList = new ArrayList<AppLineStationInfoEntity>();
 
 				// 根据起点id城市查找线路信息
-				List<Map<String, Object>> lineList = systemService
-						.findForJdbc(
-								" select lf.id,lf.name,lf.price,lf.lineTimes "
-										+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-										+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0  ",
-								stationId, cityId, serveType);
+				List<Map<String, Object>> lineList = systemService.findForJdbc(
+						" select lf.id,lf.name,lf.price,lf.lineTimes "
+								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
+								+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0  ",
+						stationId, cityId, serveType);
 
 				StringBuffer sbf = new StringBuffer();
 				for (Map<String, Object> a : lineList) {
@@ -523,7 +520,7 @@ public class AppInterfaceController extends BaseController {
 					// b.setLineId(asi.getId());
 					// }
 				}
-//				String t = getStationType(serveType);
+				// String t = getStationType(serveType);
 				if (sbf.length() > 0)
 					sbf.deleteCharAt(sbf.length() - 1);
 
@@ -537,9 +534,10 @@ public class AppInterfaceController extends BaseController {
 				// user_id=? ", userId);
 				List<Map<String, Object>> map = systemService.findForJdbc(
 						"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
-						+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in (" + sbf.toString() + ") and station_type=?",
+								+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in ("
+								+ sbf.toString() + ") and station_type=?",
 						userId, 0);
-				
+
 				List<AppStationInfoEntity> cList = new ArrayList<>();
 				for (Map<String, Object> c : map) {
 					AppStationInfoEntity addr = new AppStationInfoEntity();
@@ -905,10 +903,10 @@ public class AppInterfaceController extends BaseController {
 			// 关联表，获取发车时间 (可以建个视图)
 			Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
 
-			Date curDate = getDate();
+			Date curDate = AppUtil.getDate();
 			String sTime = o.getStartTime();
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
-			int m = compareDate(curDate, departTime, 'm');
+			int m = AppUtil.compareDate(curDate, departTime, 'm');
 
 			if (m > 120) {
 				msg = "发车时间超过两个小时，无法取消订单";
@@ -1062,7 +1060,7 @@ public class AppInterfaceController extends BaseController {
 	public void feedback(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-		
+
 		String msg = "";
 		String statusCode = "";
 
@@ -1077,7 +1075,7 @@ public class AppInterfaceController extends BaseController {
 
 			Gson g = new Gson();
 			FeedbackEntity t = g.fromJson(param, FeedbackEntity.class);
-			t.setCreateTime(getCurTime());
+			t.setCreateTime(AppUtil.getCurTime());
 			t.setId(UUIDGenerator.generate());
 
 			systemService.save(t);
@@ -1102,9 +1100,9 @@ public class AppInterfaceController extends BaseController {
 	public void personalInfo(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-		
+
 		JSONObject data = new JSONObject();
-		
+
 		String msg = "";
 		String statusCode = "";
 
@@ -1130,10 +1128,9 @@ public class AppInterfaceController extends BaseController {
 			a.setPhone(cc.getPhone());
 			a.setRealName(cc.getRealName());
 			a.setSex(cc.getSex());
-			
+
 			List<Map<String, Object>> map = systemService.findForJdbc(
 					"select b.name,b.stopLocation from customer_common_addr c inner join busstopinfo b on c.station_id=b.id ");
-			
 
 			data.put("addrs", map);
 			data.put("customerInfo", a);
@@ -1208,40 +1205,70 @@ public class AppInterfaceController extends BaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/**
-	 * 参数检测是否为空 (封装一个统一的参数检测为空的方法，后面在做吧)
-	 */
-	// public String checkParameter(JSONObject returnJsonObj, Object
-	// ...objects){
-	// for(Object i : objects){
-	//
-	// }
-	// returnJsonObj.put("msg", "缺少参数:" + );
-	// returnJsonObj.put("code", statusCode);
-	// if (list != null && list.size() > 0) {
-	// returnJsonObj.put("data", list);
-	// } else {
-	// returnJsonObj.put("data", "");
-	// }
-	//
-	// responseOutWrite(response, returnJsonObj);
-	// }
+	/** 获取消息通知 */
+	@RequestMapping(params = "getMessage")
+	public void getMessage(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
 
-	/**
-	 * 站点类型转换 线路类型 转 站点类型
-	 */
-	public String getStationType(String lineType) {
-		//
-		switch (lineType) {
-		case "2":
-		case "3":
-			return "2";
-		case "4":
-		case "5":
-			return "1";
-		default:
-			return lineType;
+		String msg = "";
+		String statusCode = "";
+
+		List<AppMessageListEntity> mList = new ArrayList<>();
+		List<Map<String, Object>> lm = null;
+		try {
+
+			String token = request.getParameter("token");
+			String userId = request.getParameter("userId");
+
+			String pageNo = request.getParameter("pageNo");
+			if (!StringUtil.isNotEmpty(pageNo)) {
+				pageNo = "1";
+			}
+
+			String maxPageItem = request.getParameter("maxPageItem");
+			if (!StringUtil.isNotEmpty(maxPageItem)) {
+				maxPageItem = "15";
+			}
+
+			// 对象中有几个字段没有赋值
+			// mList = systemService.findObjForJdbc(
+			// "select id,create_time from customer_message where user_id = '" +
+			// userId + "'", Integer.parseInt(pageNo),
+			// Integer.parseInt(maxPageItem), AppMessageListEntity.class);
+
+			lm = systemService.findForJdbcParam("select * from customer_message where user_id = ?",
+					Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
+
+			for (Map<String, Object> m : lm) {
+				AppMessageListEntity am = new AppMessageListEntity();
+				am.setContent(m.get("content") + "");
+				am.setCreateTime(m.get("create_time") + "");
+				am.setId(m.get("id") + "");
+				am.setMsgType(m.get("msg_type") + "");
+				am.setOrderId(m.get("order_id") + "");
+				am.setStatus(m.get("status")+"");
+				am.setUserId(m.get("user_id")+"");
+				mList.add(am);
+			}
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
 		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (mList != null && mList.size() > 0) {
+			returnJsonObj.put("data", mList);
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
 	}
 
 	/** 验证token是否有效 */
@@ -1252,85 +1279,11 @@ public class AppInterfaceController extends BaseController {
 			return false;
 
 		Date date = cc.getTokenUpdateTime();
-		int day = compareDate(date, new Date(), 'd');
+		int day = AppUtil.compareDate(date, new Date(), 'd');
 		if (day <= 30)
 			return true;
 
 		return false;
-	}
-
-	/**
-	 * 计算两个时间之间的差值，根据标志的不同而不同
-	 * 
-	 * @param flag
-	 *            计算标志，表示按照年/月/日/时/分/秒等计算
-	 * @param calSrc
-	 *            减数
-	 * @param calDes
-	 *            被减数
-	 * @return 两个日期之间的差值
-	 */
-	public static int compareDate(Date d1, Date d2, char flag) {
-
-		long diff = Math.abs(d1.getTime() - d2.getTime());
-
-		if (flag == 'd') {
-			return (int) (diff / (24 * 3600 * 1000));
-		}
-
-		if (flag == 'h') {
-			return (int) (diff / (3600 * 1000));
-		}
-
-		if (flag == 'm') {
-			return (int) (diff / (60 * 1000));
-		}
-
-		if (flag == 's') {
-			return (int) (diff / 1000);
-		}
-
-		return 0;
-	}
-
-	// 获取当前时间(字符串)
-	public String getCurTime() {
-		return DateUtils.date2Str(DateUtils.datetimeFormat);
-	}
-
-	// 获取当前时间(Date)
-	public Date getDate() {
-		return DateUtils.getDate();
-	}
-
-	// 生成token
-	private String generateToken(String customerId, String phone) {
-		return md5(customerId + phone);
-	}
-
-	// jdk自带的md5加密
-	private String md5(String str) {
-		MessageDigest md;
-		StringBuffer sb = new StringBuffer();
-		try {
-			// 生成一个MD5加密计算摘要
-			md = MessageDigest.getInstance("MD5");
-			// 计算md5函数
-			md.update(str.getBytes());
-			byte[] data = md.digest();
-			int index;
-			for (byte b : data) {
-				index = b;
-				if (index < 0)
-					index += 256;
-				if (index < 16)
-					sb.append("0");
-				sb.append(Integer.toHexString(index));
-			}
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return sb.toString();
 	}
 
 }

@@ -1,6 +1,7 @@
 package com.yhy.lin.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +12,14 @@ import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.entity.AppMessageListEntity;
+import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.entity.DriversInfoEntity;
+import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 import com.yhy.lin.service.TransferServiceI;
@@ -25,6 +32,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Autowired
 	private JdbcDao jdbcDao;
 	
+	//app客户消息信息
+	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
+		
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder,DataGrid dataGrid,
 			String fc_begin,String fc_end,String ddTime_begin,String ddTime_end){
@@ -181,6 +191,81 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			}
 		}
 		return transferorderView;
+	}
+
+	/**
+     * 1.添加事务注解
+     * 使用propagation 指定事务的传播行为，即当前的事务方法被另外一个事务方法调用时如何使用事务。
+     * 默认取值为REQUIRED，即使用调用方法的事务
+     * REQUIRES_NEW：使用自己的事务，调用的事务方法的事务被挂起。
+     * 
+     * 2.使用isolation 指定事务的隔离级别，最常用的取值为READ_COMMITTED
+     * 3.默认情况下 Spring 的声明式事务对所有的运行时异常进行回滚，也可以通过对应的属性进行设置。通常情况下，默认值即可。
+     * 4.使用readOnly 指定事务是否为只读。 表示这个事务只读取数据但不更新数据，这样可以帮助数据库引擎优化事务。若真的是一个只读取数据库值得方法，应设置readOnly=true
+     * 5.使用timeOut 指定强制回滚之前事务可以占用的时间。
+     */
+	@Transactional(propagation=Propagation.REQUIRES_NEW, 
+			isolation=Isolation.READ_COMMITTED, 
+//			noRollbackFor={UserAccountException.class},
+			readOnly=true//, timeout=30      //timeout   允许在执行第一条sql之后保持连接30秒
+			)
+	@Override
+	public boolean saveDriverAndDriver(List<String> orderIds, String startTime, String licencePlateId, String driverId, String licencePlateName) {
+		List<Order_LineCarDiverEntity> list = new ArrayList<Order_LineCarDiverEntity>();
+		List<TransferorderEntity> tList = new ArrayList<TransferorderEntity>();
+		List<AppMessageListEntity> mList = new ArrayList<AppMessageListEntity>();
+		
+		try{
+	        for(int i=0;i<orderIds.size();i++){
+	        	//这个订单是否已经被处理过
+	        	long l = getCountForJdbcParam("select count(1) from order_linecardiver where id=? ", new Object[]{orderIds.get(i)});
+	        	
+	        	Order_LineCarDiverEntity order_LineCarDiver = new Order_LineCarDiverEntity();
+	        	order_LineCarDiver.setId(orderIds.get(i));
+	        	order_LineCarDiver.setStartTime(startTime);
+	        	order_LineCarDiver.setLicencePlateId(licencePlateId);
+	        	order_LineCarDiver.setDriverId(driverId);
+	        	list.add(order_LineCarDiver);
+	        	
+	        	//修改订单状态
+	        	TransferorderEntity t = getEntity(TransferorderEntity.class, orderIds.get(i));
+	        	t.setOrderStatus(2);
+	        	tList.add(t);
+	        	
+	        	//app端客户消息信息
+	        	DriversInfoEntity d = get(DriversInfoEntity.class, driverId);
+				if("0".equals(t.getOrderPaystatus())){
+					//"您的订单编号为%1%2-%3的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
+					String msgInfo = USER_MESSAGE_INFO.replace("%1", t.getOrderId()).replace("%2", t.getOrderStartingStationName())
+							.replace("%3", t.getOrderTerminusStationName()).replace("%4", t.getOrderStartime())
+							.replace("%5", d.getPhoneNumber()).replace("%6", licencePlateName);
+					
+					AppMessageListEntity app = new AppMessageListEntity();
+					app.setContent(msgInfo);
+					app.setCreateTime(AppUtil.getCurTime());
+					app.setStatus("0");
+					app.setUserId(t.getUserId());
+					//被处理过   就将消息类型改为修改
+					if(l > 0){
+						app.setMsgType("1");
+					}else{
+						app.setMsgType("0");
+					}
+					app.setOrderId(orderIds.get(i));
+					mList.add(app);
+				}
+	        }
+	        saveAllEntitie(list);
+	        saveAllEntitie(mList);
+//	        if(1==1)				//测试spring事物
+//	        	throw new Exception("a");
+	        saveAllEntitie(tList);
+	        return true;
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+        
+		return false;
 	}
 	
 }

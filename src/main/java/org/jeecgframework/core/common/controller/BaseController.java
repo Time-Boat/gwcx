@@ -126,20 +126,4 @@ public class BaseController {
   		}
   	}	
   	
-  	//app
-  	public void responseOutWrite(HttpServletResponse response, JSONObject jObject) {
-		response.setHeader("Cache-Control", "no-cache");
-	    response.setContentType("text/json;charset=UTF-8");
-		response.setCharacterEncoding("UTF-8");
-		try {
-			
-			PrintWriter pw=response.getWriter();
-			pw.write(jObject.toString());
-			pw.flush();
-			pw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
 }
