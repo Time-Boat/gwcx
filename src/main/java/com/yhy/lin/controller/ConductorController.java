@@ -8,8 +8,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
-import org.codehaus.jackson.annotate.JsonAnyGetter;
-import org.jeecgframework.core.annotation.config.AutoMenu;
 import org.jeecgframework.core.annotation.config.AutoMenuOperation;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
@@ -20,7 +18,6 @@ import org.jeecgframework.core.util.ExceptionUtil;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
-import org.jeecgframework.web.demo.service.test.JeecgDemoServiceI;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,6 +166,7 @@ public class ConductorController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		conductor.setDeleteFlag((short) 0);// 默认都是为做逻辑删除的数据
 		String lineInfos = request.getParameter("lineInfos");
+		//验票员线路没有添加对应的线路id
 		System.out.println(lineInfos);
 		if (StringUtil.isNotEmpty(conductor.getId())) {
 			message = "验票员: " + conductor.getName() + "被更新成功";
@@ -215,7 +213,7 @@ public class ConductorController extends BaseController {
 		List<TSDepart> departList = systemService.getList(TSDepart.class);
 		req.setAttribute("departList", departList);
 
-		Map sexMap = new HashMap();
+		Map<Integer,String> sexMap = new HashMap<>();
 		sexMap.put(0, "男");
 		sexMap.put(1, "女");
 		req.setAttribute("sexMap", sexMap);
@@ -260,6 +258,38 @@ public class ConductorController extends BaseController {
 		} catch (Exception e) {
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 检查手机号是否在数据库中已存在
+	 */
+	@RequestMapping(params = "checkPhone")
+	@ResponseBody
+	public AjaxJson checkPhone(HttpServletRequest request) {
+		String message = "";
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		try {
+			String phone = request.getParameter("phone");
+			String id = request.getParameter("id");
+			
+			long l = conductorService.getCountForJdbcParam("select count(*) from conductor where phoneNumber=? and id <> ? ", new Object[]{phone,id});
+			
+			if(l > 0){
+				message = "手机号已存在";
+				success = false;
+			}else{
+				success = true;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		
+		j.setSuccess(success);
 		j.setMsg(message);
 		return j;
 	}
