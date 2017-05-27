@@ -21,7 +21,7 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
-
+import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
@@ -117,6 +117,7 @@ public class OpenCityController extends BaseController {
 	public AjaxJson save(OpenCityEntity openCity, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		openCity.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
 		if (StringUtil.isNotEmpty(openCity.getId())) {
 			message = "业务开通城市更新成功";
 			OpenCityEntity t = openCityService.get(OpenCityEntity.class, openCity.getId());

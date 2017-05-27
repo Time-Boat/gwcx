@@ -41,11 +41,22 @@ public class OpenCityEntity implements java.io.Serializable {
 	/**备注*/
 	private java.lang.String remark;
 	
+	//创建人
+	private java.lang.String createPeople;
+	
+	@Column(name ="CREATE_PEOPLE",nullable=true,length=20)
+	public java.lang.String getCreatePeople() {
+		return createPeople;
+	}
+
+	public void setCreatePeople(java.lang.String createPeople) {
+		this.createPeople = createPeople;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  id
 	 */
-	
 	@Id
 	@GeneratedValue(generator = "paymentableGenerator")
 	@GenericGenerator(name = "paymentableGenerator", strategy = "uuid")

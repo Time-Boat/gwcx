@@ -916,6 +916,7 @@ public class AppInterfaceController extends AppBaseController {
 				t.setOrderStatus(3);
 				// 支付状态 0：已付款，1：退款中 2：已退款 3:：未付款
 				t.setOrderPaystatus("1");
+				t.setRefundTime(AppUtil.getCurTime());
 				systemService.updateEntitie(t);
 
 				msg = AppGlobals.APP_SUCCESS_MSG;
@@ -1252,6 +1253,10 @@ public class AppInterfaceController extends AppBaseController {
 				mList.add(am);
 			}
 
+			String sql = "update customer_message set status=1 where user_id=? ";
+			int c = systemService.executeSql(sql, userId);
+//			System.out.println(c);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (Exception e) {

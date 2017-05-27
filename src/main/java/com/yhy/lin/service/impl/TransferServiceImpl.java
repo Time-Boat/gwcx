@@ -132,6 +132,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if(StringUtil.isNotEmpty(transferorder.getOrderContactsname())){
 			sql.append(" and  a.order_contactsname like '%"+transferorder.getOrderContactsname()+"%'");
 		}
+		
+		//不需要显示退款状态的订单
+		sql.append(" and order_status not in('3','4','5') ");
+		
 		sql.append(" order by a.order_startime asc ");
 		
 		return sql.toString();
@@ -205,9 +209,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
      * 5.使用timeOut 指定强制回滚之前事务可以占用的时间。
      */
 	@Transactional(propagation=Propagation.REQUIRES_NEW, 
-			isolation=Isolation.READ_COMMITTED, 
+			isolation=Isolation.READ_COMMITTED
 //			noRollbackFor={UserAccountException.class},
-			readOnly=true//, timeout=30      //timeout   允许在执行第一条sql之后保持连接30秒
+//			readOnly=true//, timeout=30      //timeout   允许在执行第一条sql之后保持连接30秒
 			)
 	@Override
 	public boolean saveDriverAndDriver(List<String> orderIds, String startTime, String licencePlateId, String driverId, String licencePlateName) {

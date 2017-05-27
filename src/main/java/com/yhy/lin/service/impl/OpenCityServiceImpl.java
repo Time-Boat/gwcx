@@ -46,6 +46,7 @@ public class OpenCityServiceImpl extends CommonServiceImpl implements OpenCitySe
 							new Db2Page("id", "id")
 							,new Db2Page("provinceName", "province_name")
 							,new Db2Page("cityName", "city_name")
+							,new Db2Page("createPeople", "create_people")
 							,new Db2Page("cityBusiness", "city_business", new MyDataExchangerBusiness2Ch())
 							,new Db2Page("status", "status")
 							,new Db2Page("remark", "remark")

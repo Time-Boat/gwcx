@@ -37,7 +37,7 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 //	private Integer orderNumberPeople;// 人数
 	private BigDecimal orderTotalPrice;// 总价
 
-	private Date applicationTime;// 申请时间
+	private Date applicationTime;// 下达订单时间
 
 	private String lineId;
 	private String lineName;
@@ -50,6 +50,28 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	private String cityName; //城市名称
 	private String cityId; //城市id
 	
+	private String refundTime; //申请退款时间
+	
+	private String rejectReason; //拒绝原因
+	
+	@Column(name = "reject_reason")
+	public String getRejectReason() {
+		return rejectReason;
+	}
+
+	public void setRejectReason(String rejectReason) {
+		this.rejectReason = rejectReason;
+	}
+
+	@Column(name = "refund_time")
+	public String getRefundTime() {
+		return refundTime;
+	}
+
+	public void setRefundTime(String refundTime) {
+		this.refundTime = refundTime;
+	}
+
 	@Column(name = "city_name")
 	public String getCityName() {
 		return cityName;
