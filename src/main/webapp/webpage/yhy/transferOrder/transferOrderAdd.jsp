@@ -6,9 +6,8 @@
 <title>接送订单处理</title>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
     <script type="text/javascript">
+    
   //重写了回调,然后自己控制关闭以及刷新
-  
-  
     function noteSubmitCallback(data) {
 	  	var win = frameElement.api.opener;//获取父窗口
 		//刷新主表单父窗口
@@ -39,10 +38,10 @@
     		var seconds=Math.round(leave3)
     		
     		//console.log(hours+"--"+minutes+"--"+seconds);
-    		if(hours < 1 || (hours==1 && minutes==0 && seconds==0)){
+    		if(minutes < 15){
     			return true;
     		}
-    		tip("相隔时间不能超过1个小时");
+    		tip("相隔时间不能超过15分钟");
     	}else{
     		tip("时间必须早于订单的出发时间");
     	}
