@@ -1,7 +1,9 @@
 package com.yhy.lin.service.impl;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +11,7 @@ import java.util.Map;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,7 @@ import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 import com.yhy.lin.service.TransferServiceI;
 
+import freemarker.template.utility.DateUtil;
 import net.sf.json.JSONObject;
 
 @Service("TransferServiceI")
@@ -269,10 +273,22 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 					app.setOrderId(orderIds.get(i));
 					mList.add(app);
 
-					contents.add(new String[] {t.getOrderContactsname() ,t.getOrderId(), t.getOrderStartingStationName(),
-							t.getOrderTerminusStationName(), t.getOrderStartime(), d.getPhoneNumber(),
-							licencePlateName, t.getOrderContactsmobile()});
-					
+					String strDate = "";
+
+					SimpleDateFormat sformat = DateUtils.datetimeFormat;
+					SimpleDateFormat sformat1 = new SimpleDateFormat("M月dd日 HH:mm");
+					try {
+						Date date = sformat.parse(t.getOrderStartime());
+						strDate = sformat1.format(date);
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+
+					contents.add(new String[] { t.getOrderContactsname(), t.getOrderStartingStationName() + " ",
+							" " + t.getOrderTerminusStationName(), strDate, t.getOrderContactsmobile() });
+					// contents.add(new String[] {"某" , "吗", "吗"
+					// , "吗", t.getOrderContactsmobile()});
+
 				}
 			}
 			saveAllEntitie(list);

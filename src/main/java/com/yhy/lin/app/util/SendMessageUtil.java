@@ -1,7 +1,5 @@
 package com.yhy.lin.app.util;
 
-import org.jeecgframework.core.util.StringUtil;
-
 import com.taobao.api.ApiException;
 import com.taobao.api.DefaultTaobaoClient;
 import com.taobao.api.TaobaoClient;
@@ -20,7 +18,7 @@ public class SendMessageUtil {
 	public static final String TEMPLATE_SMS_CODE = "SMS_63766002";
 
 	// 安排车辆信息模板
-	public static final String TEMPLATE_ARRANGE_CAR = "	SMS_63766002";
+	public static final String TEMPLATE_ARRANGE_CAR = "SMS_69620002";
 
 	public static String sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode) {
 
@@ -36,7 +34,7 @@ public class SendMessageUtil {
 		req.setSmsFreeSignName("刘航"); // 模板签名
 		StringBuffer ps = new StringBuffer("{");
 		for (int i = 0; i < paramKey.length; i++) {
-			ps.append("'" + paramKey[i] + "':'" + paramValue + "',");
+			ps.append("'" + paramKey[i] + "':'" + paramValue[i] + "',");
 		}
 		if (ps.length() > 1) {
 			ps.deleteCharAt(ps.length() - 1);

@@ -16,16 +16,11 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yhy.lin.app.entity.AppMessageListEntity;
-import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SendMessageUtil;
-import com.yhy.lin.entity.DriversInfoEntity;
-import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 import com.yhy.lin.service.TransferServiceI;
@@ -109,27 +104,26 @@ public class TransferOrderController extends BaseController {
 		String licencePlateId = request.getParameter("licencePlateId");// 车牌id
 		String driverId = request.getParameter("driverId");// 司机id
 		String licencePlateName = request.getParameter("licencePlateName");// 车牌号
-		
+
 		List<String> orderIds = extractIdListByComma(ids);
-		
+
 		List<String[]> contents = new ArrayList<>();
-		
-		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId,
-				licencePlateName, contents);
-		
+
+		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId, licencePlateName,
+				contents);
+
 		if (b) {
-			String[] keys = new String[]{"name","orderId","startStation","terminusStation","time","phone","lpName"};
-			String[] vs = new String[7];
-			for(int i=0;i<contents.size();i++){
-				contents.get(i);
-				SendMessageUtil.sendMessage(contents.get(i)[7], keys, vs, SendMessageUtil.TEMPLATE_ARRANGE_CAR);
+			String[] keys = new String[] { "name", "startStation", "terminusStation", "time" };
+			for (int i = 0; i < contents.size(); i++) {
+				String[] p = contents.get(i);
+				SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR);
 			}
 			success = true;
 			message = "订单处理成功";
 		} else {
 			message = "服务器异常";
 		}
-		
+
 		j.setSuccess(success);
 		j.setMsg(message);
 		return j;

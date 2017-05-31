@@ -35,7 +35,7 @@ public class DateUtils extends PropertyEditorSupport {
 	"yyyyMMddHHmmss");
 	public static final SimpleDateFormat short_time_sdf = new SimpleDateFormat(
 			"HH:mm");
-	public static final  SimpleDateFormat datetimeFormat = new SimpleDateFormat(
+	public static final SimpleDateFormat datetimeFormat = new SimpleDateFormat(
 	"yyyy-MM-dd HH:mm:ss");
 	// 以毫秒表示的时间
 	private static final long DAY_IN_MILLIS = 24 * 3600 * 1000;
@@ -172,6 +172,7 @@ public class DateUtils extends PropertyEditorSupport {
 		}
 		return sformat.format(_date);
 	}
+	
 	/**
 	 * 日期转换为字符串
 	 * 

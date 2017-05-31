@@ -43,6 +43,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
@@ -213,24 +214,8 @@ public class AppInterfaceController extends AppBaseController {
 		} else {
 			// 生成4位数的验证码
 			String code = StringUtil.numRandom(4);
-
-			TaobaoClient client = new DefaultTaobaoClient(AppGlobals.SERVCR_URL, AppGlobals.APP_KEY,
-					AppGlobals.APP_SECRET);
-			AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
-			req.setExtend("123456");
-			req.setSmsType("normal");
-			req.setSmsFreeSignName("刘航");
-			req.setSmsParamString("{code:'" + code + "'}");
-			req.setRecNum(mobile);
-			req.setSmsTemplateCode("SMS_63766002");
-			AlibabaAliqinFcSmsNumSendResponse rsp = null;
-			try {
-				rsp = client.execute(req);
-			} catch (ApiException e) {
-				e.printStackTrace();
-			}
-
-			String body = rsp.getBody();
+			//发送端短消息
+			String body = SendMessageUtil.sendMessage(mobile, new String[]{"code"}, new String[]{code}, SendMessageUtil.TEMPLATE_SMS_CODE);
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -306,31 +291,7 @@ public class AppInterfaceController extends AppBaseController {
 				success = false;
 			} else {
 				List<Line_busStopEntity> list = null;
-				// 如果是接机或者接火车
-				// if
-				// (AppGlobals.AIRPORT_TO_DESTINATION_TYPE.equals(t.getOrderType()
-				// + "")
-				// ||
-				// AppGlobals.TRAIN_TO_DESTINATION_TYPE.equals(t.getOrderType()
-				// + "")) {
-				//
-				// list = systemService.findHql(" from Line_busStopEntity where
-				// busStopsId=? ", eId);
-				// t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER));
-				// commonAddrId = eId;
-				// } else if
-				// (AppGlobals.DESTINATION_TO_AIRPORT_TYPE.equals(t.getOrderType()
-				// + "")
-				// ||
-				// AppGlobals.DESTINATION_TO_TRAIN_TYPE.equals(t.getOrderType()
-				// + "")) { // 送机||送火车
-				//
-				// list = systemService.findHql(" from Line_busStopEntity where
-				// busStopsId=? ", sId);
-				// t.setOrderId(MakeOrderNum.makeOrderNum(MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER));
-				// commonAddrId = sId;
-				// }
-
+				
 				switch (t.getOrderType() + "") {
 				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
 					commonAddrId = eId;
@@ -355,7 +316,7 @@ public class AppInterfaceController extends AppBaseController {
 				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", commonAddrId);
 				// 生成订单
 				t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
-
+				
 				String lId = list.get(0).getLineId();
 				List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
 				if (lList.size() > 0) {
@@ -366,10 +327,8 @@ public class AppInterfaceController extends AppBaseController {
 				t.setApplicationTime(AppUtil.getDate());
 				// t.setOrderType(1);
 
-				systemService.save(t);
-
-				CustomerCommonAddrEntity c = null;
 				// 记录常用站点
+				CustomerCommonAddrEntity c = null;
 				List<CustomerCommonAddrEntity> addrs = systemService.findHql(
 						" from CustomerCommonAddrEntity where user_id=? and station_id=? ", t.getUserId(),
 						commonAddrId);
@@ -383,7 +342,15 @@ public class AppInterfaceController extends AppBaseController {
 					c.setUserId(t.getUserId());
 					c.setId(UUIDGenerator.generate());
 				}
-
+				
+				//添加到消息中心
+				AppMessageListEntity app = new AppMessageListEntity();
+				app.setContent("您");
+				app.setCreateTime(AppUtil.getCurTime());
+				app.setStatus("0");
+				app.setUserId(t.getUserId());
+				
+				systemService.save(t);
 				systemService.save(c);
 
 				statusCode = AppGlobals.APP_SUCCESS;
