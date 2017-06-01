@@ -130,6 +130,7 @@
 						
 						<value>app.do?updateUserInfo</value>
 						<value>app.do?getUserInfo</value>
+						<value>app.do?checkTicket</value>
 						
 					</list>
 				</property>

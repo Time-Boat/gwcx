@@ -13,10 +13,23 @@ public interface AppGlobals {
 	public static final String APP_SUCCESS = "000";
 	/** 请求成功消息 */
 	public static final String APP_SUCCESS_MSG = "请求成功";
+	
 	/** 系统异常 */
 	public static final String SYSTEM_ERROR = "999";
 	/** 系统异常消息 */
-	public static final String SYSTEM_ERROR_MSG = "系统异常";
+	public static final String SYSTEM_ERROR_MSG = "系统异常！";
+	
+	/** token异常 */
+	public static final String TOKEN_ERROR = "998";
+	/** token异常消息 */
+	public static final String TOKEN_ERROR_MSG = "token为空！";
+	
+	/** 参数异常 */
+	public static final String PARAMETER_ERROR = "997";
+	
+	//自定义异常的时候传入进去了，所以这里暂时不需要定义
+//	/** 参数异常消息 */
+//	public static final String PARAMETER_ERROR_MSG = "参数为空！";
 	
 	
 	/** 订单类型 */
