@@ -22,7 +22,7 @@
 		<t:dgCol title="订单类型" field="orderType" replace="接机_0,送机_1,接火车 _2,送火车_3" query="true" align="center"></t:dgCol>
 		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,取消订单待退款_3,取消订单完成退款_4" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2" query="true" align="center"></t:dgCol>
 		<%-- <t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
 		<t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol>
 		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>

@@ -286,7 +286,8 @@ public class AppInterfaceController extends AppBaseController {
 			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(curDate, departTime, 'm');
 
-			if (m > 240) {
+			if (m < 240) {  //测试
+//			if (m > 240) {
 				msg = "必须提前4个小时才能下订单，无法取消订单";
 				success = false;
 			} else {
@@ -312,21 +313,20 @@ public class AppInterfaceController extends AppBaseController {
 				default:
 					break;
 				}
-
-				list = systemService.findHql(" from Line_busStopEntity where busStopsId=? ", commonAddrId);
+				
 				// 生成订单
 				t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
 				
-				String lId = list.get(0).getLineId();
-				List<String> lList = systemService.findListbySql("select name from lineinfo where id='" + lId + "'");
-				if (lList.size() > 0) {
-					t.setLineName(lList.get(0));
+				//做了一个视图，确保查出的线路的唯一性
+				Map<String,Object> map = systemService.findOneForJdbc("select * from order_line_view where busStopsId=? ", commonAddrId);
+				if (map.size() > 0) {
+					t.setLineName(map.get("name")+"");
+					t.setLineId(map.get("id")+"");
 				}
 
-				t.setLineId(lId);
 				t.setApplicationTime(AppUtil.getDate());
 				// t.setOrderType(1);
-
+				
 				// 记录常用站点
 				CustomerCommonAddrEntity c = null;
 				List<CustomerCommonAddrEntity> addrs = systemService.findHql(
@@ -345,12 +345,15 @@ public class AppInterfaceController extends AppBaseController {
 				
 				//添加到消息中心
 				AppMessageListEntity app = new AppMessageListEntity();
-				app.setContent("您");
+				app.setContent("您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。");
 				app.setCreateTime(AppUtil.getCurTime());
-				app.setStatus("0");
+				app.setStatus("0");   //消息状态 0：否   1：是
 				app.setUserId(t.getUserId());
+				app.setMsgType("0");  //消息类型 0:新增  1:修改   
 				
 				systemService.save(t);
+				app.setOrderId(t.getId());
+				systemService.save(app);
 				systemService.save(c);
 
 				statusCode = AppGlobals.APP_SUCCESS;

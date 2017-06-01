@@ -4,7 +4,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +27,6 @@ import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 import com.yhy.lin.service.TransferServiceI;
 
-import freemarker.template.utility.DateUtil;
 import net.sf.json.JSONObject;
 
 @Service("TransferServiceI")
