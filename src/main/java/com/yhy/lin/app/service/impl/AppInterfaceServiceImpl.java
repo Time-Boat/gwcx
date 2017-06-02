@@ -16,4 +16,5 @@ import AppInterfaceController.AppInterfaceService;
 public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInterfaceService {
 	
 	
+	
 }
