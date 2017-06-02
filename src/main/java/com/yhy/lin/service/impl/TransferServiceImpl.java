@@ -156,15 +156,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		 * " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id "
 		 * );
 		 */
-		sql.append(
-				"select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_Name,a.order_terminus_station_Name,");
-		sql.append(
-				" a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
-		sql.append(
-				" a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime, ");
+		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_Name,a.order_terminus_station_Name,");
+		sql.append(" a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
+		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime, ");
 		sql.append(" a.city_id,a.city_name ");
-		sql.append(
-				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id ");
+		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
+				+ "left join driversinfo d on b.driverId =d.id ");
 
 		sql.append(" where a.id='" + id + "'");
 		List<Object[]> list = findListbySql(sql.toString());
@@ -201,6 +198,38 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				}
 				transferorderView.setCityId(String.valueOf(obj[22]));
 				transferorderView.setCityName(String.valueOf(obj[23]));
+				
+				
+				
+				transferorderView.setId(String.valueOf(obj[0]));
+				transferorderView.setOrderId(String.valueOf(obj[1]));
+				transferorderView.setOrderType(String.valueOf(obj[2]));
+				transferorderView.setOrderStatus(String.valueOf(obj[3]));
+				transferorderView.setOrderFlightnumber(String.valueOf(obj[4]));
+				transferorderView.setOrderStartingstationName(String.valueOf(obj[5]));
+				transferorderView.setOrderTerminusstationName(String.valueOf(obj[6]));
+				if (obj[7] != null) {
+					transferorderView.setOrderStartime(sdf.parse(obj[7].toString()));
+				}
+				transferorderView.setOrderExpectedarrival(String.valueOf(obj[8]));
+				transferorderView.setOrderUnitprice(String.valueOf(obj[9]));
+				transferorderView.setOrderNumbers(String.valueOf(obj[10]));
+				transferorderView.setOrderPaytype(String.valueOf(obj[11]));
+				transferorderView.setOrderContactsname(String.valueOf(obj[12]));
+				transferorderView.setOrderContactsmobile(String.valueOf(obj[13]));
+				transferorderView.setOrderPaystatus(String.valueOf(obj[14]));
+				transferorderView.setOrderTrainnumber(String.valueOf(obj[15]));
+				transferorderView.setOrderTotalPrice(String.valueOf(obj[16]));
+				transferorderView.setDriverName(AppUtil.Null2Blank(obj[17]+""));
+				transferorderView.setDriverMobile(AppUtil.Null2Blank(String.valueOf(obj[18])+""));
+				transferorderView.setLicencePlate(AppUtil.Null2Blank(String.valueOf(obj[19])+""));
+				transferorderView.setCarStatus(AppUtil.Null2Blank(String.valueOf(obj[20])+""));
+				if (obj[21] != null) {
+					transferorderView.setApplicationTime(sdf.parse(obj[21].toString()));
+				}
+				transferorderView.setCityId(String.valueOf(obj[22]));
+				transferorderView.setCityName(String.valueOf(obj[23]));
+				
 			} catch (Exception e) {
 			}
 		}

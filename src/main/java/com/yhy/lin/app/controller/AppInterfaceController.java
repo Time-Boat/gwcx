@@ -1139,6 +1139,7 @@ public class AppInterfaceController extends AppBaseController {
 			if(checkToken(token))
 				throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 			
+			//参数验证
 			String e = checkParam(jsondata);
 			if(StringUtil.isNotEmpty(e))
 				throw new ParameterException(e, AppGlobals.PARAMETER_ERROR);

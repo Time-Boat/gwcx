@@ -60,21 +60,20 @@
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="orderStartime" name="orderStartime" ignore="ignore"
 					value="<fmt:formatDate value='${tView.orderStartime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
 				</td>
-
 			<tr>
 			<tr>
 				<td align="right">
 					<label class="Validform_label">起始位置：</label>
 				</td>
 				<td class="value">						  
-					<input  class="inputxt" id="orderStartingstation" name="orderStartingstation" value="${tView.orderStartingstation}">  
+					<input  class="inputxt" id="orderStartingstation" name="orderStartingstationName" value="${tView.orderStartingstationName}">  
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="right">
 					<label class="Validform_label">终点位置：</label>
 				</td>
 				<td class="value">
-					<input  class="inputxt" id="orderTerminusstation" name="orderTerminusstation" value="${tView.orderTerminusstation}">  		
+					<input  class="inputxt" id="orderTerminusstation" name="orderTerminusstationName" value="${tView.orderTerminusstationName}">  		
 					<span class="Validform_checktip"></span>
 				</td>
 			<tr> 
