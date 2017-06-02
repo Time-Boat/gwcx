@@ -5,13 +5,18 @@ import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.jeecgframework.core.common.controller.BaseController;
+import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.exception.ParameterException;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 
 import net.sf.json.JSONObject;
@@ -70,21 +75,30 @@ public class AppBaseController extends BaseController {
 		}
 	}
 
-	/**
-	 * 站点类型转换 线路类型 转 站点类型
-	 */
-	public String getStationType(String lineType) {
-		//
-		switch (lineType) {
-		case "2": // 接机
-		case "3": // 送机
-			return "2"; // 机场站点
-		case "4": // 接火车
-		case "5": // 送火车
-			return "1"; // 火车站点
-		default:
-			return lineType;
-		}
+	/** 验证参数是否为空 (json) */
+	public static void checkParam(String strJson) throws ParameterException {
+		JSONObject json = JSONObject.fromObject(strJson);
+		checkParam(json);
 	}
 
+	/** 验证参数是否为空 (param) */
+	public static void checkParam(String[] fileds, String... param) throws ParameterException {
+		for (int i = 0; i < param.length; i++) {
+			if (!StringUtil.isNotEmpty(param[i])) {
+				throw new ParameterException("参数" + fileds[i] + "为空", AppGlobals.PARAMETER_ERROR);
+			}
+		}
+	}
+	
+	/** 验证参数是否为空 (JSONObject) */
+	public static String checkParam(JSONObject param) throws ParameterException {
+		Set<String> set = param.keySet();
+		for (String p : set) {
+			if (StringUtil.isNotEmpty(param.get(p) + "")) {
+				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
+			}
+		}
+		return "";
+	}
+	
 }

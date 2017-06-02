@@ -35,6 +35,7 @@ import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.exception.ParameterException;
+import com.yhy.lin.app.service.impl.AppInterfaceServiceImpl;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
@@ -43,6 +44,8 @@ import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
+
+import AppInterfaceController.AppInterfaceService;
 
 /**
  * Description : 接口处理类
@@ -60,7 +63,7 @@ public class AppInterfaceController extends AppBaseController {
 	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
 
 	@Autowired
-	private UserService userService;
+	private AppInterfaceService appService;
 
 	@Autowired
 	private SystemService systemService;
@@ -103,27 +106,7 @@ public class AppInterfaceController extends AppBaseController {
 							String curTime = AppUtil.getCurTime();
 							String token = "";
 
-							// 把token的修改时间拿出来与当前时间进行比较 登录的时候不用比较。。。
-							// int d = compareDate(DateUtils.getDate(),
-							// user.getTokenUpdateTime(), 'd');
-
-							// 如果小于一个月就进行只修改token的更新时间
-							// if (StringUtil.isNotEmpty(user.getToken())) {
-							// token = user.getToken();
-							// sql = "update car_customer set status = '1',
-							// token_update_time = '" + curTime
-							// + "' where phone = '" + mobile + "' ";
-							// } else {
-							// // 生成token
-							// token = generateToken(user.getCustomerId(),
-							// user.getPhone());
-							// sql = "update car_customer set status = '1',
-							// token_update_time = '" + curTime
-							// + "',token = '" + token + "' where phone = '" +
-							// mobile + "' ";
-							// }
-							// systemService.executeSql(sql);
-
+							//修改登录状态
 							if (StringUtil.isNotEmpty(user.getToken())) {
 								token = user.getToken();
 								sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
@@ -203,9 +186,11 @@ public class AppInterfaceController extends AppBaseController {
 		} else {
 			// 生成4位数的验证码
 			String code = StringUtil.numRandom(4);
+			
 			// 发送端短消息
 			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
 					SendMessageUtil.TEMPLATE_SMS_CODE);
+			
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -214,6 +199,7 @@ public class AppInterfaceController extends AppBaseController {
 				// 当前时间
 				String curTime = AppUtil.getCurTime();
 				String sql = "";
+				//存储验证码相关信息
 				if (user == null) {
 					sql = "insert into car_customer set customer_id='" + UUIDGenerator.generate()
 							+ "',phone = ? ,create_time = ? " + ",status = '0',code_update_time = ? ,security_code = ?";
@@ -249,7 +235,7 @@ public class AppInterfaceController extends AppBaseController {
 		String statusCode = "";
 		JSONObject data = new JSONObject();
 		boolean success = false;
-
+		
 		// 记录常用站点id
 		String commonAddrId = "";
 
@@ -289,7 +275,7 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "必须提前4个小时才能下订单，无法取消订单";
 				success = false;
 			} else {
-
+				
 				switch (t.getOrderType() + "") {
 				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
 					commonAddrId = eId;
@@ -310,51 +296,9 @@ public class AppInterfaceController extends AppBaseController {
 				default:
 					break;
 				}
-
-				// 生成订单
-				t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
-
-				// 做了一个视图，确保查出的线路的唯一性
-				Map<String, Object> map = systemService
-						.findOneForJdbc("select * from order_line_view where busStopsId=? ", commonAddrId);
-				if (map.size() > 0) {
-					t.setLineName(map.get("name") + "");
-					t.setLineId(map.get("id") + "");
-				}
-
-				t.setApplicationTime(AppUtil.getDate());
-				// t.setOrderType(1);
-
-				// 记录常用站点
-				CustomerCommonAddrEntity c = null;
-				List<CustomerCommonAddrEntity> addrs = systemService.findHql(
-						" from CustomerCommonAddrEntity where user_id=? and station_id=? ", t.getUserId(),
-						commonAddrId);
-				if (addrs.size() > 0) {
-					c = addrs.get(0);
-					c.setCount(c.getCount() + 1);
-				} else {
-					c = new CustomerCommonAddrEntity();
-					c.setCount(1);
-					c.setStationId(commonAddrId);
-					c.setUserId(t.getUserId());
-					c.setId(UUIDGenerator.generate());
-				}
-
-				// 添加到消息中心
-				AppMessageListEntity app = new AppMessageListEntity();
-				app.setContent("您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName()
-						+ " 的车票，请等待管理员审核。");
-				app.setCreateTime(AppUtil.getCurTime());
-				app.setStatus("0"); // 消息状态 0：否 1：是
-				app.setUserId(t.getUserId());
-				app.setMsgType("0"); // 消息类型 0:新增 1:修改
-
-				systemService.save(t);
-				app.setOrderId(t.getId());
-				systemService.save(app);
-				systemService.save(c);
-
+				
+				appService.saveOrder(t, orderPrefix, commonAddrId);
+				
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;
@@ -394,37 +338,19 @@ public class AppInterfaceController extends AppBaseController {
 			// 所属城市
 			String cityId = request.getParameter("cityId");
 
-			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(cityId)) {
+			// 验证参数
+			checkParam(new String[] { "serveType", "cityId"}, serveType, cityId);
+			
+			List<AppStationInfoEntity> lList = appService.getPTStation(serveType, cityId);
 
-				List<AppStationInfoEntity> lList = new ArrayList<AppStationInfoEntity>();
+			data.put("PTStation", lList);
 
-				// 查找指定类型的线路
-				List<Map<String, Object>> lineList = systemService.findForJdbc(
-						" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y "
-								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
-								+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 group by lb.busStopsId ",
-						cityId, serveType, getStationType(serveType));
-
-				for (Map<String, Object> a : lineList) {
-					AppStationInfoEntity asi = new AppStationInfoEntity();
-					asi.setId(a.get("id") + "");
-					asi.setName(a.get("name") + "");
-					asi.setLineId(a.get("lineId") + "");
-					asi.setStopLocation(AppUtil.Null2Blank(a.get("stopLocation") + ""));
-					asi.setX(AppUtil.Null2Blank(a.get("x") + ""));
-					asi.setY(AppUtil.Null2Blank(a.get("y") + ""));
-
-					lList.add(asi);
-				}
-
-				data.put("PTStation", lList);
-
-				statusCode = AppGlobals.APP_SUCCESS;
-				msg = AppGlobals.APP_SUCCESS_MSG;
-			} else {
-				statusCode = "001";
-				msg = "参数不能为空";
-			}
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			e.printStackTrace();
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
@@ -460,76 +386,24 @@ public class AppInterfaceController extends AppBaseController {
 
 			String userId = request.getParameter("userId");
 
-			if (StringUtil.isNotEmpty(serveType) && StringUtil.isNotEmpty(stationId)) {
-
-				List<AppLineStationInfoEntity> lList = new ArrayList<AppLineStationInfoEntity>();
-
-				// 根据起点id城市查找线路信息
-				List<Map<String, Object>> lineList = systemService.findForJdbc(
-						" select lf.id,lf.name,lf.price,lf.lineTimes "
-								+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-								+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0  ",
-						stationId, cityId, serveType);
-
-				StringBuffer sbf = new StringBuffer();
-				for (Map<String, Object> a : lineList) {
-
-					AppLineStationInfoEntity asi = new AppLineStationInfoEntity();
-
-					asi.setId(a.get("id") + "");
-					asi.setName(a.get("name") + "");
-					asi.setPrice(AppUtil.Null2Blank(a.get("price") + ""));
-					asi.setLineTimes(AppUtil.Null2Blank(a.get("lineTimes") + ""));
-					// asi.setStationType(a.get("station_type") + "");
-					lList.add(asi);
-
-					sbf.append("'");
-					sbf.append(asi.getId());
-					sbf.append("',");
-					// // 不知道出了什么问题 lineId没改动 下面手动的去改变一下
-					// for (AppStationInfoEntity b : stationList) {
-					// b.setLineId(asi.getId());
-					// }
-				}
-				// String t = getStationType(serveType);
-				if (sbf.length() > 0)
-					sbf.deleteCharAt(sbf.length() - 1);
-
-				// 查询指定id线路中的所有普通站点
-				List<AppStationInfoEntity> stationList = systemService.findHql(
-						"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", 0);
-
-				// 常用站点列表
-				// List<CustomerCommonAddrEntity> c =
-				// systemService.findHql("from CustomerCommonAddrEntity where
-				// user_id=? ", userId);
-				List<Map<String, Object>> map = systemService.findForJdbc(
-						"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
-								+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in ("
-								+ sbf.toString() + ") and station_type=?",
-						userId, 0);
-
-				List<AppStationInfoEntity> cList = new ArrayList<>();
-				for (Map<String, Object> c : map) {
-					AppStationInfoEntity addr = new AppStationInfoEntity();
-					addr.setId(c.get("id") + "");
-					addr.setLineId(c.get("lineId") + "");
-					addr.setName(c.get("name") + "");
-					addr.setStopLocation(c.get("stopLocation") + "");
-					addr.setX(c.get("y") + "");
-					addr.setY(c.get("y") + "");
-					cList.add(addr);
-				}
-
-				data.put("addrs", cList);
-				data.put("lineInfo", lList);
-				data.put("stationInfo", stationList);
-				statusCode = AppGlobals.APP_SUCCESS;
-				msg = AppGlobals.APP_SUCCESS_MSG;
-			} else {
-				statusCode = "001";
-				msg = "参数不能为空";
-			}
+			// 验证参数
+			checkParam(new String[] { "serveType", "stationId", "cityId", "userId"}, serveType, stationId, cityId, userId);
+						
+			List<AppLineStationInfoEntity> lList = new ArrayList<>();
+			List<AppStationInfoEntity> cList = new ArrayList<>();
+			List<AppStationInfoEntity> stationList = new ArrayList<>();
+			
+			appService.getLinebyStation(serveType, cityId, stationId, userId, lList, cList, stationList);
+			
+			data.put("addrs", cList);
+			data.put("lineInfo", lList);
+			data.put("stationInfo", stationList);
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			e.printStackTrace();
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
@@ -585,8 +459,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		String msg = "";
 		String statusCode = "";
-		List<Map<String, Object>> list = null;
-		List<AppUserOrderEntity> list1 = new ArrayList<>();
+		List<AppUserOrderEntity> auoList = null;
 		try {
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
@@ -610,34 +483,8 @@ public class AppInterfaceController extends AppBaseController {
 				maxPageItem = "15";
 			}
 
-			StringBuffer sql = new StringBuffer();
-			sql.append(
-					"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
-							+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? ");
-
-			if (StringUtil.isNotEmpty(orderStatus)) {
-				sql.append(" and order_paystatus = '" + orderStatus + "'");
-			}
-
-			list = systemService.findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
-					Integer.parseInt(maxPageItem), userId);
-
-			for (Map<String, Object> map : list) {
-				// Date date = (Date) map.get("startTime");
-
-				AppUserOrderEntity auo = new AppUserOrderEntity();
-				auo.setId(map.get("id") + "");
-				auo.setOrderId(map.get("order_id") + "");
-				auo.setOrderNumbers(map.get("order_numbers") + "");
-				auo.setOrderStartime(map.get("order_startime") + ""); // 使用用户的发车时间
-				auo.setOrderStartingStationName(map.get("order_starting_station_name") + "");
-				// 要做一下为空的判断，这个字段不会为空
-				auo.setOrderStatus(map.get("order_status") + "");
-				auo.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
-				auo.setOrderTotalPrice(map.get("order_totalPrice") + "");
-				list1.add(auo);
-			}
-
+			auoList = appService.getUserOrders(userId, orderStatus, pageNo, maxPageItem);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -652,8 +499,8 @@ public class AppInterfaceController extends AppBaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (list1 != null && list1.size() > 0) {
-			returnJsonObj.put("data", list1);
+		if (auoList != null && auoList.size() > 0) {
+			returnJsonObj.put("data", auoList);
 		} else {
 			returnJsonObj.put("data", "");
 		}
@@ -673,8 +520,8 @@ public class AppInterfaceController extends AppBaseController {
 		String token = request.getParameter("token");
 		String orderId = request.getParameter("orderId");
 
-		List<Map<String, Object>> list = null;
-		AppUserOrderDetailEntity aod = new AppUserOrderDetailEntity();
+		AppUserOrderDetailEntity aod = null;
+		
 		try {
 			
 			// 验证参数
@@ -683,56 +530,8 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 			
-			list = systemService.findForJdbc(
-					"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name, "
-							+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
-							+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes "
-							+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-							+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id where a.id=? ",
-					orderId);
-
-			for (Map<String, Object> map : list) {
-				// 会出现空指针么...
-				Date date = (Date) map.get("order_startime");
-				Date date1 = (Date) map.get("applicationTime");
-
-				aod.setId(map.get("id") + "");
-				aod.setOrderType(map.get("order_type") + "");
-				aod.setOrderStatus(map.get("order_status") + "");
-				aod.setOrderId(map.get("order_id") + "");
-				aod.setOrderStartingStationName(map.get("order_starting_station_name") + "");
-				aod.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
-				aod.setOrderTotalPrice(map.get("order_totalPrice") + "");
-				aod.setOrderNumbers(map.get("order_numbers") + "");
-
-				aod.setOrderStartime(DateUtils.date2Str(date, DateUtils.datetimeFormat));
-				aod.setApplicationTime(DateUtils.date2Str(date1, DateUtils.datetimeFormat));
-
-				aod.setOrderContactsname(map.get("order_contactsname") + "");
-				aod.setOrderContactsmobile(map.get("order_contactsmobile") + "");
-				aod.setLicencePlate(AppUtil.Null2Blank(map.get("licence_plate") + ""));
-				aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
-
-				aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
-				aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
-
-				// 发车时间
-				aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));
-				// 线路时长
-				String lineTime = map.get("lineTimes") + "";
-
-				// 在发车时间的基础上加上线路所用时长
-				if (StringUtil.isNotEmpty(lineTime)) {
-					double lt = Double.parseDouble(lineTime);
-
-					long a = (long) (date.getTime() + (lt * 60 * 60 * 1000));
-
-					aod.setStationEndTime(DateUtils.date2Str(new Date(a), DateUtils.short_time_sdf));
-				} else {
-					aod.setStationEndTime("");
-				}
-			}
-
+			aod = appService.getOrderDetailById(orderId);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -953,8 +752,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		String msg = "";
 		String statusCode = "";
-		List<Map<String, Object>> list = null;
-		List<AppCheckTicket> list1 = new ArrayList<>();
+		List<AppCheckTicket> actlist = new ArrayList<>();
 		try {
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
@@ -974,36 +772,9 @@ public class AppInterfaceController extends AppBaseController {
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "15";
 			}
-
-			StringBuffer sql = new StringBuffer();
-			sql.append(
-					" select a.id,a.order_status,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
-							+ " ,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber "
-							+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-							+ " left join driversinfo d on b.driverId =d.id where a.user_id=? and a.order_status='2' and order_paystatus='0' ");
-
-			list = systemService.findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
-					Integer.parseInt(maxPageItem), userId);
-
-			for (Map<String, Object> map : list) {
-
-				AppCheckTicket auo = new AppCheckTicket();
-				auo.setId(map.get("id") + "");
-				auo.setOrderNumbers(map.get("order_numbers") + "");
-				auo.setOrderStartime(map.get("order_startime") + "");
-				auo.setOrderStartingStationName(map.get("order_starting_station_name") + "");
-				auo.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
-				// 要做一下为空的判断，这个字段不会为空
-				auo.setOrderStatus(map.get("order_status") + "");
-				auo.setOrderTotalPrice(map.get("order_totalPrice") + "");
-				auo.setLicencePlate(map.get("licence_plate") + "");
-				auo.setCarType(map.get("car_type") + "");
-				auo.setDriver(map.get("driver_name") + "");
-				auo.setDriverPhone(map.get("phoneNumber") + "");
-
-				list1.add(auo);
-			}
-
+			
+			actlist = appService.getTicketListById(userId, pageNo, maxPageItem);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -1018,8 +789,8 @@ public class AppInterfaceController extends AppBaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (list1 != null && list1.size() > 0) {
-			returnJsonObj.put("data", list1);
+		if (actlist != null && actlist.size() > 0) {
+			returnJsonObj.put("data", actlist);
 		} else {
 			returnJsonObj.put("data", "");
 		}
@@ -1123,6 +894,7 @@ public class AppInterfaceController extends AppBaseController {
 
 			data.put("addrs", map);
 			data.put("customerInfo", a);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -1216,8 +988,7 @@ public class AppInterfaceController extends AppBaseController {
 		String msg = "";
 		String statusCode = "";
 
-		List<AppMessageListEntity> mList = new ArrayList<>();
-		List<Map<String, Object>> lm = null;
+		List<AppMessageListEntity> mList = null;
 		try {
 
 			String token = request.getParameter("token");
@@ -1239,31 +1010,8 @@ public class AppInterfaceController extends AppBaseController {
 				maxPageItem = "15";
 			}
 
-			// 对象中有几个字段没有赋值
-			// mList = systemService.findObjForJdbc(
-			// "select id,create_time from customer_message where user_id = '" +
-			// userId + "'", Integer.parseInt(pageNo),
-			// Integer.parseInt(maxPageItem), AppMessageListEntity.class);
-
-			lm = systemService.findForJdbcParam("select * from customer_message where user_id = ?",
-					Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
-
-			for (Map<String, Object> m : lm) {
-				AppMessageListEntity am = new AppMessageListEntity();
-				am.setContent(m.get("content") + "");
-				am.setCreateTime(m.get("create_time") + "");
-				am.setId(m.get("id") + "");
-				am.setMsgType(m.get("msg_type") + "");
-				am.setOrderId(m.get("order_id") + "");
-				am.setStatus(m.get("status") + "");
-				am.setUserId(m.get("user_id") + "");
-				mList.add(am);
-			}
-
-			String sql = "update customer_message set status=1 where user_id=? ";
-			int c = systemService.executeSql(sql, userId);
-			// System.out.println(c);
-
+			mList = appService.getMessageListById(userId, pageNo, maxPageItem);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -1299,31 +1047,5 @@ public class AppInterfaceController extends AppBaseController {
 		if (day > 30)
 			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 	}
-
-	/** 验证参数是否为空 (json) */
-	public static void checkParam(String strJson) throws ParameterException {
-		JSONObject json = JSONObject.fromObject(strJson);
-		checkParam(json);
-	}
-
-	/** 验证参数是否为空 (param) */
-	public static void checkParam(String[] fileds, String... param) throws ParameterException {
-		for (int i = 0; i < param.length; i++) {
-			if (!StringUtil.isNotEmpty(param[i])) {
-				throw new ParameterException("参数" + fileds[i] + "为空", AppGlobals.PARAMETER_ERROR);
-			}
-		}
-	}
-
-	/** 验证参数是否为空 (JSONObject) */
-	public static String checkParam(JSONObject param) throws ParameterException {
-		Set<String> set = param.keySet();
-		for (String p : set) {
-			if (StringUtil.isNotEmpty(param.get(p) + "")) {
-				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
-			}
-		}
-		return "";
-	}
-
+	
 }

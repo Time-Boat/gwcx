@@ -289,4 +289,21 @@ public class AppUtil {
 		return DateUtils.getDate();
 	}
     
+	/**
+	 * 站点类型转换 线路类型 转 站点类型
+	 */
+	public static String getStationType(String lineType) {
+		//
+		switch (lineType) {
+		case "2": // 接机
+		case "3": // 送机
+			return "2"; // 机场站点
+		case "4": // 接火车
+		case "5": // 送火车
+			return "1"; // 火车站点
+		default:
+			return lineType;
+		}
+	}
+	
 }

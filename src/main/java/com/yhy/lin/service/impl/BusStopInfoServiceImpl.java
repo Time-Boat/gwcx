@@ -20,8 +20,10 @@ import net.sf.json.JSONObject;
 @Service("BusStopInfoServiceI")
 @Transactional
 public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStopInfoServiceI{
+	
 	@Autowired
 	private JdbcDao jdbcDao;
+	
 	@Override
 	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid){
 		String sqlWhere = getBusSqlWhere(busStopInfo);
