@@ -21,7 +21,7 @@ public class Base64Util {
         }  
         return s;  
     }  
-  
+
     // 解密  
     public static String getFromBase64(String s) {  
         byte[] b = null;  

@@ -57,18 +57,18 @@ import AppInterfaceController.AppInterfaceService;
 @Controller
 @RequestMapping(value = "/app")
 public class AppInterfaceController extends AppBaseController {
-
+	
 	/**
 	 * Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
-
+	
 	@Autowired
 	private AppInterfaceService appService;
-
+	
 	@Autowired
 	private SystemService systemService;
-
+	
 	// 登录接口
 	@RequestMapping(params = "appLogin")
 	public void AppLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -83,6 +83,8 @@ public class AppInterfaceController extends AppBaseController {
 			// String mobile = request.getParameter("mobile");// 用户名
 			// String code = request.getParameter("code");// 验证码
 
+//			String param = request.getParameter("DATA");
+			
 			String param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
 
@@ -191,7 +193,7 @@ public class AppInterfaceController extends AppBaseController {
 			// 发送端短消息
 //			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
 //					SendMessageUtil.TEMPLATE_SMS_CODE);
-			String body = "";
+			String body = "true";
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -214,7 +216,7 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "获取验证码成功";
 				statusCode = AppGlobals.APP_SUCCESS;
 			} else {
-				msg = "允许每分钟1条，累计每小时7条。每天50条";
+				msg = "允许每分钟1条，累计每小时7条。每天10条";
 				statusCode = "003";
 			}
 		}
@@ -313,16 +315,16 @@ public class AppInterfaceController extends AppBaseController {
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
-
+		
 		data.put("success", success);
-
+		
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data.toString());
-
+		
 		responseOutWrite(response, returnJsonObj);
 	}
-
+	
 	// 获取机场站点或者火车站站点信息
 	@RequestMapping(params = "getPTStation")
 	public void getPTStation(HttpServletRequest request, HttpServletResponse response) {
