@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/base.css" />
+    <script>
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            var html = document.documentElement;
+            var windowWidth = html.clientWidth;
+            html.style.fontSize = windowWidth / 7.5 + 'px';
+            // 等价于html.style.fontSize = windowWidth / 750 * 100 + 'px';
+        }, false);
+    })();
+    // 这个7.5就是根据设计稿的横向宽度来确定的，假如你的设计稿是640
+    // 那么 html.style.fontSize = windowWidth / 6.4 + 'px';
+    </script>
+    <style>
+    body {
+        background: url("images/back.png") no-repeat;
+        background-size: 100% 100%;
+    }
+
+    .header .skip {
+        width: 100%;
+        display: block;
+        text-align: right;
+        font-size: .3rem;
+        line-height: .7rem;
+        color: #fff;
+        padding-right: .7rem;
+        position: relative;
+    }
+
+    .header .skip i {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        width: .2rem;
+        height: .32rem;
+        background: url("images/skipR.png") center center no-repeat;
+        background-size: 100%;
+    }
+
+    .pic {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin: 0 auto;
+        margin-top: .8rem;
+    }
+
+    .box {
+        margin: 0 auto;
+        margin-top: 0.8rem;
+        width: 85%;
+    }
+
+    .box div {
+        position: relative;
+        height: .8rem;
+        margin-bottom: .3rem;
+    }
+
+    .box input {
+        float: left;
+        width: 100%;
+        height: .8rem;
+        border-radius: 5px;
+        border: none;
+        color: #999;
+        font-size: .3rem;
+        padding-left: 1rem;
+    }
+
+    .phone i {
+        position: absolute;
+        top: 0;
+        left: .2rem;
+        width: 10%;
+        height: .8rem;
+        background: url("images/number.png") no-repeat center center;
+        background-size: 55%;
+    }
+
+    .code input {
+        float: left;
+    }
+
+    #code {
+        width: 68%;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    #gain {
+        width: 32%;
+        padding: 0;
+        color: #fff;
+        background: #e8b82d;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .code {
+        position: relative;
+    }
+
+    .code i {
+        position: absolute;
+        top: 0;
+        left: .2rem;
+        width: 10%;
+        height: .8rem;
+        background: url("images/yanz.png") no-repeat center center;
+        background-size: 55%;
+    }
+
+    .login {
+        margin-top: .6rem;
+    }
+
+    .login input {
+        float: left;
+        width: 100%;
+        height: .8rem;
+        padding: 0;
+        background: #aeaeae;
+        border: none;
+        outline: none;
+        border-radius: 5px;
+        color: #fff;
+        font-size: .3rem;
+        text-align: center;
+    }
+
+    .login .Color {
+        background: #e8b82d;
+    }
+
+    .box .agreement {
+        width: 100%;
+        margin: 0;
+        font-size: .27rem;
+        color: #fff;
+        height: .6rem;
+        line-height: .6rem;
+        padding-left: .6rem;
+        position: relative;
+    }
+
+    .agreement i {
+        position: absolute;
+        top: 8px;
+        left: 5px;
+        width: .6rem;
+        height: .6rem;
+        background: url("images/check.png") no-repeat;
+        background-size: 50%;
+    }
+
+    .agreement .checked {
+        position: absolute;
+        top: 8px;
+        left: 5px;
+        width: .6rem;
+        height: .6rem;
+        background: url("images/checked.png") no-repeat;
+        background-size: 50%;
+    }
+
+    .pop {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.3);
+        display: none;
+    }
+
+    .pop dl {
+        width: 80%;
+        margin: auto;
+        margin-top: 60%;
+        padding: 0 5px;
+        background: #fff;
+        text-align: center;
+        font-size: .3rem;
+        color: #666;
+        line-height: .8rem;
+    }
+
+    .pop dl dt {
+        padding: 10px 0;
+    }
+
+    .pop dl dd {
+        padding: 10px 0;
+        border-top: solid 1px #ccc;
+    }
+
+
+    </style>
+</head>
+
+<body class="clearfix">
+    <div class="header">
+        <a class="skip" href="">跳过<i></i></a>
+        <img class="pic" src="images/photo.png">
+    </div>
+    <div class="box">
+        <div class="phone">
+            <i></i>
+            <input id='mobile' type="text" class="mui-input-clear mui-input" placeholder="输入您的手机号" name="phone">
+        </div>
+        <div class="code">
+            <i></i>
+            <input id="code" type="text" placeholder="请输入验证码" name="code">
+            <input id="gain" type="button" value="获取验证码">
+        </div>
+        <div class="login">
+            <input type="button" value="登录" disabled='disabled'>
+        </div>
+        <div class="agreement">
+            <i class="check"></i>我已阅读并同意《接送机订票服务用户协议》
+        </div>
+    </div>
+    <div class="pop">
+        <dl>
+            <dt></dt>
+            <dd id="sure">确定</dd>
+        </dl>
+    </div>
+    <script src="js/jquery-2.1.4.js"></script>
+    <script type="text/javascript">
+    $(function() {
+        /*填写手机号码*/
+        /*$('#phone').blur(function() {
+            if (!(/^1[34578][0-9]{9}$/.test('#code'))) {
+                console.log("手机号码有误，请重填");
+                return false;
+            }
+        })*/
+        var phone = $('#mobile').val();
+        $('#gain').on('click', function() {
+            if (phone == "") {
+                $('.pop dt').html('号码不能为空1')
+                $('.pop').fadeIn(100);
+            }
+        });
+        $('#sure').on('click', function() { //点击确定隐藏
+            $('.pop').fadeOut(100);
+        });
+        /*短信*/
+        $('#mobile').blur(function() {
+            phone = $('#mobile').val();
+            var str = /^1[34578][0-9]{9}$/.test(phone); //匹配号码
+            console.log(str)
+            var flag = true;
+            $('#gain').on('click', function() {
+                if (phone != "" && str) { //号码不为空 符合规则
+                    var time = 10;
+                    if (flag) {
+                        flag = false;
+                        var t = setInterval(function() {
+                            time--;
+                            $('#gain').val(time + 's' + '重新获取').css('background', '#aeaeae').attr('disabled', 'disabled');
+                            if (time == 0) {
+                                clearInterval(t);
+                                $('#gain').val("获取验证码").css('background', '#e8b82d').removeAttr('disabled');
+                                flag = true;
+                            }
+                        }, 1000);
+                        //发送请求
+                        $.ajax({
+                            url: "http://192.168.2.141:8080/gwcx/app.do?getSmscode&mobile=" + phone,
+                            type: "get",
+                            dataType: "json",
+                            success: function(data) {
+                                console.log(data); //成功返回
+                            }
+                        })
+                    }
+                } else if (phone == "") {
+                    $('.pop dt').html('号码不能为空2')
+                    $('.pop').fadeIn(100);
+                } else if (str) {
+                    $('.pop dt').html('请输入正确号码1')
+                    $('.pop').fadeIn(100);
+                }
+            })
+        });
+//         var code = data.code;
+//         var codemsg = data.data.codemsg;
+
+        //协议确认
+        var flag = true;
+        $('.agreement').click(function() {
+            // console.log($('.check').attr('class'))
+            if (flag) {
+                $('.login input').removeAttr('disabled');
+                flag = false;
+            } else {
+                $('.login input').attr('disabled', 'disabled');
+                flag = true;
+            };
+            $('.check').toggleClass('checked');
+            $('.login input').toggleClass('Color');
+        });
+
+        //用户填写验证码后
+        var num;
+        $('#code').blur(function() {
+            num = $('#code').val();
+            $('.login input').on('click', function() {
+                if (num != "" && code == '000' && codemsg == num) { //判断接收数据是否与用户填写相同
+                    // alert('登录成功');
+                    $.ajax({
+                        url: "http://localhost:8080/gwcx/app.do?appLogin",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            mobile: phone,
+                            code: code
+                        },
+                        success: function(data) {
+                            console.log(data);
+                        }
+                    });
+                };
+            });
+        });
+
+
+
+
+        //网页正文全文高
+        var height = document.body.scrollHeight;
+        $("body").height(height);
+    });
+    </script>
+</body>
+
+</html>

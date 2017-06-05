@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>选择用车城市</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/weui.min.css">
+    <link rel="stylesheet" href="css/jquery-weui.min.css">
+    <script src="js/template.js"></script>
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #F2F2F2;
+    }
+
+    .takeOn {
+        line-height: .8rem;
+        color: #8A8A8A;
+        margin-left: 10px;
+        font-size: .32rem;
+    }
+
+    .citys ul {
+        padding: 15px 15px;
+        background: #fff;
+    }
+
+    .citys li a {
+        display: block;
+        margin: 5px;
+        font-size: .3rem;
+        line-height: .6rem;
+        text-align: center;
+        border: 1px solid #a7a7a7;
+        border-radius: 5px;
+        background: #fff;
+        color: #666;
+    }
+
+    @media only screen and (min-width: 400px) {
+        html {
+            font-size: 55px ! important;
+        }
+    }
+    </style>
+    <script>
+    (function() {
+        document.addEventListener('DOMContentLoaded', function() {
+            var html = document.documentElement;
+            var windowWidth = html.clientWidth;
+            html.style.fontSize = windowWidth / 7.5 + 'px';
+            // 等价于html.style.fontSize = windowWidth / 750 * 100 + 'px';
+        }, false);
+    })();
+    // 这个7.5就是根据设计稿的横向宽度来确定的，假如你的设计稿是640
+    // 那么 html.style.fontSize = windowWidth / 6.4 + 'px';
+    </script>
+
+</head>
+
+<body>
+    <div class="takeOn">开通城市</div>
+    <div class="citys">
+       <!--  <ul class="clearfix weui-flex">
+           <li class="weui-flex__item">
+               <a href="">贵阳</a>
+           </li>
+           <li class="weui-flex__item">
+               <a href="">成都</a>
+           </li>
+           <li class="weui-flex__item">
+               <a href="">贵阳</a>
+           </li>
+           <li class="weui-flex__item">
+               <a href="">成都</a>
+           </li>
+       </ul> -->
+    </div>
+    <script src="js/jquery-2.1.4.js"></script>
+    <script>
+    $(function() {
+        $.ajax({
+            url:"http://192.168.2.141:8080/gwcx/app.do?getCitys",
+            type:"get",
+            dataType:"json",
+            success:function(data) {
+                //console.log(data);
+                var cityData = template('citys', data);
+                $('.citys').html(cityData);
+            }
+        })
+    })
+    </script>
+    <script id='citys' type="text/html">
+        {{each data as value i}}
+        <ul class="clearfix weui-flex">
+            <li class="weui-flex__item">
+                <a href="">{{value.cityName}}</a>
+            </li>
+            <li class="weui-flex__item">
+                <a href="">{{value.cityName}}</a>
+            </li>
+            <li class="weui-flex__item">
+                <a href="">{{value.cityName}}</a>
+            </li>
+            <li class="weui-flex__item">
+                <a href="">{{value.cityName}}</a>
+            </li>
+        </ul>
+        {{/each}}
+    </script>
+</body>
+
+</html>

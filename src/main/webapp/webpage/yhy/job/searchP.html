@@ -1,0 +1,100 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>选择到达地点</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+">
+
+    <link rel="stylesheet" href="css/weui.min.css">
+    <link rel="stylesheet" href="css/jquery-weui.min.css">
+    <link rel="stylesheet" href="css/demos.css">
+    <style>
+        #searchBar{
+            height:46px;
+            background:#fff;
+            line-height:46px;
+            margin-top:15px;
+        }
+        #searchBar b{
+            margin:0 10px;
+            border:none;
+            border-right:1px solid #F2F2F2;
+            color:#818181;
+            padding-right:10px;
+            font-weight:normal;
+        }
+        #searchBar input{
+            border:none;
+            height:15px;
+            outline:none;
+        }
+        .offen{
+            height:24px;
+            color:rgb(136,136,136);
+            padding:5px 15px;
+            font-size:14px;
+        }
+        .oPlace{
+            height:73px;
+            background:#fff;
+            width:100%;
+            border-bottom:1px solid #EDEDED;
+            line-height:32px;
+        }
+        .oPlace img{
+            display: inline-block;
+            width:15px;
+            height:20px;
+            position:relative;
+            top:3px;
+            right:5px;
+        }
+        .dPla{
+            margin-left:22px;
+            color:rgb(102,102,102);
+            font-size:16px;
+        }
+        .dPla span{
+            position:absolute;
+        }
+        .cPla{
+            margin-left:20px;
+            color:rgb(136,136,136);
+            font-size:14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="searchBar">
+        <b>贵阳市</b><input type="text" placeholder="去哪"/>
+    </div>
+    <div class="offen">常用地点</div>
+    <div class="oPlace">
+        <div class="dPla">
+            <img src="images/oPlace.png" alt=""/>
+            <span>贵州航天林泉科技园</span>
+        </div>
+        <div class="cPla">贵州省贵阳市XXX区XXX路XXX号</div>
+    </div>
+    <div class="oPlace">
+        <div class="dPla">
+            <img src="images/oPlace.png" alt=""/>
+            <span>贵州航天林泉科技园</span>
+        </div>
+        <div class="cPla">贵州省贵阳市XXX区XXX路XXX号</div>
+    </div>
+<script src="js/jquery-2.1.4.js"></script>
+<script src="js/fastclick.js"></script>
+<script>
+    $(function() {
+        FastClick.attach(document.body);
+    });
+</script>
+<script src="js/jquery-weui.min.js"></script>
+
+</body>
+</html>

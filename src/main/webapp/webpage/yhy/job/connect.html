@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="description" content="">
+    <title>接机</title>
+    <link rel="stylesheet" href="css/weui.min.css">
+    <link rel="stylesheet" href="css/jquery-weui.min.css">
+    <link rel="stylesheet" href="css/common.css"/>
+</head>
+<body>
+<div class="conN">
+    <img src="images/jie-1.png" alt=""/>
+    <div class="weui-cells">
+        <a class="weui-cell weui-cell_access" href="javascript:;">
+            <div class="weui-cell__hd"><img src="images/hNum.png" alt="" style="width:20px;margin-right:10px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p class="forT">请输入航班号（可不填）</p>
+            </div>
+            <div class="weui-cell__ft"></div>
+        </a>
+        <a class="weui-cell weui-cell_access" href="javascript:;">
+            <div class="weui-cell__hd"><img src="images/sPla.png" alt="" style="width:20px;margin-right:10px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p class="forH">贵州龙洞堡国际机场</p>
+            </div>
+            <div class="weui-cell__ft"></div>
+        </a>
+        <a class="weui-cell weui-cell_access" href="javascript:;">
+            <div class="weui-cell__hd"><img src="images/fPla.png" alt="" style="width:20px;margin-right:10px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p class="forT">请选择下车地点</p>
+            </div>
+            <div class="weui-cell__ft"></div>
+        </a>
+        <a class="weui-cell weui-cell_access" href="javascript:;">
+            <div class="weui-cell__hd">
+                <img src="images/sTime.png" alt=""
+                     style="width:20px;margin-right:10px;display:block;">
+            </div>
+            <div class="weui-cell__bd">
+                <div class="weui-cell__hd">
+                    <label for="time-format" class="weui-label takeOn">
+                    <!--<p class="forT">请选择出发时间 <span class="orderT">(订票时间最少提前4小时)</span></p>-->
+                    <input class="weui-input" id="time-format" type="text" value="">
+                    </label>
+                </div>
+            </div>
+            <div class="weui-cell__ft"></div>
+        </a>
+    </div>
+    <div class="weui-cells">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><img src="images/sTime.png" alt="" style="width:20px;margin-right:10px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p class="forT">预计到达时间 <span class="orderT">(由于路况等原因，到达时间存在误差)</span></p>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><img src="images/sPric.png" alt="" style="width:20px;margin-right:10px;display:block"></div>
+            <div class="weui-cell__bd">
+                <p class="forT">预订单价 <span class="price">￥50元/人</span></p>
+            </div>
+        </div>
+    </div>
+    <a href="" class="weui-btn weui-btn_primary imedit">立即预订</a>
+    <div id="time-container"></div>
+</div>
+
+<script src="js/jquery-2.1.4.js"></script>
+<script src="js/fastclick.js"></script>
+<script>
+    $(function(){
+        FastClick.attach(document.body);
+    });
+</script>
+<script src="js/jquery-weui.min.js"></script>
+<script>
+    $("#time-format").datetimePicker({
+        title: '请选择出发时间',
+        yearSplit: '年',
+        monthSplit: '月',
+        dateSplit: '日',
+        times: function () {
+            return [  // 自定义的时间
+                {
+                    values: (function () {
+                        var hours = [];
+                        for (var i=0; i<24; i++) hours.push(i > 9 ? i : '0'+i);
+                        return hours;
+                    })()
+                },
+                {
+                    divider: true,  // 这是一个分隔符
+                    content: '时'
+                },
+                {
+                    values: (function () {
+                        var minutes = [];
+                        for (var i=0; i<59; i++) minutes.push(i > 9 ? i : '0'+i);
+                        return minutes;
+                    })()
+                },
+                {
+                    divider: true,  // 这是一个分隔符
+                    content: '分'
+                }
+            ];
+        },
+        onChange: function (picker, values, displayValues) {
+            console.log(values);
+        }
+    });
+    $("#time-inline").datetimePicker({
+        container: '#time-container',
+        onChange: function (picker, values, displayValues) {
+            console.log(values);
+        }
+    });
+</script>
+</body>
+</html>

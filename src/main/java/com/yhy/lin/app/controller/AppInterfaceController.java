@@ -53,6 +53,7 @@ import AppInterfaceController.AppInterfaceService;
  * @author Time
  * @date 2017年5月4日 上午9:34:30
  */
+
 @Controller
 @RequestMapping(value = "/app")
 public class AppInterfaceController extends AppBaseController {
@@ -188,9 +189,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 			
 			// 发送端短消息
-			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
-					SendMessageUtil.TEMPLATE_SMS_CODE);
-			
+//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
+//					SendMessageUtil.TEMPLATE_SMS_CODE);
+			String body = "";
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -422,7 +423,7 @@ public class AppInterfaceController extends AppBaseController {
 	public void getCitys(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		//String token = request.getParameter("token");
 		
 		String msg = "";
