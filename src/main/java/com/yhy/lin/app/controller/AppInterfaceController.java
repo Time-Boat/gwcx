@@ -82,8 +82,6 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 			// String mobile = request.getParameter("mobile");// 用户名
 			// String code = request.getParameter("code");// 验证码
-
-//			String param = request.getParameter("DATA");
 			
 			String param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
@@ -102,9 +100,8 @@ public class AppInterfaceController extends AppBaseController {
 						Date date = user.getCodeUpdateTime();
 						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm');
 						// 30分钟的有效期验证
-						// if (m < 30 && user.getStatus().equals("0") &&
-						// code.equals(user.getSecurityCode())) {
-						if (m > 30 && user.getStatus().equals("1") && code.equals(user.getSecurityCode())) { // 测试
+						if (m < 30 && user.getStatus().equals("0") &&code.equals(user.getSecurityCode())) {
+//						if (m > 30 && user.getStatus().equals("1") && code.equals(user.getSecurityCode())) { // 测试
 							String sql = "";
 							String curTime = AppUtil.getCurTime();
 							String token = "";

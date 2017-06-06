@@ -141,12 +141,13 @@ public class AppUtil {
 	public static String inputToStr(HttpServletRequest request) throws IOException {
 		request.setCharacterEncoding("UTF-8");
 		InputStream is = request.getInputStream();
-		int size = request.getContentLength();
-		byte[] reqBodyBytes = readBytes(is, size);
-		String res = new String(reqBodyBytes);
-		String param = Base64Util.getFromBase64(res);
+		String param1 = Base64Util.getFromBase64Input(is);
+//		int size = request.getContentLength();
+//		byte[] reqBodyBytes = readBytes(is, size);
+//		String res = new String(reqBodyBytes);
+//		String param = Base64Util.getFromBase64(res);
 //		param = new String(param.getBytes("iso-8859-1"),"utf-8");
-		return param;
+		return param1;
 	}
 		
 		
