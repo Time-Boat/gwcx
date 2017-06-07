@@ -84,13 +84,13 @@ public class AppInterfaceController extends AppBaseController {
 			// String code = request.getParameter("code");// 验证码
 			
 			String param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			// param = param.replaceAll(":null", ":\"\"");
 			JSONObject jsondata = JSONObject.fromObject(param);
 			String mobile = jsondata.getString("mobile");
 			String code = jsondata.getString("code");
-			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
+			logger.info("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
 				if (StringUtil.isNotEmpty(code)) {
 					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone",
@@ -149,7 +149,7 @@ public class AppInterfaceController extends AppBaseController {
 				statusCode = "001";
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 			msg = "登陆异常";
 			statusCode = AppGlobals.SYSTEM_ERROR;
 		}
@@ -188,9 +188,8 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 			
 			// 发送端短消息
-//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
-//					SendMessageUtil.TEMPLATE_SMS_CODE);
-			String body = "true";
+			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
+					SendMessageUtil.TEMPLATE_SMS_CODE);
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -246,7 +245,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 			param = AppUtil.inputToStr(request);
 
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -306,11 +305,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 		
 		data.put("success", success);
@@ -350,11 +349,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -403,11 +402,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -437,7 +436,7 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -490,11 +489,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -537,11 +536,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -568,7 +567,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -588,11 +587,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -631,7 +630,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 			// 验证参数
@@ -672,11 +671,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		obj.put("success", success);
@@ -704,7 +703,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -728,11 +727,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		data.put("success", success);
@@ -780,11 +779,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -811,7 +810,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -834,11 +833,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -865,7 +864,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -900,11 +899,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -927,7 +926,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -965,11 +964,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -1017,11 +1016,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
 
 		returnJsonObj.put("msg", msg);

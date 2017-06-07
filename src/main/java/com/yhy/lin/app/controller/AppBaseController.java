@@ -61,7 +61,9 @@ public class AppBaseController extends BaseController {
 
 	// app
 	public void responseOutWrite(HttpServletResponse response, JSONObject jObject) {
+		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
+		response.setDateHeader("Expires", 0);
 		response.setContentType("text/json;charset=UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		try {
@@ -89,7 +91,7 @@ public class AppBaseController extends BaseController {
 			}
 		}
 	}
-	
+
 	/** 验证参数是否为空 (JSONObject) */
 	public static String checkParam(JSONObject param) throws ParameterException {
 		Set<String> set = param.keySet();
@@ -100,5 +102,5 @@ public class AppBaseController extends BaseController {
 		}
 		return "";
 	}
-	
+
 }
