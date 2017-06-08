@@ -188,8 +188,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 			
 			// 发送端短消息
-			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
-					SendMessageUtil.TEMPLATE_SMS_CODE);
+//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
+//					SendMessageUtil.TEMPLATE_SMS_CODE);
+			String body = "true";
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展

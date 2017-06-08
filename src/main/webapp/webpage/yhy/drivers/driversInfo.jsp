@@ -23,11 +23,52 @@
   		}
   	}
   	
+  	var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
+  	
+  	var driverb = false;
+  	
+  	var drivera = false;
+  	
+  //验证手机号是否已经被占用
+  	function driverCheckPhone(phone){
+		if(!pat.test(phone)){
+			return;
+		}
+		$.ajax({
+            type:"get",
+            url:"driversInfoController.do?checkPhone&phone="+phone+"&id="+$("#id").val(),
+            dataType:'json',
+            success:function(d){
+           		var obj = eval('('+d.jsonStr+')');
+           		driverb = obj.success;
+           		drivera = true;
+           		if(!driverb){
+           			tip(obj.msg);
+           			$('#dcheck_phone').text(obj.msg).css({color:"red"});
+           		}else{
+           			$('#dcheck_phone').text('通过信息验证！').css({color:"#71b83d"});
+           		}
+            }
+        });
+	}
+  
+  //提交前验证手机号
+  	function dcp(){
+	  	if(drivera){
+	  		if(!driverb){
+	  			$('#dcheck_phone').text("手机号已存在").css({color:"red"});
+	  		}
+	  		return driverb;
+	  	}
+  		return true;
+  	}
+  
   </script>
  </head>
  <body >
  
-  <t:formvalid formid="driversInfo" tabtitle="aaaa" dialog="true" usePlugin="password" layout="table" callback="@Override uploadFile" action="driversInfoController.do?save" >
+  <t:formvalid formid="driversInfo" tabtitle="aaaa" dialog="true" usePlugin="password" layout="table" callback="@Override uploadFile" action="driversInfoController.do?save"
+  				beforeSubmit="dcp()"  >
 			<input id="id" name="id" type="hidden" value="${driversInfoPage.id }">
 			<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 				<tr>
@@ -50,8 +91,8 @@
 					</td>
 					<td class="value">
 						<input class="inputxt" id="phoneNumber" name="phoneNumber" datatype="m" errormsg="手机号非法"
-							   value="${driversInfoPage.phoneNumber}">
-						<span class="Validform_checktip"></span>
+							   value="${driversInfoPage.phoneNumber}" onchange="driverCheckPhone(this.value);" >
+						<span id="dcheck_phone" class="Validform_checktip"></span>
 					</td>
 				</tr>
 				<tr>

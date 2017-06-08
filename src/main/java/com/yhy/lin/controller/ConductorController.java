@@ -165,9 +165,8 @@ public class ConductorController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		conductor.setDeleteFlag((short) 0);// 默认都是为做逻辑删除的数据
-		String lineInfos = request.getParameter("lineInfos");
 		//验票员线路没有添加对应的线路id
-		System.out.println(lineInfos);
+//		System.out.println(lineInfos);
 		if (StringUtil.isNotEmpty(conductor.getId())) {
 			message = "验票员: " + conductor.getName() + "被更新成功";
 			ConductorEntity t = conductorService.get(ConductorEntity.class, conductor.getId());

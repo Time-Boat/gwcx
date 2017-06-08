@@ -158,7 +158,7 @@ public class DriversInfoController extends BaseController {
 		driversInfo.setDeleteFlag(0);
 		UploadFile uploadFile = new UploadFile(request, driversInfo);
 		//uploadFile.setCusPath("plug-in/accordion/images");
-		uploadFile.setCusPath("files");    
+		uploadFile.setCusPath("image");    
 		uploadFile.setRealPath("drivingLicenseImgUrl");  
 		uploadFile.setObject(driversInfo);  
 		uploadFile.setRename(true);
@@ -186,4 +186,35 @@ public class DriversInfoController extends BaseController {
 		return new ModelAndView("yhy/drivers/driversInfo");
 	}
 	
+	/**
+	 * 检查手机号是否在数据库中已存在
+	 */
+	@RequestMapping(params = "checkPhone")
+	@ResponseBody
+	public AjaxJson checkPhone(HttpServletRequest request) {
+		String message = "";
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		try {
+			String phone = request.getParameter("phone");
+			String id = request.getParameter("id");
+			
+			long l = driversInfoService.getCountForJdbcParam("select count(*) from driversinfo where phoneNumber=? and id <> ? ", new Object[]{phone,id});
+			
+			if(l > 0){
+				message = "手机号已存在";
+				success = false;
+			}else{
+				success = true;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
 }

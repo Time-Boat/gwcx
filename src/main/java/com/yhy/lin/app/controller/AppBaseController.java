@@ -63,6 +63,9 @@ public class AppBaseController extends BaseController {
 	public void responseOutWrite(HttpServletResponse response, JSONObject jObject) {
 		response.setHeader("Pragma", "no-cache");
 		response.setHeader("Cache-Control", "no-cache");
+		//这个，是设置页面缓存的
+		//防止JSP或者Servlet中的输出被浏览器保存在缓冲区中。
+		//在代理服务器(Nginx)端防止缓冲
 		response.setDateHeader("Expires", 0);
 		response.setContentType("text/json;charset=UTF-8");
 		response.setCharacterEncoding("UTF-8");

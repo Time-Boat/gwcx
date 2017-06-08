@@ -22,6 +22,7 @@
 		}
 	 	
 	 	function callbackSelect() {
+	 		
 	 		var ids ="";
 	 		var names ="";
 	 		var iframe = this.iframe.contentWindow;
@@ -37,11 +38,13 @@
 	 			names +=",";
 	 		}
 	 		$("#jurisdiction").val(names);
+	 		$("#lineIds").val(ids);
+	 		alert(ids);
 		}
 	 	
 	  	var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
 	  	
-	  	var b = false;
+	  	var b = true;
 	  	
 	  	//验证手机号是否已经被占用
 	  	function checkPhone(phone){
@@ -81,8 +84,9 @@
  	
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="conductorController.do?save" beforeSubmit="" >
+<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="conductorController.do?save" beforeSubmit="cp()" >
 	<input id="id" name="id" type="hidden" value="${conductor.id }">
+	<input id="lineIds" name="lineIds" type="hidden" value="${conductor.lineIds }">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 		<tr>
 			<td align="right" width="15%" nowrap><label class="Validform_label"> 用户名: </label></td>
@@ -129,7 +133,7 @@
 				
 				<span class="Validform_checktip"></span>
 			</td>
-		
+		</tr>
 		<%-- <tr>
 			<td align="right"><label class="Validform_label"> 验票线路: </label></td>
 			<td class="value">

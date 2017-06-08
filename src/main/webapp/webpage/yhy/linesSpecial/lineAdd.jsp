@@ -55,7 +55,7 @@
 			</td>
 			<td class="value">
 				
-				<t:dictSelect field="type" typeGroupCode="busType" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*"></t:dictSelect>	
+				<t:dictSelect field="type" typeGroupCode="transferTy" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*"></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>

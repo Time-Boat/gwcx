@@ -34,6 +34,15 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	/**逻辑删除0是未删除 1 是已删除*/
 	private Short deleteFlag;// 状态: 0:不删除  1：删除
 	
+	private String lineIds;
+	
+	@Column(name = "line_ids")
+	public String getLineIds() {
+		return lineIds;
+	}
+	public void setLineIds(String lineIds) {
+		this.lineIds = lineIds;
+	}
 	@Column(name = "delete_flag")
 	public Short getDeleteFlag() {
 		return deleteFlag;

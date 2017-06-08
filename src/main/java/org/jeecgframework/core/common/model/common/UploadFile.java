@@ -17,7 +17,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 public class UploadFile {
 	private String byteField = "attachmentcontent";// 二进制文件内容保存到数据库的对应实体类字段
 	private String titleField = "attachmenttitle";// 文件名(标题)保存到数据库的对应实体类字段
-	private String basePath = "upload";// 文件保存目录根路径
+	private String basePath = "gwcx";// 文件保存目录根路径		"upload"
 	private String realPath = "realpath";// 文件保存在硬盘的全路径对应实体字段
 	private String extend = "extend";// 扩展名
 	private boolean view = false;// 是否是预览
@@ -30,6 +30,17 @@ public class UploadFile {
 	private MultipartHttpServletRequest multipartRequest;
 	private HttpServletRequest request;
 	private HttpServletResponse response;
+
+	//设置图片存储的磁盘根目录
+	private String diskBasePath = "D:/javaWeb/demo/nginx";
+	
+	public String getDiskBasePath() {
+		return diskBasePath;
+	}
+
+	public void setDiskBasePath(String diskBasePath) {
+		this.diskBasePath = diskBasePath;
+	}
 
 	/**
 	 * @param response

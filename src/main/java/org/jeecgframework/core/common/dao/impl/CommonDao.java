@@ -126,7 +126,9 @@ public class CommonDao extends GenericBaseCommonDao implements ICommonDao, IGene
 			Map<String, MultipartFile> fileMap = multipartRequest.getFileMap();
 			// 文件数据库保存路径
 			String path = uploadbasepath + "/";// 文件保存在硬盘的相对路径
-			String realPath = uploadFile.getMultipartRequest().getSession().getServletContext().getRealPath("/") + "/" + path;// 文件的硬盘真实路径
+//			String realPath = uploadFile.getMultipartRequest().getSession().getServletContext().getRealPath("/") + "/" + path;// 文件的硬盘真实路径
+			//为了将图片和项目分离
+			String realPath = uploadFile.getDiskBasePath() + "/" + path;
 			File file = new File(realPath);
 			if (!file.exists()) {
 				file.mkdirs();// 创建根目录
@@ -192,8 +194,8 @@ public class CommonDao extends GenericBaseCommonDao implements ICommonDao, IGene
 				}
 				File savefile = new File(savePath);
 				if (uploadFile.getRealPath() != null) {
-					// 设置文件数据库的物理路径
-					reflectHelper.setMethodValue(uploadFile.getRealPath(), path + myfilename);
+					// 设置文件数据库的物理路径      path.substring是为了把项目名剔除掉，数据库中的图片路径不需要，因为在jeecg前端框架找图片路径的时候会把项目名加上
+					reflectHelper.setMethodValue(uploadFile.getRealPath(), path.substring(path.indexOf("/")+1) + myfilename);
 				}
 				saveOrUpdate(object);
 				// 文件拷贝到指定硬盘目录

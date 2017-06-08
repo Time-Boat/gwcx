@@ -13,7 +13,6 @@
 		<t:dgCol title="申请人手机号" field="orderContactsmobile" align="center"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
-		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 	    <t:dgCol title="单价(元/人)" field="orderUnitprice" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="申请时间" field="applicationTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
@@ -23,15 +22,6 @@
 		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
 		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2" query="true" align="center"></t:dgCol>
-		<%-- <t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
-		<t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol>
-		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
-		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
-		<t:dgCol title="支付状态" field="orderPaystatus"  replace="已付款_0,退款中_1,已退款_2,未付款_3" align="center"></t:dgCol>		
-		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
-		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
-		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
-		 --%>
 		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgToolBar> 	 
 	</t:datagrid>
 </div>
