@@ -194,9 +194,9 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 				"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
 						+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? ");
 
-		if (StringUtil.isNotEmpty(orderStatus)) {
-			sql.append(" and order_paystatus = '" + orderStatus + "'");
-		}
+//		if (StringUtil.isNotEmpty(orderStatus)) {
+//			sql.append(" and order_paystatus = '" + orderStatus + "'");
+//		}
 
 		list = findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
 				Integer.parseInt(maxPageItem), userId);

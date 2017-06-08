@@ -465,10 +465,11 @@ public class AppInterfaceController extends AppBaseController {
 			String userId = request.getParameter("userId");
 
 			// 订单支付状态 0：已付款，1：退款中 2：已退款 3: 未付款
-			String orderStatus = request.getParameter("orderStatus");
+//			String orderStatus = request.getParameter("orderStatus");
 
 			// 验证参数
-			checkParam(new String[] { "token", "orderId", "orderStatus"}, token, userId, orderStatus);
+//			checkParam(new String[] { "token", "orderId", "orderStatus"}, token, userId, orderStatus);
+			checkParam(new String[] { "token", "orderId"}, token, userId);
 
 			// 验证token
 			checkToken(token);
@@ -483,7 +484,7 @@ public class AppInterfaceController extends AppBaseController {
 				maxPageItem = "15";
 			}
 
-			auoList = appService.getUserOrders(userId, orderStatus, pageNo, maxPageItem);
+			auoList = appService.getUserOrders(userId, null, pageNo, maxPageItem);
 			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
@@ -945,7 +946,7 @@ public class AppInterfaceController extends AppBaseController {
 			String idCard = jsondata.getString("cardNumber");
 			String address = jsondata.getString("address");
 
-			String path = request.getSession().getServletContext().getRealPath("");
+			String path = AppGlobals.EXTERNAL_FILE_PATH;
 
 			// 获取图片存储路径
 			String imgName = AppGlobals.WEB_FILE_PATH + userId + "_" + System.currentTimeMillis()

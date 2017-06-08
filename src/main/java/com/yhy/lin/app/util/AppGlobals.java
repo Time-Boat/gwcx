@@ -46,13 +46,13 @@ public interface AppGlobals {
 	/** 包车 */
 
 	/** web外部的文件存储路径 */
-	public static final String EXTERNAL_FILE_PATH = "C:/image/";
+	public static final String EXTERNAL_FILE_PATH = "D:/javaWeb/demo/nginx/gwcx/image";
 	
 	/** app客户头像路径 */
 	public static final String APP_USER_FILE_PATH = "userImage";
 	
 	/** web路径 */
-	public static final String WEB_FILE_PATH = "upload/files/";
+	public static final String WEB_FILE_PATH = "image/";
 	
 	/** 阿里大鱼服务器url */
 	public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
