@@ -470,15 +470,15 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证参数
 //			checkParam(new String[] { "token", "orderId", "orderStatus"}, token, userId, orderStatus);
 			checkParam(new String[] { "token", "orderId"}, token, userId);
-
+			
 			// 验证token
 			checkToken(token);
-						
+			
 			String pageNo = request.getParameter("pageNo");
 			if (!StringUtil.isNotEmpty(pageNo)) {
 				pageNo = "1";
 			}
-
+			
 			String maxPageItem = request.getParameter("maxPageItem");
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "15";

@@ -19,8 +19,7 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 
 	private String orderId;// 订单号
 	private Integer orderType;// 订单类型 0:接机 1:送机 2:接火车 3:送火车
-	private Integer orderStatus;// 订单状态
-								// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
+	private Integer orderStatus; //订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付
 	private String orderFlightnumber;// 航班号
 	private String orderStartingStationId;// 起点站
 	private String orderTerminusStationId;// 终点站
@@ -28,11 +27,11 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	private Date orderExpectedarrival;// 预计到达时间
 	private BigDecimal orderUnitprice;// 单价
 	private String orderNumbers;// 车票数量
-
+	
 	private String orderPaytype;// 支付方式0：微信 1：支付宝 2：银联
 	private String orderContactsname;// 联系人
 	private String orderContactsmobile;// 联系人手机号
-	private String orderPaystatus;// 支付状态 0：已付款，1：退款中 2：已退款 3:：未付款
+	private String orderPaystatus;// 支付状态 0：已付款，1：退款中 2：已退款 3:未付款
 	private String orderTrainnumber;// 火车车次
 //	private Integer orderNumberPeople;// 人数
 	private BigDecimal orderTotalPrice;// 总价

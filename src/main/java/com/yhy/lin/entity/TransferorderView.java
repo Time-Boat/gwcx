@@ -8,7 +8,7 @@ public class TransferorderView implements java.io.Serializable {
 	private String id;//主键
 	private String  orderId;//订单id
 	private String orderType;//订单类型 0:接机  1:送机  2:接火车 3:送火车
-	private String orderStatus;//订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
+	private String orderStatus;//订单状态  0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付
 	private String  orderFlightnumber;//航班号
 	private String  orderStartingstation;//起点站
 	private String  orderTerminusstation;//终点站
