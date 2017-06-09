@@ -23,7 +23,7 @@
 	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
 	<t:dgCol title="预计到达时间" field="lendTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group"  align="center" width="120"></t:dgCol>
 	 --%>
-	 <t:dgCol title="线路时长" field="lineTimes"  align="center" width="60"></t:dgCol>
+	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="80"></t:dgCol>
 	 
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="130"></t:dgCol>
 	<t:dgCol title="所在城市" field="city"  align="center"></t:dgCol>

@@ -134,7 +134,11 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
 						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0  ",
 				stationId, cityId, serveType);
-
+		
+		if(lineList.size() == 0){
+			return;
+		}
+		
 		StringBuffer sbf = new StringBuffer();
 		for (Map<String, Object> a : lineList) {
 
@@ -155,29 +159,35 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		if (sbf.length() > 0)
 			sbf.deleteCharAt(sbf.length() - 1);
 
+		
 		// 查询指定id线路中的所有普通站点
-		stationList = findHql(
+		List<AppStationInfoEntity> stationList1 = findHql(
 				"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", 0);
-
+		stationList.addAll(stationList1);
+		
 		// 常用站点列表
 		// List<CustomerCommonAddrEntity> c =
 		// systemService.findHql("from CustomerCommonAddrEntity where
 		// user_id=? ", userId);
-		List<Map<String, Object>> map = findForJdbc(
-				"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
-						+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in ("
-						+ sbf.toString() + ") and station_type=?",
-				userId, 0);
+		
+		//userId如果为空的话就不进行查找
+		if(StringUtil.isNotEmpty(userId)){
+			List<Map<String, Object>> map = findForJdbc(
+					"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
+							+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in ("
+							+ sbf.toString() + ") and station_type=?",
+					userId, 0);
 
-		for (Map<String, Object> c : map) {
-			AppStationInfoEntity addr = new AppStationInfoEntity();
-			addr.setId(c.get("id") + "");
-			addr.setLineId(c.get("lineId") + "");
-			addr.setName(c.get("name") + "");
-			addr.setStopLocation(c.get("stopLocation") + "");
-			addr.setX(c.get("y") + "");
-			addr.setY(c.get("y") + "");
-			cList.add(addr);
+			for (Map<String, Object> c : map) {
+				AppStationInfoEntity addr = new AppStationInfoEntity();
+				addr.setId(c.get("id") + "");
+				addr.setLineId(c.get("lineId") + "");
+				addr.setName(c.get("name") + "");
+				addr.setStopLocation(c.get("stopLocation") + "");
+				addr.setX(c.get("y") + "");
+				addr.setY(c.get("y") + "");
+				cList.add(addr);
+			}
 		}
 		
 	}

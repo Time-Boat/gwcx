@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>新增验票员</title>
+<title>新增线路</title>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 </head>
 <body style="" scroll="no">

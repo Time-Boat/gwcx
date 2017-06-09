@@ -65,8 +65,8 @@
 				<label class="Validform_label"> 线路时长: </label>
 			</td>
 			<td class="value">
-				<input class="inputxt" name="lineTimes" value="${lineInfo.lineTimes}" style="width: 10%" datatype="n1-2"> 
-				<span >小时</span>
+				<input class="inputxt" name="lineTimes" value="${lineInfo.lineTimes}" style="width: 10%" datatype="n1-3"> 
+				<span >分</span>
 			</td>
 		</tr>
 		<tr>
