@@ -57,18 +57,18 @@ import AppInterfaceController.AppInterfaceService;
 @Controller
 @RequestMapping(value = "/app")
 public class AppInterfaceController extends AppBaseController {
-	
+
 	/**
 	 * Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
-	
+
 	@Autowired
 	private AppInterfaceService appService;
-	
+
 	@Autowired
 	private SystemService systemService;
-	
+
 	// 登录接口
 	@RequestMapping(params = "appLogin")
 	public void AppLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -82,15 +82,15 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 			// String mobile = request.getParameter("mobile");// 用户名
 			// String code = request.getParameter("code");// 验证码
-			
+
 			String param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			// param = param.replaceAll(":null", ":\"\"");
 			JSONObject jsondata = JSONObject.fromObject(param);
 			String mobile = jsondata.getString("mobile");
 			String code = jsondata.getString("code");
-			logger.info("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
+			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
 				if (StringUtil.isNotEmpty(code)) {
 					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone",
@@ -100,13 +100,14 @@ public class AppInterfaceController extends AppBaseController {
 						Date date = user.getCodeUpdateTime();
 						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm');
 						// 30分钟的有效期验证
-						if (m < 30 && user.getStatus().equals("0") &&code.equals(user.getSecurityCode())) {
-//						if (m > 30 && user.getStatus().equals("1") && code.equals(user.getSecurityCode())) { // 测试
+						if (m < 30 && user.getStatus().equals("0") && code.equals(user.getSecurityCode())) {
+							// if (m > 30 && user.getStatus().equals("1") &&
+							// code.equals(user.getSecurityCode())) { // 测试
 							String sql = "";
 							String curTime = AppUtil.getCurTime();
 							String token = "";
 
-							//修改登录状态
+							// 修改登录状态
 							if (StringUtil.isNotEmpty(user.getToken())) {
 								token = user.getToken();
 								sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
@@ -149,7 +150,7 @@ public class AppInterfaceController extends AppBaseController {
 				statusCode = "001";
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			e.printStackTrace();
 			msg = "登陆异常";
 			statusCode = AppGlobals.SYSTEM_ERROR;
 		}
@@ -186,11 +187,10 @@ public class AppInterfaceController extends AppBaseController {
 		} else {
 			// 生成4位数的验证码
 			String code = StringUtil.numRandom(4);
-			
+
 			// 发送端短消息
-//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" }, new String[] { code },
-//					SendMessageUtil.TEMPLATE_SMS_CODE);
-			String body = "true";
+			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
+					SendMessageUtil.TEMPLATE_SMS_CODE);
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -199,7 +199,7 @@ public class AppInterfaceController extends AppBaseController {
 				// 当前时间
 				String curTime = AppUtil.getCurTime();
 				String sql = "";
-				//存储验证码相关信息
+				// 存储验证码相关信息
 				if (user == null) {
 					sql = "insert into car_customer set customer_id='" + UUIDGenerator.generate()
 							+ "',phone = ? ,create_time = ? " + ",status = '0',code_update_time = ? ,security_code = ?";
@@ -225,6 +225,12 @@ public class AppInterfaceController extends AppBaseController {
 
 	}
 
+	public static void main(String[] args) {
+		String body = SendMessageUtil.sendMessage("15527916902", new String[] { "code" , "product" }, new String[] { "1234" , "龙游出行" },
+				SendMessageUtil.TEMPLATE_SMS_CODE);
+		System.out.println(body);
+	}
+	
 	// 订单支付
 	@RequestMapping(params = "createOrder")
 	public void createOrder(HttpServletRequest request, HttpServletResponse response) {
@@ -235,7 +241,7 @@ public class AppInterfaceController extends AppBaseController {
 		String statusCode = "";
 		JSONObject data = new JSONObject();
 		boolean success = false;
-		
+
 		// 记录常用站点id
 		String commonAddrId = "";
 
@@ -246,7 +252,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 			param = AppUtil.inputToStr(request);
 
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -275,7 +281,7 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "必须提前4个小时才能下订单，无法取消订单";
 				success = false;
 			} else {
-				
+
 				switch (t.getOrderType() + "") {
 				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
 					commonAddrId = eId;
@@ -296,9 +302,9 @@ public class AppInterfaceController extends AppBaseController {
 				default:
 					break;
 				}
-				
+
 				appService.saveOrder(t, orderPrefix, commonAddrId);
-				
+
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;
@@ -306,28 +312,27 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
-		
+
 		data.put("success", success);
-		
+
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data.toString());
-		
+
 		responseOutWrite(response, returnJsonObj);
 	}
-	
+
 	// 获取机场站点或者火车站站点信息
 	@RequestMapping(params = "getPTStation")
 	public void getPTStation(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
@@ -339,8 +344,8 @@ public class AppInterfaceController extends AppBaseController {
 			String cityId = request.getParameter("cityId");
 
 			// 验证参数
-			checkParam(new String[] { "serveType", "cityId"}, serveType, cityId);
-			
+			checkParam(new String[] { "serveType", "cityId" }, serveType, cityId);
+
 			List<AppStationInfoEntity> lList = appService.getPTStation(serveType, cityId);
 
 			data.put("PTStation", lList);
@@ -350,11 +355,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -382,19 +387,20 @@ public class AppInterfaceController extends AppBaseController {
 			// 所属城市
 			String cityId = request.getParameter("cityId");
 			// token
-//			String token = request.getParameter("token");
+			// String token = request.getParameter("token");
 
 			String userId = request.getParameter("userId");
 
 			// 验证参数
-			checkParam(new String[] { "serveType", "stationId", "cityId", "userId"}, serveType, stationId, cityId, userId);
-						
+			checkParam(new String[] { "serveType", "stationId", "cityId", "userId" }, serveType, stationId, cityId,
+					userId);
+
 			List<AppLineStationInfoEntity> lList = new ArrayList<>();
 			List<AppStationInfoEntity> cList = new ArrayList<>();
 			List<AppStationInfoEntity> stationList = new ArrayList<>();
-			
+
 			appService.getLinebyStation(serveType, cityId, stationId, userId, lList, cList, stationList);
-			
+
 			data.put("addrs", cList);
 			data.put("lineInfo", lList);
 			data.put("stationInfo", stationList);
@@ -403,11 +409,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -422,9 +428,9 @@ public class AppInterfaceController extends AppBaseController {
 	public void getCitys(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-		
-		//String token = request.getParameter("token");
-		
+
+		// String token = request.getParameter("token");
+
 		String msg = "";
 		String statusCode = "";
 		// JSONObject data = new JSONObject();
@@ -437,7 +443,7 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -465,37 +471,38 @@ public class AppInterfaceController extends AppBaseController {
 			String userId = request.getParameter("userId");
 
 			// 订单支付状态 0：已付款，1：退款中 2：已退款 3: 未付款
-//			String orderStatus = request.getParameter("orderStatus");
+			// String orderStatus = request.getParameter("orderStatus");
 
 			// 验证参数
-//			checkParam(new String[] { "token", "orderId", "orderStatus"}, token, userId, orderStatus);
-			checkParam(new String[] { "token", "orderId"}, token, userId);
-			
+			// checkParam(new String[] { "token", "orderId", "orderStatus"},
+			// token, userId, orderStatus);
+			checkParam(new String[] { "token", "orderId" }, token, userId);
+
 			// 验证token
 			checkToken(token);
-			
+
 			String pageNo = request.getParameter("pageNo");
 			if (!StringUtil.isNotEmpty(pageNo)) {
 				pageNo = "1";
 			}
-			
+
 			String maxPageItem = request.getParameter("maxPageItem");
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "15";
 			}
 
 			auoList = appService.getUserOrders(userId, null, pageNo, maxPageItem);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -522,27 +529,27 @@ public class AppInterfaceController extends AppBaseController {
 		String orderId = request.getParameter("orderId");
 
 		AppUserOrderDetailEntity aod = null;
-		
+
 		try {
-			
+
 			// 验证参数
 			checkParam(new String[] { "token", "orderId" }, token, orderId);
 
 			// 验证token
 			checkToken(token);
-			
+
 			aod = appService.getOrderDetailById(orderId);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -569,7 +576,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 
 			param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -589,11 +596,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -632,7 +639,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 
 			param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 			// 验证参数
@@ -673,11 +680,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		obj.put("success", success);
@@ -705,7 +712,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -729,11 +736,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		data.put("success", success);
@@ -773,19 +780,19 @@ public class AppInterfaceController extends AppBaseController {
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "15";
 			}
-			
+
 			actlist = appService.getTicketListById(userId, pageNo, maxPageItem);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -812,7 +819,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -835,11 +842,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -866,7 +873,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -895,17 +902,17 @@ public class AppInterfaceController extends AppBaseController {
 
 			data.put("addrs", map);
 			data.put("customerInfo", a);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -928,7 +935,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			logger.info("前端传递参数：" + param);
+			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -966,11 +973,11 @@ public class AppInterfaceController extends AppBaseController {
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -1012,17 +1019,17 @@ public class AppInterfaceController extends AppBaseController {
 			}
 
 			mList = appService.getMessageListById(userId, pageNo, maxPageItem);
-			
+
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
-			logger.error(e.getMessage());
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			logger.error(e.getMessage());
+			e.printStackTrace();
 		}
 
 		returnJsonObj.put("msg", msg);
@@ -1049,4 +1056,49 @@ public class AppInterfaceController extends AppBaseController {
 			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 	}
 	
+	
+//	/**
+//	　　跳转支付界面，将code带过去
+//	**/
+//
+//	@RequestMapping("toPay.do")
+//	public ModelAndView toPay(HttpServletRequest request, HttpServletResponse response) throws Exception {
+//	        
+//	    ModelAndView modelAndView = new ModelAndView();
+//	    logger.debug("玩家准备填写充值信息了:" + HttpUtil.buildOriginalURL(request));
+//	        
+//	    //重定向Url
+//	    String redirecUri = URLEncoder.encode(GlobalThreadLocal.getSiteConfig().getBasePath() + "/wxOfficialAccountsPay/toInputAccountInfo.do");
+//	    //用于获取成员信息的微信返回码
+//	    String code = null;
+//	    if( request.getParameter("code")!=null ){
+//	        code =request.getParameter("code");
+//	    }
+//	    if( code == null) {
+//	        //授权         
+//	        return authorization(redirecUri);
+//	    }
+//	    code =request.getParameter("code");
+//	    // 获取用户信息
+//	    WeixinLoginUser weixinLoginUser = getWeixinLoginUser(code);
+//	        
+//	    modelAndView.addObject("openId",des.getEncString(weixinLoginUser.getOpenID()));
+//	    // 跳转到支付界面
+//	    String viewName = "/wxOfficialAccountsPay/pay";
+//	    modelAndView.setViewName(viewName);
+//	    return modelAndView;
+//	}
+//
+//	/**
+//	* 授权方法
+//	* @param redirecUri 重定向链接
+//	* 
+//	* */
+//	private ModelAndView authorization(String redirecUri) {
+//	    String siteURL="redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid="
+//	    +"&redirect_uri="+redirecUri+
+//	    "&response_type=code&scope=snsapi_userinfo&state=1234#wechat_redirect";
+//	    logger.debug("授权路径：[ "+siteURL+" ]");
+//	    return new ModelAndView(siteURL);
+//	}
 }

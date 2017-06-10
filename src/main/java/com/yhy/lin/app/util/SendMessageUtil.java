@@ -15,7 +15,7 @@ import com.taobao.api.response.AlibabaAliqinFcSmsNumSendResponse;
 public class SendMessageUtil {
 
 	// 验证码信息模板
-	public static final String TEMPLATE_SMS_CODE = "SMS_63766002";
+	public static final String TEMPLATE_SMS_CODE = "SMS_66640251";//个人SMS_63766002
 
 	// 安排车辆信息模板
 	public static final String TEMPLATE_ARRANGE_CAR = "SMS_69620002";
@@ -31,7 +31,7 @@ public class SendMessageUtil {
 		AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
 		req.setExtend("123456"); // 短信回传时的可以携带的信息 ？？？
 		req.setSmsType("normal"); // 短信类型
-		req.setSmsFreeSignName("刘航"); // 模板签名
+		req.setSmsFreeSignName("登录验证"); // 模板签名
 		StringBuffer ps = new StringBuffer("{");
 		for (int i = 0; i < paramKey.length; i++) {
 			ps.append("'" + paramKey[i] + "':'" + paramValue[i] + "',");
