@@ -99,7 +99,8 @@ public class AppBaseController extends BaseController {
 	public static String checkParam(JSONObject param) throws ParameterException {
 		Set<String> set = param.keySet();
 		for (String p : set) {
-			if (StringUtil.isNotEmpty(param.get(p) + "")) {
+//			System.out.println(param.get(p));
+			if (!StringUtil.isNotEmpty(param.get(p) + "") && !"orderFlightnumber".equals(p) && !"orderTrainnumber".equals(p)) {
 				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
 			}
 		}

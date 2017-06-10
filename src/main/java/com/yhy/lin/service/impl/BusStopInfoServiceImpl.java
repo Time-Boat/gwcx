@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
+import com.yhy.lin.entity.LineInfoEntity;
 
 import net.sf.json.JSONObject;
 
@@ -117,11 +118,10 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return sqlWhere.toString();
 	}
 	
-	//根据线路lineInfoId，拿到对应线路的未挂接的站点信息   
+	//根据线路lineInfoId，拿到对应线路的未挂接的站点信息   import com.yhy.lin.entity.LineInfoEntity;
 	@Override
-	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType,String cityId){
-		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType,cityId);
-		
+	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType,LineInfoEntity lineInfo){
+		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType, lineInfo);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		//where c.lineId is NULL 这个条件是为了不重复添加站点
 		String sqlCnt = "select count(*) from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL ";
@@ -150,22 +150,42 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return jObject;
 	}
 	
-	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,String cityId){
+	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,LineInfoEntity lineInfo){
 		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' "); 
-		if(StringUtil.isNotEmpty(cityId)){
-			sqlWhere.append(" and  a.cityId = '"+cityId+"' ");
+		if(StringUtil.isNotEmpty(lineInfo.getCityId())){
+			sqlWhere.append(" and  a.cityId = '"+lineInfo.getCityId()+"' ");
 		}
-		//线路类型
+		
+		/**是否已挂接站点，0：未挂接      1：挂接公务车站点     2：挂接接送机站点 */
+		//因为站点是公务车和接送机业务都能使用，公务车中一条线路使用了这个站点之后，其他公务车的线路就不能再使用了，但是机场线路可以使用，所以这里做了一个区分，看站点是挂在公务车类型下还是挂在接送机类型下
 		if(StringUtil.isNotEmpty(lineType)){
 			sqlWhere.append(" and  a.status != '"+lineType+"' ");
 		}
 		
 		if(StringUtil.isNotEmpty(busStopInfo.getName())){
-			sqlWhere.append(" and  a.name like '%"+busStopInfo.getName()+"%'");
+			sqlWhere.append(" and  a.name like '%" + busStopInfo.getName() + "%'");
 		}
+		
 		if(StringUtil.isNotEmpty(busStopInfo.getStopLocation())){
-			sqlWhere.append(" and  a.stopLocation like '%"+busStopInfo.getStopLocation()+"%'");
+			sqlWhere.append(" and  a.stopLocation like '%" + busStopInfo.getStopLocation() + "%'");
 		}
+		
+		//线路类型 0：班车 1：包车 2：接机 3：送机 4：接火车 5：送火车
+		//站点类型 0：普通站点    1：火车站点    2：飞机站点、
+		//接送机业务只能选择机场站点
+		switch (lineInfo.getType()) {
+		case "2":
+		case "3":
+			sqlWhere.append(" and  a.station_type != '1'");
+			break;
+		case "4":
+		case "5":
+			sqlWhere.append(" and  a.station_type != '2'");
+			break;
+		default:
+			break;
+		}
+		
 		return sqlWhere.toString();
 	}
 	

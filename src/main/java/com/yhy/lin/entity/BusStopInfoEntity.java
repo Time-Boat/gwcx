@@ -31,7 +31,8 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	private String y;
 	/**备注*/
 	private String remark;
-	/**状态0:未使用 1：已使用 */
+	/**是否已挂接站点，0：未挂接      1：挂接公务车站点     2：挂接接送机站点 */
+	//因为站点是公务车和接送机业务都能使用，公务车中一条线路使用了这个站点之后，其他公务车的线路就不能再使用了，但是机场线路可以使用，所以这里做了一个区分，看站点是挂在公务车类型下还是挂在接送机类型下
 	private String status;
 	/**用于逻辑删除 0正常  1已删除*/
 	private Short deleteFlag;

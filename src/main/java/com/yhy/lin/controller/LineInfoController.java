@@ -320,7 +320,7 @@ public class LineInfoController extends BaseController {
 		if(StringUtil.isNotEmpty(lineInfoId)){
 			LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
 			String lineType = request.getParameter("lineType");
-			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType,lineInfo.getCityId());
+			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType, lineInfo);
 			responseDatagrid(response, jObject);
 		}
 		

@@ -55,11 +55,11 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
 		
 		// 做了一个视图，确保查出的线路的唯一性
-		Map<String, Object> map = findOneForJdbc("select * from order_line_view where busStopsId=? ", commonAddrId);
-		if (map.size() > 0) {
-			t.setLineName(map.get("name") + "");
-			t.setLineId(map.get("id") + "");
-		}
+//		Map<String, Object> map = findOneForJdbc("select * from order_line_view where busStopsId=? ", commonAddrId);
+//		if (map.size() > 0) {
+//			t.setLineName(map.get("name") + "");
+//			t.setLineId(map.get("id") + "");
+//		}
 		
 		t.setApplicationTime(AppUtil.getDate());
 		// t.setOrderType(1);
@@ -104,7 +104,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		List<Map<String, Object>> lineList = findForJdbc(
 				" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y "
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
-						+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 group by lb.busStopsId ",
+						+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 group by lb.busStopsId and lf.status=0 ",
 				cityId, serveType, AppUtil.getStationType(serveType));
 
 		for (Map<String, Object> a : lineList) {
@@ -132,7 +132,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		List<Map<String, Object>> lineList = findForJdbc(
 				" select lf.id,lf.name,lf.price,lf.lineTimes "
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0  ",
+						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0  ",
 				stationId, cityId, serveType);
 		
 		if(lineList.size() == 0){

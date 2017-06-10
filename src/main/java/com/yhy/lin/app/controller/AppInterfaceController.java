@@ -189,8 +189,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 
 			// 发送端短消息
-			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
-					SendMessageUtil.TEMPLATE_SMS_CODE);
+//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
+//					SendMessageUtil.TEMPLATE_SMS_CODE);
+			String body = "true";
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -253,7 +254,7 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 
 			System.out.println("前端传递参数：" + param);
-
+			
 			JSONObject jsondata = JSONObject.fromObject(param);
 
 			// 验证参数
@@ -265,7 +266,17 @@ public class AppInterfaceController extends AppBaseController {
 
 			Gson g = new Gson();
 			TransferorderEntity t = g.fromJson(param, TransferorderEntity.class);
-
+			
+			//订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付
+			//默认进来是未支付的，当进行微信付款之后，将状态改为已支付
+			//这边是模拟数据
+			t.setOrderStatus(1);
+			
+			//支付状态 0：已付款，1：退款中 2：已退款 3：未付款 4：已拒绝
+			//默认进来是未付款，当进行微信付款之后，将状态改为已付款
+			//这边是模拟数据
+			t.setOrderPaystatus("0");
+			
 			String sId = t.getOrderStartingStationId();// 起始站
 			String eId = t.getOrderTerminusStationId();// 终点站
 

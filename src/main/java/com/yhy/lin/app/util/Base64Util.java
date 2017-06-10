@@ -2,6 +2,8 @@ package com.yhy.lin.app.util;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Base64.Decoder;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -48,6 +50,7 @@ public class Base64Util {
             try {  
                 b = decoder.decodeBuffer(s);  
                 result = new String(b, "utf-8");  
+                result = URLDecoder.decode(result, "UTF-8");
             } catch (Exception e) {  
                 e.printStackTrace();  
             }  
