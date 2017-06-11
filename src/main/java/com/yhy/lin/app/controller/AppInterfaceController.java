@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -16,7 +15,6 @@ import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
 import org.jeecgframework.web.system.service.SystemService;
-import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,16 +29,13 @@ import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
-import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.exception.ParameterException;
-import com.yhy.lin.app.service.impl.AppInterfaceServiceImpl;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
-import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -85,9 +80,12 @@ public class AppInterfaceController extends AppBaseController {
 
 			String param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
-
-			// param = param.replaceAll(":null", ":\"\"");
+						
 			JSONObject jsondata = JSONObject.fromObject(param);
+			
+			// 验证参数
+			checkParam(jsondata);
+						
 			String mobile = jsondata.getString("mobile");
 			String code = jsondata.getString("code");
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
@@ -149,6 +147,10 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "手机号不能为空！";
 				statusCode = "001";
 			}
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
 		} catch (Exception e) {
 			e.printStackTrace();
 			msg = "登陆异常";
@@ -226,12 +228,6 @@ public class AppInterfaceController extends AppBaseController {
 
 	}
 
-	public static void main(String[] args) {
-		String body = SendMessageUtil.sendMessage("15527916902", new String[] { "code" , "product" }, new String[] { "1234" , "龙游出行" },
-				SendMessageUtil.TEMPLATE_SMS_CODE);
-		System.out.println(body);
-	}
-	
 	// 订单支付
 	@RequestMapping(params = "createOrder")
 	public void createOrder(HttpServletRequest request, HttpServletResponse response) {

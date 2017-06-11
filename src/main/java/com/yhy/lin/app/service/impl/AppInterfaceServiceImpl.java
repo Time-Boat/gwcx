@@ -90,8 +90,8 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		app.setMsgType("0"); // 消息类型 0:新增 1:修改
 		app.setOrderId(t.getId());
 		
-		save(t);
 		save(app);
+		save(t);
 		save(c);
 	}
 
@@ -351,7 +351,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		String sql = "update customer_message set status=1 where user_id=? ";
 		executeSql(sql, userId);
 		
-		return null;
+		return mList;
 	}
 
 	

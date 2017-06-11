@@ -131,6 +131,7 @@
 						<value>app.do?updateUserInfo</value>
 						<value>app.do?getUserInfo</value>
 						<value>app.do?checkTicket</value>
+						<value>app.do?getMessage</value>
 						
 					</list>
 				</property>
