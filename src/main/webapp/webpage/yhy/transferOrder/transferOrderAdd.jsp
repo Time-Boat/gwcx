@@ -19,7 +19,7 @@
     
     function checkDepartTime(){
     	var date1 = $('#startDate').val();
-    	var date2 = $('#slDate').val();
+    	var date2 = $('#slDate').val();     //选中的订单中最小的时间
     	date1 = Date.parse(new Date(date1));  
     	
     	var date3 = date2 - date1/1000;  //时间差的毫秒数
@@ -38,7 +38,9 @@
     		var seconds=Math.round(leave3)
     		
     		//console.log(hours+"--"+minutes+"--"+seconds);
-    		if(minutes < 15){
+    		var mm = hours*60+minutes;
+    		//console.log(hours*60+minutes);
+    		if(mm < 15){
     			return true;
     		}
     		tip("相隔时间不能超过15分钟");

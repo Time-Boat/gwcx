@@ -80,7 +80,7 @@
 			tip('请选择项目');
 			return;
 		}
-		console.log(slDate);
+		//console.log(slDate);
 		
 		url += '&ids='+ids+'&slDate='+(slDate/1000);
 		//console.log(url);

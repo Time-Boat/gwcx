@@ -258,29 +258,31 @@ public class AppUtil {
 	 *            被减数
 	 * @return 两个日期之间的差值
 	 */
-	public static int compareDate(Date d1, Date d2, char flag) {
+	public static int compareDate(Date d1, Date d2, char flag, String isAbs) {
 
-		long diff = Math.abs(d1.getTime() - d2.getTime());
-
-		if (flag == 'd') {
+		long diff = 0;
+		if("abs".equals(isAbs)){
+			diff = Math.abs(d1.getTime() - d2.getTime());
+		}else{
+			diff = d1.getTime() - d2.getTime();
+		}
+		
+		switch (flag) {
+		case 'd':
 			return (int) (diff / (24 * 3600 * 1000));
-		}
-
-		if (flag == 'h') {
+		case 'h':
 			return (int) (diff / (3600 * 1000));
-		}
-
-		if (flag == 'm') {
+		case 'm':
 			return (int) (diff / (60 * 1000));
-		}
-
-		if (flag == 's') {
+		case 's':
 			return (int) (diff / 1000);
+		default:
+			break;
 		}
 
 		return 0;
 	}
-
+	
 	// 获取当前时间(字符串)
 	public static String getCurTime() {
 		return DateUtils.date2Str(DateUtils.datetimeFormat);

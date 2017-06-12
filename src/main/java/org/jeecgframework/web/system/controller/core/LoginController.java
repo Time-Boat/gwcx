@@ -97,7 +97,7 @@ public class LoginController extends BaseController{
 		//验证码
 		String randCode = req.getParameter("randCode");
 		//注释掉验证码，方便调试
-		/*if (StringUtils.isEmpty(randCode)) {
+		/*if (StringUtil.isEmpty(randCode)) {
 			j.setMsg(mutiLangService.getLang("common.enter.verifycode"));
 			j.setSuccess(false);
 		} else if (!randCode.equalsIgnoreCase(String.valueOf(session.getAttribute("randCode")))) {
@@ -132,7 +132,6 @@ public class LoginController extends BaseController{
 					saveLoginSuccessInfo(req, u, orgId);
 				}
 			} else {
-
 				j.setMsg(mutiLangService.getLang("common.lock.user"));
 
 				j.setSuccess(false);

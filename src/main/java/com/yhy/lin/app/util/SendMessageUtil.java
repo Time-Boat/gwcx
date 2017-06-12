@@ -16,11 +16,17 @@ public class SendMessageUtil {
 
 	// 验证码信息模板
 	public static final String TEMPLATE_SMS_CODE = "SMS_66640251";//个人SMS_63766002
-
+	// 验证码信息模板对应签名
+	public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "登录验证";
+	
 	// 安排车辆信息模板
-	public static final String TEMPLATE_ARRANGE_CAR = "SMS_69620002";
-
-	public static String sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode) {
+	public static final String TEMPLATE_ARRANGE_CAR = "SMS_70420532";//SMS_69620002
+	// 安排车辆信息模板对应签名
+	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "变更验证";
+	
+	
+	
+	public static String sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
 
 		String body = "";
 
@@ -31,7 +37,7 @@ public class SendMessageUtil {
 		AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
 		req.setExtend("123456"); // 短信回传时的可以携带的信息 ？？？
 		req.setSmsType("normal"); // 短信类型
-		req.setSmsFreeSignName("登录验证"); // 模板签名
+		req.setSmsFreeSignName(signName); // 模板签名
 		StringBuffer ps = new StringBuffer("{");
 		for (int i = 0; i < paramKey.length; i++) {
 			ps.append("'" + paramKey[i] + "':'" + paramValue[i] + "',");

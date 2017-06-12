@@ -211,8 +211,10 @@
       error : function() {// 请求失败处理函数
       },
       success : function(data) {
+    	//console.log(data);
         var d = $.parseJSON(data);
         if (d.success) {
+			//console.log(d.attributes.orgNum);
           if (d.attributes.orgNum > 1) {
           	  //用户拥有多个部门，需选择部门进行登录
         	  var title, okButton;
@@ -223,6 +225,7 @@
                 title = "请选择组织机构";
                 okButton = "确定";
               }
+              
             $.dialog({
               id: 'LHG1976D',
               title: title,

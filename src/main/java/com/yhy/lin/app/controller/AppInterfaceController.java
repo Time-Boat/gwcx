@@ -36,6 +36,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -96,7 +97,7 @@ public class AppInterfaceController extends AppBaseController {
 
 					if (user != null) {
 						Date date = user.getCodeUpdateTime();
-						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm');
+						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm', "");
 						// 30分钟的有效期验证
 						if (m < 30 && user.getStatus().equals("0") && code.equals(user.getSecurityCode())) {
 							// if (m > 30 && user.getStatus().equals("1") &&
@@ -191,9 +192,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 
 			// 发送端短消息
-//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
-//					SendMessageUtil.TEMPLATE_SMS_CODE);
-			String body = "true";
+			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
+					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+//			String body = "true";
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -281,11 +282,11 @@ public class AppInterfaceController extends AppBaseController {
 			// 和当前时间进行比较，出发时间和当前时间不能低于4个小时
 			Date curDate = AppUtil.getDate();
 			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
-			int m = AppUtil.compareDate(curDate, departTime, 'm');
+			int m = AppUtil.compareDate(curDate, departTime, 'm' , "abs");
 
-			// if (m < 240) { //测试
-			if (m > 240) {
-				msg = "必须提前4个小时才能下订单，无法取消订单";
+			// if (m > 240) { //测试
+			if (m < 240) {
+				msg = "必须提前4个小时才能下订单";
 				success = false;
 			} else {
 
@@ -666,7 +667,7 @@ public class AppInterfaceController extends AppBaseController {
 			Date curDate = AppUtil.getDate();
 			String sTime = o.getStartTime();
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
-			int m = AppUtil.compareDate(curDate, departTime, 'm');
+			int m = AppUtil.compareDate(curDate, departTime, 'm', "");
 
 			if (m > 120) {
 				msg = "发车时间超过两个小时，无法取消订单";
@@ -1049,6 +1050,70 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
+	/** 删除消息通知 */
+	@RequestMapping(params = "delMessage")
+	public void delMessage(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		JSONObject data = new JSONObject();
+		
+		boolean success = false;
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		try {
+//			param = AppUtil.inputToStr(request);
+//
+//			System.out.println("前端传递参数：" + param);
+//
+//			JSONObject jsondata = JSONObject.fromObject(param);
+//
+//			// 验证参数
+//			checkParam(jsondata);
+//
+//			String token = jsondata.getString("token");
+//			String messageId = request.getParameter("messageId");
+
+			String token = request.getParameter("token");
+			String messageId = request.getParameter("messageId");
+			
+			System.out.println("前端传递参数：token:" + token + "---messageId:" + messageId);
+			
+			// 验证参数
+			checkParam(new String[] { "token", "messageId" }, token, messageId);
+
+			// 验证token
+			checkToken(token);
+
+			AppMessageListEntity a = appService.get(AppMessageListEntity.class, messageId);
+			if(a != null){
+				appService.delete(a);
+			}
+			
+			success = true;
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		data.put("success", success);
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+	}
 
 	/** 验证token是否有效 */
 	public void checkToken(String token) throws ParameterException {
@@ -1058,7 +1123,7 @@ public class AppInterfaceController extends AppBaseController {
 			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 
 		Date date = cc.getTokenUpdateTime();
-		int day = AppUtil.compareDate(date, new Date(), 'd');
+		int day = AppUtil.compareDate(date, new Date(), 'd', "");
 		if (day > 30)
 			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 	}

@@ -116,7 +116,7 @@ public class TransferOrderController extends BaseController {
 			String[] keys = new String[] { "name", "startStation", "terminusStation", "time" };
 			for (int i = 0; i < contents.size(); i++) {
 				String[] p = contents.get(i);
-				SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR);
+				SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
 			}
 			success = true;
 			message = "订单处理成功";

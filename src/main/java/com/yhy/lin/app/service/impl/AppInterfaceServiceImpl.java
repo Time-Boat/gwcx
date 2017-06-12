@@ -79,6 +79,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			c.setUserId(t.getUserId());
 			c.setId(UUIDGenerator.generate());
 		}
+		save(t);
 		
 		// 添加到消息中心
 		AppMessageListEntity app = new AppMessageListEntity();
@@ -90,8 +91,8 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		app.setMsgType("0"); // 消息类型 0:新增 1:修改
 		app.setOrderId(t.getId());
 		
+		
 		save(app);
-		save(t);
 		save(c);
 	}
 
@@ -104,7 +105,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		List<Map<String, Object>> lineList = findForJdbc(
 				" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y "
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
-						+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 group by lb.busStopsId and lf.status=0 ",
+						+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 and lf.status=0 group by lb.busStopsId ",
 				cityId, serveType, AppUtil.getStationType(serveType));
 
 		for (Map<String, Object> a : lineList) {
@@ -333,7 +334,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		List<AppMessageListEntity> mList = new ArrayList<>();
 		List<Map<String, Object>> lm = null;
 		
-		lm = findForJdbcParam("select * from customer_message where user_id = ?",
+		lm = findForJdbcParam("select * from customer_message where user_id = ? order by create_time desc  ",
 				Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
 
 		for (Map<String, Object> m : lm) {
@@ -349,6 +350,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		}
 
 		String sql = "update customer_message set status=1 where user_id=? ";
+		
 		executeSql(sql, userId);
 		
 		return mList;
