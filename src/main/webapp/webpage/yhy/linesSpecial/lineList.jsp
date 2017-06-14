@@ -33,6 +33,8 @@
 	 --%>
 	<t:dgCol title="操作" field="opt" width="100"></t:dgCol>
 
+	<%-- <t:dgDelOpt title="下架" url="lineInfoController.do?del&id={id}&deleteFlag=1" /> --%>
+	
 	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
 	<t:dgToolBar operationCode="detail" title="线路查看" icon="icon-search" url="lineInfoSpecializedController.do?addorupdate" funname="detail"></t:dgToolBar>
 </t:datagrid> </div>

@@ -88,6 +88,13 @@ public interface AppGlobals {
 	
 	
 	
+	/**
+	 * 交易类型
+	 */
+	public static final String TRADE_TYPE = "JSAPI";
+	
+	public static final String SIGN_TYPE = "MD5";
+	
 	
 	
 	

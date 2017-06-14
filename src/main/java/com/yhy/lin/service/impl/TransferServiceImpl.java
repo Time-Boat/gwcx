@@ -69,23 +69,31 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
-		Db2Page[] db2Pages = { new Db2Page("id"), new Db2Page("orderId", "order_id", null),
-				new Db2Page("orderType", "order_type", null), new Db2Page("orderStatus", "order_status", null),
+		Db2Page[] db2Pages = { 
+				new Db2Page("id"), 
+				new Db2Page("orderId", "order_id", null),
+				new Db2Page("orderType", "order_type", null), 
+				new Db2Page("orderStatus", "order_status", null),
 				new Db2Page("orderFlightnumber", "order_flightnumber", null),
 				new Db2Page("orderStartingstation", "order_starting_station_name", null),
 				new Db2Page("orderTerminusstation", "order_terminus_station_name", null),
 				new Db2Page("orderStartime", "order_startime", null),
 				new Db2Page("orderExpectedarrival", "order_expectedarrival", null),
 				new Db2Page("orderUnitprice", "order_unitprice", null),
-				new Db2Page("orderNumbers", "order_numbers", null), new Db2Page("orderPaytype", "order_paytype", null),
+				new Db2Page("orderNumbers", "order_numbers", null), 
+				new Db2Page("orderPaytype", "order_paytype", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
 				new Db2Page("orderPaystatus", "order_paystatus", null),
 				new Db2Page("orderTrainnumber", "order_trainnumber", null),
-				new Db2Page("orderTotalPrice", "order_totalPrice", null), new Db2Page("name", "name", null),
-				new Db2Page("phoneNumber", "phoneNumber", null), new Db2Page("licencePlate", "licence_plate", null),
-				new Db2Page("applicationTime", "applicationTime", null), new Db2Page("lineId", "line_id", null),
-				new Db2Page("lineName", "line_name", null), new Db2Page("cityName", "city_name", null)
+				new Db2Page("orderTotalPrice", "order_totalPrice", null), 
+				new Db2Page("name", "name", null),
+				new Db2Page("phoneNumber", "phoneNumber", null), 
+				new Db2Page("licencePlate", "licence_plate", null),
+				new Db2Page("applicationTime", "applicationTime", null), 
+				new Db2Page("lineId", "line_id", null),
+				new Db2Page("lineName", "line_name", null), 
+				new Db2Page("cityName", "city_name", null)
 
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

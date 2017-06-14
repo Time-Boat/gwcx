@@ -1,5 +1,6 @@
 package com.yhy.lin.app.controller;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
+import org.jeecgframework.p3.core.utils.common.HttpUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -1115,6 +1117,7 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
+	
 	/** 验证token是否有效 */
 	public void checkToken(String token) throws ParameterException {
 

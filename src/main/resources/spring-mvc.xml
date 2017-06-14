@@ -123,7 +123,6 @@
 						<value>app.do?getPTStation</value>
 						<value>app.do?getOrderDetail</value>
 						
-						<value>app.do?continuePayment</value> <!-- 废弃 -->
 						<value>app.do?cancelOrder</value>
 						<value>app.do?completeOrder</value>
 						<value>app.do?feedback</value>
@@ -133,6 +132,12 @@
 						<value>app.do?checkTicket</value>
 						<value>app.do?getMessage</value>
 						<value>app.do?delMessage</value>
+						
+						<!-- 微信支付 -->
+						<value>wx.do?userAuth</value>
+						<value>wx.do?toPay</value>
+						<value>wx.do?notifyUrl</value>
+						<value>wx.do?success</value>
 						
 					</list>
 				</property>
