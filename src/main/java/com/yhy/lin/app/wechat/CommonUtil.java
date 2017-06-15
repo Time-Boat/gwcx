@@ -45,7 +45,7 @@ public class CommonUtil {
 //			TrustManager[] tm = { new TrustAnyTrustManager() };
 //			SSLContext sslContext = SSLContext.getInstance("SSL", "SunJSSE");
 //			sslContext.init(null, tm, new java.security.SecureRandom());
-			// 从上述SSLContext对象中得到SSLSocketFactory对象
+//			//从上述SSLContext对象中得到SSLSocketFactory对象
 //			SSLSocketFactory ssf = sslContext.getSocketFactory();
 
 			URL url = new URL(requestUrl);

@@ -65,7 +65,7 @@ public class WeixinPayController {
 					"appid=" + AppGlobals.WECHAT_ID +
 					"&redirect_uri=" +
 					 backUri+
-					"&response_type=code&scope=snsapi_userinfo&state=123#wechat_redirect";
+					"&response_type=code&scope=snsapi_userinfo&state=1234#wechat_redirect";
 			System.out.println("url:" + url);
 			response.sendRedirect(url);
 		} catch (IOException e) {
@@ -93,10 +93,10 @@ public class WeixinPayController {
 			System.out.println("code:"+code);
 			System.out.println("userId:"+userId);
 			
-			//获取统一下单需要的openid
-			String openId ="";
 			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid="
 					+ AppGlobals.WECHAT_ID + "&secret=" + AppGlobals.WECHAT_APP_SECRET + "&code=" + code + "&grant_type=authorization_code";
+			//获取统一下单需要的openid
+			String openId ="";
 			System.out.println("URL:"+URL);
 			JSONObject jsonObject = CommonUtil.httpsRequest(URL, "GET", null);
 			System.out.println(jsonObject);

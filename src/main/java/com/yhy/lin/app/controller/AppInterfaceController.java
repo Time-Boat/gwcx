@@ -284,14 +284,13 @@ public class AppInterfaceController extends AppBaseController {
 			// 和当前时间进行比较，出发时间和当前时间不能低于4个小时
 			Date curDate = AppUtil.getDate();
 			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
-			int m = AppUtil.compareDate(curDate, departTime, 'm' , "abs");
+			int m = AppUtil.compareDate(curDate, departTime, 'm', "abs");
 
 			// if (m > 240) { //测试
 			if (m < 240) {
 				msg = "必须提前4个小时才能下订单";
 				success = false;
 			} else {
-
 				switch (t.getOrderType() + "") {
 				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
 					commonAddrId = eId;

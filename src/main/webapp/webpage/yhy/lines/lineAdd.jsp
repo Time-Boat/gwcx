@@ -79,7 +79,8 @@
 			</td>
 			<td class="value">
 				<!-- 这里面写死，因为这个线路添加中只有班车类型的添加 -->
-				<t:dictSelect field="type" typeGroupCode="busType" hasLabel="false" defaultVal="0" datatype="*" readonly="readonly" ></t:dictSelect>	
+				
+				<t:dictSelect field="type" typeGroupCode="linetype" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>

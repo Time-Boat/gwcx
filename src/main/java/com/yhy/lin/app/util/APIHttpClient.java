@@ -1,22 +1,21 @@
 package com.yhy.lin.app.util;
+
 import java.io.IOException;  
-import java.nio.charset.Charset;  
   
 import org.apache.commons.logging.Log;  
-import org.apache.commons.logging.LogFactory;  
-import org.apache.http.HttpResponse;  
-import org.apache.http.HttpStatus;  
-import org.apache.http.client.HttpClient;  
-import org.apache.http.client.methods.HttpPost;  
-import org.apache.http.entity.StringEntity;  
-import org.apache.http.impl.client.DefaultHttpClient;  
-import org.apache.http.util.EntityUtils;  
-  
+import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+
 import com.google.gson.JsonArray;  
 import com.google.gson.JsonObject;
-
-import sun.misc.BASE64Encoder;  
   
+
 public class APIHttpClient {  
   
     // 接口地址 

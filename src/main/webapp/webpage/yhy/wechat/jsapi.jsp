@@ -10,6 +10,7 @@ System.out.println("in jsapi.jsp");
 <html>
 	<head>
 		<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+		<script type="text/javascript" src="../public/jquery/jquery-2.0.3.min.js"></script>
 		<script type="text/javascript">
 		
 		function onBridgeReady(){
@@ -38,7 +39,15 @@ System.out.println("in jsapi.jsp");
 			   ); 
 			}
 		
-		if (typeof('WeixinJSBridge') == "undefined"){
+	/* 	if (typeof window.WeixinJSBridge == "undefined"){
+			$(document).on('WeixinJSBridgeReady',function(){ 
+			  $('#weiXinPay').click(); 
+			  }); } else { 
+			  $('#weiXinPay').click();
+			}    
+			    */
+	    function callpay(){
+			if (typeof WeixinJSBridge == "undefined"){
 			   if( document.addEventListener ){
 			       document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
 			   }else if (document.attachEvent){
@@ -47,14 +56,15 @@ System.out.println("in jsapi.jsp");
 			   }
 			}else{ 
 			   onBridgeReady();
-			}	  	
+			}	
+	    }
 		</script>	
 	    <title>订单-支付</title>
 	</head>
 <body>
 	<script type="text/javascript">
 		$(document).ready(function () {
-			onBridgeReady();
+			callpay();
 	    });
 		
 	</script>
