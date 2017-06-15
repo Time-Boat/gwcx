@@ -10,7 +10,7 @@ System.out.println("in jsapi.jsp");
 <html>
 	<head>
 		<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
-		<script type="text/javascript" src="../public/jquery/jquery-2.0.3.min.js"></script>
+		<script src='plug-in/jquery/jquery-1.9.1.js'></script>
 		<script type="text/javascript">
 		
 		function onBridgeReady(){
@@ -24,17 +24,22 @@ System.out.println("in jsapi.jsp");
 			           "paySign":"${sign}" //微信签名 
 			       },
 			       function(res){
-			    	// 使用以下方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。 
+			    	// 使用以下方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。  
+			    		var url = "${pageContext.request.contextPath}/wx.do?success&orderId=${orderId}&status=";
 			    		if(res.err_msg == "get_brand_wcpay_request:ok") {
-			        	   alert("支付成功");
-			        	   window.location.href = "${pageContext.request.contextPath}/wx.do?success&orderId=${orderId}";
-			           }else if(res.err_msg == "get_brand_wcpay_request:fail"){
-			       			alert('支付失败');
+			        	    //alert("支付成功");
+			        	    url += "0";//"${pageContext.request.contextPath}/wx.do?success&orderId=${orderId}";
+			            }else if(res.err_msg == "get_brand_wcpay_request:fail"){
+			            	url += "1"
+			       			//alert('支付失败');
 			       		}else if(res.err_msg == "get_brand_wcpay_request:cancel"){
-			       			alert('支付取消');
+			       			url += "2"
+			       			//alert('支付取消');
 			       		}else{
-			       			alert(res.err_msg);
+			       			url += "1"
+			       			//alert(res.err_msg);
 			       		}
+			    		window.location.href = url;
 			       }
 			   ); 
 			}
@@ -54,7 +59,7 @@ System.out.println("in jsapi.jsp");
 			       document.attachEvent('WeixinJSBridgeReady', onBridgeReady); 
 			       document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
 			   }
-			}else{ 
+			}else{
 			   onBridgeReady();
 			}	
 	    }

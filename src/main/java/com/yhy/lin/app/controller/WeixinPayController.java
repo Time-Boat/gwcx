@@ -16,18 +16,21 @@ import javax.servlet.http.HttpServletResponse;
 import net.sf.json.JSONObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.AppGlobals;
-import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.wechat.CommonUtil;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.app.wechat.Sha1Util;
 import com.yhy.lin.app.wechat.TxtUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.TransferorderEntity;
 
 /**
  * 微信支付Controller
@@ -38,9 +41,14 @@ import com.yhy.lin.app.wechat.WeixinPayUtil;
 @Controller
 @RequestMapping("/wx")
 @SuppressWarnings("rawtypes")
-public class WeixinPayController {
+public class WeixinPayController{
+	
+	@Autowired
+	private SystemService systemService;
 	
 	private static String baseUrl = "http://car.cywtrip.com/gwcx";
+	
+//	private static String baseUrl = "http://localhost:8080/gwcx";
 	
 	/**
 	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId
@@ -51,10 +59,11 @@ public class WeixinPayController {
 	@RequestMapping(params = "userAuth")
 	public String userAuth(HttpServletRequest request, HttpServletResponse response){
 		try {
-			String orderId = AppGlobals.SP_NAME;
+//			String orderId = MakeOrderNum.makeOrderNum("tx");//AppGlobals.SP_NAME;
+			
+			String orderId = request.getParameter("orderId");
 			String totalFee = request.getParameter("totalFee");
 			System.out.println("in userAuth,orderId:" + orderId);
-			
 			//授权后要跳转的链接
 			String backUri = baseUrl + "/wx.do?toPay";
 			backUri = backUri + "&orderId=" + orderId + "&totalFee=" + totalFee;
@@ -81,22 +90,26 @@ public class WeixinPayController {
 			System.out.println("in toPay,orderId:" + orderId);
 			
 			String totalFeeStr = request.getParameter("totalFee");
+			System.out.println("totalFeeStr:"+totalFeeStr);
 			Float totalFee = 0.0f;
 			
 			if(StringUtils.isNotBlank(totalFeeStr)){
 				totalFee = new Float(totalFeeStr);
 			}
-
+			
 			//网页授权后获取传递的参数
 			String userId = request.getParameter("userId"); 	
 			String code = request.getParameter("code");
 			System.out.println("code:"+code);
+			if(!StringUtil.isNotEmpty(code)){
+				return null;
+			}
 			System.out.println("userId:"+userId);
 			
 			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid="
 					+ AppGlobals.WECHAT_ID + "&secret=" + AppGlobals.WECHAT_APP_SECRET + "&code=" + code + "&grant_type=authorization_code";
 			//获取统一下单需要的openid
-			String openId ="";
+			String openId = "";
 			System.out.println("URL:"+URL);
 			JSONObject jsonObject = CommonUtil.httpsRequest(URL, "GET", null);
 			System.out.println(jsonObject);
@@ -289,34 +302,53 @@ public class WeixinPayController {
 	@RequestMapping(params = "success")
 	public ModelAndView toWXPaySuccess(HttpServletRequest request,
 			HttpServletResponse response, Model model) throws IOException{
+		
 		String id = request.getParameter("orderId");
+		String status = request.getParameter("status");
+		
 		System.out.println("toWXPaySuccess, orderId: " + id);
 		try {
-			Map resultMap = WeixinPayUtil.checkWxOrderPay(id);
-			System.out.println("resultMap:" + resultMap);
-			String return_code = (String)resultMap.get("return_code");
-        	String result_code = (String)resultMap.get("result_code");
-        	System.out.println("return_code:" + return_code + ",result_code:" + result_code);
-        	if("SUCCESS".equals(return_code)){
-        		if("SUCCESS".equals(result_code)){
-            	    model.addAttribute("orderId", id);
-        			model.addAttribute("payResult", "1");
-        		}else{
-        			String err_code = (String)resultMap.get("err_code");
-            	    String err_code_des = (String)resultMap.get("err_code_des");
-            	    System.out.println("weixin resultCode:"+result_code+",err_code:"+err_code+",err_code_des:"+err_code_des);
-
-            	    model.addAttribute("err_code", err_code);
-            	    model.addAttribute("err_code_des", err_code_des);
-        			model.addAttribute("payResult", "0");
-        		}
-        	}else{
-        	    model.addAttribute("payResult", "0");
-        	    model.addAttribute("err_code_des", "通信错误");
-        	}
+//			Map resultMap = WeixinPayUtil.checkWxOrderPay(id);
+//			System.out.println("resultMap:" + resultMap);
+//			String return_code = (String)resultMap.get("return_code");
+//        	String result_code = (String)resultMap.get("result_code");
+//        	System.out.println("return_code:" + return_code + ",result_code:" + result_code);
+//        	if("SUCCESS".equals(return_code)){
+//        		if("SUCCESS".equals(result_code)){
+//            	    model.addAttribute("orderId", id);
+//        			model.addAttribute("payResult", "1");
+//        		}else{
+//        			String err_code = (String)resultMap.get("err_code");
+//            	    String err_code_des = (String)resultMap.get("err_code_des");
+//            	    System.out.println("weixin resultCode:"+result_code+",err_code:"+err_code+",err_code_des:"+err_code_des);
+//
+//            	    model.addAttribute("err_code", err_code);
+//            	    model.addAttribute("err_code_des", err_code_des);
+//        			model.addAttribute("payResult", "0");
+//        		}
+//        	}else{
+//        	    model.addAttribute("payResult", "0");
+//        	    model.addAttribute("err_code_des", "通信错误");
+//        	}
+			
+			request.setAttribute("status", status);
+			
+			System.out.println("toWXPaySuccess   status:" + status );
+			System.out.println("toWXPaySuccess   id:" + id );
+			
+			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
+			if("0".equals(status)){
+				t.setOrderStatus(1);
+				t.setOrderPaystatus("0");
+			}else{
+				t.setOrderStatus(6);
+				t.setOrderPaystatus("3");
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		return new ModelAndView("yhy/wechat/payResult");
 	}
 

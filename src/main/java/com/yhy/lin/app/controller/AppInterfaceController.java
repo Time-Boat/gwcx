@@ -1,6 +1,5 @@
 package com.yhy.lin.app.controller;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,7 +14,6 @@ import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
-import org.jeecgframework.p3.core.utils.common.HttpUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -269,12 +267,12 @@ public class AppInterfaceController extends AppBaseController {
 			//订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付
 			//默认进来是未支付的，当进行微信付款之后，将状态改为已支付
 			//这边是模拟数据
-			t.setOrderStatus(1);
+			t.setOrderStatus(6);
 			
 			//支付状态 0：已付款，1：退款中 2：已退款 3：未付款 4：已拒绝
 			//默认进来是未付款，当进行微信付款之后，将状态改为已付款
 			//这边是模拟数据
-			t.setOrderPaystatus("0");
+			t.setOrderPaystatus("3");
 			
 			String sId = t.getOrderStartingStationId();// 起始站
 			String eId = t.getOrderTerminusStationId();// 终点站
@@ -313,7 +311,8 @@ public class AppInterfaceController extends AppBaseController {
 				}
 
 				appService.saveOrder(t, orderPrefix, commonAddrId);
-
+				System.out.println("保存订单成功，订单状态为未支付");
+				data.put("orderId", t.getId());
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;
@@ -399,16 +398,22 @@ public class AppInterfaceController extends AppBaseController {
 			// String token = request.getParameter("token");
 
 			String userId = request.getParameter("userId");
+			
+			//模糊查询站点条件
+			String likeStation = request.getParameter("likeStation");
 
 			// 验证参数
-			checkParam(new String[] { "serveType", "stationId", "cityId", "userId" }, serveType, stationId, cityId,
-					userId);
+			checkParam(new String[] { "serveType", "stationId", "cityId", "userId", "likeStation" }, serveType, stationId, cityId,
+					userId, likeStation);
 
+			//线路信息
 			List<AppLineStationInfoEntity> lList = new ArrayList<>();
+			//用户常用站点信息
 			List<AppStationInfoEntity> cList = new ArrayList<>();
+			//站点信息
 			List<AppStationInfoEntity> stationList = new ArrayList<>();
 
-			appService.getLinebyStation(serveType, cityId, stationId, userId, lList, cList, stationList);
+			appService.getLinebyStation(serveType, cityId, stationId, userId, likeStation, lList, cList, stationList);
 
 			data.put("addrs", cList);
 			data.put("lineInfo", lList);
@@ -497,11 +502,11 @@ public class AppInterfaceController extends AppBaseController {
 
 			String maxPageItem = request.getParameter("maxPageItem");
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
-				maxPageItem = "15";
+				maxPageItem = "150";
 			}
 
 			auoList = appService.getUserOrders(userId, null, pageNo, maxPageItem);
-
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {

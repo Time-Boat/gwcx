@@ -58,16 +58,22 @@ public class WeixinPayUtil {
 		try {
 			httpost.setEntity(new StringEntity(xmlParam, "UTF-8"));
 			HttpResponse response = httpclient.execute(httpost);
+			
 			String jsonStr = EntityUtils
 					.toString(response.getEntity(), "UTF-8");
+			
+			//关闭资源
+			EntityUtils.consume(response.getEntity());
+			
 			Map<String, Object> dataMap = new HashMap<String, Object>();
-
+			System.out.println("getPayNo:"+jsonStr);
 			if (jsonStr.indexOf("FAIL") != -1) {
 				return prepay_id;
 			}
 			Map map = doXMLParse(jsonStr);
 			String return_code = (String) map.get("return_code");
 			prepay_id = (String) map.get("prepay_id");
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

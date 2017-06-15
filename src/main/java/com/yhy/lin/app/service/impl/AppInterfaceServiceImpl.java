@@ -125,7 +125,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	}
 
 	@Override
-	public void getLinebyStation(String serveType, String cityId, String stationId, String userId,
+	public void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
 		List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
 		List<AppStationInfoEntity> stationList) {
 		
@@ -133,7 +133,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		List<Map<String, Object>> lineList = findForJdbc(
 				" select lf.id,lf.name,lf.price,lf.lineTimes "
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0  ",
+						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ",
 				stationId, cityId, serveType);
 		
 		if(lineList.size() == 0){
@@ -163,7 +163,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		// 查询指定id线路中的所有普通站点
 		List<AppStationInfoEntity> stationList1 = findHql(
-				"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ", 0);
+				"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? and name like '%" + likeStation + "%' ", 0);
 		stationList.addAll(stationList1);
 		
 		// 常用站点列表
@@ -172,7 +172,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		// user_id=? ", userId);
 		
 		//userId如果为空的话就不进行查找
-		if(StringUtil.isNotEmpty(userId)){
+		if(StringUtil.isNotEmpty(userId) && !StringUtil.isNotEmpty(likeStation)){
 			List<Map<String, Object>> map = findForJdbc(
 					"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
 							+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in ("

@@ -26,7 +26,7 @@ public interface AppInterfaceService extends CommonService{
 	List<AppStationInfoEntity> getPTStation(String serveType, String cityId);
 
 	/** 获取线路站点信息 */
-	void getLinebyStation(String serveType, String cityId, String stationId, String userId,
+	void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
 			List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
 			List<AppStationInfoEntity> stationList);
 
