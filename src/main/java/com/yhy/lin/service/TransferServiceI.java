@@ -12,7 +12,7 @@ import com.yhy.lin.entity.TransferorderView;
 import net.sf.json.JSONObject;
 
 public interface TransferServiceI extends CommonService {
-	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
+	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,String orderType,String orderStartingstation,String orderTerminusstation,String orderStatus, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end);
 
 	// 根据id查询接送机的详细信息

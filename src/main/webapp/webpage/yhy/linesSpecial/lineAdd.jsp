@@ -62,6 +62,17 @@
 		</tr>
 		<tr>
 			<td align="right">
+				<label class="Validform_label"> 出车时间段: </label>
+			</td>
+			<td class="value">
+				
+				<t:dictSelect field="type" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
+				
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
 				<label class="Validform_label"> 线路时长: </label>
 			</td>
 			<td class="value">

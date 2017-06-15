@@ -36,7 +36,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		// 取出当前页的数据 
 		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
 		 		+ "a.endY,a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
-		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName ");
+		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath ");
 		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId where 1=1 ");
 		 
 		if (!sqlWhere.isEmpty()) {
@@ -69,6 +69,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("settledCompanyName", "settledCompanyName", null)
 				,new Db2Page("city", "city", null)
 				,new Db2Page("cityId", "cityId", null)
+				,new Db2Page("dispath", "dispath", null)
 				
 				
 		};

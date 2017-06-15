@@ -14,6 +14,7 @@
 	<t:dgCol title="线路备注" field="remark"  align="center" width="60"></t:dgCol>
 	
 	<t:dgCol title="线路类型" field="type" replace="公务班车_0,接送包车_1,接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="60"></t:dgCol>
+	<t:dgCol title="出车时间段" field="dispath" replace="5:00~23:00_0,23:00~5:00_1"  align="center" width="90"></t:dgCol>
 	<%--
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>

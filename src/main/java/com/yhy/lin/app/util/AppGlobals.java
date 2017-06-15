@@ -95,7 +95,10 @@ public interface AppGlobals {
 	
 	public static final String SIGN_TYPE = "MD5";
 	
-	
+	/**
+	 * 商品名称
+	 */
+	public static final String SP_NAME = "龙游出行app支付";
 	
 	
 	

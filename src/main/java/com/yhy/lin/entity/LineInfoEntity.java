@@ -66,6 +66,7 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	
 	private String  cityName;
 	
+	private String dispath;
 	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
@@ -229,9 +230,12 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	public void setCityName(String cityName) {
 		this.cityName = cityName;
 	}
-	
-	
-	
-	
+	@Column(name = "dispath")
+	public String getDispath() {
+		return dispath;
+	}
+	public void setDispath(String dispath) {
+		this.dispath = dispath;
+	}
 	
 }

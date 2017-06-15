@@ -39,9 +39,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
 
 	@Override
-	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
+	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,String orderType,String orderStartingstation,String orderTerminusstation,String orderStatus, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder, fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,orderId, orderType, orderStartingstation, orderTerminusstation, orderStatus, fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -58,10 +58,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append(
 				"a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
 		sql.append(
-				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name ");
+				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
-						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
+						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId left join car_customer cu on a.user_id=cu.customer_id");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -93,14 +93,17 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("applicationTime", "applicationTime", null), 
 				new Db2Page("lineId", "line_id", null),
 				new Db2Page("lineName", "line_name", null), 
-				new Db2Page("cityName", "city_name", null)
+				new Db2Page("cityName", "city_name", null),
+				new Db2Page("userId", "user_id", null),
+				new Db2Page("custphone", "phone", null)
+				
 
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
 	}
 
-	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String ddTime_begin,
+	public String getWhere(TransferorderEntity transferorder,String orderId,String orderType,String orderStartingstation,String orderTerminusstation,String orderStatus, String fc_begin, String fc_end, String ddTime_begin,
 			String ddTime_end) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -116,24 +119,24 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and a.order_expectedarrival between '" + ddTime_begin + "' and '" + ddTime_end + "'");
 		}
 		// 订单编号
-		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
-			sql.append(" and  a.order_id like '%" + transferorder.getOrderId() + "%'");
+		if (StringUtil.isNotEmpty(orderId)) {
+			sql.append(" and  a.order_id like '%" + orderId + "%'");
 		}
 		// 订单类型
-		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
-			sql.append(" and  a.order_type ='" + transferorder.getOrderType() + "'");
+		if (StringUtil.isNotEmpty(orderType)) {
+			sql.append(" and  a.order_type ='" + orderType + "'");
 		}
 		// 订单状态
-		if (StringUtil.isNotEmpty(transferorder.getOrderStatus())) {
-			sql.append(" and  a.order_status ='" + transferorder.getOrderStatus() + "'");
+		if (StringUtil.isNotEmpty(orderStatus)) {
+			sql.append(" and  a.order_status ='" + orderStatus + "'");
 		}
 		// 起点站id
-		if (StringUtil.isNotEmpty(transferorder.getOrderStartingStationId())) {
-			sql.append(" and  a.order_starting_station_id = '" + transferorder.getOrderStartingStationId() + "'");
+		if (StringUtil.isNotEmpty(orderStartingstation)) {
+			sql.append(" and  a.order_starting_station_name = '" +orderStartingstation+ "'");
 		}
 		// 终点站id
-		if (StringUtil.isNotEmpty(transferorder.getOrderTerminusStationId())) {
-			sql.append(" and  a.order_terminus_station_id = '" + transferorder.getOrderTerminusStationId() + "'");
+		if (StringUtil.isNotEmpty(orderTerminusstation)) {
+			sql.append(" and  a.order_terminus_station_name = '" + orderTerminusstation + "'");
 		}
 
 		// 申请人

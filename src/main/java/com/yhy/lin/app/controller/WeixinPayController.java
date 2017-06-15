@@ -51,7 +51,7 @@ public class WeixinPayController {
 	@RequestMapping(params = "userAuth")
 	public String userAuth(HttpServletRequest request, HttpServletResponse response){
 		try {
-			String orderId = MakeOrderNum.makeOrderNum("Ts");
+			String orderId = AppGlobals.SP_NAME;
 			String totalFee = request.getParameter("totalFee");
 			System.out.println("in userAuth,orderId:" + orderId);
 			
@@ -159,7 +159,7 @@ public class WeixinPayController {
 			
 			String sign = reqHandler.createSign(packageParams);
 			System.out.println("sign:"+sign);
-			String xml="<xml>"+
+			String xml = "<xml>"+
 					"<appid>"+AppGlobals.WECHAT_ID+"</appid>"+
 					"<mch_id>"+AppGlobals.MCH_ID+"</mch_id>"+
 					"<nonce_str>"+nonce_str+"</nonce_str>"+
@@ -194,7 +194,7 @@ public class WeixinPayController {
 			finalpackage.put("nonceStr", nonce_str);
 			finalpackage.put("package", packages);
 			finalpackage.put("signType", AppGlobals.SIGN_TYPE);
-			String finalsign = reqHandler.createSign(finalpackage);
+			String finalsign = reqHandler.createSign(finalpackage);    //生成签名
 			System.out.println("/jsapi?appid="+AppGlobals.WECHAT_ID+"&timeStamp="+timestamp+"&nonceStr="+nonce_str+"&package="+packages+"&sign="+finalsign);
 			
 			model.addAttribute("appid", AppGlobals.WECHAT_ID);
@@ -268,7 +268,7 @@ public class WeixinPayController {
 					System.out.println("weixin receive check Sign fail");
                     String checkXml = "<xml><return_code><![CDATA[FAIL]]></return_code>"+
                     					"<return_msg><![CDATA[check sign fail]]></return_msg></xml>";
-                    WeixinPayUtil.getTradeOrder("http://weixin.xinfor.com/wx/notifyUrl", checkXml);
+                    WeixinPayUtil.getTradeOrder("http://weixin.xinfor.com/wx.do&notifyUrl", checkXml);
 				}
 			}
 		} catch (Exception e) {

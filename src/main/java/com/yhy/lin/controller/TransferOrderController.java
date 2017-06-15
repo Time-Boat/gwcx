@@ -58,12 +58,18 @@ public class TransferOrderController extends BaseController {
 	@RequestMapping(params = "datagrid")
 	public void dataGrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
+		String orderId = request.getParameter("orderId");
+		String orderType = request.getParameter("orderType");
+		String orderStartingstation = request.getParameter("orderStartingstation");
+		String orderTerminusstation = request.getParameter("orderTerminusstation");
+		String orderStatus = request.getParameter("orderStatus");
+		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end, ddTime_begin,
-				ddTime_end);
+		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderId,orderType,orderStartingstation, orderTerminusstation,
+				orderStatus,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);
 	}

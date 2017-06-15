@@ -61,23 +61,22 @@ public class RequestHandler {
 	 * 
 	 * @return
 	 */
-	public RequestHandler(HttpServletRequest request,
-			HttpServletResponse response) {
+	public RequestHandler(HttpServletRequest request, HttpServletResponse response) {
 		this.last_errcode = "0";
 		this.request = request;
 		this.response = response;
-		//this.charset = "GBK";
+		// this.charset = "GBK";
 		this.charset = "UTF-8";
 		this.parameters = new TreeMap();
 		// 验证notify支付订单网关
 		notifyUrl = "https://gw.tenpay.com/gateway/simpleverifynotifyid.xml";
-		
+
 	}
 
 	/**
 	 * 初始化函数。
 	 */
-	public void init(String app_id, String app_secret,	String partner_key) {
+	public void init(String app_id, String app_secret, String partner_key) {
 		this.last_errcode = "0";
 		this.Token = "token_";
 		this.debugInfo = "";
@@ -98,7 +97,7 @@ public class RequestHandler {
 	}
 
 	/**
-	 *获取入口地址,不包含参数值
+	 * 获取入口地址,不包含参数值
 	 */
 	public String getGateUrl() {
 		return gateUrl;
@@ -116,25 +115,24 @@ public class RequestHandler {
 		return (null == s) ? "" : s;
 	}
 
-	
-	 //设置密钥
-	
+	// 设置密钥
+
 	public void setKey(String key) {
 		this.partnerkey = key;
 	}
-	//设置微信密钥
-	public void  setAppKey(String key){
+
+	// 设置微信密钥
+	public void setAppKey(String key) {
 		this.appkey = key;
 	}
-	
+
 	// 特殊字符处理
 	public String UrlEncode(String src) throws UnsupportedEncodingException {
 		return URLEncoder.encode(src, this.charset).replace("+", "%20");
 	}
 
 	// 获取package的签名包
-	public String genPackage(SortedMap<String, String> packageParams)
-			throws UnsupportedEncodingException {
+	public String genPackage(SortedMap<String, String> packageParams) throws UnsupportedEncodingException {
 		String sign = createSign(packageParams);
 
 		StringBuffer sb = new StringBuffer();
@@ -149,7 +147,7 @@ public class RequestHandler {
 
 		// 去掉最后一个&
 		String packageValue = sb.append("sign=" + sign).toString();
-//		System.out.println("UrlEncode后 packageValue=" + packageValue);
+		// System.out.println("UrlEncode后 packageValue=" + packageValue);
 		return packageValue;
 	}
 
@@ -164,19 +162,18 @@ public class RequestHandler {
 			Map.Entry entry = (Map.Entry) it.next();
 			String k = (String) entry.getKey();
 			String v = (String) entry.getValue();
-			if (null != v && !"".equals(v) && !"sign".equals(k)
-					&& !"key".equals(k)) {
+			if (null != v && !"".equals(v) && !"sign".equals(k) && !"key".equals(k)) {
 				sb.append(k + "=" + v + "&");
 			}
 		}
 		sb.append("key=" + this.getKey());
 		System.out.println("md5 sb:" + sb);
-		String sign = MD5Util.MD5(sb.toString())
-				.toUpperCase();
+		String sign = MD5Util.MD5(sb.toString()).toUpperCase();
 		System.out.println("packge签名:" + sign);
 		return sign;
 
 	}
+
 	/**
 	 * 创建package签名
 	 */
@@ -194,39 +191,36 @@ public class RequestHandler {
 		}
 
 		// 算出摘要
-//		String enc = TenpayUtil.getCharacterEncoding(this.request,
-//				this.response);
+		// String enc = TenpayUtil.getCharacterEncoding(this.request,
+		// this.response);
 		String sign = MD5Util.MD5(sb.toString()).toLowerCase();
 
 		String tenpaySign = this.getParameter("sign").toLowerCase();
 
 		// debug信息
-		this.setDebugInfo(sb.toString() + " => sign:" + sign + " tenpaySign:"
-				+ tenpaySign);
+		this.setDebugInfo(sb.toString() + " => sign:" + sign + " tenpaySign:" + tenpaySign);
 
 		return tenpaySign.equals(sign);
 	}
 
-	
+	// 输出XML
+	public String parseXML() {
+		StringBuffer sb = new StringBuffer();
+		sb.append("<xml>");
+		Set es = this.parameters.entrySet();
+		Iterator it = es.iterator();
+		while (it.hasNext()) {
+			Map.Entry entry = (Map.Entry) it.next();
+			String k = (String) entry.getKey();
+			String v = (String) entry.getValue();
+			if (null != v && !"".equals(v) && !"appkey".equals(k)) {
 
-    //输出XML
-	   public String parseXML() {
-		   StringBuffer sb = new StringBuffer();
-	       sb.append("<xml>");
-	       Set es = this.parameters.entrySet();
-	       Iterator it = es.iterator();
-	       while(it.hasNext()) {
-				Map.Entry entry = (Map.Entry)it.next();
-				String k = (String)entry.getKey();
-				String v = (String)entry.getValue();
-				if(null != v && !"".equals(v) && !"appkey".equals(k)) {
-					
-					sb.append("<" + k +">" + getParameter(k) + "</" + k + ">\n");
-				}
+				sb.append("<" + k + ">" + getParameter(k) + "</" + k + ">\n");
 			}
-	       sb.append("</xml>");
-			return sb.toString();
 		}
+		sb.append("</xml>");
+		return sb.toString();
+	}
 
 	/**
 	 * 设置debug信息
@@ -234,12 +228,15 @@ public class RequestHandler {
 	protected void setDebugInfo(String debugInfo) {
 		this.debugInfo = debugInfo;
 	}
+
 	public void setPartnerkey(String partnerkey) {
 		this.partnerkey = partnerkey;
 	}
+
 	public String getDebugInfo() {
 		return debugInfo;
 	}
+
 	public String getKey() {
 		return partnerkey;
 	}
