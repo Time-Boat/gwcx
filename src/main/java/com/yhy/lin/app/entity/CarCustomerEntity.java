@@ -26,7 +26,7 @@ import org.hibernate.annotations.GenericGenerator;
 @SuppressWarnings("serial")
 public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 主键 */
-	private java.lang.String customerId;
+	private java.lang.String id;
 	/** 真实姓名 */
 	private java.lang.String realName;
 	/** 性别 */
@@ -110,9 +110,9 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	@Id
 	@GeneratedValue(generator = "paymentableGenerator")
 	@GenericGenerator(name = "paymentableGenerator", strategy = "uuid")
-	@Column(name = "CUSTOMER_ID", nullable = false, length = 36)
-	public java.lang.String getCustomerId() {
-		return this.customerId;
+	@Column(name = "ID", nullable = false, length = 36)
+	public String getId() {
+		return this.id;
 	}
 
 	/**
@@ -121,8 +121,8 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	 * @param: java.lang.String
 	 *             主键
 	 */
-	public void setCustomerId(java.lang.String customerId) {
-		this.customerId = customerId;
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	/**
@@ -328,7 +328,7 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	@Override
 	@Transient
 	public String getUserId() {
-		return customerId;
+		return id;
 	}
 
 	public void setUserId(String userId) {

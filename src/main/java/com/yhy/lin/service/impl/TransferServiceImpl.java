@@ -61,7 +61,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
-						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId left join car_customer cu on a.user_id=cu.customer_id");
+						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId left join car_customer cu on a.user_id=cu.id");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}

@@ -24,7 +24,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.CommonUtil;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.app.wechat.Sha1Util;
@@ -308,42 +310,59 @@ public class WeixinPayController{
 		
 		System.out.println("toWXPaySuccess, orderId: " + id);
 		try {
-//			Map resultMap = WeixinPayUtil.checkWxOrderPay(id);
-//			System.out.println("resultMap:" + resultMap);
-//			String return_code = (String)resultMap.get("return_code");
-//        	String result_code = (String)resultMap.get("result_code");
-//        	System.out.println("return_code:" + return_code + ",result_code:" + result_code);
-//        	if("SUCCESS".equals(return_code)){
-//        		if("SUCCESS".equals(result_code)){
-//            	    model.addAttribute("orderId", id);
-//        			model.addAttribute("payResult", "1");
-//        		}else{
-//        			String err_code = (String)resultMap.get("err_code");
-//            	    String err_code_des = (String)resultMap.get("err_code_des");
-//            	    System.out.println("weixin resultCode:"+result_code+",err_code:"+err_code+",err_code_des:"+err_code_des);
-//
-//            	    model.addAttribute("err_code", err_code);
-//            	    model.addAttribute("err_code_des", err_code_des);
-//        			model.addAttribute("payResult", "0");
-//        		}
-//        	}else{
-//        	    model.addAttribute("payResult", "0");
-//        	    model.addAttribute("err_code_des", "通信错误");
-//        	}
-			
-			request.setAttribute("status", status);
-			
-			System.out.println("toWXPaySuccess   status:" + status );
-			System.out.println("toWXPaySuccess   id:" + id );
-			
-			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
-			if("0".equals(status)){
-				t.setOrderStatus(1);
-				t.setOrderPaystatus("0");
-			}else{
-				t.setOrderStatus(6);
-				t.setOrderPaystatus("3");
-			}
+			Map resultMap = WeixinPayUtil.checkWxOrderPay(id);
+			System.out.println("resultMap:" + resultMap);
+			String return_code = (String)resultMap.get("return_code");
+        	String result_code = (String)resultMap.get("result_code");
+        	System.out.println("return_code:" + return_code + ",result_code:" + result_code);
+        	if("SUCCESS".equals(return_code)){
+        		if("SUCCESS".equals(result_code)){
+            	    model.addAttribute("orderId", id);
+        			model.addAttribute("payResult", "1");
+        		}else{
+        			String err_code = (String)resultMap.get("err_code");
+            	    String err_code_des = (String)resultMap.get("err_code_des");
+            	    System.out.println("weixin resultCode:"+result_code+",err_code:"+err_code+",err_code_des:"+err_code_des);
+
+            	    model.addAttribute("err_code", err_code);
+            	    model.addAttribute("err_code_des", err_code_des);
+        			model.addAttribute("payResult", "0");
+        		}
+        		
+        		//如果成功，处理业务逻辑
+        		request.setAttribute("status", status);
+    			
+    			System.out.println("toWXPaySuccess   status:" + status );
+    			System.out.println("toWXPaySuccess   id:" + id );
+    			
+    			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
+    			if("0".equals(status)){
+    				t.setOrderStatus(1);
+    				t.setOrderPaystatus("0");
+    				
+    				// 如果购买成功，将消息添加到消息中心
+        			AppMessageListEntity app = new AppMessageListEntity();
+        			app.setContent("您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName()
+        					+ " 的车票，请等待管理员审核。");
+        			app.setCreateTime(AppUtil.getCurTime());
+        			app.setStatus("0"); // 消息状态 0：否 1：是
+        			app.setUserId(t.getUserId());
+        			app.setMsgType("0"); // 消息类型 0:新增 1:修改
+        			app.setOrderId(t.getId());
+        			systemService.save(app);
+        			
+    			}else{
+    				t.setOrderStatus(6);
+    				t.setOrderPaystatus("3");
+    			}
+    			systemService.save(t);
+    			
+    			
+    			
+        	}else{
+        	    model.addAttribute("payResult", "0");
+        	    model.addAttribute("err_code_des", "通信错误");
+        	}
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -113,7 +113,7 @@ public class AppInterfaceController extends AppBaseController {
 								systemService.executeSql(sql, curTime, mobile);
 							} else {
 								// 生成token
-								token = generateToken(user.getCustomerId(), user.getPhone());
+								token = generateToken(user.getId(), user.getPhone());
 								sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
 								systemService.executeSql(sql, curTime, token, mobile);
 							}
@@ -205,7 +205,7 @@ public class AppInterfaceController extends AppBaseController {
 				String sql = "";
 				// 存储验证码相关信息
 				if (user == null) {
-					sql = "insert into car_customer set customer_id='" + UUIDGenerator.generate()
+					sql = "insert into car_customer set id='" + UUIDGenerator.generate()
 							+ "',phone = ? ,create_time = ? " + ",status = '0',code_update_time = ? ,security_code = ?";
 					systemService.executeSql(sql, mobile, curTime, curTime, code);
 				} else {
@@ -403,8 +403,8 @@ public class AppInterfaceController extends AppBaseController {
 			String likeStation = request.getParameter("likeStation");
 
 			// 验证参数
-			checkParam(new String[] { "serveType", "stationId", "cityId", "userId", "likeStation" }, serveType, stationId, cityId,
-					userId, likeStation);
+			checkParam(new String[] { "serveType", "stationId", "cityId", "userId"}, serveType, stationId, cityId,
+					userId);
 
 			//线路信息
 			List<AppLineStationInfoEntity> lList = new ArrayList<>();
@@ -905,7 +905,7 @@ public class AppInterfaceController extends AppBaseController {
 			a = new AppCustomerEntity();
 			a.setAddress(cc.getAddress());
 			a.setCardNumber(cc.getCardNumber());
-			a.setUserId(cc.getCustomerId());
+			a.setUserId(cc.getId());
 			a.setCustomerImg(cc.getCustomerImg());
 			a.setPhone(cc.getPhone());
 			a.setRealName(cc.getRealName());
@@ -1001,12 +1001,59 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
+	/** 当前用户是否有新消息 */
+	@RequestMapping(params = "hasNewMessage")
+	public void hasNewMessage(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		JSONObject data = new JSONObject();
+		
+		String msg = "";
+		String statusCode = "";
+		boolean success = false;
+		
+		try {
+
+			String token = request.getParameter("token");
+			String userId = request.getParameter("userId");
+
+			// 验证参数
+			checkParam(new String[] { "token", "userId" }, token, userId);
+
+			// 验证token
+			checkToken(token);
+			
+			long c = appService.getCountForJdbcParam("select * from customer_message where userId=? ", new Object[]{userId});
+			if(c > 0){
+				success = true;
+			}
+			
+			data.put("success", success);
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data);
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
 	/** 获取消息通知 */
 	@RequestMapping(params = "getMessage")
 	public void getMessage(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
 

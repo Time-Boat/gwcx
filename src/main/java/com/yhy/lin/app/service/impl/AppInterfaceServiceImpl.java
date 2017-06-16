@@ -79,20 +79,9 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			c.setUserId(t.getUserId());
 			c.setId(UUIDGenerator.generate());
 		}
+		
 		save(t);
 		
-		// 添加到消息中心
-		AppMessageListEntity app = new AppMessageListEntity();
-		app.setContent("您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName()
-				+ " 的车票，请等待管理员审核。");
-		app.setCreateTime(AppUtil.getCurTime());
-		app.setStatus("0"); // 消息状态 0：否 1：是
-		app.setUserId(t.getUserId());
-		app.setMsgType("0"); // 消息类型 0:新增 1:修改
-		app.setOrderId(t.getId());
-		
-		
-		save(app);
 		save(c);
 	}
 
@@ -131,7 +120,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		// 根据起点id城市查找线路信息
 		List<Map<String, Object>> lineList = findForJdbc(
-				" select lf.id,lf.name,lf.price,lf.lineTimes "
+				" select lf.id,lf.name,lf.price,lf.lineTimes,lf.dispath "
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
 						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ",
 				stationId, cityId, serveType);
@@ -149,7 +138,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			asi.setName(a.get("name") + "");
 			asi.setPrice(AppUtil.Null2Blank(a.get("price") + ""));
 			asi.setLineTimes(AppUtil.Null2Blank(a.get("lineTimes") + ""));
-			// asi.setStationType(a.get("station_type") + "");
+			asi.setDispath(a.get("dispath") + "");
 			lList.add(asi);
 
 			sbf.append("'");
