@@ -22,7 +22,7 @@ public interface AppGlobals {
 	/** token异常 */
 	public static final String TOKEN_ERROR = "998";
 	/** token异常消息 */
-	public static final String TOKEN_ERROR_MSG = "token为空！";
+	public static final String TOKEN_ERROR_MSG = "token无效！";
 	
 	/** 参数异常 */
 	public static final String PARAMETER_ERROR = "997";

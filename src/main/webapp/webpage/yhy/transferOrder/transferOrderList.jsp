@@ -30,7 +30,7 @@
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,待付款_6" query="true" align="center"></t:dgCol>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
 	</t:datagrid>
@@ -51,6 +51,12 @@
 		var lineId = rows[0].lineId;
 		var ds = rows[0].orderStartime;
 		for(var i=0;i<rows.length;i++){
+			
+			//判断订单状态，如果是未支付就提示不让安排司机车辆
+			if(rows[i].orderStatus == '6'){
+				tip('未付款的订单不能安排车辆');
+				return;
+			}
 			
 			//判断选中的订单是不是在同一条线路上
 			if(lineId == rows[i].lineId){

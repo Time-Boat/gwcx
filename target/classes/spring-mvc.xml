@@ -127,6 +127,8 @@
 						<value>app.do?completeOrder</value>
 						<value>app.do?feedback</value>
 						
+						
+						<value>app.do?modifyOrder</value>
 						<value>app.do?updateUserInfo</value>
 						<value>app.do?getUserInfo</value>
 						<value>app.do?checkTicket</value>

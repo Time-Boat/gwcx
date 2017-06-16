@@ -17,7 +17,7 @@
   <div data-role="content">
     <form method="post">
       <div data-role="fieldcontain">
-        <label for="paymoney">支付金额：</label>
+        <label for="paymoney">支付金额1：</label>
         <input type="text" name="paymoney" id="paymoney" placeholder="请输入支付金额..">       
         <p id="p1">你输入的金额为：</p>
         <p>微信支付需要加收1%手续费</p>
@@ -34,7 +34,7 @@
 		$(document).ready(function(){
 			$("#paymoney").change(function(){
               var pay=$("#paymoney").val();
-              var rate = ${rate};
+              var rate = 1;//${rate};
 			  $("#p1").html('你输入的金额为：'+pay+'元');
 			  $("#p3").html('合计需要支付金额'+parseFloat((pay*rate).toPrecision(12))+'元');
 			});
@@ -47,8 +47,8 @@
 	    		alert("请输入支付金额！");
 	    		return;
 	    	}else{
-	    		var rate = ${rate};
-	    		pay = parseFloat((pay*rate).toPrecision(12)); 
+	    		//var rate = ${rate};
+	    		//pay = parseFloat((pay*rate).toPrecision(12)); 
 	    		window.location.href="${pageContext.request.contextPath}/wx/userAuth?totalFee="+pay;
 	    	}
 	    }

@@ -192,9 +192,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 
 			// 发送端短消息
-			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
-					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-//			String body = "true";
+//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
+//					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+			String body = "true";
 			if (body.contains("true")) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -604,7 +604,7 @@ public class AppInterfaceController extends AppBaseController {
 			String orderId = jsondata.getString("orderId");
 
 			t = systemService.getEntity(TransferorderEntity.class, orderId);
-
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
