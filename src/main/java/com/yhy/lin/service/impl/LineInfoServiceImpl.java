@@ -36,8 +36,8 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		// 取出当前页的数据 
 		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
 		 		+ "a.endY,a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
-		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath ");
-		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId where 1=1 ");
+		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname");
+		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id=a.endLocation where 1=1 ");
 		 
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -48,10 +48,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		Db2Page[] db2Pages = {
 				new Db2Page("id")
 				,new Db2Page("name", "name", null)
-				,new Db2Page("startLocation", "startLocation", null)
+				,new Db2Page("startLocation", "startname", null)
 				,new Db2Page("startX", "startX", null)
 				,new Db2Page("startY", "startY", null)
-				,new Db2Page("endLocation", "endLocation", null)
+				,new Db2Page("endLocation", "endname", null)
 				,new Db2Page("endX", "endX", null)
 				,new Db2Page("endY", "endY", null)
 				,new Db2Page("imageurl", "imageurl", null)

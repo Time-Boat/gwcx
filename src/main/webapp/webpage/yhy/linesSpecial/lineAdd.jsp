@@ -5,6 +5,76 @@
 <head>
 <title>新增验票员</title>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
+<script type="text/javascript">
+    function getAddr(){
+    	
+		var city = $('#city option:selected').val();//获取选中城市
+    	var type = $('#type option:selected').val();//获取选中城市
+    	$("#startLocation").empty();//先置空 
+    	$("#endLocation").empty();//先置空 
+    	
+    		$.ajax({
+     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type,
+     		   dataType: 'json',
+     		   complete: function(data,status) {
+     			   var message=data.responseText;
+     			   var info = eval(message);
+     			   var arr = new  Array();
+     			  var arr1 = new  Array();
+     			   for(var i=0;i<info.length;i++){
+     				  var sta = info[i].statype;
+     				  //接机  
+     				  if(type=="2"){
+     					 if(sta=="0"){
+         					 arr.push(info[i]); 
+         				  }
+         				 if(sta=="2"){
+         					 arr1.push(info[i]); 
+         				  }
+     				  }
+     				//送机  
+      				 if(type=="3"){
+      					if(sta=="0"){
+         					 arr1.push(info[i]); 
+         				  }
+         				 if(sta=="2"){
+         					 arr.push(info[i]); 
+         				  }
+      				 }
+     				  
+      				//接火车
+     				 if(type=="4"){
+     					 if(sta=="0"){
+         					 arr.push(info[i]); 
+         				  }
+         				 if(sta=="1"){
+         					 arr1.push(info[i]); 
+         				  }
+     				  }
+     				 
+     				 //送火车 
+     				if(type=="5"){
+    					 if(sta=="0"){
+        					 arr1.push(info[i]); 
+        				  }
+        				 if(sta=="1"){
+        					 arr.push(info[i]); 
+        				  }
+    				  }
+     				
+     				  }
+     			  $("#startLocation").append($('<option value="">--请选择--</option>'));
+     			  $("#endLocation").append($('<option value="">--请选择--</option>'));
+     			   $.each(arr1, function(i,n){
+     				   $("#startLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框  
+     			   });
+     			  $.each(arr, function(i,n){
+    				   $("#endLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框  
+    			   });
+     			   }
+     		   });
+    }
+</script>
 </head>
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?save">
@@ -20,53 +90,43 @@
 				<span class="Validform_checktip"></span> 
 			</td>
 		</tr>
+		
 		<tr>
 			<td align="right">
-				<label class="Validform_label"> 起始发车地址: </label>
+				<label class="Validform_label"> 选择线路城市: </label>
 			</td>
 			<td class="value">
-				<input class="inputxt" name="startLocation" value="${lineInfo.startLocation}" style="width: 60%" datatype="*"> 
+				<select id="city" name="city" datatype="*" onChange="getAddr()">
+						<option value="">--请选择城市--</option>
+						<c:forEach var="c" items="${cities}">
+							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if> >
+								${c.cityName}
+							</option>
+						</c:forEach>
+				</select> 
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 终点位置地址: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="endLocation" value="${lineInfo.endLocation}" style="width: 60%" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 线路状态: </label>
-			</td>
-			<td class="value">
-				
-					<t:dictSelect field="status" typeGroupCode="lineStatus" hasLabel="false" defaultVal="${lineInfo.status}" datatype="*"></t:dictSelect>	
-				
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
+		
 		<tr>
 			<td align="right">
 				<label class="Validform_label"> 线路类型: </label>
 			</td>
 			<td class="value">
 				
-				<t:dictSelect field="type" typeGroupCode="transferTy" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*"></t:dictSelect>	
+				<t:dictSelect id="type" field="type" extendJson="{onchange:getAddr()}" typeGroupCode="transferTy" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
+		
 		<tr>
 			<td align="right">
 				<label class="Validform_label"> 出车时间段: </label>
 			</td>
 			<td class="value">
 				
-				<t:dictSelect field="type" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
+				<t:dictSelect field="dispath" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>
@@ -80,19 +140,48 @@
 				<span >分</span>
 			</td>
 		</tr>
+		
 		<tr>
 			<td align="right">
-				<label class="Validform_label"> 选择线路城市: </label>
+				<label class="Validform_label"> 起始发车地址: </label>
 			</td>
 			<td class="value">
-				<select name="city" datatype="*" >
-						<option value="">--请选择城市--</option>
-						<c:forEach var="c" items="${cities}">
-							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if> >
-								${c.cityName}
-							</option>
-						</c:forEach>
-				</select> 
+				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" >  
+                            <option value="${lineInfo.startLocation}" style="color:#999999">--请选择--</option>  
+                        </select>
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 终点位置地址:  </label>
+			</td>
+			<td class="value">
+				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" >  
+                            <option value="${lineInfo.endLocation}" style="color:#999999">--请选择--</option>  
+                        </select>
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		
+		<%--
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 终点位置地址: </label>
+			</td>
+			<td class="value">
+				<input class="inputxt" name="endLocation" value="${lineInfo.endLocation}" style="width: 60%" datatype="*"> 
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>--%>
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 线路状态: </label>
+			</td>
+			<td class="value">
+				
+					<t:dictSelect field="status" typeGroupCode="lineStatus" hasLabel="false" defaultVal="${lineInfo.status}" datatype="*"></t:dictSelect>	
+				
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>

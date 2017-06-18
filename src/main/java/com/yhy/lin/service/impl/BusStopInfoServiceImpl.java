@@ -188,5 +188,22 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		
 		return sqlWhere.toString();
 	}
+
+	@Override
+	public JSONObject getLineDataGrid(String city,DataGrid dataGrid) {
+		// TODO Auto-generated method stub
+		String sqlWhere = getCitySqlWhere(city);
+		String sql = "select * from cities c,busstopinfo b where c.cityId = b.cityId and c.cityId =" +city;
+		
+		return null;
+	}
+	public String getCitySqlWhere(String city){
+		StringBuffer sqlWhere = new StringBuffer();
+		
+		if(StringUtil.isNotEmpty(city)){
+			sqlWhere.append(" and c.cityId = '"+city+"' ");
+		}
+		return sqlWhere.toString();
+	}
 	
 }
