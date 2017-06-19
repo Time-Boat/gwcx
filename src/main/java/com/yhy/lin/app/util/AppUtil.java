@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -63,7 +65,7 @@ public class AppUtil {
 		}
 	}
 
-	//input流转成byte字节数组
+	// input流转成byte字节数组
 	public static final byte[] readBytes(InputStream is, int contentLen) {
 		if (contentLen > 0) {
 			int readLen = 0;
@@ -71,9 +73,9 @@ public class AppUtil {
 			byte[] message = new byte[contentLen];
 			try {
 				while (readLen != contentLen) {
-					
-					//读取的方式不一样会出问题。。。。
-//					readLengthThisTime = is.read(message);
+
+					// 读取的方式不一样会出问题。。。。
+					// readLengthThisTime = is.read(message);
 					readLengthThisTime = is.read(message, readLen, contentLen - readLen);
 					if (readLengthThisTime == -1) {// Should not happen.
 						break;
@@ -84,7 +86,7 @@ public class AppUtil {
 			} catch (IOException e) {
 				// Ignore
 				e.printStackTrace();
-			}finally{
+			} finally {
 				try {
 					is.close();
 				} catch (IOException e) {
@@ -94,63 +96,63 @@ public class AppUtil {
 		}
 		return new byte[] {};
 	}
-	
-//	//获取body中的流，将其转换成json字符串
-//	public static String inputToStr(HttpServletRequest request) throws IOException {
-//		request.setCharacterEncoding("UTF-8");
-//		InputStream is = request.getInputStream();
-//		int size = request.getContentLength();
-//		byte[] reqBodyBytes = readBytes(is, size);
-//		String param = new String(reqBodyBytes,"utf-8");
-//		return param;
-//	}
-	
-//	public static final byte[] readBytes(InputStream is, int contentLen) {
-//        if (contentLen > 0) {
-//                int readLen = 0;
-//
-//                int readLengthThisTime = 0;
-//
-//                byte[] message = new byte[contentLen];
-//
-//                try {
-//
-//                        while (readLen != contentLen) {
-//
-//                                readLengthThisTime = is.read(message, readLen, contentLen
-//                                                - readLen);
-//
-//                                if (readLengthThisTime == -1) {// Should not happen.
-//                                        break;
-//                                }
-//
-//                                readLen += readLengthThisTime;
-//                        }
-//
-//                        return message;
-//                } catch (IOException e) {
-//                        // Ignore
-//                        // e.printStackTrace();
-//                }
-//        }
-//
-//        return new byte[] {};
-//}
-	
-	//获取body中的流，将其转换成json字符串
+
+	// //获取body中的流，将其转换成json字符串
+	// public static String inputToStr(HttpServletRequest request) throws
+	// IOException {
+	// request.setCharacterEncoding("UTF-8");
+	// InputStream is = request.getInputStream();
+	// int size = request.getContentLength();
+	// byte[] reqBodyBytes = readBytes(is, size);
+	// String param = new String(reqBodyBytes,"utf-8");
+	// return param;
+	// }
+
+	// public static final byte[] readBytes(InputStream is, int contentLen) {
+	// if (contentLen > 0) {
+	// int readLen = 0;
+	//
+	// int readLengthThisTime = 0;
+	//
+	// byte[] message = new byte[contentLen];
+	//
+	// try {
+	//
+	// while (readLen != contentLen) {
+	//
+	// readLengthThisTime = is.read(message, readLen, contentLen
+	// - readLen);
+	//
+	// if (readLengthThisTime == -1) {// Should not happen.
+	// break;
+	// }
+	//
+	// readLen += readLengthThisTime;
+	// }
+	//
+	// return message;
+	// } catch (IOException e) {
+	// // Ignore
+	// // e.printStackTrace();
+	// }
+	// }
+	//
+	// return new byte[] {};
+	// }
+
+	// 获取body中的流，将其转换成json字符串
 	public static String inputToStr(HttpServletRequest request) throws IOException {
 		request.setCharacterEncoding("UTF-8");
 		InputStream is = request.getInputStream();
 		String param1 = Base64Util.getFromBase64Input(is);
-//		int size = request.getContentLength();
-//		byte[] reqBodyBytes = readBytes(is, size);
-//		String res = new String(reqBodyBytes);
-//		String param = Base64Util.getFromBase64(res);
-//		param1 = new String(param1.getBytes("iso-8859-1"),"utf-8");
+		// int size = request.getContentLength();
+		// byte[] reqBodyBytes = readBytes(is, size);
+		// String res = new String(reqBodyBytes);
+		// String param = Base64Util.getFromBase64(res);
+		// param1 = new String(param1.getBytes("iso-8859-1"),"utf-8");
 		return param1;
 	}
-		
-		
+
 	/**
 	 * 将值为null的字符串转为空字符串
 	 *
@@ -165,8 +167,8 @@ public class AppUtil {
 			return srcString.trim();
 		}
 	}
-	
-	//null转0
+
+	// null转0
 	public static float StrToZero(String srcString) {
 		float f = 0;
 		if (Null2Blank(srcString).length() > 0) {
@@ -177,57 +179,59 @@ public class AppUtil {
 		}
 		return f;
 	}
-	
+
 	/**
-     * 判断字符是否是中文
-     *
-     * @param c 字符
-     * @return 是否是中文
-     */
-    public static boolean isChinese(char c) {
-        Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
-        if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
-                || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
-                || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
-                || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION
-                || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
-                || ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS) {
-            return true;
-        }
-        return false;
-    }
- 
-    /**
-     * 判断字符串是否是乱码
-     *
-     * @param strName 字符串
-     * @return 是否是乱码
-     */
-    public static boolean isMessyCode(String strName) {
-        Pattern p = Pattern.compile("\\s*|t*|r*|n*");
-        Matcher m = p.matcher(strName);
-        String after = m.replaceAll("");
-        String temp = after.replaceAll("\\p{P}", "");
-        char[] ch = temp.trim().toCharArray();
-        float chLength = ch.length;
-        float count = 0;
-        for (int i = 0; i < ch.length; i++) {
-            char c = ch[i];
-            if (!Character.isLetterOrDigit(c)) {
-                if (!isChinese(c)) {
-                    count = count + 1;
-                }
-            }
-        }
-        float result = count / chLength;
-        if (result > 0.4) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    
-    /**
+	 * 判断字符是否是中文
+	 *
+	 * @param c
+	 *            字符
+	 * @return 是否是中文
+	 */
+	public static boolean isChinese(char c) {
+		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
+		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION
+				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS) {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * 判断字符串是否是乱码
+	 *
+	 * @param strName
+	 *            字符串
+	 * @return 是否是乱码
+	 */
+	public static boolean isMessyCode(String strName) {
+		Pattern p = Pattern.compile("\\s*|t*|r*|n*");
+		Matcher m = p.matcher(strName);
+		String after = m.replaceAll("");
+		String temp = after.replaceAll("\\p{P}", "");
+		char[] ch = temp.trim().toCharArray();
+		float chLength = ch.length;
+		float count = 0;
+		for (int i = 0; i < ch.length; i++) {
+			char c = ch[i];
+			if (!Character.isLetterOrDigit(c)) {
+				if (!isChinese(c)) {
+					count = count + 1;
+				}
+			}
+		}
+		float result = count / chLength;
+		if (result > 0.4) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * 参数检测是否为空 (封装一个统一的参数检测为空的方法，后面在做吧)
 	 */
 	// public String checkParameter(JSONObject returnJsonObj, Object
@@ -246,7 +250,6 @@ public class AppUtil {
 	// responseOutWrite(response, returnJsonObj);
 	// }
 
-
 	/**
 	 * 计算两个时间之间的差值，根据标志的不同而不同
 	 * 
@@ -261,12 +264,12 @@ public class AppUtil {
 	public static int compareDate(Date d1, Date d2, char flag, String isAbs) {
 
 		long diff = 0;
-		if("abs".equals(isAbs)){
+		if ("abs".equals(isAbs)) {
 			diff = Math.abs(d1.getTime() - d2.getTime());
-		}else{
+		} else {
 			diff = d1.getTime() - d2.getTime();
 		}
-		
+
 		switch (flag) {
 		case 'd':
 			return (int) (diff / (24 * 3600 * 1000));
@@ -282,7 +285,7 @@ public class AppUtil {
 
 		return 0;
 	}
-	
+
 	// 获取当前时间(字符串)
 	public static String getCurTime() {
 		return DateUtils.date2Str(DateUtils.datetimeFormat);
@@ -292,7 +295,32 @@ public class AppUtil {
 	public static Date getDate() {
 		return DateUtils.getDate();
 	}
-    
+
+	/**
+	 * 字符串转换成日期
+	 * 
+	 * @param str
+	 * @param sdf
+	 * @return
+	 */
+	public static Date str2Date(String str, SimpleDateFormat sdf) {
+		return DateUtils.str2Date(str, sdf);
+	}
+
+	/**
+	 * 字符串转换成日期
+	 * 
+	 * @param str
+	 * @return
+	 */
+	public static Date str2Date(String str) {
+		return str2Date(str, DateUtils.datetimeFormat);
+	}
+
+	public static String dateformat(String date, String format) {
+		return DateUtils.dateformat(date, format);
+	}
+
 	/**
 	 * 站点类型转换 线路类型 转 站点类型
 	 */
@@ -309,5 +337,5 @@ public class AppUtil {
 			return lineType;
 		}
 	}
-	
+
 }

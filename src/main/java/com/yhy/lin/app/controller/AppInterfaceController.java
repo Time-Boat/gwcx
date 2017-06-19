@@ -1,7 +1,10 @@
 package com.yhy.lin.app.controller;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 
@@ -264,58 +267,75 @@ public class AppInterfaceController extends AppBaseController {
 			Gson g = new Gson();
 			TransferorderEntity t = g.fromJson(param, TransferorderEntity.class);
 			
-			//订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付
-			//默认进来是未支付的，当进行微信付款之后，将状态改为已支付
-			//这边是模拟数据
-			t.setOrderStatus(6);
-			
-			//支付状态 0：已付款，1：退款中 2：已退款 3：未付款 4：已拒绝
-			//默认进来是未付款，当进行微信付款之后，将状态改为已付款
-			//这边是模拟数据
-			t.setOrderPaystatus("3");
-			
-			String sId = t.getOrderStartingStationId();// 起始站
-			String eId = t.getOrderTerminusStationId();// 终点站
-
-			String startTime = t.getOrderStartime();
-
 			// 和当前时间进行比较，出发时间和当前时间不能低于4个小时
+			String startTime = t.getOrderStartime();
 			Date curDate = AppUtil.getDate();
 			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(curDate, departTime, 'm', "abs");
-
+			
+			//暂时先判断23:00-5：00之间，以后可能会根据线路的运营时间来判断
+			Calendar calendar = new GregorianCalendar();
+			calendar.setTime(departTime);
+			int hour = calendar.get(Calendar.HOUR_OF_DAY);
+			
 			// if (m > 240) { //测试
-			if (m < 240) {
-				msg = "必须提前4个小时才能下订单";
+			if (m < 720) {
+				msg = "必须提前12个小时才能下订单";
+				statusCode = "888";
+				success = false;
+			} else if(hour >= 23 || hour <= 5){
+				msg = "出发时间不能为23点到凌晨5点之间";
+				statusCode = "888";
 				success = false;
 			} else {
-				switch (t.getOrderType() + "") {
-				case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
-					commonAddrId = eId;
-					orderPrefix = MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER;
-					break;
-				case AppGlobals.DESTINATION_TO_AIRPORT_TYPE:
-					commonAddrId = sId;
-					orderPrefix = MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER;
-					break;
-				case AppGlobals.TRAIN_TO_DESTINATION_TYPE:
-					commonAddrId = eId;
-					orderPrefix = MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER;
-					break;
-				case AppGlobals.DESTINATION_TO_TRAIN_TYPE:
-					commonAddrId = sId;
-					orderPrefix = MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER;
-					break;
-				default:
-					break;
+				//如果是未支付的订单，进行修改之后，判断这个id是不是存在的如果是存在的，直接修改内容
+				if(StringUtil.isNotEmpty(t.getId())){
+					
+					appService.saveOrUpdate(t);
+					
+				} else {
+					
+					//订单状态 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付
+					//默认进来是未支付的，当进行微信付款之后，将状态改为已支付
+					//这边是模拟数据
+					t.setOrderStatus(6);
+					
+					//支付状态 0：已付款，1：退款中 2：已退款 3：未付款 4：已拒绝
+					//默认进来是未付款，当进行微信付款之后，将状态改为已付款
+					//这边是模拟数据
+					t.setOrderPaystatus("3");
+					
+					String sId = t.getOrderStartingStationId();// 起始站
+					String eId = t.getOrderTerminusStationId();// 终点站
+					
+					switch (t.getOrderType() + "") {
+					case AppGlobals.AIRPORT_TO_DESTINATION_TYPE:
+						commonAddrId = eId;
+						orderPrefix = MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER;
+						break;
+					case AppGlobals.DESTINATION_TO_AIRPORT_TYPE:
+						commonAddrId = sId;
+						orderPrefix = MakeOrderNum.AIRPORT_TO_DESTINATION_ORDER;
+						break;
+					case AppGlobals.TRAIN_TO_DESTINATION_TYPE:
+						commonAddrId = eId;
+						orderPrefix = MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER;
+						break;
+					case AppGlobals.DESTINATION_TO_TRAIN_TYPE:
+						commonAddrId = sId;
+						orderPrefix = MakeOrderNum.DESTINATION_TO_AIRPORT_ORDER;
+						break;
+					default:
+						break;
+					}
+	
+					appService.saveOrder(t, orderPrefix, commonAddrId);
+					System.out.println("保存订单成功，订单状态为未支付");
+					data.put("orderId", t.getId());
+					statusCode = AppGlobals.APP_SUCCESS;
+					msg = AppGlobals.APP_SUCCESS_MSG;
+					success = true;
 				}
-
-				appService.saveOrder(t, orderPrefix, commonAddrId);
-				System.out.println("保存订单成功，订单状态为未支付");
-				data.put("orderId", t.getId());
-				statusCode = AppGlobals.APP_SUCCESS;
-				msg = AppGlobals.APP_SUCCESS_MSG;
-				success = true;
 			}
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
@@ -665,7 +685,7 @@ public class AppInterfaceController extends AppBaseController {
 
 			String orderId = jsondata.getString("orderId");
 
-			// 需不需要做时间的判断 在发车2个小时之前才能取消订单 (是需要的...)
+			// 需不需要做时间的判断 在发车4个小时之前才能取消订单 (是需要的...)
 			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
 			// 关联表，获取发车时间 (可以建个视图)
 			Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
@@ -675,8 +695,8 @@ public class AppInterfaceController extends AppBaseController {
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(curDate, departTime, 'm', "");
 
-			if (m > 120) {
-				msg = "发车时间超过两个小时，无法取消订单";
+			if (m > 240) {
+				msg = "发车时间超过四个小时，无法取消订单";
 				success = false;
 			} else {
 				// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
@@ -1182,49 +1202,4 @@ public class AppInterfaceController extends AppBaseController {
 			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 	}
 	
-	
-//	/**
-//	　　跳转支付界面，将code带过去
-//	**/
-//
-//	@RequestMapping("toPay.do")
-//	public ModelAndView toPay(HttpServletRequest request, HttpServletResponse response) throws Exception {
-//	        
-//	    ModelAndView modelAndView = new ModelAndView();
-//	    logger.debug("玩家准备填写充值信息了:" + HttpUtil.buildOriginalURL(request));
-//	        
-//	    //重定向Url
-//	    String redirecUri = URLEncoder.encode(GlobalThreadLocal.getSiteConfig().getBasePath() + "/wxOfficialAccountsPay/toInputAccountInfo.do");
-//	    //用于获取成员信息的微信返回码
-//	    String code = null;
-//	    if( request.getParameter("code")!=null ){
-//	        code =request.getParameter("code");
-//	    }
-//	    if( code == null) {
-//	        //授权         
-//	        return authorization(redirecUri);
-//	    }
-//	    code =request.getParameter("code");
-//	    // 获取用户信息
-//	    WeixinLoginUser weixinLoginUser = getWeixinLoginUser(code);
-//	        
-//	    modelAndView.addObject("openId",des.getEncString(weixinLoginUser.getOpenID()));
-//	    // 跳转到支付界面
-//	    String viewName = "/wxOfficialAccountsPay/pay";
-//	    modelAndView.setViewName(viewName);
-//	    return modelAndView;
-//	}
-//
-//	/**
-//	* 授权方法
-//	* @param redirecUri 重定向链接
-//	* 
-//	* */
-//	private ModelAndView authorization(String redirecUri) {
-//	    String siteURL="redirect:https://open.weixin.qq.com/connect/oauth2/authorize?appid="
-//	    +"&redirect_uri="+redirecUri+
-//	    "&response_type=code&scope=snsapi_userinfo&state=1234#wechat_redirect";
-//	    logger.debug("授权路径：[ "+siteURL+" ]");
-//	    return new ModelAndView(siteURL);
-//	}
 }
