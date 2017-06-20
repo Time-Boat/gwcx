@@ -425,6 +425,8 @@ public class LineInfoController extends BaseController {
 	public JSONArray getLineJson(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
         String city = request.getParameter("city");
         String type = request.getParameter("type");
+        String starts = request.getParameter("starts");
+        String ends = request.getParameter("ends");
         //List<BusStopInfoEntity> listbus = busStopInfoService.getLineDataGrid(city,dataGrid);
         
         //responseDatagrid(response, jObject);
@@ -442,22 +444,21 @@ public class LineInfoController extends BaseController {
         		if(type.equals("4") || type.equals("5")){
         			str.append(" and STATION_TYPE != 2");
         		}
-        		str.append(" and status !='2'");
             }
+        	str.append(" and status !='2'");
         	
         }else{
         	if(StringUtil.isNotEmpty(type)){
         		if(type.equals("2") || type.equals("3")){
-        			str.append("from BusStopInfoEntity where STATION_TYPE !=1");
+        			str.append("from BusStopInfoEntity where STATION_TYPE !=1 and");
         		}
         		if(type.equals("4") || type.equals("5")){
-        			str.append("from BusStopInfoEntity where STATION_TYPE !=2");
+        			str.append("from BusStopInfoEntity where STATION_TYPE !=2 and");
         		}
-            	str.append(" and status !='2'");
             }else{
             	str.append("from BusStopInfoEntity where ");
-            	str.append(" status !='2'");
             }
+        	str.append(" status !='2'");
         }
         
         List<BusStopInfoEntity> cList = busStopInfoService.findByQueryString(str.toString());
@@ -465,6 +466,26 @@ public class LineInfoController extends BaseController {
         JSONObject jsonObj = new JSONObject(); 
         JSONArray jsonArray = new JSONArray();  
         List<String> list = new ArrayList<>();
+        String startname = "";
+        String endname = "";
+        if(StringUtil.isNotEmpty(starts)){
+        	List<BusStopInfoEntity> sList = busStopInfoService.findByProperty(BusStopInfoEntity.class,"id",starts);
+        	if(sList.size()>0){
+        		for (int i = 0; i < sList.size(); i++) {
+    				 startname = sList.get(i).getName();
+    			}
+        	}
+        	
+        }
+        
+        if(StringUtil.isNotEmpty(ends)){
+        	List<BusStopInfoEntity> eList = busStopInfoService.findByProperty(BusStopInfoEntity.class,"id",ends);
+        	if(eList.size()>0){
+        		for (int i = 0; i < eList.size(); i++) {
+    				 endname = eList.get(i).getName();
+    			}
+        	}
+        }
         if(cList.size()>0){
         	for (int i = 0; i < cList.size(); i++) {
             	String name =  cList.get(i).getName();
@@ -473,10 +494,13 @@ public class LineInfoController extends BaseController {
             	jsonObj.put("stopid", id);
             	jsonObj.put("name", name);
             	jsonObj.put("statype", statype);
+            	jsonObj.put("startname", startname);
+            	jsonObj.put("endname", endname);
             	jsonArray.add(jsonObj);
             	list.add(name);
     		}
         }
+       
 		return jsonArray;
 	}
 

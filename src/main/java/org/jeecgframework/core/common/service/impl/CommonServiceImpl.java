@@ -22,6 +22,7 @@ import org.jeecgframework.core.common.model.json.DataGridReturn;
 import org.jeecgframework.core.common.model.json.ImportFile;
 import org.jeecgframework.core.common.model.json.TreeGrid;
 import org.jeecgframework.core.common.service.CommonService;
+import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.vo.datatable.DataTableReturn;
 import org.jeecgframework.tag.vo.easyui.Autocomplete;
 import org.jeecgframework.tag.vo.easyui.ComboTreeModel;
@@ -634,7 +635,8 @@ public class CommonServiceImpl implements CommonService {
 					if (objValue == null) {
 						jsonTemp += "null";
 					} else {
-						jsonTemp += "'" + objValue + "'";
+						String val = (objValue + "" ).replace("\n","\\s").replace("\r","\\s");
+						jsonTemp += "'" + val + "'";
 					}
 				}
 				jsonTemp += "}";

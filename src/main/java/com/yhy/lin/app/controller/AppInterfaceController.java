@@ -35,6 +35,7 @@ import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.exception.ParameterException;
+import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
@@ -43,8 +44,6 @@ import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
-
-import AppInterfaceController.AppInterfaceService;
 
 /**
  * Description : 接口处理类
@@ -688,10 +687,10 @@ public class AppInterfaceController extends AppBaseController {
 			// 需不需要做时间的判断 在发车4个小时之前才能取消订单 (是需要的...)
 			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
 			// 关联表，获取发车时间 (可以建个视图)
-			Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
+			//Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
 
 			Date curDate = AppUtil.getDate();
-			String sTime = o.getStartTime();
+			String sTime = t.getOrderStartime();
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(curDate, departTime, 'm', "");
 
@@ -845,21 +844,23 @@ public class AppInterfaceController extends AppBaseController {
 	public void feedback(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		JSONObject data = new JSONObject();
+		
 		String msg = "";
 		String statusCode = "";
+		boolean success = false;
 
 		String param = "";
 
 		try {
-			param = AppUtil.inputToStr(request);
+			param = AppUtil.inputToStr(request); 
 			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
-
+			
 			// 验证参数
 			checkParam(jsondata);
-
+			
 			// 验证token
 			String token = jsondata.getString("token");
 			checkToken(token);
@@ -870,7 +871,8 @@ public class AppInterfaceController extends AppBaseController {
 			t.setId(UUIDGenerator.generate());
 
 			systemService.save(t);
-
+			
+			success = true;
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -882,10 +884,10 @@ public class AppInterfaceController extends AppBaseController {
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
-
+		data.put("success", success);
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", "");
+		returnJsonObj.put("data", data);
 
 		responseOutWrite(response, returnJsonObj);
 	}
@@ -961,9 +963,11 @@ public class AppInterfaceController extends AppBaseController {
 	public void uploadPersonalInfo(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		JSONObject data = new JSONObject();
+		
 		String msg = "";
 		String statusCode = "";
+		boolean success = false;
 
 		String param = "";
 
@@ -1001,7 +1005,7 @@ public class AppInterfaceController extends AppBaseController {
 			cc.setCustomerImg(imgName);
 
 			systemService.save(cc);
-
+			success = true;
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -1013,10 +1017,10 @@ public class AppInterfaceController extends AppBaseController {
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
-
+		data.put("success", success);
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", "");
+		returnJsonObj.put("data", data);
 
 		responseOutWrite(response, returnJsonObj);
 	}
@@ -1085,10 +1089,10 @@ public class AppInterfaceController extends AppBaseController {
 
 			// 验证参数
 			checkParam(new String[] { "token", "userId" }, token, userId);
-
+			
 			// 验证token
 			checkToken(token);
-
+			
 			String pageNo = request.getParameter("pageNo");
 			if (!StringUtil.isNotEmpty(pageNo)) {
 				pageNo = "1";

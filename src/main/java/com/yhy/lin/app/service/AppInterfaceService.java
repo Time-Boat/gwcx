@@ -1,4 +1,4 @@
-package AppInterfaceController;
+package com.yhy.lin.app.service;
 
 import java.util.List;
 

@@ -10,11 +10,13 @@
     	
 		var city = $('#city option:selected').val();//获取选中城市
     	var type = $('#type option:selected').val();//获取选中城市
+    	var starts =  $("#starts").val();//获取起点
+		var ends =  $("#ends").val();//获取终点 
     	$("#startLocation").empty();//先置空 
     	$("#endLocation").empty();//先置空 
     	
     		$.ajax({
-     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type,
+     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type+'&starts='+starts+'&ends='+ends,
      		   dataType: 'json',
      		   complete: function(data,status) {
      			   var message=data.responseText;
@@ -61,24 +63,51 @@
         					 arr.push(info[i]); 
         				  }
     				  }
-     				
-     				  }
-     			  $("#startLocation").append($('<option value="">--请选择--</option>'));
-     			  $("#endLocation").append($('<option value="">--请选择--</option>'));
-     			   $.each(arr1, function(i,n){
-     				   $("#startLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框  
-     			   });
-     			  $.each(arr, function(i,n){
-    				   $("#endLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框  
-    			   });
+     				 }
+     			   
+     			   if(type=="2" || type=="4"){
+     				  if(arr1.length>0){
+         				  for(var i=0;i<arr1.length;i++){
+             				  if(arr1[i].name==arr1[i].startname){
+             					 $("#startLocation").append($('<option value="'+arr1[i].stopid+'">'+arr1[i].startname+'</option>'));//后台数据加到下拉框
+             					 $("#endLocation").append($('<option value="'+arr1[i].stopid+'">'+arr1[i].endname+'</option>'));//后台数据加到下拉框
+             				  }
+             			  }
+         			   }
+     			   }
+     			   
+     			   if(type=="3" || type=="5"){
+     				  if(arr.length>0){
+         				  for(var i=0;i<arr.length;i++){
+             				  if(arr[i].name==arr[i].endname){
+             					 $("#startLocation").append($('<option value="'+arr[i].stopid+'">'+arr[i].startname+'</option>'));//后台数据加到下拉框
+             					 $("#endLocation").append($('<option value="'+arr[i].stopid+'">'+arr[i].endname+'</option>'));//后台数据加到下拉框
+             				  }
+             			  }
+         			   }
+     			   }
+     			   
+     			  $.each(arr1, function(i,n){
+   					 $("#startLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
+   				});
+      			 $.each(arr, function(i,n){
+ 					 $("#endLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
+ 				});
      			   }
      		   });
     }
+    //进入触发 
+    $(function(){
+    	getAddr();
+    });
+    
 </script>
 </head>
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?save">
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
+	<input id="ends" name="endLocations" type="hidden" value="${lineInfo.endLocation}">
+	<input id="starts" name="startLocations" type="hidden" value="${lineInfo.startLocation}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 		
 		<tr>
@@ -131,15 +160,6 @@
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 线路时长: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="lineTimes" value="${lineInfo.lineTimes}" style="width: 10%" datatype="n1-3"> 
-				<span >分</span>
-			</td>
-		</tr>
 		
 		<tr>
 			<td align="right">
@@ -147,8 +167,14 @@
 			</td>
 			<td class="value">
 				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" >  
-                            <option value="${lineInfo.startLocation}" style="color:#999999">--请选择--</option>  
-                        </select>
+                            <%-- <option value="${lineInfo.startLocation}" style="color:#999999">${lineInfo.startLocation}</option> --%>
+                            <%-- <option value="${s.id}" <c:if test="${s.id==lineInfo.startLocation}" >selected="selected"</c:if> >${s.name}</option>
+                            <option value="">--请选择---</option>
+							<c:forEach items="${starts}" var="s" >
+								
+							</c:forEach> --%>
+							
+                </select>
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
@@ -158,9 +184,22 @@
 			</td>
 			<td class="value">
 				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" >  
-                            <option value="${lineInfo.endLocation}" style="color:#999999">--请选择--</option>  
-                        </select>
+                    <option value="">--请选择---</option>
+							<c:forEach items="${ends}" var="e" >
+							<option value="${e.id}" <c:if test="" >selected="selected"</c:if> >${e.name}</option>
+					</c:forEach>        
+                </select>
 				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 线路时长: </label>
+			</td>
+			<td class="value">
+				<input class="inputxt" name="lineTimes" value="${lineInfo.lineTimes}" style="width: 10%" datatype="n1-3"> 
+				<span >分</span>
 			</td>
 		</tr>
 		

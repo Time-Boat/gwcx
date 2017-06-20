@@ -21,11 +21,10 @@ import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
+import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.TransferorderEntity;
-
-import AppInterfaceController.AppInterfaceService;
 
 /**
 * Description : 
