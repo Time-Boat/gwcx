@@ -53,6 +53,17 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String rejectReason; //拒绝原因
 	
+	private String beforeStatus;
+	
+	@Column(name = "before_status")
+	public String getBeforeStatus() {
+		return beforeStatus;
+	}
+
+	public void setBeforeStatus(String beforeStatus) {
+		this.beforeStatus = beforeStatus;
+	}
+
 	@Column(name = "reject_reason")
 	public String getRejectReason() {
 		return rejectReason;

@@ -509,7 +509,7 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证参数
 			// checkParam(new String[] { "token", "orderId", "orderStatus"},
 			// token, userId, orderStatus);
-			checkParam(new String[] { "token", "orderId" }, token, userId);
+			checkParam(new String[] { "token", "userId" }, token, userId);
 
 			// 验证token
 			checkToken(token);
@@ -698,10 +698,15 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "发车时间超过四个小时，无法取消订单";
 				success = false;
 			} else {
+				// 记录取消订单之前的状态
+				t.setBeforeStatus(t.getOrderStatus() + "");
+				System.out.println("取消订单之前的状态:" + t.getOrderStatus());
+				
 				// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
 				t.setOrderStatus(3);
-				// 支付状态 0：已付款，1：退款中 2：已退款 3:：未付款
+				// 支付状态 0：已付款，1：退款中 2：已退款 3：未付款
 				t.setOrderPaystatus("1");
+				
 				t.setRefundTime(AppUtil.getCurTime());
 				systemService.updateEntitie(t);
 
