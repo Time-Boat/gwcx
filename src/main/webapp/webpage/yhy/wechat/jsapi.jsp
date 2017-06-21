@@ -39,7 +39,7 @@ System.out.println("in jsapi.jsp");
 			       			url += "1"
 			       			//alert(res.err_msg);
 			       		}
-			    		window.location.href = url;
+			    		window.location.replace(url);
 			       }
 			   ); 
 			}

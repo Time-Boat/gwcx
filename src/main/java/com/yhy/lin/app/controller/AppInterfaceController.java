@@ -422,8 +422,7 @@ public class AppInterfaceController extends AppBaseController {
 			String likeStation = request.getParameter("likeStation");
 
 			// 验证参数
-			checkParam(new String[] { "serveType", "stationId", "cityId", "userId"}, serveType, stationId, cityId,
-					userId);
+			checkParam(new String[] { "serveType", "stationId", "cityId"}, serveType, stationId, cityId);
 
 			//线路信息
 			List<AppLineStationInfoEntity> lList = new ArrayList<>();

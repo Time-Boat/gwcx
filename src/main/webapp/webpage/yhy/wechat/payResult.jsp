@@ -11,9 +11,9 @@
 		$(function(){
 			var status = $("#status").val();
 			if(status == "0"){
-				window.location.href = "/job/payStateYes.html";
+				window.location.replace("/job/payStateYes.html");
 			}else{
-				window.location.href = "/job/payStateNo.html";
+				window.location.replace("/job/payStateNo.html");
 			}
 		});
 	</script>

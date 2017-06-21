@@ -53,11 +53,11 @@
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="rejectRefund(id)" title="拒绝" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#5" funname="lookRejectReason(id)" title="查看原因" ></t:dgFunOpt> --%>
 		<t:dgToolBar title="批量同意" icon="icon-edit" url="orderRefundController.do?doAgreeALLSelect" funname="AgreeALLSelect"></t:dgToolBar>
-		<t:dgToolBar title="批量拒绝" icon="icon-edit" url="" funname="RefuseALLSelect"></t:dgToolBar>
+		<%-- <t:dgToolBar title="批量拒绝" icon="icon-edit" url="" funname="RefuseALLSelect"></t:dgToolBar> --%>
 	</t:datagrid>
 </div>
 
-<div id="win"  class="easyui-window" title="退款原因" style="width:400px;height:300px"
+<!-- <div id="win"  class="easyui-window" title="退款原因" style="width:400px;height:300px"
     data-options="modal:true" closed="true" >
     <div class="easyui-layout" data-options="fit:true">
 		<div style="text-align: center; " data-options="region:'center'">
@@ -71,7 +71,7 @@
 			</div>
 		</div>
     </div>
-</div>
+</div> -->
 
 </div>
 <script type="text/javascript">
@@ -82,7 +82,7 @@
 		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
 
-	function agreeRefund(id){
+/* 	function agreeRefund(id){
 		$.dialog.confirm('确定同意退款吗？',function(r){
 			if(!r){
 				return;
@@ -102,7 +102,7 @@
 		        });
 			}
 		});
-	}
+	} 
 	
 	function rejectRefund(id){
 		$('#win').window('open'); // open a window
@@ -149,6 +149,7 @@
         });
 		
 	}
+	*/
 	
 	/**
 	 * 批量同意退款
@@ -199,7 +200,7 @@
 	 * @param gname
 	 * @return
 	 */
-	function RefuseALLSelect(title,url,gname) {
+	/* function RefuseALLSelect(title,url,gname) {
 	    var ids = [];
 	    var rows = $("#"+gname).datagrid('getSelections');
 	    if (rows.length > 0) {
@@ -245,6 +246,6 @@
             //}
             }
         });
-	}
+	} */
 </script>
  

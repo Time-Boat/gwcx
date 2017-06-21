@@ -74,6 +74,10 @@ public interface AppGlobals {
 	
 	
 	/** 微信第三方支付*/
+	
+	/** 退款url*/
+	public static final String REFUND_API = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+	
 	/** appId*/
 	public static final String WECHAT_ID = "wx1775577d8050cf73";
 	
@@ -86,7 +90,8 @@ public interface AppGlobals {
 	/** 收款商户后台进行配置，登录微信商户平台–账户设置–安全设置–api安全，设置32位key值*/
 	public static final String WECHAT_KEY = "GZLYXNYYYYXGS20170601jiesongyewu";
 	
-	
+	/** 证书路径*/
+	public static final String CERT_PATH_LOCATION = "WEB-INF/cert/apiclient_cert.p12";
 	
 	/**
 	 * 交易类型

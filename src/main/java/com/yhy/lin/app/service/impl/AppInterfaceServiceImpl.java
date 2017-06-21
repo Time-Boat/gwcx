@@ -324,7 +324,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		lm = findForJdbcParam("select * from customer_message where user_id = ? order by create_time desc  ",
 				Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
-
+		
 		for (Map<String, Object> m : lm) {
 			AppMessageListEntity am = new AppMessageListEntity();
 			am.setContent(m.get("content") + "");

@@ -21,7 +21,18 @@ public class UUIDGenerator {
 		return new StringBuilder(32).append(format(getIP())).append(
 				format(getJVM())).append(format(getHiTime())).append(
 				format(getLoTime())).append(format(getCount())).toString();
-		
+	}
+
+	/**
+	 * 产生一个16位的UUID
+	 * 
+	 * @return
+	 */
+
+	public static String generate(int length) {
+		return new StringBuilder(length).append(format(getIP())).append(
+				format(getJVM())).append(format(getHiTime())).append(
+				format(getLoTime())).append(format(getCount())).toString();
 	}
 
 	private static final int IP;

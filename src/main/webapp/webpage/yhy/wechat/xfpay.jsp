@@ -49,7 +49,7 @@
 	    	}else{
 	    		//var rate = ${rate};
 	    		//pay = parseFloat((pay*rate).toPrecision(12)); 
-	    		window.location.href="${pageContext.request.contextPath}/wx/userAuth?totalFee="+pay;
+	    		window.location.replace("${pageContext.request.contextPath}/wx/userAuth?totalFee="+pay);
 	    	}
 	    }
 	 </script>

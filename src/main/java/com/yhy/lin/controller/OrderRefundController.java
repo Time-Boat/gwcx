@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.OrderRefundServiceI;
 
@@ -184,6 +185,7 @@ public class OrderRefundController extends BaseController {
 					list.add(trans);
 				}
 			}
+			
 			message = "批量拒绝成功！";
 			// 批量拒绝
 			orderRefundService.updateAllEntitie(list);
