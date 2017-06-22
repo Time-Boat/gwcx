@@ -84,12 +84,10 @@
 			<div style="margin-top: 30px">
 			-->
 			
-			<h5>确定要同意退款吗？</h5>
+			<h5 id="reTitle" >确定要同意退款吗？</h5>
 			<input id="sub" type="button" class="button white" value="确定" style="margin-right: 50px;width:50px;height:30px" onclick="submitRefuse()" />
 			<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$('#win').window('close');"/>
-			<div id="refund_loading" style='display:none;position:absolute;cursor1:wait;left:50%;top:20px;transform: translateX(-50%);width:auto;height:16px;padding:12px 5px 10px 30px;
- 			 background:#fff url(plug-in/ace/assets/css/images/loading.gif) no-repeat scroll center left;color:#000;'>
- 			 	正在退款，请等待...
+			<div id="refund_loading" style='display:none;position:absolute;cursor1:wait;left:50%;top:20px;transform: translateX(-50%);width:200px;height:32px;color:#000;'>
 		 </div>
 		</div>
     </div>
@@ -219,48 +217,76 @@
 		}
 	} */
 	
+	var refundUrl;
+	var refundGname;
+	var rows;
+	
 	function AgreeALLSelect(title,url,gname) {
+		
+		rows = $("#"+gname).datagrid('getSelections');
+		console.log(rows);
+	    if (rows.length <= 0) {
+			tip("请选择需要批量同意退款的数据！");
+			return;
+		}
+	    
+	    refundBegin();
+	    
+		refundUrl = url;
+		refundGname = gname;
 		$('#win').window('open');
+		
 	}
 	
 	function submitRefuse(){
-		
+		console.log(rows);
 		$('#refund_loading').show();
 		$('#sub').hide();
 		$('#cal').hide();
+		$('#reTitle').hide();
+		$('#refund_loading').html("正在退款，请等待...");
+		$('#refund_loading').css('background','#fff url(plug-in/ace/assets/css/images/loading.gif) no-repeat scroll 11px -4px');
+		
 		var ids = [];
 		var fees = [];
-	    var rows = $("#"+gname).datagrid('getSelections');
-	    if (rows.length > 0) {
-		   if (r) {
-				for ( var i = 0; i < rows.length; i++) {
-					ids.push(rows[i].id);
-					fees.push(rows[i].orderTotalPrice);
-				}
-				$.ajax({
-					url : url,
-					type : 'post',
-					data : {
-						ids : ids.join(','),
-						fees: fees.join(',')
-					},
-					async : false,
-					success : function(data) {
-						console.log(data);
-						var d = $.parseJSON(data);
-						console.log(d);
-						var msg = d.msg;
-						tip(d.description + '\n' + msg);
-						reloadTable();
-						$("#"+gname).datagrid('unselectAll');
-						ids='';
-					}
-				});
-			}
-		} else {
-			tip("请选择需要批量同意退款的数据！");
+	    
+		for ( var i = 0; i < rows.length; i++) {
+			ids.push(rows[i].id);
+			fees.push(rows[i].orderTotalPrice);
 		}
+		
+		$.ajax({
+			url : refundUrl,
+			type : 'post',
+			data : {
+				ids : ids.join(','),
+				fees: fees.join(',')
+			},
+			//async : false,
+			success : function(data) {
+				//console.log(data);
+				var d = $.parseJSON(data);
+				console.log(d);
+				var msg = d.msg;
+				//tip(d.description + '\n' + msg);
+				console.log(d.success);
+				$('#refund_loading').html(d.description);
+				
+				$('#refund_loading').css('background','Transparent');
+				reloadTable();
+				$("#"+refundGname).datagrid('unselectAll');
+				ids='';
+			}
+		});
 	} 
+	
+	function refundBegin(){
+		$('#refund_loading').html("");
+		$('#sub').show();
+		$('#cal').show();
+		$('#reTitle').show();
+		$('#refund_loading').hide();
+	}
 	
 	/**
 	 * 批量拒绝退款

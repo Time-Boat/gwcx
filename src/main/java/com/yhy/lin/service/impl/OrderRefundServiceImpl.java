@@ -87,7 +87,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 添加了权限
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 
-		sql.append(" and t.org_code like '" + orgCode + "%' ");
+//		sql.append(" and t.org_code like '" + orgCode + "%' ");
 		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
@@ -178,7 +178,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		
 		String msg = "";
 		String statusCode = "";
-		
+		String discription = "";
 		boolean success = false;
 		
 		int sCount = 0;   //退款成功订单数
@@ -238,7 +238,12 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		}
 		
 		map.put("msg", msg);
-		map.put("description", "退款成功订单：" + sCount + "条，退款失败订单：" + fCount + "条。");
+		if(success){
+			discription = "退款成功订单：" + sCount + "条<br/>退款失败订单：" + fCount + "条";
+		}else{
+			discription = "退款成功订单：" + sCount + "条<br/>退款失败订单：" + fCount + "条<br/>失败原因：" + msg;
+		}
+		map.put("description", discription);
 		map.put("statusCode", statusCode);
 		map.put("success", success+"");
 		return map;
