@@ -73,6 +73,28 @@
     </div>
 </div> -->
 
+<div id="win"  class="easyui-window" title="确认退款" style="width:400px;height:150px"
+    data-options="modal:true" closed="true" >
+    <div class="easyui-layout" data-options="fit:true">
+		<div style="text-align: center; position:relative; " data-options="region:'center'">
+			<!-- <input type="hidden" id="dialog_order_id" value="" />
+			
+			<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols="7"></textarea>
+			<input id="terefuse" type="hidden" />
+			<div style="margin-top: 30px">
+			-->
+			
+			<h5>确定要同意退款吗？</h5>
+			<input id="sub" type="button" class="button white" value="确定" style="margin-right: 50px;width:50px;height:30px" onclick="submitRefuse()" />
+			<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$('#win').window('close');"/>
+			<div id="refund_loading" style='display:none;position:absolute;cursor1:wait;left:50%;top:20px;transform: translateX(-50%);width:auto;height:16px;padding:12px 5px 10px 30px;
+ 			 background:#fff url(plug-in/ace/assets/css/images/loading.gif) no-repeat scroll center left;color:#000;'>
+ 			 	正在退款，请等待...
+		 </div>
+		</div>
+    </div>
+</div>
+
 </div>
 <script type="text/javascript">
 	$(document).ready(function(){
@@ -158,8 +180,9 @@
 	 * @param gname
 	 * @return
 	 */
-	function AgreeALLSelect(title,url,gname) {
-	    var ids = [];
+	/* function AgreeALLSelect(title,url,gname) {
+		var ids = [];
+		var fees = [];
 	    var rows = $("#"+gname).datagrid('getSelections');
 	    if (rows.length > 0) {
 	    	$.dialog.setting.zIndex = getzIndex(true);
@@ -167,31 +190,77 @@
 			   if (r) {
 					for ( var i = 0; i < rows.length; i++) {
 						ids.push(rows[i].id);
+						fees.push(rows[i].orderTotalPrice);
 					}
 					$.ajax({
 						url : url,
 						type : 'post',
 						data : {
-							ids : ids.join(',')
+							ids : ids.join(','),
+							fees: fees.join(',')
 						},
-						cache : false,
+						async : false,
 						success : function(data) {
+							console.log(data);
 							var d = $.parseJSON(data);
-							if (d.success) {
-								var msg = d.msg;
-								tip(msg);
-								reloadTable();
-								$("#"+gname).datagrid('unselectAll');
-								ids='';
-							}
+							console.log(d);
+							var msg = d.msg;
+							tip(d.description + '\n' + msg);
+							reloadTable();
+							$("#"+gname).datagrid('unselectAll');
+							ids='';
 						}
 					});
+					refunding();
 				}
 			});
 		} else {
 			tip("请选择需要批量同意退款的数据！");
 		}
+	} */
+	
+	function AgreeALLSelect(title,url,gname) {
+		$('#win').window('open');
 	}
+	
+	function submitRefuse(){
+		
+		$('#refund_loading').show();
+		$('#sub').hide();
+		$('#cal').hide();
+		var ids = [];
+		var fees = [];
+	    var rows = $("#"+gname).datagrid('getSelections');
+	    if (rows.length > 0) {
+		   if (r) {
+				for ( var i = 0; i < rows.length; i++) {
+					ids.push(rows[i].id);
+					fees.push(rows[i].orderTotalPrice);
+				}
+				$.ajax({
+					url : url,
+					type : 'post',
+					data : {
+						ids : ids.join(','),
+						fees: fees.join(',')
+					},
+					async : false,
+					success : function(data) {
+						console.log(data);
+						var d = $.parseJSON(data);
+						console.log(d);
+						var msg = d.msg;
+						tip(d.description + '\n' + msg);
+						reloadTable();
+						$("#"+gname).datagrid('unselectAll');
+						ids='';
+					}
+				});
+			}
+		} else {
+			tip("请选择需要批量同意退款的数据！");
+		}
+	} 
 	
 	/**
 	 * 批量拒绝退款
@@ -247,5 +316,6 @@
             }
         });
 	} */
+	
 </script>
  

@@ -251,14 +251,14 @@ public class AppInterfaceController extends AppBaseController {
 		String param = "";
 		try {
 			param = AppUtil.inputToStr(request);
-
+			
 			System.out.println("前端传递参数：" + param);
 			
 			JSONObject jsondata = JSONObject.fromObject(param);
-
+			
 			// 验证参数
 			checkParam(jsondata);
-
+			
 			String token = jsondata.getString("token");
 			// 验证token
 			checkToken(token);

@@ -1,7 +1,10 @@
 package com.yhy.lin.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,6 +21,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.entity.AppMessageListEntity;
+import com.yhy.lin.app.entity.RefundReqData;
+import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.wechat.MobiMessage;
+import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.OrderRefundServiceI;
 
@@ -130,32 +138,43 @@ public class OrderRefundController extends BaseController {
 	 */
 	@RequestMapping(params = "doAgreeALLSelect")
 	@ResponseBody
-	public AjaxJson doAgreeALLSelect(TransferorderEntity trans, HttpServletRequest request) {
+	public JSONObject doAgreeALLSelect(TransferorderEntity trans, HttpServletRequest request, HttpServletResponse response) {
+		
+		
 		String message = null;
-		AjaxJson j = new AjaxJson();
+		Map<String,String> map = null;
 		try {
 			String ids = request.getParameter("ids");
-			String[] entitys = ids.split(",");
+			String fees = request.getParameter("fees");
 			List<TransferorderEntity> list = new ArrayList<TransferorderEntity>();
-			if(entitys.length>0){
-				for (int i = 0; i < entitys.length; i++) {
-					trans = systemService.getEntity(TransferorderEntity.class, entitys[i]);
-					trans.setOrderStatus(4);
-					trans.setOrderPaystatus("2");
-					list.add(trans);
-				}
-			}
+			
+			// 获得当前目录
+			String path = request.getSession().getServletContext().getRealPath("/");
+			
+			RequestHandler refundRequest = new RequestHandler(request, response);
+			
+			map = orderRefundService.agreeAllRefund(ids, fees, refundRequest, path);
+			
+//			String[] entitys = ids.split(",");
+//			if(entitys.length>0){
+//				for (int i = 0; i < entitys.length; i++) {
+//					trans = systemService.getEntity(TransferorderEntity.class, entitys[i]);
+//					trans.setOrderStatus(4);
+//					trans.setOrderPaystatus("2");
+//					list.add(trans);
+//				}
+//			}
 			
 			message = "批量同意成功！";
 			// 批量逻辑删除
-			orderRefundService.updateAllEntitie(list);
+			//orderRefundService.updateAllEntitie(list);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-		j.setMsg(message);
-		return j;
+		systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
+		
+		return JSONObject.fromObject(map);
 	}
-	
 	
 	/**
 	 * 批量拒绝退款

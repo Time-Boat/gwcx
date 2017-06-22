@@ -124,8 +124,57 @@ public class RefundReqData {
 	 * @param refundFee
 	 *            退款总金额，单位为分
 	 */
+	public RefundReqData() {
+		
+	}
+	
 	public RefundReqData(String transactionID, String outTradeNo, String outRefundNo, int totalFee, int refundFee) {
 
+		setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
+		
+//		// 微信分配的公众号ID（开通公众号之后可以获取到）
+//		setAppid(AppGlobals.WECHAT_ID);
+//
+//		// 微信支付分配的商户号ID（开通公众号的微信支付功能之后可以获取到）
+//		setMch_id(AppGlobals.MCH_ID);
+//
+//		// transaction_id是微信系统为每一笔支付交易分配的订单号，通过这个订单号可以标识这笔交易，它由支付订单API支付成功时返回的数据里面获取到。
+//		setTransaction_id(transactionID);
+//
+//		// 商户系统自己生成的唯一的订单号
+//		setOut_trade_no(outTradeNo);
+//
+//		setOut_refund_no(outRefundNo);
+//
+//		setTotal_fee(totalFee);
+//
+//		setRefund_fee(refundFee);
+//
+//		setOp_user_id(AppGlobals.MCH_ID);
+//
+//		// 随机字符串，不长于32 位
+//		setNonce_str(UUIDGenerator.generate(16));
+
+//		SortedMap<String, Object> parameters = new TreeMap<String, Object>();
+//		parameters.put("appid", appid);
+//		parameters.put("mch_id", mch_id);
+//		parameters.put("nonce_str", nonce_str);
+//		parameters.put("transaction_id", transaction_id);
+//		parameters.put("out_trade_no", out_trade_no);
+//		parameters.put("out_refund_no", out_refund_no);
+//		parameters.put("total_fee", total_fee);
+//		parameters.put("refund_fee", refund_fee);
+//		parameters.put("op_user_id", op_user_id);
+
+//		RequestHandler reqHandler = new RequestHandler(request, response);
+		// reqHandler.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET,
+		// AppGlobals.WECHAT_KEY);
+//		String sign = reqHandler.createSign(parameters);
+//		setSign(sign); // 把签名数据设置到Sign这个属性中
+
+	}
+	
+	public void setParams(String transactionID, String outTradeNo, String outRefundNo, int totalFee, int refundFee){
 		// 微信分配的公众号ID（开通公众号之后可以获取到）
 		setAppid(AppGlobals.WECHAT_ID);
 
@@ -148,26 +197,7 @@ public class RefundReqData {
 
 		// 随机字符串，不长于32 位
 		setNonce_str(UUIDGenerator.generate(16));
-
-//		SortedMap<String, Object> parameters = new TreeMap<String, Object>();
-//		parameters.put("appid", appid);
-//		parameters.put("mch_id", mch_id);
-//		parameters.put("nonce_str", nonce_str);
-//		parameters.put("transaction_id", transaction_id);
-//		parameters.put("out_trade_no", out_trade_no);
-//		parameters.put("out_refund_no", out_refund_no);
-//		parameters.put("total_fee", total_fee);
-//		parameters.put("refund_fee", refund_fee);
-//		parameters.put("op_user_id", op_user_id);
-
-//		RequestHandler reqHandler = new RequestHandler(request, response);
-		// reqHandler.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET,
-		// AppGlobals.WECHAT_KEY);
-//		String sign = reqHandler.createSign(parameters);
-//		setSign(sign); // 把签名数据设置到Sign这个属性中
-
 	}
-
 	
 	public SortedMap<String, String> getParameters() {
 		// 根据API给的签名规则进行签名

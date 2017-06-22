@@ -140,7 +140,6 @@
 						<value>wx.do?toPay</value>
 						<value>wx.do?notifyUrl</value>
 						<value>wx.do?success</value>
-						<value>wx.do?refund</value>
 						
 					</list>
 				</property>

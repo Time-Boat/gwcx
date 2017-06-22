@@ -10,13 +10,14 @@
     	
 		var city = $('#city option:selected').val();//获取选中城市
     	var type = $('#type option:selected').val();//获取选中城市
+    	var ids=  $("#id").val();
     	var starts =  $("#starts").val();//获取起点
 		var ends =  $("#ends").val();//获取终点 
     	$("#startLocation").empty();//先置空 
     	$("#endLocation").empty();//先置空 
     	
     		$.ajax({
-     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type+'&starts='+starts+'&ends='+ends,
+     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type+'&starts='+starts+'&ends='+ends+'&ids='+ids,
      		   dataType: 'json',
      		   complete: function(data,status) {
      			   var message=data.responseText;
@@ -64,7 +65,8 @@
         				  }
     				  }
      				 }
-     			   
+     			    
+     			   //修改的时候给下拉框赋值 
      			   if(type=="2" || type=="4"){
      				  if(arr1.length>0){
          				  for(var i=0;i<arr1.length;i++){
@@ -75,7 +77,7 @@
              			  }
          			   }
      			   }
-     			   
+     			//修改的时候给下拉框赋值 
      			   if(type=="3" || type=="5"){
      				  if(arr.length>0){
          				  for(var i=0;i<arr.length;i++){
@@ -88,10 +90,14 @@
      			   }
      			   
      			  $.each(arr1, function(i,n){
-   					 $("#startLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
+     				  if(starts!=n.stopid){//去掉重复的数据
+     					 $("#startLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
+     				  }
    				});
       			 $.each(arr, function(i,n){
- 					 $("#endLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
+      				 if(ends!=n.stopid){//去掉重复的数据
+      					$("#endLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
+      				 }
  				});
      			   }
      		   });

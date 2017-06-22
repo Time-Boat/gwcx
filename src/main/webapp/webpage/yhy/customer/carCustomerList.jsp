@@ -11,11 +11,6 @@
    <t:dgCol title="身份证号码" field="cardNumber"   width="120"></t:dgCol>
    <t:dgCol title="居住地址" field="address"   width="120"></t:dgCol>
    <t:dgCol title="注册时间" field="createTime" formatter="yyyy-MM-dd hh:mm:ss"  width="120"></t:dgCol>
-   <t:dgCol title="Token更新日期" field="tokenUpdateTime" formatter="yyyy-MM-dd"  width="120"></t:dgCol>
-   <t:dgCol title="4位数字验证码" field="securityCode"   width="120"></t:dgCol>
-   <t:dgCol title="验证码更新时间" field="codeUpdateTime" formatter="yyyy-MM-dd hh:mm:ss"  width="120"></t:dgCol>
-   <t:dgCol title="登录类型（保留）" field="loginType"   width="120"></t:dgCol>
-   <t:dgCol title="短信效验状态：0.未校验；1.已校验；" field="status" width="120"></t:dgCol>
    <t:dgCol title="备注信息" field="remark"   width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
    <t:dgFunOpt funname="checkcommonAddr(id,realName)" title="常用地址"></t:dgFunOpt>

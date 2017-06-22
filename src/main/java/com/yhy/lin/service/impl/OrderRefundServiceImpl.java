@@ -1,5 +1,8 @@
 package com.yhy.lin.service.impl;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +18,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.entity.RefundReqData;
+import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.wechat.MobiMessage;
+import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.OrderRefundServiceI;
 
@@ -78,8 +85,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		StringBuffer sql = new StringBuffer(" where 1=1 and t.org_code like '" + orgCode + "%' ");
+		StringBuffer sql = new StringBuffer(" where 1=1 ");
 
+		sql.append(" and t.org_code like '" + orgCode + "%' ");
+		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
@@ -127,9 +136,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	)
 	@Override
 	public boolean agreeRefund(String id) {
-
+		
 		boolean success = false;
-
+		
 		try {
 			TransferorderEntity t = getEntity(TransferorderEntity.class, id);
 			t.setOrderStatus(4);
@@ -158,6 +167,81 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			e.printStackTrace();
 		}
 		return success;
+	}
+
+	//@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+	//不要加事物，批量退款的时候，如果前两个人的款项已经退还，数据库就要做相应的修改
+	@Override
+	public Map<String,String> agreeAllRefund(String ids, String fees, RequestHandler refundRequest, String path) {
+		
+		Map<String,String> map = new HashMap<>();
+		
+		String msg = "";
+		String statusCode = "";
+		
+		boolean success = false;
+		
+		int sCount = 0;   //退款成功订单数
+		int fCount = 0;   //退款失败订单数
+		
+		Date now = new Date();
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");// 可以方便地修改日期格式
+		String outRefundNo = "NO" + dateFormat.format(now);
+		RefundReqData refundReqData = new RefundReqData();
+		String[] arrId = ids.split(",");
+		String[] arrFee = fees.split(",");
+		try {
+			for(int i=0;i<arrId.length;i++){
+				// 获得退款的传入参数
+				String transactionID = "";
+				String outTradeNo = arrId[i];
+				int totalFee = (int) ((Double.parseDouble(arrFee[i]) * 100));
+				int refundFee = totalFee;
+				
+				refundReqData.setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
+				
+				refundRequest.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
+		
+				refundReqData.setSign(refundRequest.createSign(refundReqData.getParameters()));
+		
+				String info = MobiMessage.RefundReqData2xml(refundReqData).replaceAll("__", "_");
+				System.out.println(info);
+				// LogUtils.trace(info);
+				
+				String result = refundRequest.httpsRequest(AppGlobals.REFUND_API, info, path);
+	
+				Map<String, String> getMap = MobiMessage.parseXml(result);
+				if ("SUCCESS".equals(getMap.get("result_code")) && "OK".equals(getMap.get("return_msg"))) {
+					statusCode = AppGlobals.APP_SUCCESS;  //result_code=FAIL
+					msg = AppGlobals.APP_SUCCESS_MSG;
+					success = true;
+					sCount += 1;
+					
+					//修改订单状态
+					TransferorderEntity trans = getEntity(TransferorderEntity.class, arrId[i]);
+					trans.setOrderStatus(4);
+					trans.setOrderPaystatus("2");
+					saveOrUpdate(trans);
+					
+				} else {
+					// 返回错误描述
+					// return JSONObject.fromObject(getMap.get("err_code_des"));
+					msg = getMap.get("err_code_des");
+					statusCode = "777";
+					fCount += 1;
+				}
+			}
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+		
+		map.put("msg", msg);
+		map.put("description", "退款成功订单：" + sCount + "条，退款失败订单：" + fCount + "条。");
+		map.put("statusCode", statusCode);
+		map.put("success", success+"");
+		return map;
 	}
 
 	/**

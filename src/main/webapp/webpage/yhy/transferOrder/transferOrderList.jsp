@@ -10,6 +10,7 @@
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,待付款_6" query="true" align="center"></t:dgCol>
 		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
@@ -30,7 +31,6 @@
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,待付款_6" query="true" align="center"></t:dgCol>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
 	</t:datagrid>
