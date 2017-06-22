@@ -87,7 +87,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 添加了权限
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 
-//		sql.append(" and t.org_code like '" + orgCode + "%' ");
+		//sql.append(" and t.org_code like '" + orgCode + "%' ");
 		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
@@ -184,14 +184,15 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		int sCount = 0;   //退款成功订单数
 		int fCount = 0;   //退款失败订单数
 		
-		Date now = new Date();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");// 可以方便地修改日期格式
-		String outRefundNo = "NO" + dateFormat.format(now);
+		
 		RefundReqData refundReqData = new RefundReqData();
 		String[] arrId = ids.split(",");
 		String[] arrFee = fees.split(",");
 		try {
 			for(int i=0;i<arrId.length;i++){
+				Date now = new Date();
+				String outRefundNo = "NO" + dateFormat.format(now.getTime());
 				// 获得退款的传入参数
 				String transactionID = "";
 				String outTradeNo = arrId[i];
@@ -226,6 +227,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				} else {
 					// 返回错误描述
 					// return JSONObject.fromObject(getMap.get("err_code_des"));
+					success = false;
 					msg = getMap.get("err_code_des");
 					statusCode = "777";
 					fCount += 1;

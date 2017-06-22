@@ -466,6 +466,9 @@ public class LineInfoController extends BaseController {
 		if(type.equals("4") || type.equals("5")){
 			st.append(" and b.station_type != 2");
 		}
+		if(type.equals("0")){
+			st.append(" and b.station_type = '0'");
+		}
 		st.append(" and (b.status !='2'");
 		
 		st.append("or (a.lineId= '");

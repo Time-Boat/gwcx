@@ -9,8 +9,10 @@
     function getAddr(){
     	
 		var city = $('#city option:selected').val();//获取选中城市
-    	var type = $('#type option:selected').val();//获取选中城市
+    	var type = $('#type option:selected').val();//获取选中线路类型 
     	var ids=  $("#id").val();
+    	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
+    	var endLocation = $('#endLocation option:selected').val();//获取选中起点 
     	var starts =  $("#starts").val();//获取起点
 		var ends =  $("#ends").val();//获取终点 
     	$("#startLocation").empty();//先置空 
@@ -65,9 +67,11 @@
         				  }
     				  }
      				 }
+     			    if(ids!="" && ids!=null){
+     			    	
      			    
-     			   //修改的时候给下拉框赋值 
-     			   if(type=="2" || type=="4"){
+     			 //修改的时候给下拉框赋值 
+     			 if(type=="2" || type=="4"){
      				  if(arr1.length>0){
          				  for(var i=0;i<arr1.length;i++){
              				  if(arr1[i].name==arr1[i].startname){
@@ -77,7 +81,7 @@
              			  }
          			   }
      			   }
-     			//修改的时候给下拉框赋值 
+     				//修改的时候给下拉框赋值 
      			   if(type=="3" || type=="5"){
      				  if(arr.length>0){
          				  for(var i=0;i<arr.length;i++){
@@ -88,6 +92,14 @@
              			  }
          			   }
      			   }
+     			    }else{
+     			    	if(startLocation=="" || startLocation==null){
+     			    		$("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+     			    	}
+						if(endLocation=="" || endLocation==null){
+							$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+						}
+     			    }
      			   
      			  $.each(arr1, function(i,n){
      				  if(starts!=n.stopid){//去掉重复的数据
@@ -173,13 +185,6 @@
 			</td>
 			<td class="value">
 				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" >  
-                            <%-- <option value="${lineInfo.startLocation}" style="color:#999999">${lineInfo.startLocation}</option> --%>
-                            <%-- <option value="${s.id}" <c:if test="${s.id==lineInfo.startLocation}" >selected="selected"</c:if> >${s.name}</option>
-                            <option value="">--请选择---</option>
-							<c:forEach items="${starts}" var="s" >
-								
-							</c:forEach> --%>
-							
                 </select>
 				<span class="Validform_checktip"></span>
 			</td>
@@ -190,10 +195,6 @@
 			</td>
 			<td class="value">
 				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" >  
-                    <option value="">--请选择---</option>
-							<c:forEach items="${ends}" var="e" >
-							<option value="${e.id}" <c:if test="" >selected="selected"</c:if> >${e.name}</option>
-					</c:forEach>        
                 </select>
 				<span class="Validform_checktip"></span>
 			</td>

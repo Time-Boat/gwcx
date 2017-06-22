@@ -110,11 +110,11 @@ public class TransferOrderController extends BaseController {
 		String licencePlateId = request.getParameter("licencePlateId");// 车牌id
 		String driverId = request.getParameter("driverId");// 司机id
 		String licencePlateName = request.getParameter("licencePlateName");// 车牌号
-
+		
 		List<String> orderIds = extractIdListByComma(ids);
-
+		
 		List<String[]> contents = new ArrayList<>();
-
+		
 		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId, licencePlateName,
 				contents);
 		

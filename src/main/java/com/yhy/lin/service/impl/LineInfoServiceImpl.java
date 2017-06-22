@@ -42,7 +42,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
-		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
@@ -124,7 +123,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += " where 1=1 " + sqlWhere;
 		}
-		System.out.println(sqlCnt.toString());
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
 		 sql.append("select a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
@@ -135,7 +133,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
-		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString() , dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
