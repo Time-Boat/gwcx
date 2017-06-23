@@ -146,7 +146,6 @@ public class OrderRefundController extends BaseController {
 		try {
 			String ids = request.getParameter("ids");
 			String fees = request.getParameter("fees");
-			List<TransferorderEntity> list = new ArrayList<TransferorderEntity>();
 			
 			// 获得当前目录
 			String path = request.getSession().getServletContext().getRealPath("/");

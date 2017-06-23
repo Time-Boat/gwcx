@@ -160,7 +160,7 @@ public class WeixinPayController extends AppBaseController{
 			// String product_id = "";
 
 			// 这里notify_url是 支付完成后微信发给该链接信息，可以判断会员是否支付成功，改变订单状态等。
-			String notify_url = baseUrl + "/wx.do?notifyUrl";
+			String notify_url = baseUrl + "/wx/notifyUrl.do";
 
 			SortedMap<String, String> packageParams = new TreeMap<String, String>();
 			packageParams.put("appid", AppGlobals.WECHAT_ID);
@@ -195,6 +195,7 @@ public class WeixinPayController extends AppBaseController{
 				if (prepay_id.equals("")) {
 					request.setAttribute("ErrorMsg", "统一支付接口获取预支付订单出错");
 					response.sendRedirect("error.jsp");
+					return null;
 				}
 			} catch (Exception e1) {
 				e1.printStackTrace();
@@ -235,7 +236,7 @@ public class WeixinPayController extends AppBaseController{
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(params = "notifyUrl")
+	@RequestMapping(value = "/notifyUrl")
 	public String weixinReceive(HttpServletRequest request, HttpServletResponse response, Model model) {
 		System.out.println("==开始进入h5支付回调方法==");
 		String xml_review_result = WeixinPayUtil.getXmlRequest(request);
@@ -283,7 +284,7 @@ public class WeixinPayController extends AppBaseController{
 					System.out.println("weixin receive check Sign fail");
 					String checkXml = "<xml><return_code><![CDATA[FAIL]]></return_code>"
 							+ "<return_msg><![CDATA[check sign fail]]></return_msg></xml>";
-					WeixinPayUtil.getTradeOrder("http://weixin.xinfor.com/wx.do&notifyUrl", checkXml);
+					WeixinPayUtil.getTradeOrder("http://weixin.xinfor.com/wx/notifyUrl", checkXml);
 				}
 			}
 		} catch (Exception e) {

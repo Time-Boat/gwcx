@@ -282,7 +282,7 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "必须提前12个小时才能下订单";
 				statusCode = "888";
 				success = false;
-			} else if(hour >= 23 || hour <= 5){
+			} else if(hour > 23 || hour < 5){
 				msg = "出发时间不能为23点到凌晨5点之间";
 				statusCode = "888";
 				success = false;
@@ -331,10 +331,10 @@ public class AppInterfaceController extends AppBaseController {
 					appService.saveOrder(t, orderPrefix, commonAddrId);
 					System.out.println("保存订单成功，订单状态为未支付");
 					data.put("orderId", t.getId());
-					statusCode = AppGlobals.APP_SUCCESS;
-					msg = AppGlobals.APP_SUCCESS_MSG;
-					success = true;
 				}
+				statusCode = AppGlobals.APP_SUCCESS;
+				msg = AppGlobals.APP_SUCCESS_MSG;
+				success = true;
 			}
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
