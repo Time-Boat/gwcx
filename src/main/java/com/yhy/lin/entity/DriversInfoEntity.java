@@ -52,7 +52,11 @@ public class DriversInfoEntity implements java.io.Serializable {
 	private String remark;
 	/**驾照图片（后期考虑进去）*/
 	private String drivingLicenseImgUrl;
-	
+	/**
+	 * 所在城市
+	 * @return
+	 */
+	private String cityId;
 
 	// 主键生成策略：uuid 采用128位的uuid算法生成主键，uuid被编码为一个32位16进制数字的字符串。占用空间大（字符串类型）。
 	@Id
@@ -150,5 +154,11 @@ public class DriversInfoEntity implements java.io.Serializable {
 	public void setDrivingLicense(String drivingLicense) {
 		this.drivingLicense = drivingLicense;
 	}
-	
+	@Column(name="cityId",nullable=true)
+	public String getCityId() {
+		return cityId;
+	}
+	public void setCityId(String cityId) {
+		this.cityId = cityId;
+	}
 }

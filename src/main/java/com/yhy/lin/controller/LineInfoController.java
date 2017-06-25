@@ -140,9 +140,14 @@ public class LineInfoController extends BaseController {
 		String zdId = request.getParameter("zdId");
 		AjaxJson j = new AjaxJson();
 		try {
+			Line_busStopEntity lines = systemService.getEntity(Line_busStopEntity.class, id);
+			LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
+			
 			systemService.deleteEntityById(Line_busStopEntity.class, id);
+			
 			//将站点状态改为0
-			systemService.updateBySqlString("update busstopinfo set status='0' where id = '"+zdId+"'");
+			systemService.updateBySqlString("update busstopinfo set status=REPLACE(status,'"+lin.getType()+"','') where id='"+zdId+"'");
+			
 			message = "删除成功";
 		} catch (Exception e) {
 		}
@@ -299,7 +304,6 @@ public class LineInfoController extends BaseController {
 				str2.append("' and a.busStopsId=b.id and a.lineId='");
 				str2.append(lineInfo.getId()+"'");
 				
-				System.out.println(str2.toString());
 				List<Object> bList =systemService.findListbySql(str2.toString());
 				if(bList.size()>0){
 					message="站点存在！";
@@ -308,11 +312,15 @@ public class LineInfoController extends BaseController {
 					lin_busStop.setBusStopsId(startlocaid);
 					lin_busStop.setSiteOrder(0);
 					list.add(lin_busStop);
-					str.append("update busstopinfo set status= '2'");
-					str.append(" where ");
-					str.append("id = '"+startlocaid+"' and ");
-					str.append(" station_type = '0' ");
-					systemService.updateBySqlString(str.toString());
+					if(StringUtil.isNotEmpty(lineInfo.getType())){
+						str.append("update busstopinfo set status=CONCAT(status,'");
+						str.append(lineInfo.getType());
+						str.append("') where ");
+						str.append("id = '"+startlocaid+"' and ");
+						str.append(" station_type = '0' ");
+						systemService.updateBySqlString(str.toString());
+					}
+					
 				}
 				
 			}
@@ -328,8 +336,9 @@ public class LineInfoController extends BaseController {
 					lin_busStop1.setBusStopsId(endlocaid);
 					lin_busStop1.setSiteOrder(0);
 					list.add(lin_busStop1);
-					str1.append("update busstopinfo set status= '2'");
-					str1.append(" where ");
+					str1.append("update busstopinfo set status=CONCAT(status,'");
+					str1.append(lineInfo.getType());
+					str1.append("') where ");
 					str1.append("id = '"+endlocaid+"' and ");
 					str1.append(" station_type = '0' ");
 					systemService.updateBySqlString(str1.toString());
@@ -455,25 +464,62 @@ public class LineInfoController extends BaseController {
         JSONObject jsonObj = new JSONObject(); 
         JSONArray jsonArray = new JSONArray();
         StringBuffer st = new StringBuffer();
-        st.append("select DISTINCT b.id,b.name,b.station_type from busstopinfo b,line_busstop a where ");
         
-        st.append(" b.cityId='");
-    	st.append(city+"'");
-    	
-    	if(type.equals("2") || type.equals("3")){
-			st.append(" and b.station_type != 1");
-		}
-		if(type.equals("4") || type.equals("5")){
-			st.append(" and b.station_type != 2");
-		}
-		if(type.equals("0")){
-			st.append(" and b.station_type = '0'");
-		}
-		st.append(" and (b.status !='2'");
-		
-		st.append("or (a.lineId= '");
-		st.append(ids+"'");
-		st.append(" and a.busStopsId=b.id))");
+        String sql = "select * from line_busstop a";
+        List<Object> sqlList =systemService.findListbySql(sql);
+        //判断是否有挂机数据
+        if(sqlList.size()>0){
+        	st.append("select DISTINCT b.id,b.name,b.station_type from busstopinfo b,line_busstop a where ");
+            
+            st.append(" b.cityId='");
+        	st.append(city+"'");
+        	
+        	if(type.equals("2") || type.equals("3")){
+    			st.append(" and b.station_type != 1");
+    		}
+    		if(type.equals("4") || type.equals("5")){
+    			st.append(" and b.station_type != 2");
+    		}
+    		if(type.equals("0")){
+    			st.append(" and b.station_type = '0'");
+    		}
+    		
+    		if(StringUtil.isNotEmpty(type)){
+    			st.append(" and (b.status not like'%");
+    			st.append(type);
+    			st.append("%'");
+    		}else{
+    			st.append(" and (b.status ='0'");
+    		}
+    		
+    		st.append("or (a.lineId= '");
+    		st.append(ids+"'");
+    		st.append(" and a.busStopsId=b.id))");
+        }else{
+        	st.append("select DISTINCT b.id,b.name,b.station_type from busstopinfo b where ");
+            
+            st.append(" b.cityId='");
+        	st.append(city+"'");
+        	
+        	if(type.equals("2") || type.equals("3")){
+    			st.append(" and b.station_type != 1");
+    		}
+    		if(type.equals("4") || type.equals("5")){
+    			st.append(" and b.station_type != 2");
+    		}
+    		if(type.equals("0")){
+    			st.append(" and b.station_type = '0'");
+    		}
+    		
+    		if(StringUtil.isNotEmpty(type)){
+    			st.append(" and b.status not like'%");
+    			st.append(type);
+    			st.append("%'");
+    		}else{
+    			st.append(" and b.status ='0'");
+    		}
+    		
+        }
         
         List<Object> bList =systemService.findListbySql(st.toString());
         String startname = "";

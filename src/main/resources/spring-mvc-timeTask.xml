@@ -28,7 +28,7 @@
 
 	<bean id="taskDemoServiceTaskCronTrigger" class="org.jeecgframework.core.timer.DataBaseCronTriggerBean">
 		<property name="jobDetail" ref="taskDemoServiceTaskJob" />
-		<property name="cronExpression" value="0 0/1 * * * ?" />
+		<property name="cronExpression" value="*/1 * * * * ?" />
 	</bean>
 	
 	
@@ -50,8 +50,8 @@
 		class="org.jeecgframework.core.timer.DataBaseSchedulerFactoryBean">
 		<property name="triggers">
 			<list>
-				<!--
 				<ref bean="taskDemoServiceTaskCronTrigger" />
+				<!--
 				<ref bean="smsSendTaskCronTrigger" />
 				-->
 			</list>

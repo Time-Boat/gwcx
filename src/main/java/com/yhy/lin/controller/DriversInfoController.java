@@ -3,6 +3,7 @@ package com.yhy.lin.controller;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +31,7 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import javax.validation.Validator;
 
 import com.yhy.lin.entity.DriversInfoEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.DriversInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -183,6 +185,8 @@ public class DriversInfoController extends BaseController {
 			String type = req.getParameter("type");
 			req.setAttribute("type", type);
 		}
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/drivers/driversInfo");
 	}
 	

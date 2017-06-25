@@ -156,10 +156,10 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 			sqlWhere.append(" and  a.cityId = '"+lineInfo.getCityId()+"' ");
 		}
 		
-		/**是否已挂接站点，0：未挂接      1：挂接公务车站点     2：挂接接送机站点 */
+		/**是否已挂接站点，0：未挂接      1：挂接公务车站点     2：挂接接机站点  3:挂机送机站点  4：挂接接火车站站点   5：挂接送火车站站点*/
 		//因为站点是公务车和接送机业务都能使用，公务车中一条线路使用了这个站点之后，其他公务车的线路就不能再使用了，但是机场线路可以使用，所以这里做了一个区分，看站点是挂在公务车类型下还是挂在接送机类型下
-		if(StringUtil.isNotEmpty(lineType)){
-			sqlWhere.append(" and  a.status != '"+lineType+"' ");
+		if(StringUtil.isNotEmpty(lineInfo.getType())){
+			sqlWhere.append(" and  a.status not like '%"+lineInfo.getType()+"%' ");
 		}
 		
 		if(StringUtil.isNotEmpty(busStopInfo.getName())){

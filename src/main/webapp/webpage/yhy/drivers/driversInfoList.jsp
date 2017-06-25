@@ -11,6 +11,7 @@
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="司机姓名" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="性别" sortable="true" field="sex" dictionary="sex" query="true" align="center" width="60"></t:dgCol>
+	<t:dgCol title="所在城市" sortable="true" field="cityName" query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="年龄" sortable="true" editor="numberbox" field="age" align="center" width="80"></t:dgCol>
 	<t:dgCol title="电话" sortable="true" query="true" field="phoneNumber" align="center" width="80"></t:dgCol>
 	<t:dgCol title="身份证" field="idCard" align="center" width="80"></t:dgCol>

@@ -65,7 +65,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
-
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
@@ -149,7 +148,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 不需要显示退款状态的订单
 		sql.append(" and order_status not in('3','4','5') ");
 
-		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0)");
+		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),order_startime desc");
 
 		return sql.toString();
 	}

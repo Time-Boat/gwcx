@@ -938,7 +938,7 @@ public class AppInterfaceController extends AppBaseController {
 			a.setSex(cc.getSex());
 
 			List<Map<String, Object>> map = systemService.findForJdbc(
-					"select b.name,b.stopLocation from customer_common_addr c inner join busstopinfo b on c.station_id=b.id ");
+					"select b.name,b.stopLocation from customer_common_addr c inner join busstopinfo b on c.station_id=b.id where user_id = ? ", userId);
 
 			data.put("addrs", map);
 			data.put("customerInfo", a);
@@ -992,22 +992,28 @@ public class AppInterfaceController extends AppBaseController {
 			String pName = jsondata.getString("imgName");
 			String userId = jsondata.getString("userId");
 
-			String idCard = jsondata.getString("cardNumber");
+			String idCard = jsondata.getString("idCard");
 			String address = jsondata.getString("address");
+			String userName = jsondata.getString("userName");
 
 			String path = AppGlobals.EXTERNAL_FILE_PATH;
 
-			// 获取图片存储路径
-			String imgName = AppGlobals.WEB_FILE_PATH + userId + "_" + System.currentTimeMillis()
-					+ pName.substring(pName.lastIndexOf("."), pName.length());
-
-			boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgName);
-
+			String imgName = "";
+			if(StringUtil.isNotEmpty(imagesBaseBM)){
+				// 获取图片存储路径
+				imgName = AppGlobals.WEB_FILE_PATH + userId + "_" + System.currentTimeMillis()
+						+ pName.substring(pName.lastIndexOf("."), pName.length());
+				
+				boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgName);
+			}
+			
 			CarCustomerEntity cc = systemService.getEntity(CarCustomerEntity.class, userId);
 			cc.setAddress(address);
 			cc.setCardNumber(idCard);
 			cc.setCustomerImg(imgName);
-
+			cc.setUserName(userName);
+			cc.setRealName(userName);
+			
 			systemService.save(cc);
 			success = true;
 			statusCode = AppGlobals.APP_SUCCESS;

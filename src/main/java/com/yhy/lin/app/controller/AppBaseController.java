@@ -101,7 +101,7 @@ public class AppBaseController extends BaseController {
 		for (String p : set) {
 //			System.out.println(param.get(p));
 			if (!StringUtil.isNotEmpty(param.get(p) + "") && !"orderFlightnumber".equals(p) && !"orderTrainnumber".equals(p)
-					&& !"likeStation".equals(p)) {
+					&& !"likeStation".equals(p) && !"header".equals(p) && !"imgName".equals(p)) {
 				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
 			}
 		}
