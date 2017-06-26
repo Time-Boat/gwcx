@@ -46,7 +46,8 @@ public interface AppGlobals {
 	/** 包车 */
 
 	/** web外部的文件存储路径 */
-	public static final String EXTERNAL_FILE_PATH = "D:/javaWeb/demo/nginx/gwcx/image";
+	//public static final String EXTERNAL_FILE_PATH = "D:/javaWeb/demo/nginx/gwcx/image";
+	public static final String EXTERNAL_FILE_PATH = "C:/nginx";
 	
 	/** app客户头像路径 */
 	public static final String APP_USER_FILE_PATH = "userImage";

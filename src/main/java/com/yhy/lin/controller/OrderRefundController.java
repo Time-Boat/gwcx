@@ -170,7 +170,7 @@ public class OrderRefundController extends BaseController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
+		//systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 		
 		return JSONObject.fromObject(map);
 	}

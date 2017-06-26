@@ -1,6 +1,5 @@
 package com.yhy.lin.app.controller;
 
-import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -40,9 +39,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
-import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.OpenCityEntity;
-import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -996,7 +993,7 @@ public class AppInterfaceController extends AppBaseController {
 			String address = jsondata.getString("address");
 			String userName = jsondata.getString("userName");
 
-			String path = AppGlobals.EXTERNAL_FILE_PATH;
+			String path = AppGlobals.EXTERNAL_FILE_PATH + "/image/user";
 
 			String imgName = "";
 			if(StringUtil.isNotEmpty(imagesBaseBM)){

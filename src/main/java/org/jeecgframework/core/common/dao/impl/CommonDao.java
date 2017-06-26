@@ -129,8 +129,10 @@ public class CommonDao extends GenericBaseCommonDao implements ICommonDao, IGene
 //			String realPath = uploadFile.getMultipartRequest().getSession().getServletContext().getRealPath("/") + "/" + path;// 文件的硬盘真实路径
 			//为了将图片和项目分离
 			String realPath = uploadFile.getDiskBasePath() + "/" + path;
+			System.out.println("图片存储路径：" + realPath);
 			File file = new File(realPath);
 			if (!file.exists()) {
+				System.out.println("图片路径不存在，创建路径文件夹");
 				file.mkdirs();// 创建根目录
 			}
 			if (uploadFile.getCusPath() != null) {

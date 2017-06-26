@@ -30,6 +30,7 @@ import org.jeecgframework.core.util.MyBeanUtils;
 
 import javax.validation.Validator;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.DriversInfoServiceI;
@@ -122,7 +123,9 @@ public class DriversInfoController extends BaseController {
 	public AjaxJson save(DriversInfoEntity driversInfo, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		String cityId = request.getParameter("city");
 		if (StringUtil.isNotEmpty(driversInfo.getId())) {
+			driversInfo.setCityId(cityId);
 			message = "司机信息表更新成功";
 			DriversInfoEntity t = driversInfoService.get(DriversInfoEntity.class, driversInfo.getId());
 			try {
@@ -160,7 +163,9 @@ public class DriversInfoController extends BaseController {
 		driversInfo.setDeleteFlag(0);
 		UploadFile uploadFile = new UploadFile(request, driversInfo);
 		//uploadFile.setCusPath("plug-in/accordion/images");
-		uploadFile.setCusPath("image");    
+		uploadFile.setDiskBasePath(AppGlobals.EXTERNAL_FILE_PATH);
+		uploadFile.setCusPath("image");  
+		uploadFile.setBasePath("driver");
 		uploadFile.setRealPath("drivingLicenseImgUrl");  
 		uploadFile.setObject(driversInfo);  
 		uploadFile.setRename(true);
