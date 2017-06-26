@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.controller.AppInterfaceController;
 import com.yhy.lin.app.entity.RefundReqData;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.wechat.MobiMessage;
@@ -33,6 +35,11 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	@Autowired
 	private JdbcDao jdbcDao;
 
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
+	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
@@ -229,9 +236,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 					// return JSONObject.fromObject(getMap.get("err_code_des"));
 					success = false;
 					msg = getMap.get("err_code_des");
+					if(!StringUtil.isNotEmpty(msg)){
+						msg = getMap.get("return_msg");
+					}
 					statusCode = "777";
 					fCount += 1;
 				}
+				logger.info("订单id：" + arrId[i] + "   订单信息：" + msg);
 			}
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;

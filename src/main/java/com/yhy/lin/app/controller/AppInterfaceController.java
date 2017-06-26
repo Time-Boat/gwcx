@@ -107,7 +107,7 @@ public class AppInterfaceController extends AppBaseController {
 							String sql = "";
 							String curTime = AppUtil.getCurTime();
 							String token = "";
-
+							
 							// 修改登录状态
 							if (StringUtil.isNotEmpty(user.getToken())) {
 								token = user.getToken();
