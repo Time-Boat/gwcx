@@ -25,7 +25,7 @@ System.out.println("in jsapi.jsp");
 			       },
 			       function(res){
 			    	// 使用以下方式判断前端返回,微信团队郑重提示：res.err_msg将在用户支付成功后返回    ok，但并不保证它绝对可靠。  
-			    		var url = "${pageContext.request.contextPath}/wx.do?success&orderId=${orderId}&status=";
+			    		var url = "${pageContext.request.contextPath}/wx.do?success&orderPayNumber=${orderPayNumber}&orderId=${orderId}&status=";
 			    		if(res.err_msg == "get_brand_wcpay_request:ok") {
 			        	    //alert("支付成功");
 			        	    url += "0";//"${pageContext.request.contextPath}/wx.do?success&orderId=${orderId}";

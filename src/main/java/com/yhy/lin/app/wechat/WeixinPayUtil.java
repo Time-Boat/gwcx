@@ -107,6 +107,7 @@ public class WeixinPayUtil {
 		if (null == strxml || "".equals(strxml)) {
 			return null;
 		}
+		strxml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + strxml; 
 		logger.error("doXMLParse  strxml: " + strxml);
 		Map m = new HashMap();
 		InputStream in = String2Inputstream(strxml);
@@ -314,7 +315,7 @@ public class WeixinPayUtil {
 		storeMap.put("nonce_str", nonce_str); // 随机数
 		sign = createSign(storeMap);
 
-		String xml = "<xml>"
+		String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>" + "<xml>"
 				   + "<appid>" + AppGlobals.WECHAT_ID + "</appid>"
 				   + "<mch_id>" + AppGlobals.MCH_ID + "</mch_id>"
 				   + "<nonce_str>" + nonce_str + "</nonce_str>" 
@@ -323,7 +324,7 @@ public class WeixinPayUtil {
 		
 		logger.error("checkWxOrderPay  xml: " + xml);
 		String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/orderquery", xml);
-		System.out.println("orderquery,result:" + resultMsg);
+		logger.error("orderquery,result   xml: " + xml);
 		if (StringUtils.isNotBlank(resultMsg)) {
 			Map resultMap = WeixinPayUtil.doXMLParse(resultMsg);
 			if (resultMap != null && resultMap.size() > 0) {
@@ -341,58 +342,74 @@ public class WeixinPayUtil {
 
 	public static void main(String[] args) {
 
-		// String sign = "";
-		// SortedMap<String, String> storeMap = new TreeMap<String, String>();
-		// storeMap.put("trade_type", "NATIVE"); // 交易类型
-		// storeMap.put("spbill_create_ip", "127.0.0.1"); // 本机的Ip
-		// storeMap.put("body", "test"); // 描述
-		// storeMap.put("out_trade_no", "123456"); // 商户 后台的贸易单号
-		// storeMap.put("total_fee", "" + 100); // 金额必须为整数 单位为分
-		// storeMap.put("notify_url", "http://www.pinxuew.com/wechat"); //
-		// 支付成功后，回调地址
-		// storeMap.put("appid", "wx5e45586116813f60"); // appid
-		// storeMap.put("mch_id", "1251135401"); // 商户号
-		// storeMap.put("nonce_str", "1add1a30ac87aa2db72f57a2375d8fec"); // 随机数
-		// sign = createSign(storeMap);
-		// WeixinInfoDTO weixinInfoDTO = new WeixinInfoDTO();
-		// weixinInfoDTO.setAppid("wx5e45586116813f60");
-		// weixinInfoDTO.setBody("test");
-		// weixinInfoDTO.setMch_id("1251135401");
-		// weixinInfoDTO.setNonce_str("1add1a30ac87aa2db72f57a2375d8fec");
-		// weixinInfoDTO.setNotify_url("http://www.pinxuew.com/wechat");
-		// weixinInfoDTO.setOut_trade_no("123456");
-		// weixinInfoDTO.setSign(sign);
-		// weixinInfoDTO.setSpbill_create_ip("127.0.0.1");
-		// weixinInfoDTO.setTotal_fee(100);
-		// weixinInfoDTO.setTrade_type("NATIVE");
-		// String codeUrl = generateCodeUrl(weixinInfoDTO);
-		// System.out.println(codeUrl);
+//		 String sign = "";
+//		 SortedMap<String, String> storeMap = new TreeMap<String, String>();
+//		 storeMap.put("trade_type", "NATIVE"); // 交易类型
+//		 storeMap.put("spbill_create_ip", "127.0.0.1"); // 本机的Ip
+//		 storeMap.put("body", "test"); // 描述
+//		 storeMap.put("out_trade_no", "123456"); // 商户 后台的贸易单号
+//		 storeMap.put("total_fee", "" + 100); // 金额必须为整数 单位为分
+//		 //支付成功后，回调地址
+//		 storeMap.put("notify_url", "http://www.pinxuew.com/wechat"); 
+//		 storeMap.put("appid", "wx5e45586116813f60"); // appid
+//		 storeMap.put("mch_id", "1251135401"); // 商户号
+//		 storeMap.put("nonce_str", "1add1a30ac87aa2db72f57a2375d8fec"); // 随机数
+//		 sign = createSign(storeMap);
+		 
+//		 WeixinInfoDTO weixinInfoDTO = new WeixinInfoDTO();
+//		 weixinInfoDTO.setAppid("wx5e45586116813f60");
+//		 weixinInfoDTO.setBody("test");
+//		 weixinInfoDTO.setMch_id("1251135401");
+//		 weixinInfoDTO.setNonce_str("1add1a30ac87aa2db72f57a2375d8fec");
+//		 weixinInfoDTO.setNotify_url("http://www.pinxuew.com/wechat");
+//		 weixinInfoDTO.setOut_trade_no("123456");
+//		 weixinInfoDTO.setSign(sign);
+//		 weixinInfoDTO.setSpbill_create_ip("127.0.0.1");
+//		 weixinInfoDTO.setTotal_fee(100);
+//		 weixinInfoDTO.setTrade_type("NATIVE");
+//		 String codeUrl = generateCodeUrl(weixinInfoDTO);
+//		 System.out.println(codeUrl);
 
-		// String xml="<xml>"+
-		// "<appid>wx5e45586116813f60</appid>"+
-		// "<mch_id>1251135401</mch_id>"+
-		// "<nonce_str>1add1a30ac87aa2db72f57a2375d8fec</nonce_str>"+
-		// "<sign>"+sign+"</sign>"+
-		// "<body>test</body>"+
-		// "<out_trade_no>123456</out_trade_no>"+
-		// "<total_fee>1</total_fee>"+
-		// "<spbill_create_ip>127.0.0.1</spbill_create_ip>"+
-		// "<notify_url>http://www.baidu.com</notify_url>"+
-		// "<trade_type>NATIVE</trade_type>"+
-		// "</xml>";
-
-		// String xml = "<xml>" + "<appid>wx5e45586116813f60</appid>"
-		// + "<body>test</body>" + "<mch_id>1251135401</mch_id>"
-		// + "<nonce_str>1add1a30ac87aa2db72f57a2375d8fec</nonce_str>"
-		// + "<notify_url>http://www.pinxuew.com/wechat</notify_url>"
-		// + "<out_trade_no>123456</out_trade_no>"
-		// + "<spbill_create_ip>127.0.0.1</spbill_create_ip>"
-		// + "<total_fee>100</total_fee>"
-		// + "<trade_type>NATIVE</trade_type>"
-		// + "<sign>EB3C28F5C2BA88F636286F438905ACCD</sign>" + "</xml>";
-		// String resultMsg = getTradeOrder(
-		// "https://api.mch.weixin.qq.com/pay/unifiedorder", xml);
-		// System.out.println(resultMsg);
+//		 String xml="<xml>"+
+//		 "<appid>wx5e45586116813f60</appid>"+
+//		 "<mch_id>1251135401</mch_id>"+
+//		 "<nonce_str>1add1a30ac87aa2db72f57a2375d8fec</nonce_str>"+
+//		 "<sign>"+sign+"</sign>"+
+//		 "<body>test</body>"+
+//		 "<out_trade_no>123456</out_trade_no>"+
+//		 "<total_fee>1</total_fee>"+
+//		 "<spbill_create_ip>127.0.0.1</spbill_create_ip>"+
+//		 "<notify_url>http://www.baidu.com</notify_url>"+
+//		 "<trade_type>NATIVE</trade_type>"+
+//		 "</xml>";
+		
+		 String sign = "";
+		 SortedMap<String, String> storeMap = new TreeMap<String, String>();
+		 storeMap.put("appid", "wx1775577d8050cf73"); // appid
+		 storeMap.put("body", "啊"); // 描述
+		 storeMap.put("trade_type", "NATIVE"); // 交易类型
+		 storeMap.put("mch_id", "1481189932"); // 商户号
+		 storeMap.put("nonce_str", "1add1a30ac87aa2db12f57a2375d8fee"); // 随机数
+		 storeMap.put("out_trade_no", "1234561"); // 商户 后台的贸易单号
+		 storeMap.put("total_fee", "100"); // 金额必须为整数 单位为分
+		 //支付成功后，回调地址
+		 storeMap.put("notify_url", "http://www.pinxuew.com/wechat"); 
+		 sign = createSign(storeMap);
+		 System.out.println(sign);
+		 
+		 String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><xml>" 
+		 + "<appid>wx1775577d8050cf73</appid>"
+		 + "<body>啊</body>" 
+		 + "<trade_type>NATIVE</trade_type>"
+		 + "<mch_id>1481189932</mch_id>"
+		 + "<nonce_str>1add1a30ac87aa2db12f57a2375d8fee</nonce_str>"
+		 + "<out_trade_no>1234561</out_trade_no>"
+		 + "<total_fee>100</total_fee>"
+		 + "<notify_url>http://www.pinxuew.com/wechat</notify_url>"
+		 + "<sign>"+sign+"</sign>" + "</xml>";
+		 System.out.println(xml);
+		 String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/unifiedorder", xml);
+		 System.out.println(resultMsg);
 
 //		String sign = "";
 //		SortedMap<String, String> storeMap = new TreeMap<String, String>();
@@ -410,21 +427,21 @@ public class WeixinPayUtil {
 //		String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/orderquery", xml);
 //		System.out.println(resultMsg);
 		
-		String sign = "";
-		SortedMap<String, String> storeMap = new TreeMap<String, String>();
-		storeMap.put("out_trade_no", "2c9a500d5cafe1ad015cafe2f1710000"); // 商户 后台的贸易单号
-		storeMap.put("appid", "wx1775577d8050cf73"); // appid
-		storeMap.put("mch_id", "1481189932"); // 商户号
-		storeMap.put("nonce_str", "bca3531d7cc245feac80e9f7a4cd7f4e"); // 随机数
-		sign = createSign(storeMap);
-
-		String xml = "<xml><appid>wx1775577d8050cf73</appid>"
-				   + "<mch_id>1481189932</mch_id>"
-				   + "<nonce_str>bca3531d7cc245feac80e9f7a4cd7f4e</nonce_str>"
-				   + "<out_trade_no>2c9a500d5cafe1ad015cafe2f1710000</out_trade_no>" 
-				   + "<sign>" + sign + "</sign></xml>";
-		String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/orderquery", xml);
-		System.out.println(resultMsg);
+//		String sign = "";
+//		SortedMap<String, String> storeMap = new TreeMap<String, String>();
+//		storeMap.put("out_trade_no", "2c9a500d5cafe1ad015cafe2f1710000"); // 商户 后台的贸易单号
+//		storeMap.put("appid", "wx1775577d8050cf73"); // appid
+//		storeMap.put("mch_id", "1481189932"); // 商户号
+//		storeMap.put("nonce_str", "bca3531d7cc245feac80e9f7a4cd7f4e"); // 随机数
+//		sign = createSign(storeMap);
+//
+//		String xml = "<xml><appid>wx1775577d8050cf73</appid>"
+//				   + "<mch_id>1481189932</mch_id>"
+//				   + "<nonce_str>bca3531d7cc245feac80e9f7a4cd7f4e</nonce_str>"
+//				   + "<out_trade_no>2c9a500d5cafe1ad015cafe2f1710000</out_trade_no>" 
+//				   + "<sign>" + sign + "</sign></xml>";
+//		String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/orderquery", xml);
+//		System.out.println(resultMsg);
 		
 		// try {
 		// Map map = doXMLParse(resultMsg);

@@ -125,6 +125,11 @@ public class CarInfoController extends BaseController {
 	public AjaxJson save(CarInfoEntity carInfo, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		String driverId = request.getParameter("licenceDriverId");
+		if(StringUtil.isNotEmpty(driverId)){
+			carInfo.setDriverId(driverId);
+		}
+
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			message = "车辆信息更新成功";
 			CarInfoEntity t = carInfoService.get(CarInfoEntity.class, carInfo.getId());
@@ -179,5 +184,15 @@ public class CarInfoController extends BaseController {
 		req.setAttribute("driversList", driversList);
 		return new ModelAndView("yhy/car/carInfo");
 	}
-	
+	/**
+	 * 线路排班列表页面跳转
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "addDriver")
+	public ModelAndView addCar(HttpServletRequest req) {
+		String lpId = req.getParameter("lpId");
+		req.setAttribute("lpId", lpId);
+		return new ModelAndView("/yhy/car/driverAndCity");
+	}
 }

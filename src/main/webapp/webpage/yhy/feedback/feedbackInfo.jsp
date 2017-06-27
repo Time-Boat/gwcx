@@ -9,7 +9,7 @@
  <body style="overflow-y: hidden" scroll="no">
   <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="feedbackInfoController.do?save">
 			<input id="id" name="id" type="hidden" value="${feedbackInfoPage.id }">
-			<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
+			<table style="width: 400px;" cellpadding="0" cellspacing="1" class="formtable">
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
@@ -17,8 +17,9 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="content" name="content" ignore="ignore"
-							   value="${feedbackInfoPage.content}">
+						<textarea rows="5" cols="40" id="content" name="content" >${feedbackInfoPage.content}</textarea>
+						<%-- <input class="inputxt" id="content" name="content" ignore="ignore"
+							   value="${feedbackInfoPage.content}"> --%>
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

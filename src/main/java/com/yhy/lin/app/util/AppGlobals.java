@@ -77,7 +77,10 @@ public interface AppGlobals {
 	/** 微信第三方支付*/
 	
 	/** 退款url*/
-	public static final String REFUND_API = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+	public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+	
+	/** 生成二维码地址*/
+	public static final String WECHAT_QR_URL = "https://api.weixin.qq.com/cgi-bin/qrcode/create";
 	
 	/** appId*/
 	public static final String WECHAT_ID = "wx1775577d8050cf73";

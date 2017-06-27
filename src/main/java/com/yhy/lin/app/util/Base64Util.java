@@ -47,14 +47,14 @@ public class Base64Util {
         String result = null;  
         if (s != null) {  
             BASE64Decoder decoder = new BASE64Decoder();  
-            try {  
+            try {
                 b = decoder.decodeBuffer(s);  
                 result = new String(b, "utf-8");  
                 result = URLDecoder.decode(result, "UTF-8");
-            } catch (Exception e) {  
+            } catch (Exception e) {
                 e.printStackTrace();  
-            }  
-        }  
+            }
+        }
         return result;  
     }  
     

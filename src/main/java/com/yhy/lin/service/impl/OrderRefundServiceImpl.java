@@ -206,7 +206,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				int totalFee = (int) ((Double.parseDouble(arrFee[i]) * 100));
 				int refundFee = totalFee;
 				
-				refundReqData.setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
+				TransferorderEntity t = get(TransferorderEntity.class, outTradeNo);
+//				refundReqData.setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
+				refundReqData.setParams(transactionID, t.getOrderPayNumber(), outRefundNo, totalFee, refundFee);
 				
 				refundRequest.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
 		

@@ -193,7 +193,7 @@ public class RequestHandler {
 		}
 		sb.append("key=" + this.getKey());
 		System.out.println("md5 sb:" + sb);
-		String sign = MD5Util.MD5(sb.toString()).toUpperCase();
+		String sign = MD5Util.AppMD5(sb.toString()).toUpperCase();
 		System.out.println("packge签名:" + sign);
 		return sign;
 

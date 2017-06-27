@@ -2,10 +2,13 @@ package com.yhy.lin.app.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
+import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -14,13 +17,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
+import oracle.net.aso.MD5;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.core.util.UUIDGenerator;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,6 +36,7 @@ import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.RefundReqData;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.MD5Util;
 import com.yhy.lin.app.wechat.CommonUtil;
 import com.yhy.lin.app.wechat.MobiMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
@@ -52,9 +60,14 @@ public class WeixinPayController extends AppBaseController{
 	@Autowired
 	private SystemService systemService;
 
+	// private stxatic String baseUrl = "http://localhost:8080/gwcx";
 	private static String baseUrl = "http://car.cywtrip.com/gwcx";
 
-	// private static String baseUrl = "http://localhost:8080/gwcx";
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
+	
 
 	/**
 	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId
@@ -74,6 +87,7 @@ public class WeixinPayController extends AppBaseController{
 			System.out.println("in userAuth,orderId:" + orderId);
 			// 授权后要跳转的链接
 			String backUri = baseUrl + "/wx.do?toPay";
+			
 			backUri = backUri + "&orderId=" + orderId + "&totalFee=" + totalFee;
 			// URLEncoder.encode 后可以在backUri 的url里面获取传递的所有参数
 			backUri = URLEncoder.encode(backUri, "utf-8");
@@ -112,7 +126,7 @@ public class WeixinPayController extends AppBaseController{
 				return null;
 			}
 			System.out.println("userId:" + userId);
-
+			
 			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AppGlobals.WECHAT_ID + "&secret="
 					+ AppGlobals.WECHAT_APP_SECRET + "&code=" + code + "&grant_type=authorization_code";
 			// 获取统一下单需要的openid
@@ -124,15 +138,19 @@ public class WeixinPayController extends AppBaseController{
 				openId = jsonObject.getString("openid");
 				System.out.println("openid:" + openId);
 			}
-
+			
+			//微信订单号    要存在订单表中
+			String orderPayNumber = UUIDGenerator.generate();
+			
 			// 获取openId后调用统一支付接口https://api.mch.weixin.qq.com/pay/unifiedorder
 			// 随机数
 			// String nonce_str = "1add1a30ac87aa2db72f57a2375d8fec";
 			String nonce_str = UUID.randomUUID().toString().replaceAll("-", "");
 			// 商品描述
-			String body = orderId;
+			String body = "龙游出行";
 			// 商户订单号
-			String out_trade_no = orderId;
+			//String out_trade_no = orderId;
+			String out_trade_no = orderPayNumber;
 			// 订单生成的机器 IP
 			String spbill_create_ip = request.getRemoteAddr();
 			// 总金额
@@ -160,7 +178,8 @@ public class WeixinPayController extends AppBaseController{
 			// String product_id = "";
 
 			// 这里notify_url是 支付完成后微信发给该链接信息，可以判断会员是否支付成功，改变订单状态等。
-			String notify_url = baseUrl + "/wx/notifyUrl.do";
+//			String notify_url = baseUrl + "/wx/notifyUrl.do";
+			String notify_url = "http://car.cywtrip.com:8080/gwcx/wx/notifyUrl.do";
 
 			SortedMap<String, String> packageParams = new TreeMap<String, String>();
 			packageParams.put("appid", AppGlobals.WECHAT_ID);
@@ -173,10 +192,10 @@ public class WeixinPayController extends AppBaseController{
 			packageParams.put("notify_url", notify_url);
 			packageParams.put("trade_type", AppGlobals.TRADE_TYPE);
 			packageParams.put("openid", openId);
-
+			
 			RequestHandler reqHandler = new RequestHandler(request, response);
 			reqHandler.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
-
+			
 			String sign = reqHandler.createSign(packageParams);
 			System.out.println("sign:" + sign);
 			String xml = "<xml>" + "<appid>" + AppGlobals.WECHAT_ID + "</appid>" + "<mch_id>" + AppGlobals.MCH_ID
@@ -220,9 +239,10 @@ public class WeixinPayController extends AppBaseController{
 
 			model.addAttribute("bizOrderId", orderId);
 			model.addAttribute("orderId", orderId);
+			model.addAttribute("orderPayNumber", orderPayNumber);
 			model.addAttribute("payPrice", total_fee);
 			return new ModelAndView("yhy/wechat/jsapi");
-		} catch (NumberFormatException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
@@ -238,7 +258,7 @@ public class WeixinPayController extends AppBaseController{
 	 */
 	@RequestMapping(value = "/notifyUrl")
 	public String weixinReceive(HttpServletRequest request, HttpServletResponse response, Model model) {
-		System.out.println("==开始进入h5支付回调方法==");
+		logger.info("==开始进入h5支付回调方法==");
 		String xml_review_result = WeixinPayUtil.getXmlRequest(request);
 		System.out.println("微信支付结果:" + xml_review_result);
 		Map resultMap = null;
@@ -309,8 +329,9 @@ public class WeixinPayController extends AppBaseController{
 
 		String id = request.getParameter("orderId");
 		String status = request.getParameter("status");
-
+		String orderPayNumber = request.getParameter("orderPayNumber");
 		System.out.println("toWXPaySuccess, orderId: " + id);
+		System.out.println("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
 		try {
 			Map resultMap = WeixinPayUtil.checkWxOrderPay(id);
 			System.out.println("resultMap:" + resultMap);
@@ -342,6 +363,7 @@ public class WeixinPayController extends AppBaseController{
 				if ("0".equals(status)) {
 					t.setOrderStatus(1);
 					t.setOrderPaystatus("0");
+					t.setOrderPayNumber(orderPayNumber);
 
 					// 如果购买成功，将消息添加到消息中心
 					AppMessageListEntity app = new AppMessageListEntity();
@@ -371,5 +393,71 @@ public class WeixinPayController extends AppBaseController{
 
 		return new ModelAndView("yhy/wechat/payResult");
 	}
-
+	
+	/**
+	 * 微信消息推送回调
+	 * 
+	 */
+	@RequestMapping(params = "eventPush")
+	public void eventPush(@RequestBody(required=false) String body,HttpServletRequest request, HttpServletResponse response, Model model)
+			throws IOException {
+		
+		logger.info("进入eventPush回调url");
+		logger.info("eventPush   xml:" + body);
+		
+//		String signature = request.getParameter("signature");  
+//        String timestamp = request.getParameter("timestamp");  
+//        String nonce = request.getParameter("nonce");  
+//        String echostr = request.getParameter("echostr");  
+        
+        PrintWriter out = response.getWriter();  
+//        if (checkSignature(signature, timestamp, nonce)){  
+//        	logger.info("eventPush: echostr=" + echostr);
+//        	out.print(echostr);
+        out.print("");
+//        }  
+        out.close();
+		
+	}
+	
+//	/**
+//	 * 微信消息推送回调
+//	 * 
+//	 */
+//	@RequestMapping(params = "eventPush")
+//	public void eventPush(HttpServletRequest request, HttpServletResponse response, Model model)
+//			throws IOException {
+//		
+//		logger.info("进入eventPush回调url");
+//		
+//		String signature = request.getParameter("signature");  
+//        String timestamp = request.getParameter("timestamp");  
+//        String nonce = request.getParameter("nonce");  
+//        String echostr = request.getParameter("echostr");  
+//        
+//        PrintWriter out = response.getWriter();  
+//        if (checkSignature(signature, timestamp, nonce)){  
+//        	logger.info("eventPush: echostr=" + echostr);
+//        	out.print(echostr);
+//        }  
+//        out.close();
+//	}
+//
+//	public static boolean checkSignature(String signature, String timestamp,  
+//            String nonce) {
+//        String[] arr = new String[] { "longyouchuxing2017", timestamp, nonce };  
+//        // sort  
+//        Arrays.sort(arr);  
+//  
+//        // generate String  
+//        String content = arr[0]+arr[1]+arr[2];  
+//          
+//        // shal code  
+//        String temp = new Sha1Util().getSha1(content);  
+//        logger.info("eventPush: code=" + temp);
+//        logger.info("eventPush: signature=" + signature);
+//        
+//        return temp.equalsIgnoreCase(signature);  
+//    }  
+	
 }

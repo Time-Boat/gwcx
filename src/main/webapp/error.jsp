@@ -5,7 +5,7 @@
 
 <head>
 <meta charset="utf-8">
-<title>预定成功</title>
+<title>预定失败</title>
 <meta name="viewport"
 	content="width=device-width, initial-scale=1, user-scalable=no">
 <script>

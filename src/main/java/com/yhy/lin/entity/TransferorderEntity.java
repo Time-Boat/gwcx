@@ -53,8 +53,19 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String rejectReason; //拒绝原因
 	
-	private String beforeStatus;
+	private String beforeStatus;  //申请退款之前的订单状态
 	
+	private String orderPayNumber;  //微信支付订单号
+	
+	@Column(name = "order_pay_number")
+	public String getOrderPayNumber() {
+		return orderPayNumber;
+	}
+
+	public void setOrderPayNumber(String orderPayNumber) {
+		this.orderPayNumber = orderPayNumber;
+	}
+
 	@Column(name = "before_status")
 	public String getBeforeStatus() {
 		return beforeStatus;

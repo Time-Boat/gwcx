@@ -80,12 +80,12 @@ public class AppInterfaceController extends AppBaseController {
 
 			String param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
-						
+			
 			JSONObject jsondata = JSONObject.fromObject(param);
 			
 			// 验证参数
 			checkParam(jsondata);
-						
+			
 			String mobile = jsondata.getString("mobile");
 			String code = jsondata.getString("code");
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");

@@ -15,7 +15,7 @@
    <t:dgCol title="备注" field="remark"   width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
    <t:dgDelOpt title="删除" url="carInfoController.do?del&id={id}" />
-   <t:dgToolBar title="录入" icon="icon-add" url="carInfoController.do?addorupdate" funname="add"></t:dgToolBar>
+   <t:dgToolBar title="录入" icon="icon-add" url="carInfoController.do?addorupdate" funname="add" width="600" height="500"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="carInfoController.do?addorupdate" funname="update"></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="carInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
   </t:datagrid>

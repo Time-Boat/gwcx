@@ -58,7 +58,7 @@
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
-				<tr>
+				<%-- <tr>
 					<td align="right">
 						<label class="Validform_label">
 							司机:
@@ -72,7 +72,20 @@
 						</select>
 						<span class="Validform_checktip"></span>
 					</td>
+				</tr> --%>
+				<tr>
+				<td align="right">
+					<label class="Validform_label">
+						司机:
+					</label>
+				</td>
+					<td class="value">					
+						<input readonly="true" class="inputxt" id="licenceDriver" name="licenceDriver" value="">
+						<input id="licenceDriverId" name="licenceDriverId" type="hidden" value="" >
+						<span class="Validform_checktip"></span>
+					</td>
 				</tr>
+				
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
@@ -117,4 +130,29 @@
 				</tr>
 			</table>
 		</t:formvalid>
+		<script type="text/javascript">
+	$("#licenceDriver").click(function(){
+		
+			 	$.dialog.setting.zIndex = 9999;
+			    $.dialog({content: 'url:carInfoController.do?addDriver', zIndex: 2100, lock: true, width:1000, height:600, opacity: 0.4, button: [
+			        {name:'确定',  
+			        	callback:function(){
+			        		var iframe = this.iframe.contentWindow;
+			        	    var rowsData = iframe.$('#driversInfoList').datagrid('getSelections');
+			        	    if (!rowsData || rowsData.length==0) {
+			        	        return;
+			        	    }else{
+			        	    	var driverId = rowsData[0].id;//司机id
+			        	    	var name = rowsData[0].name;
+			        	    	$("#licenceDriver").val(name);
+			        	    	$("#licenceDriverId").val(driverId);
+			        	    }
+			        	},
+			        	focus:true
+			        },
+			        {name:'取消',callback:function (){}}
+			    ]}).zindex();
+	});
+	
+</script>
  </body>

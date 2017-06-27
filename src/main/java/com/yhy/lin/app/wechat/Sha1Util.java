@@ -1,6 +1,5 @@
 package com.yhy.lin.app.wechat;
 
-import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.util.Iterator;
 import java.util.Map;
@@ -23,11 +22,12 @@ public class Sha1Util {
 		Random random = new Random();
 		return MD5Util.MD5(String.valueOf(random.nextInt(10000)));
 	}
+
 	public static String getTimeStamp() {
 		return String.valueOf(System.currentTimeMillis() / 1000);
 	}
-	
-   //创建签名SHA1
+
+	// 创建签名SHA1
 	public static String createSHA1Sign(SortedMap<String, String> signParams) throws Exception {
 		StringBuffer sb = new StringBuffer();
 		Set es = signParams.entrySet();
@@ -37,19 +37,19 @@ public class Sha1Util {
 			String k = (String) entry.getKey();
 			String v = (String) entry.getValue();
 			sb.append(k + "=" + v + "&");
-			//要采用URLENCODER的原始值！
+			// 要采用URLENCODER的原始值！
 		}
 		String params = sb.substring(0, sb.lastIndexOf("&"));
 		System.out.println("sha1 sb:" + params);
 		return getSha1(params);
 	}
-	//Sha1签名
+
+	// Sha1签名
 	public static String getSha1(String str) {
 		if (str == null || str.length() == 0) {
 			return null;
 		}
-		char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-				'a', 'b', 'c', 'd', 'e', 'f' };
+		char hexDigits[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
 
 		try {
 			MessageDigest mdTemp = MessageDigest.getInstance("SHA1");
@@ -69,4 +69,7 @@ public class Sha1Util {
 			return null;
 		}
 	}
+	
+	
+
 }

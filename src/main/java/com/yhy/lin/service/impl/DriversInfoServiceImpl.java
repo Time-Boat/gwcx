@@ -40,7 +40,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId " + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId " + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -57,6 +57,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 							,new Db2Page("createDate", "createDate")
 							,new Db2Page("deleteFlag", "deleteFlag")
 							,new Db2Page("remark", "remark")
+							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("drivingLicenseImgUrl", "drivingLicenseImgUrl")
 					};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

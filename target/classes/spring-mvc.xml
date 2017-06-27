@@ -135,11 +135,16 @@
 						<value>app.do?getMessage</value>
 						<value>app.do?delMessage</value>
 						
+						<!-- 微信公众号 -->
+						
 						<!-- 微信支付 -->
 						<value>wx.do?userAuth</value>
 						<value>wx.do?toPay</value>
 						<value>wx/notifyUrl.do</value>
 						<value>wx.do?success</value>
+						<!-- 微信消息推送 -->
+						<value>wx.do?eventPush</value>
+						
 						
 					</list>
 				</property>
