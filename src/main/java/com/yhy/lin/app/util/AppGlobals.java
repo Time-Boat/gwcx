@@ -45,16 +45,14 @@ public interface AppGlobals {
 	/** 班车 */
 	/** 包车 */
 
-	/** web外部的文件存储路径 */
-	//public static final String EXTERNAL_FILE_PATH = "D:/javaWeb/demo/nginx/gwcx/image";
-	public static final String EXTERNAL_FILE_PATH = "C:/nginx";
+	/** 图片base路径 */
+	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
 	
 	/** app客户头像路径 */
-	public static final String APP_USER_FILE_PATH = "userImage";
+	public static final String APP_USER_FILE_PATH = "/image/user/";
 	
-	/** web路径 */
-	public static final String WEB_FILE_PATH = "image/";
-	
+	/** 司机头像路径 */
+	public static final String DRIVER_FILE_PATH = "/image/driver/";
 	
 	/** 阿里大鱼服务器url */
 	public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
@@ -79,8 +77,8 @@ public interface AppGlobals {
 	/** 退款url*/
 	public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 	
-	/** 生成二维码地址*/
-	public static final String WECHAT_QR_URL = "https://api.weixin.qq.com/cgi-bin/qrcode/create";
+	/** 获取access_token url*/
+	public static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=%1&appid=%2&secret=%3";
 	
 	/** appId*/
 	public static final String WECHAT_ID = "wx1775577d8050cf73";

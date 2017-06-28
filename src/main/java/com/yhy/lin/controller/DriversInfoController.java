@@ -163,7 +163,7 @@ public class DriversInfoController extends BaseController {
 		driversInfo.setDeleteFlag(0);
 		UploadFile uploadFile = new UploadFile(request, driversInfo);
 		//uploadFile.setCusPath("plug-in/accordion/images");
-		uploadFile.setDiskBasePath(AppGlobals.EXTERNAL_FILE_PATH);
+		uploadFile.setDiskBasePath(AppGlobals.IMAGE_BASE_FILE_PATH);
 		uploadFile.setCusPath("image");  
 		uploadFile.setBasePath("driver");
 		uploadFile.setRealPath("drivingLicenseImgUrl");  

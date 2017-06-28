@@ -2,7 +2,9 @@ package com.yhy.lin.app.controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
 import oracle.net.aso.MD5;
+import sun.misc.BASE64Decoder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -399,23 +402,38 @@ public class WeixinPayController extends AppBaseController{
 	 * 
 	 */
 	@RequestMapping(params = "eventPush")
-	public void eventPush(@RequestBody(required=false) String body,HttpServletRequest request, HttpServletResponse response, Model model)
+	public void eventPush(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		
 		logger.info("进入eventPush回调url");
-		logger.info("eventPush   xml:" + body);
+		try {
+			
+			String xml = WeixinPayUtil.getXmlRequest(request);
+			if(StringUtil.isNotEmpty(xml)){
+				Map map = WeixinPayUtil.doXMLParse(xml);
+				String type = (map.get("Event") + "").toLowerCase();
+				
+				switch (type) {
+				case "subscribe":
+				case "scan":
+					logger.info("用户扫描二维码进入");
+					
+					break;
+				case "click":
+					logger.info("用户点击菜单进入");
+					
+					break;
+				default:
+					break;
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		
-//		String signature = request.getParameter("signature");  
-//        String timestamp = request.getParameter("timestamp");  
-//        String nonce = request.getParameter("nonce");  
-//        String echostr = request.getParameter("echostr");  
-        
         PrintWriter out = response.getWriter();  
-//        if (checkSignature(signature, timestamp, nonce)){  
-//        	logger.info("eventPush: echostr=" + echostr);
-//        	out.print(echostr);
         out.print("");
-//        }  
         out.close();
 		
 	}

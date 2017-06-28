@@ -39,7 +39,7 @@ public class Base64Util {
             }  
         }  
         return result;  
-    }  
+    }
     
  // 解密  
     public static String getFromBase64Input(InputStream s) {  

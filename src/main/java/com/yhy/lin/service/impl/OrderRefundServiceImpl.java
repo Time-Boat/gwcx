@@ -55,7 +55,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		}
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append("select a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_starting_station_name,a.order_terminus_station_name,");
+		sql.append("select a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name,");
 		sql.append("a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.reject_reason,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
@@ -67,9 +67,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
-		Db2Page[] db2Pages = { new Db2Page("id"), new Db2Page("orderId", "order_id", null),
-				new Db2Page("orderStatus", "order_status", null), new Db2Page("orderStartime", "order_startime", null),
-				new Db2Page("orderNumbers", "order_numbers", null), new Db2Page("orderPaytype", "order_paytype", null),
+		Db2Page[] db2Pages = { new Db2Page("id"), 
+				new Db2Page("orderId", "order_id", null),
+				new Db2Page("orderStatus", "order_status", null), 
+				new Db2Page("orderType", "order_type", null),
+				new Db2Page("orderStartime", "order_startime", null),
+				new Db2Page("orderNumbers", "order_numbers", null),
+				new Db2Page("orderPaytype", "order_paytype", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
 				new Db2Page("orderPaystatus", "order_paystatus", null),
@@ -218,7 +222,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				System.out.println(info);
 				// LogUtils.trace(info);
 				
-				String result = refundRequest.httpsRequest(AppGlobals.REFUND_API, info, path);
+				String result = refundRequest.httpsRequest(AppGlobals.REFUND_URL, info, path);
 	
 				Map<String, String> getMap = MobiMessage.parseXml(result);
 				if ("SUCCESS".equals(getMap.get("result_code")) && "OK".equals(getMap.get("return_msg"))) {

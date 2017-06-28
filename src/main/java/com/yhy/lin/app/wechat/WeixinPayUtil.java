@@ -30,10 +30,13 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import com.alibaba.druid.support.logging.Log;
+import com.google.gson.JsonObject;
+import com.yhy.lin.app.util.APIHttpClient;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.MD5Util;
 import com.yhy.lin.controller.CarInfoController;
+
+import net.sf.json.JSONObject;
 
 /**
  * 微信支付工具类
@@ -340,6 +343,45 @@ public class WeixinPayUtil {
 		return null;
 	}
 
+	
+	/** 生成二维码url*/
+	private static String WECHAT_REQUEST_QR_URL = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%1";
+	
+	/** 生成二维码url*/
+	private static String WECHAT_QR_URL = "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%1";
+	
+	/**
+	 * 获取access_token
+	 * 
+	 * @return ac_token
+	 */
+	public static String getAccessToken(){
+		String url = AppGlobals.ACCESS_TOKEN_URL.replace("%1", "client_credential").replace("%2", AppGlobals.WECHAT_ID).replace("%3", AppGlobals.WECHAT_APP_SECRET);
+		//APIHttpClient网络请求对象
+		APIHttpClient httpClient = new APIHttpClient(url);
+		String str = httpClient.get();
+		String ac_token = JSONObject.fromObject(str).get("access_token") + "";
+		return ac_token;
+	}
+	
+	/**
+	 * 生成二维码地址
+	 * 
+	 * @return param 二维码携带参数  json
+	 */
+	public static String getQRCode(String promoterId){
+		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
+		//APIHttpClient网络请求对象
+		APIHttpClient httpClient = new APIHttpClient(url);
+		
+		JsonObject j = new JsonObject();
+		j.addProperty("promoterId", promoterId);
+		String str = httpClient.post(j.toString());
+		String ac_token = JSONObject.fromObject(str).get("ticket") + "";
+		return WECHAT_QR_URL.replace("%1", ac_token);
+	}
+	
+	
 	public static void main(String[] args) {
 
 //		 String sign = "";
@@ -383,33 +425,33 @@ public class WeixinPayUtil {
 //		 "<trade_type>NATIVE</trade_type>"+
 //		 "</xml>";
 		
-		 String sign = "";
-		 SortedMap<String, String> storeMap = new TreeMap<String, String>();
-		 storeMap.put("appid", "wx1775577d8050cf73"); // appid
-		 storeMap.put("body", "啊"); // 描述
-		 storeMap.put("trade_type", "NATIVE"); // 交易类型
-		 storeMap.put("mch_id", "1481189932"); // 商户号
-		 storeMap.put("nonce_str", "1add1a30ac87aa2db12f57a2375d8fee"); // 随机数
-		 storeMap.put("out_trade_no", "1234561"); // 商户 后台的贸易单号
-		 storeMap.put("total_fee", "100"); // 金额必须为整数 单位为分
-		 //支付成功后，回调地址
-		 storeMap.put("notify_url", "http://www.pinxuew.com/wechat"); 
-		 sign = createSign(storeMap);
-		 System.out.println(sign);
+//		 String sign = "";
+//		 SortedMap<String, String> storeMap = new TreeMap<String, String>();
+//		 storeMap.put("appid", "wx1775577d8050cf73"); // appid
+//		 storeMap.put("body", "啊"); // 描述
+//		 storeMap.put("trade_type", "NATIVE"); // 交易类型
+//		 storeMap.put("mch_id", "1481189932"); // 商户号
+//		 storeMap.put("nonce_str", "1add1a30ac87aa2db12f57a2375d8fee"); // 随机数
+//		 storeMap.put("out_trade_no", "1234561"); // 商户 后台的贸易单号
+//		 storeMap.put("total_fee", "100"); // 金额必须为整数 单位为分
+//		 //支付成功后，回调地址
+//		 storeMap.put("notify_url", "http://www.pinxuew.com/wechat"); 
+//		 sign = createSign(storeMap);
+//		 System.out.println(sign);
 		 
-		 String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><xml>" 
-		 + "<appid>wx1775577d8050cf73</appid>"
-		 + "<body>啊</body>" 
-		 + "<trade_type>NATIVE</trade_type>"
-		 + "<mch_id>1481189932</mch_id>"
-		 + "<nonce_str>1add1a30ac87aa2db12f57a2375d8fee</nonce_str>"
-		 + "<out_trade_no>1234561</out_trade_no>"
-		 + "<total_fee>100</total_fee>"
-		 + "<notify_url>http://www.pinxuew.com/wechat</notify_url>"
-		 + "<sign>"+sign+"</sign>" + "</xml>";
-		 System.out.println(xml);
-		 String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/unifiedorder", xml);
-		 System.out.println(resultMsg);
+//		 String xml = "<?xml version=\"1.0\" encoding=\"utf-8\"?><xml>" 
+//		 + "<appid>wx1775577d8050cf73</appid>"
+//		 + "<body>啊</body>" 
+//		 + "<trade_type>NATIVE</trade_type>"
+//		 + "<mch_id>1481189932</mch_id>"
+//		 + "<nonce_str>1add1a30ac87aa2db12f57a2375d8fee</nonce_str>"
+//		 + "<out_trade_no>1234561</out_trade_no>"
+//		 + "<total_fee>100</total_fee>"
+//		 + "<notify_url>http://www.pinxuew.com/wechat</notify_url>"
+//		 + "<sign>"+sign+"</sign>" + "</xml>";
+//		 System.out.println(xml);
+//		 String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/unifiedorder", xml);
+//		 System.out.println(resultMsg);
 
 //		String sign = "";
 //		SortedMap<String, String> storeMap = new TreeMap<String, String>();

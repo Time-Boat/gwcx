@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.yhy.lin.app.entity.AppCheckTicket;
 import com.yhy.lin.app.entity.AppCustomerEntity;
 import com.yhy.lin.app.entity.AppLineStationInfoEntity;
@@ -39,6 +40,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
@@ -992,15 +994,15 @@ public class AppInterfaceController extends AppBaseController {
 			String idCard = jsondata.getString("idCard");
 			String address = jsondata.getString("address");
 			String userName = jsondata.getString("userName");
-
-			String path = AppGlobals.EXTERNAL_FILE_PATH + "/image/user";
-
+			
 			String imgName = "";
+			
+			String path = AppGlobals.IMAGE_BASE_FILE_PATH;
 			if(StringUtil.isNotEmpty(imagesBaseBM)){
 				// 获取图片存储路径
-				imgName = AppGlobals.WEB_FILE_PATH + userId + "_" + System.currentTimeMillis()
+				imgName = AppGlobals.APP_USER_FILE_PATH + userId + "_" + System.currentTimeMillis()
 						+ pName.substring(pName.lastIndexOf("."), pName.length());
-				
+				imagesBaseBM = imagesBaseBM.replaceAll(" ", "+");
 				boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgName);
 			}
 			
@@ -1199,6 +1201,56 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
+	/** 生成二维码接口 */
+	@RequestMapping(params = "generateQRCode")
+	public void generateQRCode(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		JSONObject data = new JSONObject();
+		
+		boolean success = false;
+		String msg = "";
+		String statusCode = "";
+		
+		try {
+			
+			String token = request.getParameter("token");
+			String account = request.getParameter("account");
+			
+			System.out.println("前端传递参数：token:" + token + "---messageId:" + account);
+			
+			// 验证参数
+			checkParam(new String[] { "token", "account" }, token, account);
+
+			// 验证token
+			checkToken(token);
+			
+			JsonObject j = new JsonObject();
+			j.addProperty("account", account);
+			String QRUrl = WeixinPayUtil.getQRCode(j.toString());
+			data.put("QRUrl", QRUrl);
+			
+			success = true;
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		data.put("success", success);
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+	}
 	
 	/** 验证token是否有效 */
 	public void checkToken(String token) throws ParameterException {
