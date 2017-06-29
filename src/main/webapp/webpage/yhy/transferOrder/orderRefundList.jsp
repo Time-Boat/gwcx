@@ -33,6 +33,7 @@
 			    idField="id" fit="true" queryMode="group" checkbox="true">
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
+		<t:dgCol title="订单类型" field="orderType" replace="接机_0,送机_1,接火车_2,送火车_3" query="true" align="center"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
@@ -46,8 +47,7 @@
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
 		<t:dgCol title="申请退款时间" field="refundTime" align="center"></t:dgCol>
-		<t:dgCol title="拒绝原因" field="rejectReason" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="取消订单待退款_3,取消订单完成退款_4,拒绝退款_5" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单状态" field="orderStatus" replace="取消订单待退款_3,取消订单完成退款_4" query="true" align="center"></t:dgCol>
 		<%-- <t:dgCol title="操作" field="opt" align="center"></t:dgCol>
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="agreeRefund(id)" title="同意" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="rejectRefund(id)" title="拒绝" ></t:dgFunOpt>

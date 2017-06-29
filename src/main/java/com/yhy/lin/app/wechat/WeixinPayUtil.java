@@ -375,12 +375,13 @@ public class WeixinPayUtil {
 		APIHttpClient httpClient = new APIHttpClient(url);
 		
 		JsonObject j = new JsonObject();
-		j.addProperty("promoterId", promoterId);
+		j.addProperty("expire_seconds", 7200);    //临时二维码生效时间
+		j.addProperty("action_name", "QR_SCENE");   //二维码类型，QR_SCENE为临时,QR_LIMIT_SCENE为永久,QR_LIMIT_STR_SCENE为永久的字符串参数值
+		j.addProperty("action_info", " {\"scene\": {\"scene_id\": " + promoterId + "}}");     //临时二维码字段 scene_id        永久二维码字段 scene_str 
 		String str = httpClient.post(j.toString());
 		String ac_token = JSONObject.fromObject(str).get("ticket") + "";
 		return WECHAT_QR_URL.replace("%1", ac_token);
 	}
-	
 	
 	public static void main(String[] args) {
 

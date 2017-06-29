@@ -3,11 +3,11 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <div class="easyui-layout" fit="true">
   <div region="center" style="padding:0px;border:0px">
-  <t:datagrid name="carCustomerList" title="乘客管理" actionUrl="carCustomerController.do?datagrid" fitColumns="true" idField="id" fit="true">
+  <t:datagrid name="carCustomerList" title="乘客管理" actionUrl="carCustomerController.do?datagrid" fitColumns="true" queryMode="group" idField="id" fit="true">
    <t:dgCol title="主键" field="id" hidden="true"  width="120"></t:dgCol>
-   <t:dgCol title="真实姓名" field="realName"   width="120"></t:dgCol>
+   <t:dgCol title="真实姓名" field="realName" query="true"  width="120"></t:dgCol>
    <t:dgCol title="性别" field="sex"  width="120"></t:dgCol>
-   <t:dgCol title="手机号码" field="phone"   width="120"></t:dgCol>
+   <t:dgCol title="手机号码" field="phone" query="true"  width="120"></t:dgCol>
    <t:dgCol title="身份证号码" field="cardNumber"   width="120"></t:dgCol>
    <t:dgCol title="居住地址" field="address"   width="120"></t:dgCol>
    <t:dgCol title="注册时间" field="createTime" formatter="yyyy-MM-dd hh:mm:ss"  width="120"></t:dgCol>

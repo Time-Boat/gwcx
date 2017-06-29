@@ -148,7 +148,6 @@
 						<!-- 二维码生成 -->
 						<value>app.do?generateQRCode</value>
 						
-						
 					</list>
 				</property>
 			</bean>

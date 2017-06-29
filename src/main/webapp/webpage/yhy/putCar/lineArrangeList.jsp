@@ -78,7 +78,7 @@
 		return d;  
 	 }  */
 	 
-	 function putTicket(id,lineId){
+	function putTicket(id,lineId){
  		createwindow("线路放票", "lineArrangeController.do?addorupdate&id="+id+"&lineId="+lineId,"700px","400px");
  	}
 	 

@@ -971,12 +971,13 @@ public class AppInterfaceController extends AppBaseController {
 		String msg = "";
 		String statusCode = "";
 		boolean success = false;
-
+		//图片路径
+		String imgUrl = "";
 		String param = "";
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+//			System.out.println("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -995,21 +996,19 @@ public class AppInterfaceController extends AppBaseController {
 			String address = jsondata.getString("address");
 			String userName = jsondata.getString("userName");
 			
-			String imgName = "";
-			
+			CarCustomerEntity cc = systemService.getEntity(CarCustomerEntity.class, userId);
 			String path = AppGlobals.IMAGE_BASE_FILE_PATH;
 			if(StringUtil.isNotEmpty(imagesBaseBM)){
 				// 获取图片存储路径
-				imgName = AppGlobals.APP_USER_FILE_PATH + userId + "_" + System.currentTimeMillis()
+				imgUrl = AppGlobals.APP_USER_FILE_PATH + userId + "_" + System.currentTimeMillis()
 						+ pName.substring(pName.lastIndexOf("."), pName.length());
 				imagesBaseBM = imagesBaseBM.replaceAll(" ", "+");
-				boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgName);
+				boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgUrl);
+				
+				cc.setCustomerImg(imgUrl);
 			}
-			
-			CarCustomerEntity cc = systemService.getEntity(CarCustomerEntity.class, userId);
 			cc.setAddress(address);
 			cc.setCardNumber(idCard);
-			cc.setCustomerImg(imgName);
 			cc.setUserName(userName);
 			cc.setRealName(userName);
 			
@@ -1027,6 +1026,7 @@ public class AppInterfaceController extends AppBaseController {
 			e.printStackTrace();
 		}
 		data.put("success", success);
+		data.put("imgUrl", imgUrl);
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data);

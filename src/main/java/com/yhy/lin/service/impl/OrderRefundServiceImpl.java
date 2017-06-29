@@ -98,8 +98,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 添加了权限
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 
-		//sql.append(" and t.org_code like '" + orgCode + "%' ");
-		
+		if(StringUtil.isNotEmpty(orgCode)){
+			sql.append(" and t.org_code like '" + orgCode + "%' ");
+		}
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");

@@ -59,15 +59,15 @@ public class CarCustomerController extends BaseController {
 	 */
 	@RequestMapping(params = "datagrid")
 	public void datagrid(CarCustomerEntity carCustomer,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(CarCustomerEntity.class, dataGrid);
+		//CriteriaQuery cq = new CriteriaQuery(CarCustomerEntity.class, dataGrid);
 		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, carCustomer, request.getParameterMap());
-		//String customerId = request.getParameter("customerId");
-		///String commonAddrs = request.getParameter("commonAddrs");
-		//JSONObject jObject = carCustomerService.getDatagrid(carCustomer, dataGrid,customerId,commonAddrs);
-		//responseDatagrid(response, jObject);
-		this.carCustomerService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		//org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, carCustomer, request.getParameterMap());
+		String realName = request.getParameter("realName");
+		String phone = request.getParameter("phone");
+		JSONObject jObject = carCustomerService.getDatagrid2(carCustomer, dataGrid,realName,phone);
+		responseDatagrid(response, jObject);
+		//this.carCustomerService.getDataGridReturn(cq, true);
+		//TagUtil.datagrid(response, dataGrid);
 	}
 	
 	/**

@@ -68,6 +68,59 @@ public class CarCustomerServiceImpl extends CommonServiceImpl implements CarCust
 		return sqlWhere.toString();
 	}
 
+	@Override
+	public JSONObject getDatagrid2(CarCustomerEntity carCustomer, DataGrid dataGrid, String realName, String phone) {
+				
+			String sqlWhere = getSqlWhere2(realName,phone);
+				
+				// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
+				String sqlCnt = "select count(*) from car_customer s";
+				if (!sqlWhere.isEmpty()) {
+					sqlCnt += " where" + sqlWhere;
+				}
+				
+				Long iCount = getCountForJdbcParam(sqlCnt, null);
+				
+				// 取出当前页的数据 
+				String sql = "select s.id,s.real_name,s.sex,s.phone,s.card_number,s.address,s.create_time,s.remark from car_customer s";
+				if (!sqlWhere.isEmpty()) {
+					sql += " where " + sqlWhere;
+				}
+				
+				
+				List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
+				// 将结果集转换成页面上对应的数据集
+				Db2Page[] db2Pages = {
+						new Db2Page("id","id")
+						,new Db2Page("realName", "real_name", null)
+						,new Db2Page("sex", "sex", null)
+						,new Db2Page("phone", "phone", null)
+						,new Db2Page("cardNumber", "card_number", null)
+						,new Db2Page("address", "address", null)
+						,new Db2Page("createTime", "create_time", null)
+						,new Db2Page("remark", "remark", null)
+				};
+				JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+				return jObject;
+	}
+	
+	public String getSqlWhere2(String realName,String phone){
+		StringBuffer sqlWhere = new StringBuffer();
+		
+		if(StringUtil.isNotEmpty(realName)){
+			sqlWhere.append("  s.real_name like '%"+realName+"%' ");
+			if(StringUtil.isNotEmpty(phone)){
+				sqlWhere.append(" and s.phone like '%"+phone+"%' ");
+			}
+		}else{
+			if(StringUtil.isNotEmpty(phone)){
+				sqlWhere.append(" s.phone like '%"+phone+"%' ");
+			}
+		}
+		
+		return sqlWhere.toString();
+	}
+
 	
 	
 }
