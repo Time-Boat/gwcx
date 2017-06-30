@@ -11,8 +11,8 @@
 	<t:dgCol title="预计站点到站时间" field="arrivalTime" align="center" ></t:dgCol>
 	<t:dgCol title="common.operation" field="opt"></t:dgCol>
 	<t:dgFunOpt title="删除关联站点" funname="delZd(id,line_busstopId)" />
-	<t:dgToolBar title="添加站点挂接"  icon="icon-add" url="lineInfoController.do?busStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}" funname="add"></t:dgToolBar>
-	<t:dgToolBar title="站点时间、序号编辑"  icon="icon-edit" url="lineInfoController.do?updateBusStopOrder" funname="update"></t:dgToolBar>
+	<t:dgToolBar title="添加站点挂接"  operationCode="addSite" icon="icon-add" url="lineInfoController.do?busStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}" funname="add"></t:dgToolBar>
+	<t:dgToolBar title="站点时间、序号编辑" operationCode="editSite"  icon="icon-edit" url="lineInfoController.do?updateBusStopOrder" funname="update"></t:dgToolBar>
 
 </t:datagrid>
 </div>

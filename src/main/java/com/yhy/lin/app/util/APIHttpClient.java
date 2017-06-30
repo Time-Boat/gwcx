@@ -1,11 +1,14 @@
 package com.yhy.lin.app.util;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.commons.logging.Log;  
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
@@ -68,8 +71,8 @@ public class APIHttpClient {
     public APIHttpClient(String url) {  
   
         if (url != null) {
-            this.apiURL = url;  
-        }  
+            this.apiURL = url;
+        }
         if (apiURL != null) {
             httpClient = new DefaultHttpClient();  
             method = new HttpPost(apiURL);  
@@ -133,7 +136,6 @@ public class APIHttpClient {
         try {  
             // 建立一个NameValuePair数组，用于存储欲传送的参数  
 //            method.addHeader("Content-type","application/json; charset=utf-8");  
-            method.setHeader("Accept", "application/json");  
             startTime = System.currentTimeMillis();  
             HttpGet request = new HttpGet(apiURL);
             HttpResponse response = httpClient.execute(request);  
@@ -147,10 +149,9 @@ public class APIHttpClient {
                 logger.error("Method failed:" + response.getStatusLine());  
                 status = 1;  
             }  
-  
             // Read the response body  
             body = EntityUtils.toString(response.getEntity());  
-  
+            
         } catch (IOException e) {  
             // 网络错误  
         status = 3;  
@@ -161,6 +162,63 @@ public class APIHttpClient {
         return body;  
     }  
   
+    /** 
+     * 调用 API 
+     *  
+     * @param parameters 
+     * @return 
+     */  
+    public void getQRFile(String path) {
+    	
+    	boolean b = false;
+    	FileOutputStream fileOutputStream = null;
+    	InputStream is = null;
+    			
+        try {  
+            // 建立一个NameValuePair数组，用于存储欲传送的参数  
+//            method.addHeader("Content-type","application/json; charset=utf-8");  
+            startTime = System.currentTimeMillis();  
+            HttpGet request = new HttpGet(apiURL);
+            HttpResponse response = httpClient.execute(request);  
+              
+            endTime = System.currentTimeMillis();  
+            int statusCode = response.getStatusLine().getStatusCode();  
+              
+            logger.info("statusCode:" + statusCode);  
+            logger.info("调用API 花费时间(单位：毫秒)：" + (endTime - startTime));  
+            if (statusCode != HttpStatus.SC_OK) {  
+                logger.error("Method failed:" + response.getStatusLine());  
+                status = 1;  
+            }  
+            
+            HttpEntity h = response.getEntity();
+            is = h.getContent();
+            
+            byte[] data = new byte[1024];
+            int len = 0;
+            
+            fileOutputStream = new FileOutputStream(path);
+            
+            while ((len = is.read(data)) != -1) {
+            	fileOutputStream.write(data, 0, len);
+            }
+            b = true;
+        } catch (IOException e) {
+        	e.printStackTrace();
+            // 网络错误  
+        	status = 3;
+        } finally {
+        	try {
+				is.close();
+				fileOutputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+            logger.info("调用接口状态：" + status);  
+        }
+//        return b;  
+    }  
+    
     public static void main(String[] args) {
     	//线路站点信息测试
     	//apiURL += "&serveType=2&cityId=520100";
@@ -171,7 +229,8 @@ public class APIHttpClient {
 //    	apiURL = AppGlobals.WECHAT_QR_URL + "?access_token=CbhUuvu4rOt5TIVZ_tFe9F5apAPc93uyZ7c0Bmk79pYSNx3lKVI2ChrIAecJt5pATWQH_"
 //    			+ "tv16IWVSuGdbJH9rg8asiLqn1xbmDkLtEL50D5446StWw4nt-wCd8bzalzaQCKhAJAEQY";
 //    	String url = AppGlobals.ACCESS_TOKEN_URL.replace("%1", "client_credential").replace("%2", AppGlobals.WECHAT_ID).replace("%3", AppGlobals.WECHAT_APP_SECRET);
-        APIHttpClient ac = new APIHttpClient(apiURL);
+        APIHttpClient ac = new APIHttpClient("https://mp.weixin.qq.com/cgi-bin/showqrcode?"
+        		+ "ticket=gQHr8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAySElsNWs4Wm1jemsxMDAwMGcwM2IAAgS221NZAwQAAAAA");
         JsonArray arry = new JsonArray();
         JsonObject j = new JsonObject();
         System.out.println(ac.get());
@@ -234,7 +293,7 @@ public class APIHttpClient {
 //			e.printStackTrace();
 //		}  
         
-        System.out.println(ac.post("{\"action_name\": \"QR_LIMIT_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": 456}}}"));
+//        System.out.println(ac.post("{\"action_name\": \"QR_LIMIT_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": 456}}}"));
     }
 
     /** 

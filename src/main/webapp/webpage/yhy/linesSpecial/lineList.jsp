@@ -28,8 +28,8 @@
 	 
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="130"></t:dgCol>
 	<t:dgCol title="所在城市" field="city"  align="center"></t:dgCol>
-	<t:dgToolBar operationCode="add" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
-	<t:dgToolBar operationCode="edit" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500"></t:dgToolBar>
+	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
+	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
 	<%-- <t:dgToolBar operationCode="edit" title="站点挂接" icon="icon-edit" url="lineInfoController.do?addBusStop" funname="update"></t:dgToolBar>
 	 --%>
 	<t:dgCol title="操作" field="opt" width="100"></t:dgCol>

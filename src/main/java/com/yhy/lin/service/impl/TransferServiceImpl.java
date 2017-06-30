@@ -10,6 +10,7 @@ import java.util.Map;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
@@ -85,18 +86,16 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
 				new Db2Page("orderPaystatus", "order_paystatus", null),
 				new Db2Page("orderTrainnumber", "order_trainnumber", null),
-				new Db2Page("orderTotalPrice", "order_totalPrice", null), 
+				new Db2Page("orderTotalPrice", "order_totalPrice", null),
 				new Db2Page("name", "name", null),
-				new Db2Page("phoneNumber", "phoneNumber", null), 
+				new Db2Page("phoneNumber", "phoneNumber", null),
 				new Db2Page("licencePlate", "licence_plate", null),
-				new Db2Page("applicationTime", "applicationTime", null), 
+				new Db2Page("applicationTime", "applicationTime", null),
 				new Db2Page("lineId", "line_id", null),
-				new Db2Page("lineName", "line_name", null), 
+				new Db2Page("lineName", "line_name", null),
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("userId", "user_id", null),
-				new Db2Page("custphone", "phone", null)
-				
-
+				new Db2Page("custphone", "phone", null),
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;

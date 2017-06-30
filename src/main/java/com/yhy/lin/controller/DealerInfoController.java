@@ -22,6 +22,7 @@ import org.jeecgframework.core.util.MyBeanUtils;
 
 import javax.validation.Validator;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
@@ -147,8 +148,11 @@ public class DealerInfoController extends BaseController {
 		
 		dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, dealerInfo.getId());
 		try {
-			String url = WeixinPayUtil.getQRCode(req.getParameter("id"));
-			dealerInfo.setQrCodeUrl(url);
+			//文件存储路径
+			String path = AppGlobals.QR_CODE_FILE_PATH + req.getParameter("id") + ".jpg";
+			WeixinPayUtil.getQRCode(req.getParameter("id"), AppGlobals.IMAGE_BASE_FILE_PATH + path);
+			
+			dealerInfo.setQrCodeUrl(path);
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "二维码生成失败";

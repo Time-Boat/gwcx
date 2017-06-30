@@ -54,6 +54,9 @@ public interface AppGlobals {
 	/** 司机头像路径 */
 	public static final String DRIVER_FILE_PATH = "/image/driver/";
 	
+	/** 二维码图片路径 */
+	public static final String QR_CODE_FILE_PATH = "/image/QRCode/";
+	
 	/** 阿里大鱼服务器url */
 	public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
 
@@ -66,7 +69,6 @@ public interface AppGlobals {
 	/** 阿里大鱼appSecret */
 	public static final String APP_SECRET = "5be5a4659944c0ce41129ad3fc2f3fad";//个人fb8a26bf549a4d68082338d8a6391007
 
-	
 	/** 手机号验证 */
 	public static final String CHECK_PHONE = "^1[34578]\\d{9}$";
 	

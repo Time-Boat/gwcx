@@ -3,6 +3,7 @@ package com.yhy.lin.app.wechat;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -367,9 +368,9 @@ public class WeixinPayUtil {
 	/**
 	 * 生成二维码地址
 	 * 
-	 * @return param 二维码携带参数  json
+	 * @return promoterId 渠道商id
 	 */
-	public static String getQRCode(String promoterId){
+	public static void getQRCode(String promoterId, String path){
 		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
 		//APIHttpClient网络请求对象
 		APIHttpClient httpClient = new APIHttpClient(url);
@@ -380,7 +381,22 @@ public class WeixinPayUtil {
 		j.addProperty("action_info", " {\"scene\": {\"scene_id\": " + promoterId + "}}");     //临时二维码字段 scene_id        永久二维码字段 scene_str 
 		String str = httpClient.post(j.toString());
 		String ac_token = JSONObject.fromObject(str).get("ticket") + "";
-		return WECHAT_QR_URL.replace("%1", ac_token);
+		
+		saveQRCode2Loacl(WECHAT_QR_URL.replace("%1", ac_token), path);
+		//return WECHAT_QR_URL.replace("%1", ac_token);
+	}
+	
+	/**
+	 * 将二维码地址保存到本地
+	 * 
+	 * @return url 二维码携带参数  json
+	 */
+	public static void saveQRCode2Loacl(String url, String path){
+		//APIHttpClient网络请求对象
+		APIHttpClient httpClient = new APIHttpClient(url);
+		//将请求到的二维码保存到指定地址
+		httpClient.getQRFile(path);
+//		return "";
 	}
 	
 	public static void main(String[] args) {

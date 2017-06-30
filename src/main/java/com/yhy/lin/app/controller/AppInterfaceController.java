@@ -1227,8 +1227,9 @@ public class AppInterfaceController extends AppBaseController {
 			
 			JsonObject j = new JsonObject();
 			j.addProperty("account", account);
-			String QRUrl = WeixinPayUtil.getQRCode(j.toString());
-			data.put("QRUrl", QRUrl);
+			String path = AppGlobals.QR_CODE_FILE_PATH + account + ".jpg";
+			WeixinPayUtil.getQRCode(j.toString(), AppGlobals.IMAGE_BASE_FILE_PATH + path);
+			data.put("QRUrl", path);
 			
 			success = true;
 			statusCode = AppGlobals.APP_SUCCESS;
