@@ -44,6 +44,8 @@ import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
+import ch.qos.logback.classic.net.SyslogAppender;
+
 /**
  * Description : 接口处理类
  * 
@@ -1056,7 +1058,8 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 			
-			long c = appService.getCountForJdbcParam("select * from customer_message where userId=? ", new Object[]{userId});
+			String sql = "select count(*) from customer_message where user_id='" + userId + "'";
+			long c = appService.getCountForJdbc(sql);
 			if(c > 0){
 				success = true;
 			}

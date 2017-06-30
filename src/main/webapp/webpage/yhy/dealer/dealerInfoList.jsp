@@ -26,13 +26,23 @@
 		}
 		
 		function downloadQRCode(qrCodeUrl){
-			window.location.href = qrCodeUrl;
+			var path = "<%=request.getServerName() + ":" + request.getServerPort() %>";
+			console.log("path:" + path + qrCodeUrl);
+			console.log("qrCodeUrl:" + qrCodeUrl);
+			
+			var aObject = $("#downloadCode");
+			aObject.attr("href", "http://" + path + qrCodeUrl);
+			//aObject.click();
+			document.getElementById("downloadCode").click();
+			//window.location.href = path + qrCodeUrl;
+			//window.open(qrCodeUrl);
 		}
 		
 		function lookQRCode(qrCodeUrl){
-			window.open(qrCodeUrl);
+			window.open(qrCodeUrl);	
 		}
 	</script>
+	<a hidden="true" id="downloadCode" download ></a>
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
