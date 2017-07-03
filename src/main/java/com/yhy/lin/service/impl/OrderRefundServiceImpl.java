@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yhy.lin.app.controller.AppInterfaceController;
 import com.yhy.lin.app.entity.RefundReqData;
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.MobiMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -154,6 +155,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			TransferorderEntity t = getEntity(TransferorderEntity.class, id);
 			t.setOrderStatus(4);
 			t.setOrderPaystatus("2");
+			t.setRefundCompletedTime(AppUtil.getCurTime());
 			updateEntitie(t);
 			success = true;
 		} catch (Exception e) {

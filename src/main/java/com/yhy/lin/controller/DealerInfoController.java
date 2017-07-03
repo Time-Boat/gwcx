@@ -100,7 +100,6 @@ public class DealerInfoController extends BaseController {
 		return j;
 	}
 
-
 	/**
 	 * 添加渠道商信息
 	 * 

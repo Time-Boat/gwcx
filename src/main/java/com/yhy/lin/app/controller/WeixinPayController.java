@@ -46,6 +46,7 @@ import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.app.wechat.Sha1Util;
 import com.yhy.lin.app.wechat.TxtUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.DealerCustomerEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -73,7 +74,37 @@ public class WeixinPayController extends AppBaseController{
 	
 
 	/**
-	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId
+	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId   (进入主页)
+	 * 
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(params = "user")
+	public String user(HttpServletRequest request, HttpServletResponse response) {
+		try {
+
+			// 授权后要跳转的链接
+			String backUri = "http://car.cywtrip.com/job/index.html";
+			
+			backUri = backUri + "&openId=";
+			// URLEncoder.encode 后可以在backUri 的url里面获取传递的所有参数
+			backUri = URLEncoder.encode(backUri, "utf-8");
+			// scope 参数视各自需求而定，这里用scope=snsapi_base
+			// 不弹出授权页面直接授权目的只获取统一支付接口的openid
+			String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" + "appid=" + AppGlobals.WECHAT_ID
+					+ "&redirect_uri=" + backUri
+					+ "&response_type=code&scope=snsapi_userinfo&state=1234#wechat_redirect";
+			System.out.println("url:" + url);
+			response.sendRedirect(url);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId    (支付)
 	 * 
 	 * @param request
 	 * @param response
@@ -417,10 +448,22 @@ public class WeixinPayController extends AppBaseController{
 				case "subscribe":
 				case "scan":
 					logger.info("用户扫描二维码进入");
-					
 					String fromUser = map.get("FromUserName") + "";
-					logger.info("fromUser: " + fromUser);
+					String partnerId = map.get("EventKey") + "";   //合作渠道商id
 					
+					DealerCustomerEntity d = systemService.findUniqueByProperty(DealerCustomerEntity.class, "open_id", fromUser);
+					if(d == null){
+						d = new DealerCustomerEntity();
+						d.setOpenId(fromUser);
+					}
+					
+					d.setCreateDate(AppUtil.getDate());
+					d.setDealerId(partnerId);
+					
+					systemService.saveOrUpdate(d);
+					
+					logger.info("fromUser: " + fromUser);
+					logger.info("partnerId: " + partnerId);
 					break;
 				case "click":
 					logger.info("用户点击菜单进入");

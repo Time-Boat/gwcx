@@ -57,6 +57,17 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String orderPayNumber;  //微信支付订单号
 	
+	private String refundCompletedTime;
+	
+	@Column(name = "refund_completed_time")
+	public String getRefundCompletedTime() {
+		return refundCompletedTime;
+	}
+
+	public void setRefundCompletedTime(String refundCompletedTime) {
+		this.refundCompletedTime = refundCompletedTime;
+	}
+
 	@Column(name = "order_pay_number")
 	public String getOrderPayNumber() {
 		return orderPayNumber;

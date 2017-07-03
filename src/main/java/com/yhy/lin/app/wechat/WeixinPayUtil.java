@@ -362,6 +362,7 @@ public class WeixinPayUtil {
 		APIHttpClient httpClient = new APIHttpClient(url);
 		String str = httpClient.get();
 		String ac_token = JSONObject.fromObject(str).get("access_token") + "";
+		System.out.println(ac_token);
 		return ac_token;
 	}
 	
@@ -376,14 +377,19 @@ public class WeixinPayUtil {
 		APIHttpClient httpClient = new APIHttpClient(url);
 		
 		JsonObject j = new JsonObject();
-		j.addProperty("expire_seconds", 7200);    //临时二维码生效时间
-		j.addProperty("action_name", "QR_SCENE");   //二维码类型，QR_SCENE为临时,QR_LIMIT_SCENE为永久,QR_LIMIT_STR_SCENE为永久的字符串参数值
-		j.addProperty("action_info", " {\"scene\": {\"scene_id\": " + promoterId + "}}");     //临时二维码字段 scene_id        永久二维码字段 scene_str 
-		String str = httpClient.post(j.toString());
+		JsonObject j1 = new JsonObject();
+//		j.addProperty("expire_seconds", 7200);    //临时二维码生效时间
+//		j.addProperty("action_name", "QR_LIMIT_SCENE");   //二维码类型，QR_SCENE为临时,QR_LIMIT_SCENE为永久,QR_LIMIT_STR_SCENE为永久的字符串参数值
+//		j.addProperty("action_info", "{\"scene\": {\"scene_id\": " + 1223 + "}}");     //临时二维码字段 scene_id        永久二维码可以使用scene_id也可以使用scene_str
+		
+//		String QRBody = "{\"expire_seconds\": 604800, \"action_name\": \"QR_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": \"" + promoterId + "\"}}}";
+		String QRBody = "{\"action_name\": \"QR_LIMIT_STR_SCENE\", \"action_info\": {\"scene\": {\"scene_str\": \"" + promoterId + "\"}}}";
+		
+		String str = httpClient.post(QRBody);
 		String ac_token = JSONObject.fromObject(str).get("ticket") + "";
 		
 		saveQRCode2Loacl(WECHAT_QR_URL.replace("%1", ac_token), path);
-		//return WECHAT_QR_URL.replace("%1", ac_token);
+//		return WECHAT_QR_URL.replace("%1", ac_token);
 	}
 	
 	/**
