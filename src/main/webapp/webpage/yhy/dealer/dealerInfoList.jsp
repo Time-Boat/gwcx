@@ -27,8 +27,8 @@
 		
 		function downloadQRCode(qrCodeUrl){
 			var path = "<%=request.getServerName() + ":" + request.getServerPort() %>";
-			console.log("path:" + path + qrCodeUrl);
-			console.log("qrCodeUrl:" + qrCodeUrl);
+			//console.log("path:" + path + qrCodeUrl);
+			//console.log("qrCodeUrl:" + qrCodeUrl);
 			
 			var aObject = $("#downloadCode");
 			aObject.attr("href", "http://" + path + qrCodeUrl);
@@ -60,7 +60,7 @@
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
    <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览"></t:dgFunOpt>
-   <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)"  title="下载"></t:dgFunOpt> 
+   <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载"></t:dgFunOpt> 
   </t:datagrid>
   </div>
  </div>

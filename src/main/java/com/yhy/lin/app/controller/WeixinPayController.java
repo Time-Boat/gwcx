@@ -418,6 +418,9 @@ public class WeixinPayController extends AppBaseController{
 				case "scan":
 					logger.info("用户扫描二维码进入");
 					
+					String fromUser = map.get("FromUserName") + "";
+					logger.info("fromUser: " + fromUser);
+					
 					break;
 				case "click":
 					logger.info("用户点击菜单进入");
@@ -435,7 +438,6 @@ public class WeixinPayController extends AppBaseController{
         PrintWriter out = response.getWriter();  
         out.print("");
         out.close();
-		
 	}
 	
 //	/**

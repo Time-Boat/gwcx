@@ -1054,7 +1054,7 @@ public class AppInterfaceController extends AppBaseController {
 
 			// 验证参数
 			checkParam(new String[] { "token", "userId" }, token, userId);
-
+			
 			// 验证token
 			checkToken(token);
 			

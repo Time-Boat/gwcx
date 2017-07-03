@@ -33,7 +33,7 @@
 			    idField="id" fit="true" queryMode="group" checkbox="true">
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
-		<t:dgCol title="订单类型" field="orderType" replace="接机_0,送机_1,接火车_2,送火车_3" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单类型" field="orderType" dictionary="transferTy" query="true" align="center"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
