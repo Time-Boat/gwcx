@@ -585,6 +585,14 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 
+			String isMessage = request.getParameter("isMessage");
+			
+			if(isMessage != null && "1".equals(isMessage)){
+				//进入消息详情页后就将所有的消息改为已读
+				String sql = "update customer_message set status=1 where order_id=? ";
+				systemService.executeSql(sql, orderId);
+			}
+			
 			aod = appService.getOrderDetailById(orderId);
 
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -1112,7 +1120,7 @@ public class AppInterfaceController extends AppBaseController {
 
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
-
+			
 			// 验证参数
 			checkParam(new String[] { "token", "userId" }, token, userId);
 			
