@@ -14,6 +14,7 @@ import net.sf.json.JSONObject;
 
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.DateUtils;
+import org.jeecgframework.core.util.PasswordUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
 import org.jeecgframework.web.system.service.SystemService;
@@ -77,17 +78,23 @@ public class AppInterfaceController extends AppBaseController {
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
+		
+		String isNew = "";
 
 		try {
 			// String mobile = request.getParameter("mobile");// 用户名
 			// String code = request.getParameter("code");// 验证码
-
+			
+//			String mobile = request.getParameter("mobile");		// 授权参数
+//			String code = request.getParameter("code");		// 授权参数
+//			String openId = request.getParameter("openId");		// 授权参数
+			
 			String param = AppUtil.inputToStr(request);
 			System.out.println("前端传递参数：" + param);
-			
+//			
 			JSONObject jsondata = JSONObject.fromObject(param);
-			
-			// 验证参数
+//			
+			//验证参数
 			checkParam(jsondata);
 			
 			String mobile = jsondata.getString("mobile");
@@ -119,6 +126,10 @@ public class AppInterfaceController extends AppBaseController {
 								token = generateToken(user.getId(), user.getPhone());
 								sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
 								systemService.executeSql(sql, curTime, token, mobile);
+								// 新注册用户 标识
+								if(user.getTokenUpdateTime() == null){
+									isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
+								}
 							}
 
 							// 添加登陆日志
@@ -134,6 +145,7 @@ public class AppInterfaceController extends AppBaseController {
 							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
 							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
 							data.put("phone", user.getPhone());
+							data.put("isNew", isNew);
 							statusCode = AppGlobals.APP_SUCCESS;
 						} else {
 							msg = "验证码不正确！";
@@ -151,11 +163,13 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "手机号不能为空！";
 				statusCode = "001";
 			}
-		} catch (ParameterException e) {
+		}
+		catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
 			logger.error(e.getErrorMessage());
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
 			msg = "登陆异常";
 			statusCode = AppGlobals.SYSTEM_ERROR;
@@ -193,7 +207,7 @@ public class AppInterfaceController extends AppBaseController {
 		} else {
 			// 生成4位数的验证码
 			String code = StringUtil.numRandom(4);
-
+			
 			// 发送端短消息
 //			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
 //					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
@@ -202,7 +216,7 @@ public class AppInterfaceController extends AppBaseController {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
 				UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-
+				
 				// 当前时间
 				String curTime = AppUtil.getCurTime();
 				String sql = "";

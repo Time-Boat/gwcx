@@ -59,7 +59,18 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	
 	/** 用户头像  */
 	private java.lang.String customerImg;
-
+	
+	/** 此客户的微信唯一识别码  */
+	private java.lang.String openId;
+	
+	@Column(name = "OPEN_ID", nullable = true, length = 32)
+	public java.lang.String getOpenId() {
+		return openId;
+	}
+	public void setOpenId(java.lang.String openId) {
+		this.openId = openId;
+	}
+	
 	@Column(name = "CUSTOMER_IMG", nullable = true, length = 50)
 	public java.lang.String getCustomerImg() {
 		return customerImg;

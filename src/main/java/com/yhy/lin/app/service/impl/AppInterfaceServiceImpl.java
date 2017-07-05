@@ -80,7 +80,6 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		}
 		
 		save(t);
-		
 		save(c);
 	}
 
@@ -337,9 +336,9 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			mList.add(am);
 		}
 
-		String sql = "update customer_message set status=1 where user_id=? ";
-		
-		executeSql(sql, userId);
+		//进入消息中心后就将所有的消息改为已读       （改为点击消息的时候改为已读）
+//		String sql = "update customer_message set status=1 where user_id=? ";
+//		executeSql(sql, userId);
 		
 		return mList;
 	}

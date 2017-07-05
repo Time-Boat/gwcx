@@ -38,7 +38,7 @@ public class DealerInfoEntity implements java.io.Serializable {
 	/**二维码地址*/
 	private java.lang.String qrCodeUrl;
 	/**被扫描次数*/
-	private java.lang.String scanCount;
+	private java.lang.Integer scanCount;
 	/**联系电话*/
 	private java.lang.String phone;
 	/**负责人*/
@@ -112,19 +112,19 @@ public class DealerInfoEntity implements java.io.Serializable {
 		this.qrCodeUrl = qrCodeUrl;
 	}
 	/**
-	 *方法: 取得java.lang.String
-	 *@return: java.lang.String  被扫描次数
+	 *方法: 取得java.lang.Integer
+	 *@return: java.lang.Integer  被扫描次数
 	 */
-	@Column(name ="SCAN_COUNT",nullable=true,length=10)
-	public java.lang.String getScanCount(){
+	@Column(name ="SCAN_COUNT",nullable=true,precision=10,scale=0)
+	public java.lang.Integer getScanCount(){
 		return this.scanCount;
 	}
 
 	/**
-	 *方法: 设置java.lang.String
-	 *@param: java.lang.String  被扫描次数
+	 *方法: 设置java.lang.Integer
+	 *@param: java.lang.Integer  被扫描次数
 	 */
-	public void setScanCount(java.lang.String scanCount){
+	public void setScanCount(java.lang.Integer scanCount){
 		this.scanCount = scanCount;
 	}
 	/**

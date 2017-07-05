@@ -125,7 +125,7 @@ public class DealerInfoController extends BaseController {
 		} else {
 			message = "渠道商信息添加成功";
 			dealerInfo.setCreateDate(AppUtil.getDate());
-			dealerInfo.setScanCount("0");
+			dealerInfo.setScanCount(0);
 			
 			dealerInfoService.save(dealerInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);

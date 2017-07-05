@@ -149,6 +149,12 @@
 						<!-- 二维码生成 -->
 						<value>app.do?generateQRCode</value>
 						
+						<!-- 微信菜单点击 -->
+						<value>wx.do?toIndex</value>
+						
+						<!-- 微信授权 -->
+						<value>wx.do?wxOauth2</value>
+						
 					</list>
 				</property>
 			</bean>

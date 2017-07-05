@@ -24,6 +24,7 @@ import sun.misc.BASE64Decoder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.jeecgframework.core.util.PasswordUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
 import org.jeecgframework.web.system.service.SystemService;
@@ -34,9 +35,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.yhy.lin.app.entity.AppMessageListEntity;
+import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.RefundReqData;
+import com.yhy.lin.app.service.WeixinPayService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MD5Util;
@@ -46,6 +50,7 @@ import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.app.wechat.Sha1Util;
 import com.yhy.lin.app.wechat.TxtUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.app.wechat.menu.MenuContext;
 import com.yhy.lin.entity.DealerCustomerEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
@@ -64,6 +69,9 @@ public class WeixinPayController extends AppBaseController{
 	@Autowired
 	private SystemService systemService;
 
+	@Autowired
+	private WeixinPayService wxService;
+	
 	// private stxatic String baseUrl = "http://localhost:8080/gwcx";
 	private static String baseUrl = "http://car.cywtrip.com/gwcx";
 
@@ -71,37 +79,6 @@ public class WeixinPayController extends AppBaseController{
 	 * Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
-	
-
-	/**
-	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId   (进入主页)
-	 * 
-	 * @param request
-	 * @param response
-	 * @return
-	 */
-	@RequestMapping(params = "user")
-	public String user(HttpServletRequest request, HttpServletResponse response) {
-		try {
-
-			// 授权后要跳转的链接
-			String backUri = "http://car.cywtrip.com/job/index.html";
-			
-			backUri = backUri + "&openId=";
-			// URLEncoder.encode 后可以在backUri 的url里面获取传递的所有参数
-			backUri = URLEncoder.encode(backUri, "utf-8");
-			// scope 参数视各自需求而定，这里用scope=snsapi_base
-			// 不弹出授权页面直接授权目的只获取统一支付接口的openid
-			String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" + "appid=" + AppGlobals.WECHAT_ID
-					+ "&redirect_uri=" + backUri
-					+ "&response_type=code&scope=snsapi_userinfo&state=1234#wechat_redirect";
-			System.out.println("url:" + url);
-			response.sendRedirect(url);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
 	
 	/**
 	 * 微信网页授权获取用户基本信息，先获取 code，跳转 url 通过 code 获取 openId    (支付)
@@ -118,7 +95,7 @@ public class WeixinPayController extends AppBaseController{
 
 			String orderId = request.getParameter("orderId");
 			String totalFee = request.getParameter("totalFee");
-			System.out.println("in userAuth,orderId:" + orderId);
+			logger.info("in userAuth,orderId:" + orderId);
 			// 授权后要跳转的链接
 			String backUri = baseUrl + "/wx.do?toPay";
 			
@@ -130,7 +107,7 @@ public class WeixinPayController extends AppBaseController{
 			String url = "https://open.weixin.qq.com/connect/oauth2/authorize?" + "appid=" + AppGlobals.WECHAT_ID
 					+ "&redirect_uri=" + backUri
 					+ "&response_type=code&scope=snsapi_userinfo&state=1234#wechat_redirect";
-			System.out.println("url:" + url);
+			logger.info("url:" + url);
 			response.sendRedirect(url);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -433,10 +410,11 @@ public class WeixinPayController extends AppBaseController{
 	 * 
 	 */
 	@RequestMapping(params = "eventPush")
-	public void eventPush(HttpServletRequest request, HttpServletResponse response)
+	public ModelAndView eventPush(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		
 		logger.info("进入eventPush回调url");
+		String url = "";
 		try {
 			
 			String xml = WeixinPayUtil.getXmlRequest(request);
@@ -444,43 +422,167 @@ public class WeixinPayController extends AppBaseController{
 				Map map = WeixinPayUtil.doXMLParse(xml);
 				String type = (map.get("Event") + "").toLowerCase();
 				
+				String eventKey = map.get("EventKey") + "";
+				
+				String fromUser = map.get("FromUserName") + "";
+				logger.info("fromUser: " + fromUser);
+				logger.info("partnerId: " + eventKey);
+				
 				switch (type) {
 				case "subscribe":
 				case "scan":
 					logger.info("用户扫描二维码进入");
-					String fromUser = map.get("FromUserName") + "";
-					String partnerId = map.get("EventKey") + "";   //合作渠道商id
+//					String partnerId = map.get("EventKey") + "";   //合作渠道商id
 					
-					DealerCustomerEntity d = systemService.findUniqueByProperty(DealerCustomerEntity.class, "open_id", fromUser);
+					//如果该用户已经注册并绑定了渠道商
+					CarCustomerEntity cc = systemService.findUniqueByProperty(CarCustomerEntity.class, "openId", fromUser);
+					if(cc != null){
+						return null;
+					}
+					
+					DealerCustomerEntity d = systemService.findUniqueByProperty(DealerCustomerEntity.class, "openId", fromUser);
 					if(d == null){
 						d = new DealerCustomerEntity();
 						d.setOpenId(fromUser);
 					}
 					
 					d.setCreateDate(AppUtil.getDate());
-					d.setDealerId(partnerId);
+					d.setDealerId(eventKey);
 					
 					systemService.saveOrUpdate(d);
 					
-					logger.info("fromUser: " + fromUser);
-					logger.info("partnerId: " + partnerId);
 					break;
 				case "click":
-					logger.info("用户点击菜单进入");
-					
+					logger.info("用户点击菜单(click)进入");
+					//策略模式
+					MenuContext context = new MenuContext(eventKey, type, fromUser);  
+					url = context.execute();
 					break;
+				case "view":
+					logger.info("用户点击菜单(view)进入");
+					//策略模式
+					url = eventKey + "&openId=" + fromUser;
+					break;
+
 				default:
 					break;
 				}
-				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
-        PrintWriter out = response.getWriter();  
-        out.print("");
-        out.close();
+//		PrintWriter out = response.getWriter();  
+//        out.print("");
+//        out.close();
+        
+		logger.info("跳转的url" + url);
+        if(StringUtil.isNotEmpty(url)){
+//        	return new ModelAndView(new RedirectView(url));
+        	return null;
+        }else{
+        	return null;
+        }
+        
+	}
+	
+	/**
+	 * 微信view菜单按钮授权跳转
+	 * 
+	 */
+	@RequestMapping(params = "wxOauth2")
+	public String viewMenu(HttpServletRequest request, HttpServletResponse response){
+		logger.info("进入wxOauth2");
+		try {
+			// String orderId =
+			// MakeOrderNum.makeOrderNum("tx");//AppGlobals.SP_NAME;
+
+			// 授权后要跳转的链接
+			String backUri = baseUrl + "/wx.do?toIndex";
+			
+			String reUrl = request.getParameter("redirect_uri");
+			String phone = request.getParameter("phone");
+			//新用户判断
+			String isNew = request.getParameter("isNew");
+			
+			logger.info("wxOauth2    phone:" + phone);
+			logger.info("wxOauth2    reUrl:" + reUrl);
+			logger.info("wxOauth2    isNew:" + isNew);
+			
+			if(!StringUtil.isNotEmpty(isNew)){
+				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+			}
+			
+			//如果这个用户已经绑定了渠道商，则不需要再去获得他的openId
+			CarCustomerEntity car = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", phone);
+			String openId = car.getOpenId();
+			if(StringUtil.isNotEmpty(openId)){
+				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+			}
+			
+			//解密的结果是不是正确的       解密耗时久，所以放在两个条件之后
+			String plaintext = PasswordUtil.decrypt(isNew, car.getToken(), PasswordUtil.getStaticSalt());
+			logger.info("wxOauth2    plaintext:" + plaintext);
+			if(!plaintext.equals(phone)){
+				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+			}
+			
+			backUri = backUri + "&redirect_uri=" + reUrl + "&phone=" + phone + "&isNew" + plaintext;
+			logger.info("wxOauth2    backUri:" + backUri);
+			
+			// URLEncoder.encode 后可以在backUri 的url里面获取传递的所有参数
+			backUri = URLEncoder.encode(backUri, "utf-8");
+			// scope 参数视各自需求而定，这里用scope=snsapi_base
+			// 不弹出授权页面直接授权目的只获取统一支付接口的openid
+			String url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + AppGlobals.WECHAT_ID
+					+ "&redirect_uri=" + backUri
+					+ "&response_type=code&scope=snsapi_base&state=1#wechat_redirect";
+			logger.info("url:" + url);
+			response.sendRedirect(url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * 微信view菜单按钮授权跳转
+	 * 
+	 */
+	@RequestMapping(params = "toIndex")
+	public String toIndex(HttpServletRequest request, HttpServletResponse response){
+		logger.info("进入toIndex");
+		// 获取统一下单需要的openid
+		String openId = "";
+		
+		String code = request.getParameter("code");
+		String phone = request.getParameter("phone");
+		String redirect_uri = request.getParameter("redirect_uri");
+		
+		logger.info("code:" + code);
+		logger.info("toIndex    redirect_uri:" + redirect_uri);
+		try {
+			if (!StringUtil.isNotEmpty(code)) {
+				return "redirect:http://car.cywtrip.com/job/" + redirect_uri + ".html";
+			}
+			
+			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AppGlobals.WECHAT_ID + "&secret="
+					+ AppGlobals.WECHAT_APP_SECRET + "&code=" + code + "&grant_type=authorization_code";
+			
+			logger.info("URL:" + URL);
+			//获取openId
+			JSONObject jsonObject = CommonUtil.httpsRequest(URL, "GET", null);
+			logger.info(jsonObject);
+			if (null != jsonObject) {
+				openId = jsonObject.getString("openid");
+				logger.info("openid:" + openId);
+				
+				wxService.updateBandingInfo(openId, phone);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "redirect:http://car.cywtrip.com/job/" + redirect_uri + ".html";
 	}
 	
 //	/**

@@ -406,7 +406,7 @@ public class WeixinPayUtil {
 	}
 	
 	public static void main(String[] args) {
-
+		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
 //		 String sign = "";
 //		 SortedMap<String, String> storeMap = new TreeMap<String, String>();
 //		 storeMap.put("trade_type", "NATIVE"); // 交易类型

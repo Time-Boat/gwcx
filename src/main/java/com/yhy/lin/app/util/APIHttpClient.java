@@ -229,16 +229,17 @@ public class APIHttpClient {
 //    	apiURL = AppGlobals.WECHAT_QR_URL + "?access_token=CbhUuvu4rOt5TIVZ_tFe9F5apAPc93uyZ7c0Bmk79pYSNx3lKVI2ChrIAecJt5pATWQH_"
 //    			+ "tv16IWVSuGdbJH9rg8asiLqn1xbmDkLtEL50D5446StWw4nt-wCd8bzalzaQCKhAJAEQY";
 //    	String url = AppGlobals.ACCESS_TOKEN_URL.replace("%1", "client_credential").replace("%2", AppGlobals.WECHAT_ID).replace("%3", AppGlobals.WECHAT_APP_SECRET);
-        APIHttpClient ac = new APIHttpClient("https://mp.weixin.qq.com/cgi-bin/showqrcode?"
-        		+ "ticket=gQHr8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAySElsNWs4Wm1jemsxMDAwMGcwM2IAAgS221NZAwQAAAAA");
+//        APIHttpClient ac = new APIHttpClient("https://mp.weixin.qq.com/cgi-bin/showqrcode?"
+//        		+ "ticket=gQHr8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAySElsNWs4Wm1jemsxMDAwMGcwM2IAAgS221NZAwQAAAAA");
+        			APIHttpClient ac = new APIHttpClient("http://localhost:8080/gwcx/wx.do?wxOauth2");
         JsonArray arry = new JsonArray();
         JsonObject j = new JsonObject();
         System.out.println(ac.get());
         
         
         //登录接口
-//        j.addProperty("mobile", "15527916902");  
-//        j.addProperty("code", "1325");  
+        j.addProperty("mobile", "15527916902");  
+        j.addProperty("code", "1325");  
         
         //接送机订单测试
 //        j.addProperty("orderType", "2");  
@@ -287,11 +288,11 @@ public class APIHttpClient {
         // 返回Base64编码过的字节数组字符串
 //        System.out.println(j.toString());
 //        System.out.println(Base64Util.getBase64(j.toString()));
-//        try {
-//			System.out.println(ac.post(Base64Util.getBase64(URLEncoder.encode(j.toString(), "UTF-8"))));
-//		} catch (UnsupportedEncodingException e) {
-//			e.printStackTrace();
-//		}  
+        try {
+			System.out.println(ac.post(Base64Util.getBase64(URLEncoder.encode(j.toString(), "UTF-8"))));
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}  
         
 //        System.out.println(ac.post("{\"action_name\": \"QR_LIMIT_SCENE\", \"action_info\": {\"scene\": {\"scene_id\": 456}}}"));
     }
