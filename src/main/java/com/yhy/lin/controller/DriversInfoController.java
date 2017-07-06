@@ -85,8 +85,9 @@ public class DriversInfoController extends BaseController {
 		String sex = request.getParameter("sex");
 		String name = request.getParameter("name");
 		String phoneNumber = request.getParameter("phoneNumber");
+		String status =  request.getParameter("status");
 		
-		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,sex ,name ,phoneNumber);
+		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,sex ,name ,phoneNumber,status);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -140,6 +141,7 @@ public class DriversInfoController extends BaseController {
 			message = "司机信息表添加成功";
 			driversInfo.setCreateDate(new Date(System.currentTimeMillis()));
 			driversInfo.setDeleteFlag(0);
+			driversInfo.setStatus("0");
 			driversInfoService.save(driversInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}

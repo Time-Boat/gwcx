@@ -43,8 +43,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
-			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder, fc_begin, fc_end, ddTime_begin, ddTime_end);
+			String orderStartingstation,String orderTerminusstation) {
+		String sqlWhere = getWhere(transferorder, fc_begin, fc_end, orderStartingstation, orderTerminusstation);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -91,8 +91,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		return jObject;
 	}
 
-	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String ddTime_begin,
-			String ddTime_end) {
+	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String orderStartingstation,
+			String orderTerminusstation) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
@@ -104,10 +104,6 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
-		}
-		// 预计到达时间
-		if (StringUtil.isNotEmpty(ddTime_begin) && StringUtil.isNotEmpty(ddTime_end)) {
-			sql.append(" and a.order_expectedarrival between '" + ddTime_begin + "' and '" + ddTime_end + "'");
 		}
 		// 订单编号
 		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
@@ -122,12 +118,12 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			sql.append(" and  a.order_status ='" + transferorder.getOrderStatus() + "'");
 		}
 		// 起点站id
-		if (StringUtil.isNotEmpty(transferorder.getOrderStartingStationId())) {
-			sql.append(" and  a.order_starting_station_id = '" + transferorder.getOrderStartingStationId() + "'");
+		if (StringUtil.isNotEmpty(orderStartingstation)) {
+			sql.append(" and  a.order_starting_station_name like '%" + orderStartingstation + "%'");
 		}
 		// 终点站id
-		if (StringUtil.isNotEmpty(transferorder.getOrderTerminusStationId())) {
-			sql.append(" and  a.order_terminus_station_id = '" + transferorder.getOrderTerminusStationId() + "'");
+		if (StringUtil.isNotEmpty(orderTerminusstation)) {
+			sql.append(" and  a.order_terminus_station_name like '%" + orderTerminusstation + "%'");
 		}
 
 		// 申请人
@@ -137,7 +133,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 
 		sql.append(" and order_status in('3','4','5') ");
 
-		sql.append(" order by a.order_startime asc ");
+		sql.append(" order by a.order_status,a.refund_time ");
 
 		return sql.toString();
 	}

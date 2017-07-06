@@ -80,8 +80,8 @@
 					</label>
 				</td>
 					<td class="value">					
-						<input readonly="true" class="inputxt" id="licenceDriver" name="licenceDriver" value="">
-						<input id="licenceDriverId" name="licenceDriverId" type="hidden" value="" >
+						<input readonly="true" class="inputxt" id="licenceDriver" name="licenceDriver" value="${driverPage.name}">
+						<input id="licenceDriverId" name="driverId" type="hidden" value="${carInfoPage.driverId}" >
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

@@ -66,7 +66,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
-		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = { 
@@ -95,7 +94,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("lineName", "line_name", null),
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("userId", "user_id", null),
-				new Db2Page("custphone", "phone", null),
+				new Db2Page("custphone", "phone", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;

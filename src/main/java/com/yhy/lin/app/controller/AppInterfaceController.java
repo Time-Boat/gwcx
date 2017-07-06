@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.yhy.lin.app.entity.AppCheckTicket;
 import com.yhy.lin.app.entity.AppCustomerEntity;
@@ -44,8 +45,6 @@ import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
-
-import ch.qos.logback.classic.net.SyslogAppender;
 
 /**
  * Description : 接口处理类
@@ -90,7 +89,7 @@ public class AppInterfaceController extends AppBaseController {
 //			String openId = request.getParameter("openId");		// 授权参数
 			
 			String param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			System.out.println("appLogin    前端传递参数：" + param);
 //			
 			JSONObject jsondata = JSONObject.fromObject(param);
 //			
@@ -197,7 +196,7 @@ public class AppInterfaceController extends AppBaseController {
 		JSONObject data = new JSONObject();
 
 		String mobile = request.getParameter("mobile");
-
+		logger.info("手机号: " + mobile);
 		if (!StringUtil.isNotEmpty(mobile)) {
 			msg = "手机号不能为空";
 			statusCode = "001";
@@ -207,7 +206,7 @@ public class AppInterfaceController extends AppBaseController {
 		} else {
 			// 生成4位数的验证码
 			String code = StringUtil.numRandom(4);
-			
+			logger.info("验证码: " + code);
 			// 发送端短消息
 //			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
 //					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
@@ -267,7 +266,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 			param = AppUtil.inputToStr(request);
 			
-			System.out.println("前端传递参数：" + param);
+			System.out.println("createOrder   前端传递参数：" + param);
 			
 			JSONObject jsondata = JSONObject.fromObject(param);
 			
@@ -278,7 +277,11 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 
-			Gson g = new Gson();
+			//在linux服务器中日期转换要指定格式
+			Gson g = new GsonBuilder()  	
+					  .setDateFormat("yyyy-MM-dd HH:mm:ss")  
+					  .create();  
+			
 			TransferorderEntity t = g.fromJson(param, TransferorderEntity.class);
 			
 			// 和当前时间进行比较，出发时间和当前时间不能低于4个小时
@@ -344,7 +347,7 @@ public class AppInterfaceController extends AppBaseController {
 					}
 	
 					appService.saveOrder(t, orderPrefix, commonAddrId);
-					System.out.println("保存订单成功，订单状态为未支付");
+					logger.info("保存订单成功，订单状态为未支付");
 					data.put("orderId", t.getId());
 				}
 				statusCode = AppGlobals.APP_SUCCESS;
@@ -585,12 +588,12 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 
-			String isMessage = request.getParameter("isMessage");
+			String messageId = request.getParameter("messageId");
 			
-			if(isMessage != null && "1".equals(isMessage)){
+			if(messageId != null ){
 				//进入消息详情页后就将所有的消息改为已读
-				String sql = "update customer_message set status=1 where order_id=? ";
-				systemService.executeSql(sql, orderId);
+				String sql = "update customer_message set status=1 where id=? ";
+				long l = systemService.executeSql(sql, messageId);
 			}
 			
 			aod = appService.getOrderDetailById(orderId);
@@ -631,7 +634,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			System.out.println("modifyOrder     前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -694,7 +697,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			System.out.println("cancelOrder     前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 			// 验证参数
@@ -772,7 +775,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			System.out.println("completeOrder    前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -881,7 +884,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request); 
-			System.out.println("前端传递参数：" + param);
+			System.out.println("feedback    前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 			
@@ -936,7 +939,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			System.out.println("前端传递参数：" + param);
+			System.out.println("getUserInfo     前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -1001,7 +1004,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-//			System.out.println("前端传递参数：" + param);
+//			logger.info("前端传递参数：" + param);
 
 			JSONObject jsondata = JSONObject.fromObject(param);
 
@@ -1019,6 +1022,9 @@ public class AppInterfaceController extends AppBaseController {
 			String idCard = jsondata.getString("idCard");
 			String address = jsondata.getString("address");
 			String userName = jsondata.getString("userName");
+			
+			logger.info("uploadPersonalInfo   前端传递参数：  imgName=" + pName + "    userId=" + userId + "    address=" + address 
+					+ "    userName=" + userName + "    idCard=" + idCard);
 			
 			CarCustomerEntity cc = systemService.getEntity(CarCustomerEntity.class, userId);
 			String path = AppGlobals.IMAGE_BASE_FILE_PATH;
@@ -1080,7 +1086,7 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 			
-			String sql = "select count(*) from customer_message where user_id='" + userId + "'";
+			String sql = "select count(*) from customer_message where user_id='" + userId + "' and status=0 ";
 			long c = appService.getCountForJdbc(sql);
 			if(c > 0){
 				success = true;
@@ -1191,7 +1197,7 @@ public class AppInterfaceController extends AppBaseController {
 			String token = request.getParameter("token");
 			String messageId = request.getParameter("messageId");
 			
-			System.out.println("前端传递参数：token:" + token + "---messageId:" + messageId);
+			System.out.println("delMessage  前端传递参数：token:" + token + "---messageId:" + messageId);
 			
 			// 验证参数
 			checkParam(new String[] { "token", "messageId" }, token, messageId);
@@ -1242,7 +1248,7 @@ public class AppInterfaceController extends AppBaseController {
 			String token = request.getParameter("token");
 			String account = request.getParameter("account");
 			
-			System.out.println("前端传递参数：token:" + token + "---messageId:" + account);
+			System.out.println("generateQRCode    前端传递参数：token:" + token + "---messageId:" + account);
 			
 			// 验证参数
 			checkParam(new String[] { "token", "account" }, token, account);

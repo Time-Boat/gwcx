@@ -38,6 +38,17 @@
 </div>
 </div>
 <script type="text/javascript">
+	//进入触发 
+	$(function() {
+		$('#transferOrderList').datagrid({   
+		    rowStyler:function(index,row){   
+		        if (row.orderStatus=="1"){   
+		            return 'color:red';   
+		        }
+		    }   
+		});
+	});
+
 	$(document).ready(function(){
 		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	

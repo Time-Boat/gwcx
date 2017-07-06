@@ -190,7 +190,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		StringBuffer sql = new StringBuffer();
 		sql.append(
 				"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
-						+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? ");
+						+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? ORDER BY INSTR('2,1,6,3,4,5,0',order_status ) asc ");
 
 //		if (StringUtil.isNotEmpty(orderStatus)) {
 //			sql.append(" and order_paystatus = '" + orderStatus + "'");
@@ -226,7 +226,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		//为了通用这个详情页，把几个订单详情页的属性都拿出来了
 		list = findForJdbc(
-				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name, "
+				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name,a.order_expectedarrival, "
 						+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
 						+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes "
 						+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
@@ -260,16 +260,23 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 			// 发车时间
 			aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));
-			// 线路时长
-			String lineTime = map.get("lineTimes") + "";
 
-			// 在发车时间的基础上加上线路所用时长
+//			// 线路时长
+//			String lineTime = map.get("lineTimes") + "";
+//			// 在发车时间的基础上加上线路所用时长
+//			if (StringUtil.isNotEmpty(lineTime)) {
+//				double lt = Double.parseDouble(lineTime);
+//
+//				long a = (long) (date.getTime() + (lt * 60 * 1000));
+//
+//				aod.setStationEndTime(DateUtils.date2Str(new Date(a), DateUtils.short_time_sdf));
+//			} else {
+//				aod.setStationEndTime("");
+//			}
+			
+			String lineTime = map.get("order_expectedarrival") + "";
 			if (StringUtil.isNotEmpty(lineTime)) {
-				double lt = Double.parseDouble(lineTime);
-
-				long a = (long) (date.getTime() + (lt * 60 * 60 * 1000));
-
-				aod.setStationEndTime(DateUtils.date2Str(new Date(a), DateUtils.short_time_sdf));
+				aod.setStationEndTime(lineTime.substring(lineTime.indexOf(" "), lineTime.lastIndexOf(":")));
 			} else {
 				aod.setStationEndTime("");
 			}

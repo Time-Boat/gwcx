@@ -106,6 +106,10 @@ public class CarInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		carInfo = systemService.getEntity(CarInfoEntity.class, carInfo.getId());
+		if(StringUtil.isNotEmpty(carInfo.getDriverId())){
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
+			driver.setStatus("0");//修改司机状态--被使用
+		}
 		message = "车辆信息删除成功";
 		carInfoService.delete(carInfo);
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
@@ -125,10 +129,6 @@ public class CarInfoController extends BaseController {
 	public AjaxJson save(CarInfoEntity carInfo, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		String driverId = request.getParameter("licenceDriverId");
-		if(StringUtil.isNotEmpty(driverId)){
-			carInfo.setDriverId(driverId);
-		}
 
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			message = "车辆信息更新成功";
@@ -145,7 +145,10 @@ public class CarInfoController extends BaseController {
 			message = "车辆信息添加成功";
 			
 			carInfo.setDeleteFlag(0);
-			
+			if(StringUtil.isNotEmpty(carInfo.getDriverId())){
+				DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
+				driver.setStatus("1");//修改司机状态--被使用
+			}
 			carInfoService.save(carInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
@@ -166,6 +169,10 @@ public class CarInfoController extends BaseController {
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			carInfo = carInfoService.getEntity(CarInfoEntity.class, carInfo.getId());
 			req.setAttribute("carInfoPage", carInfo);
+		}
+		if (StringUtil.isNotEmpty(carInfo.getDriverId())) {
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
+			req.setAttribute("driverPage", driver);
 		}
 		
 		driversList = carInfoService.getDriverList(carInfo.getDriverId());

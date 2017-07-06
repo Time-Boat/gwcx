@@ -12,7 +12,7 @@ import net.sf.json.JSONObject;
 
 public interface OrderRefundServiceI extends CommonService{
 	
-	public JSONObject getDatagrid(TransferorderEntity transferorder,DataGrid dataGrid,String fc_begin,String fc_end,String ddTime_begin,String ddTime_end);
+	public JSONObject getDatagrid(TransferorderEntity transferorder,DataGrid dataGrid,String fc_begin,String fc_end,String orderStartingstation,String orderTerminusstation);
 
 	public boolean agreeRefund(String id);
 

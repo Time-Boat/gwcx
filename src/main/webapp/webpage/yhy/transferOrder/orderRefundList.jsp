@@ -29,7 +29,7 @@
 </style>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
-	<t:datagrid name="orderRefundList" title="接送订单处理" autoLoadData="true" actionUrl="orderRefundController.do?datagrid" fitColumns="true"
+	<t:datagrid name="orderRefundList" title="接送机退款管理" autoLoadData="true" actionUrl="orderRefundController.do?datagrid" fitColumns="true"
 			    idField="id" fit="true" queryMode="group" checkbox="true">
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
@@ -96,11 +96,20 @@
 
 </div>
 <script type="text/javascript">
+//进入触发 
+$(function() {
+	$('#orderRefundList').datagrid({   
+	    rowStyler:function(index,row){   
+	        if (row.orderStatus=="3"){   
+	            return 'color:#901622';   
+	        }
+	    }   
+	});
+});
+
 	$(document).ready(function(){
 		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
-		$("input[name='orderExpectedarrival_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
 
 /* 	function agreeRefund(id){

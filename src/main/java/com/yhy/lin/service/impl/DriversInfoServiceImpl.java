@@ -19,7 +19,7 @@ import org.jeecgframework.core.util.StringUtil;
 public class DriversInfoServiceImpl extends CommonServiceImpl implements DriversInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, String sex, String name, String phoneNumber) {
+	public JSONObject getDatagrid(DataGrid dataGrid, String sex, String name, String phoneNumber,String status) {
 		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag = 0 ");
 	    
 		if(StringUtil.isNotEmpty(sex)){
@@ -32,6 +32,9 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		if(StringUtil.isNotEmpty(phoneNumber)){
 			queryCondition.append(" and d.phoneNumber like '" + phoneNumber +"%' ");
+		}
+		if(StringUtil.isNotEmpty(status)){
+			queryCondition.append(" and d.status ='" + status +"' ");
 		}
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）

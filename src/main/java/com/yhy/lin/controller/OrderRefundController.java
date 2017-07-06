@@ -40,7 +40,7 @@ public class OrderRefundController extends BaseController {
 	@Autowired
 	private OrderRefundServiceI orderRefundService;
 
-	// 接送机订单处理
+	//退款管理
 	@RequestMapping(params = "orderRefundList")
 	public ModelAndView orderRefundOrderList(HttpServletRequest request, HttpServletResponse response) {
 		return new ModelAndView("yhy/transferOrder/orderRefundList");
@@ -51,10 +51,10 @@ public class OrderRefundController extends BaseController {
 			DataGrid dataGrid) {
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
-		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
-		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end, ddTime_begin,
-				ddTime_end);
+		String orderStartingstation =request.getParameter("orderStartingstation");
+		String orderTerminusstation =request.getParameter("orderTerminusstation");
+		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end, orderStartingstation,
+				orderTerminusstation);
 
 		responseDatagrid(response, jObject);
 	}

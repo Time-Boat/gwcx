@@ -45,8 +45,11 @@ public interface AppGlobals {
 	/** 班车 */
 	/** 包车 */
 
-	/** 图片base路径 */
-	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
+	/** windows图片base路径 */
+//	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
+	
+	/** linux图片base路径 */
+	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
 	
 	/** app客户头像路径 */
 	public static final String APP_USER_FILE_PATH = "/image/user/";
@@ -56,6 +59,8 @@ public interface AppGlobals {
 	
 	/** 二维码图片路径 */
 	public static final String QR_CODE_FILE_PATH = "/image/QRCode/";
+	
+	
 	
 	/** 阿里大鱼服务器url */
 	public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
