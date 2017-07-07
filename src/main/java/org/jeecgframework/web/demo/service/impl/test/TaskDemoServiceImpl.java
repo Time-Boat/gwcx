@@ -30,6 +30,7 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 		
 		for(TransferorderEntity t : tList){
 			t.setOrderStatus(0);
+			t.setOrderCompletedTime(AppUtil.getDate());
 			logger.info("定时完成订单          时间：" + AppUtil.getDate() + "，订单id：" + t.getId());
 			saveOrUpdate(t);
 		}

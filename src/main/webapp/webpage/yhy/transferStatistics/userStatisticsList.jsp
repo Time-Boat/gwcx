@@ -11,17 +11,13 @@
 			<t:dgCol title="注册时间" field="createTime" editor="datebox"
 				formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group"
 				align="center"></t:dgCol>
-			<t:dgCol title="用户名" field="realName" width="120"></t:dgCol>
+			<t:dgCol title="用户名" field="realName" width="120" align="center"></t:dgCol>
 			<t:dgCol title="手机号" field="phone" width="120" align="center"></t:dgCol>
 			<t:dgCol title="身份证号" field="cardNumber" width="120" align="center"></t:dgCol>
 			<t:dgCol title="居住地" field="address" width="120" align="center"></t:dgCol>
 			<t:dgCol title="用户来源渠道" field="wwwww" width="120" align="center"></t:dgCol>
 			<t:dgCol title="常用地址" field="commonAddr" width="120" align="center"></t:dgCol>
 			<t:dgCol title="登录次数" field="carType" width="120" align="center"></t:dgCol>
-			<t:dgCol title="订票数量" field="orderNumbers" width="120" align="center"></t:dgCol>
-			<t:dgCol title="累计消费" field="orderTotalPrice" width="120"
-				align="center"></t:dgCol>
-
 		</t:datagrid>
 	</div>
 </div>
@@ -41,5 +37,6 @@
 							});
 						});
 			});
+	
 </script>
 

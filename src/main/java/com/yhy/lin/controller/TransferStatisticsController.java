@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.TransferStatisticsServiceI;
 
@@ -58,12 +59,12 @@ public class TransferStatisticsController extends BaseController {
 	}
 
 	@RequestMapping(params = "userdatagrid")
-	public void userdatagrid(TransferorderEntity transferorder, HttpServletRequest request,
+	public void userdatagrid(CarCustomerEntity carcustomer, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
 		String fc_begin = request.getParameter("createTime_begin");
 		String fc_end = request.getParameter("createTime_end");
 
-		JSONObject jObject = transferStatisticsServiceI.getUserDatagrid(transferorder, dataGrid, fc_begin, fc_end);
+		JSONObject jObject = transferStatisticsServiceI.getUserDatagrid(carcustomer, dataGrid, fc_begin, fc_end);
 
 		responseDatagrid(response, jObject);
 	}

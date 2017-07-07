@@ -11,6 +11,7 @@ import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
+import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,7 +58,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		sql.append("select a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name,");
-		sql.append("a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,refund_time,");
+		sql.append("a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.refund_time,a.refund_price,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
@@ -86,6 +87,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				new Db2Page("orderTerminusstation", "order_terminus_station_name", null),
 				new Db2Page("refundTime", "refund_time", null),
 				new Db2Page("cityName", "city_name", null),
+				new Db2Page("refundPrice", "refund_price", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -151,7 +153,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			TransferorderEntity t = getEntity(TransferorderEntity.class, id);
 			t.setOrderStatus(4);
 			t.setOrderPaystatus("2");
-			t.setRefundCompletedTime(AppUtil.getCurTime());
+			t.setRefundCompletedTime(AppUtil.getDate());
 			updateEntitie(t);
 			success = true;
 		} catch (Exception e) {
@@ -205,17 +207,34 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				// 获得退款的传入参数
 				String transactionID = "";
 				String outTradeNo = arrId[i];
-				int totalFee = (int) ((Double.parseDouble(arrFee[i]) * 100));
-				int refundFee = totalFee;
 				
 				TransferorderEntity t = get(TransferorderEntity.class, outTradeNo);
+				
+				//计算订单的发车时间距离退款的时间在24小时之内，则只能退还50%的款项
+				String startTime = t.getOrderStartime();
+				String refundTime = t.getRefundTime();
+				int m = AppUtil.compareDate(AppUtil.str2Date(startTime), AppUtil.str2Date(refundTime), 'h', "");
+				
+				int totalFee = (int) ((Double.parseDouble(arrFee[i]) * 100));
+				int refundFee = 0;
+				
+				//可以用策略模式    需要改进
+				if (m < 24) {
+					refundFee = totalFee/2;
+				} else {
+					refundFee = totalFee;
+				}
+				
+				logger.info("总金额：" + totalFee);
+				logger.info("退款金额：" + refundFee);
+				
 //				refundReqData.setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
 				refundReqData.setParams(transactionID, t.getOrderPayNumber(), outRefundNo, totalFee, refundFee);
 				
 				refundRequest.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
 		
 				refundReqData.setSign(refundRequest.createSign(refundReqData.getParameters()));
-		
+				
 				String info = MobiMessage.RefundReqData2xml(refundReqData).replaceAll("__", "_");
 				System.out.println(info);
 				// LogUtils.trace(info);
@@ -233,6 +252,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 					TransferorderEntity trans = getEntity(TransferorderEntity.class, arrId[i]);
 					trans.setOrderStatus(4);
 					trans.setOrderPaystatus("2");
+					//退款金额
+					double fee = refundFee/100;
+					trans.setRefundPrice(fee + "");
 					saveOrUpdate(trans);
 					
 				} else {

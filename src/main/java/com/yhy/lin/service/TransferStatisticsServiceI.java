@@ -3,13 +3,14 @@ package com.yhy.lin.service;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.CommonService;
 
+import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 import net.sf.json.JSONObject;
 
 public interface TransferStatisticsServiceI extends CommonService {
 
-	public JSONObject getUserDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin,
+	public JSONObject getUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String fc_begin,
 			String fc_end);
 
 	public JSONObject getOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String orderId,String orderStatus,String lineName,

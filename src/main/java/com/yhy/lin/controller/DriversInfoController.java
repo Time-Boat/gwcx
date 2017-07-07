@@ -78,7 +78,6 @@ public class DriversInfoController extends BaseController {
 	 * @param dataGrid
 	 * @param user
 	 */
-
 	@RequestMapping(params = "datagrid")
 	public void datagrid(DriversInfoEntity driversInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		

@@ -7,9 +7,11 @@ import java.util.Map;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.TransferStatisticsServiceI;
 
@@ -20,55 +22,32 @@ import net.sf.json.JSONObject;
 public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements TransferStatisticsServiceI {
 
 	@Override
-	public JSONObject getUserDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin,
+	public JSONObject getUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String fc_begin,
 			String fc_end) {
 		String sqlWhere = getWhere(fc_begin, fc_end);
 
 		StringBuffer sql = new StringBuffer();
 		String sqlCnt = "select COUNT(*) from car_customer s  ";
 		if (!sqlWhere.isEmpty()) {
-			sqlCnt += " where 1=1 ";
 			sqlCnt += sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append(
-				"select s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,SUM(t.order_numbers) as "
-						+ "order_numbers,SUM(t.order_totalPrice) as order_totalPrice"
-						+ " from car_customer s left join  transferorder t  on  s.id=t.user_id ");
+				"select s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr from car_customer s ");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
-		sql.append(" GROUP BY s.id");
 
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
-		int orderNumbers = 0;
-		int orderTotalPrice = 0;
-		if (mapList.size() > 0) {
-			for (int i = 0; i < mapList.size(); i++) {
-				Object orderNumber = mapList.get(i).get("order_numbers");
-				Object total = mapList.get(i).get("order_totalPrice");
-				if (orderNumber != null) {
-					String order = orderNumber + "";
-					int t = Integer.parseInt(order.substring(0, order.indexOf(".")));
-					orderNumbers = t + orderNumbers;
-				}
-				if (total != null) {
-					BigDecimal ta = (BigDecimal) total;
-					int tatal = ta.intValue();
-					orderTotalPrice = tatal + orderTotalPrice;
-				}
-			}
-		}
-
-		dataGrid.setFooter(
-				"'orderNumbers':'" + orderNumbers + "','orderTotalPrice':'" + orderTotalPrice + "','commonAddr':'合计:'");
+		
+		
+		dataGrid.setFooter("'commonAddr':'合计:'");
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = { new Db2Page("id"), new Db2Page("createTime", "create_time", null),
 				new Db2Page("realName", "real_name", null), new Db2Page("phone", "phone", null),
 				new Db2Page("cardNumber", "card_number", null), new Db2Page("address", "address", null),
-				new Db2Page("commonAddr", "common_addr", null), new Db2Page("orderNumbers", "order_numbers", null),
-				new Db2Page("orderTotalPrice", "order_totalPrice", null)
+				new Db2Page("commonAddr", "common_addr", null)
 
 		};
 		JSONObject jObject = this.getJsonDatagridEasyUIs(mapList, iCount.intValue(), db2Pages, dataGrid);
@@ -119,6 +98,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				}
 			}
 		}
+		//dataGrid.setFooter("'commonAddr':'合计:'",TagUtil.getTotalValue("commonAddr", "合计"));
 		dataGrid.setFooter("'orderNumbers':'" + orderNumbers + "张','orderTotalPrice':'" + orderTotalPrice
 				+ "元','orderStatus':'合计:'");
 
@@ -238,10 +218,12 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 	public String getWhere(String fc_begin, String fc_end) {
 		StringBuffer sql = new StringBuffer();
 
+		sql.append(" where 1=1 ");
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and s.create_time between '" + fc_begin + "' and '" + fc_end + "'");
 		}
+		sql.append(" ORDER BY s.create_time");
 		return sql.toString();
 	}
 

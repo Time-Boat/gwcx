@@ -106,10 +106,12 @@ public class CarInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		carInfo = systemService.getEntity(CarInfoEntity.class, carInfo.getId());
+		
 		if(StringUtil.isNotEmpty(carInfo.getDriverId())){
 			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
 			driver.setStatus("0");//修改司机状态--被使用
 		}
+		
 		message = "车辆信息删除成功";
 		carInfoService.delete(carInfo);
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
@@ -130,9 +132,12 @@ public class CarInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 
+		String beforeDriverId = "";
+		
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			message = "车辆信息更新成功";
 			CarInfoEntity t = carInfoService.get(CarInfoEntity.class, carInfo.getId());
+			beforeDriverId = t.getDriverId();
 			try {
 				MyBeanUtils.copyBeanNotNull2Bean(carInfo, t);
 				carInfoService.saveOrUpdate(t);
@@ -145,13 +150,24 @@ public class CarInfoController extends BaseController {
 			message = "车辆信息添加成功";
 			
 			carInfo.setDeleteFlag(0);
-			if(StringUtil.isNotEmpty(carInfo.getDriverId())){
-				DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
-				driver.setStatus("1");//修改司机状态--被使用
-			}
 			carInfoService.save(carInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
+		
+		//修改司机状态--被使用
+		if(StringUtil.isNotEmpty(carInfo.getDriverId())){
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
+			driver.setStatus("1");
+			systemService.save(driver);
+		}
+		
+		//被替换的司机要把状态改为0   beforeDriverId
+		if(StringUtil.isNotEmpty(beforeDriverId) && !beforeDriverId.equals(carInfo.getDriverId())){
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, beforeDriverId);
+			driver.setStatus("0");
+			systemService.save(driver);
+		}
+		
 		j.setMsg(message);
 		return j;
 	}

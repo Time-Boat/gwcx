@@ -709,7 +709,7 @@ public class AppInterfaceController extends AppBaseController {
 
 			String orderId = jsondata.getString("orderId");
 
-			// 需不需要做时间的判断 在发车4个小时之前才能取消订单 (是需要的...)
+			// 需不需要做时间的判断 在发车1个小时之前才能取消订单 (是需要的...)
 			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
 			// 关联表，获取发车时间 (可以建个视图)
 			//Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
@@ -717,10 +717,10 @@ public class AppInterfaceController extends AppBaseController {
 			Date curDate = AppUtil.getDate();
 			String sTime = t.getOrderStartime();
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
-			int m = AppUtil.compareDate(curDate, departTime, 'm', "");
+			int m = AppUtil.compareDate(departTime, curDate, 'm', "");
 
-			if (m > 240) {
-				msg = "发车时间超过四个小时，无法取消订单";
+			if (m < 60) {
+				msg = "距离发车时间不到一个小时，无法取消订单";
 				success = false;
 			} else {
 				// 记录取消订单之前的状态
