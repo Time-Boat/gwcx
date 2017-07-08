@@ -42,6 +42,8 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 		//可以添加一个token过期的定时器，每天定时清空过期的token    不要清空token时间，用token更新时间来判断是不是新注册用户
 //		org.jeecgframework.core.util.LogUtil.info("---------任务测试-------" + t.get(0).getOrderStartime());
 		
+		//定时清空未支付的订单
+		
 	}
 
 }

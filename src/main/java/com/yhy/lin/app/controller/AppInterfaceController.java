@@ -540,7 +540,7 @@ public class AppInterfaceController extends AppBaseController {
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "150";
 			}
-
+			
 			auoList = appService.getUserOrders(userId, null, pageNo, maxPageItem);
 			
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -617,7 +617,7 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 修改订单 */
+	/** 修改订单 （未支付订单修改） */
 	@RequestMapping(params = "modifyOrder")
 	public void modifyOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -679,7 +679,69 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
+	/** 订单改期 */
+	@RequestMapping(params = "modifyPayOrder")
+	public void modifyPayOrder(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
 
+		String msg = "";
+		String statusCode = "";
+
+		String param = "";
+
+		// List<Map<String,Object>> list = null;
+		// List<TransferorderEntity> list = null;
+		TransferorderEntity t = null;
+		try {
+			param = AppUtil.inputToStr(request);
+			System.out.println("modifyPayOrder     前端传递参数：" + param);
+
+			JSONObject jsondata = JSONObject.fromObject(param);
+
+			// 验证参数
+			checkParam(jsondata);
+
+			String token = jsondata.getString("token");
+			// 验证token
+			checkToken(token);
+
+			String orderId = jsondata.getString("orderId");
+
+			t = systemService.getEntity(TransferorderEntity.class, orderId);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		if (t != null) {
+			returnJsonObj.put("data", t);
+
+			// 把json中的日期类型替换成字符串类型
+			Date date = t.getApplicationTime();
+			Date date1 = t.getOrderExpectedarrival();
+			JSONObject str = (JSONObject) returnJsonObj.get("data");
+			str.put("applicationTime", date.toString());
+			str.put("orderExpectedarrival", date1.toString());
+
+		} else {
+			returnJsonObj.put("data", "");
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
 	/** 取消订单 */
 	@RequestMapping(params = "cancelOrder")
 	public void cancelOrder(HttpServletRequest request, HttpServletResponse response) {
@@ -1076,7 +1138,6 @@ public class AppInterfaceController extends AppBaseController {
 		boolean success = false;
 		
 		try {
-
 			String token = request.getParameter("token");
 			String userId = request.getParameter("userId");
 

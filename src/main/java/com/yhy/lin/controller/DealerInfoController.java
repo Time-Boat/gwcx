@@ -149,8 +149,9 @@ public class DealerInfoController extends BaseController {
 		try {
 			//文件存储路径
 			String path = AppGlobals.QR_CODE_FILE_PATH + req.getParameter("id") + ".jpg";
+			logger.info("linux全路径：" + AppGlobals.IMAGE_BASE_FILE_PATH + path);
+			logger.info("数据库存储路径：" + path);
 			WeixinPayUtil.getQRCode(req.getParameter("id"), AppGlobals.IMAGE_BASE_FILE_PATH + path);
-			
 			dealerInfo.setQrCodeUrl(path);
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {

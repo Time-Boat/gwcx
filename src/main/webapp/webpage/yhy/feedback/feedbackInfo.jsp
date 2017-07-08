@@ -17,7 +17,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<textarea rows="5" cols="40" id="content" name="content" >${feedbackInfoPage.content}</textarea>
+						<textarea rows="10" cols="60" style="margin: 0px; width: 474px; height: 238px;background-color: #fff" id="content" name="content" >${feedbackInfoPage.content}</textarea>
 						<%-- <input class="inputxt" id="content" name="content" ignore="ignore"
 							   value="${feedbackInfoPage.content}"> --%>
 						<span class="Validform_checktip"></span>

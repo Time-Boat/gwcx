@@ -12,7 +12,7 @@
    <t:dgCol title="创建时间" field="createTime"  align="center" width="120"></t:dgCol>
    <t:dgCol title="反馈状态（备用）" field="status" align="center"  width="120"></t:dgCol>
    <t:dgCol title="备注（备用）" field="remark"  align="center" width="120"></t:dgCol>
-   <t:dgToolBar title="查看反馈详细" icon="icon-search" url="feedbackInfoController.do?addorupdate" funname="detail" width="400" height="250"></t:dgToolBar>
+   <t:dgToolBar title="查看反馈详细" icon="icon-search" url="feedbackInfoController.do?addorupdate" funname="detail" width="600" height="350"></t:dgToolBar>
   </t:datagrid>
   </div>
  </div>

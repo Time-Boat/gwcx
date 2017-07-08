@@ -236,11 +236,11 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				refundReqData.setSign(refundRequest.createSign(refundReqData.getParameters()));
 				
 				String info = MobiMessage.RefundReqData2xml(refundReqData).replaceAll("__", "_");
-				System.out.println(info);
+				logger.info(info);
 				// LogUtils.trace(info);
 				
 				String result = refundRequest.httpsRequest(AppGlobals.REFUND_URL, info, path);
-	
+				
 				Map<String, String> getMap = MobiMessage.parseXml(result);
 				if ("SUCCESS".equals(getMap.get("result_code")) && "OK".equals(getMap.get("return_msg"))) {
 					statusCode = AppGlobals.APP_SUCCESS;  //result_code=FAIL
@@ -253,7 +253,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 					trans.setOrderStatus(4);
 					trans.setOrderPaystatus("2");
 					//退款金额
-					double fee = refundFee/100;
+					double fee = (double)refundFee/100;
+					logger.info("refundFee：" + refundFee);
+					logger.info("fee：" + fee);
 					trans.setRefundPrice(fee + "");
 					saveOrUpdate(trans);
 					
