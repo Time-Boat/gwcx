@@ -22,6 +22,7 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 	@Override
 	public void work() {
 		
+		String curTime = AppUtil.getCurTime();
 //		List<Map<String,Object>> t = findForJdbc("select * from transferorder where to_days(order_startime) = to_days(now())");
 		
 		//定时修改状态
@@ -36,11 +37,15 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 		}
 		
 		if(tList.size() <= 0){
-			logger.info("时间：" + AppUtil.getDate() + "，没有未完成的订单。");
+			logger.info("时间：" + curTime + "，没有未完成的订单。");
 		}
 		
 		//可以添加一个token过期的定时器，每天定时清空过期的token    不要清空token时间，用token更新时间来判断是不是新注册用户
-//		org.jeecgframework.core.util.LogUtil.info("---------任务测试-------" + t.get(0).getOrderStartime());
+		
+		//定时删除未支付订单
+//		String delOrder = "delete from transferorder where to_days(order_startime) = to_days(now()) and order_status=? ";
+//		int delSum = executeSql(delOrder, 6);
+//		logger.info("时间：" + curTime + "，已删除" + delSum + "条未支付的订单");
 		
 		//定时清空未支付的订单
 		
