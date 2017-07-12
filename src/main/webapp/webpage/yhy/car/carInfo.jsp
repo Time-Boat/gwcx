@@ -29,8 +29,9 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="carType" name="carType" datatype="*"
-							   value="${carInfoPage.carType}">
+					<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
+						<%-- <input class="inputxt" id="carType" name="carType" datatype="*"
+							   value="${carInfoPage.carType}"> --%>
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

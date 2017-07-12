@@ -32,12 +32,12 @@
 	</div>
 
 </div>
-<div id="total" hidden="true">
+<!-- <div id="total" hidden="true">
 	<label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;订单总量：</label><label
 		id="orderTotal"></label> <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收入:</label><label
 		id="totalPrice"></label>
 
-</div>
+</div> -->
 <input type="text" value="${accountList}" id="accounts" type="hidden" />
 <script type="text/javascript">
 	$(document).ready(
@@ -54,12 +54,12 @@
 								dateFmt : 'yyyy-MM-dd HH:mm:ss'
 							});
 						});
-				$(".datagrid-toolbar").append($("#total"));
-				$("#total").show();
 			});
 
 	//初始化查询条件
 	$(function() {
+		$(".datagrid-toolbar").append("<div id='total' hidden='true'><label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;订单总量：</label><label id='orderTotal'></label> <label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总收入:</label><label id='totalPrice'></label></div>");
+		$("#total").show();
 		var json = $("#accounts").val();
 		var obj = eval('(' + json + ')');
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
@@ -73,6 +73,7 @@
 		var a4 = '</select></span>';
 		$("#dealerStatisticsListForm").append(a1 + a2 + a3 + c1 + a4);
 		gettotal();
+		
 	});
 
 	function gettotal() {

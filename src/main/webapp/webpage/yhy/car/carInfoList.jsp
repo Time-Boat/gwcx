@@ -6,7 +6,7 @@
   <t:datagrid name="carInfoList" title="车辆信息" autoLoadData="true" actionUrl="carInfoController.do?datagrid" idField="id" fitColumns="true" queryMode="group" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="车牌号" field="licencePlate" query="true" width="120"></t:dgCol>
-   <t:dgCol title="车辆类型" field="carType" query="true" width="120"></t:dgCol>
+   <t:dgCol title="车辆类型" field="carType" dictionary="car_Type" query="true" width="120"></t:dgCol>
    <t:dgCol title="座位数" field="seat" width="120"></t:dgCol>
    <t:dgCol title="车辆位置" field="stopPosition" width="120"></t:dgCol>
    <t:dgCol title="司机" field="name"   width="120"></t:dgCol>

@@ -75,36 +75,19 @@
     </div>
 </div> -->
 
-<div id="win"  class="easyui-window" title="确认退款" style="width:400px;height:150px"
-    data-options="modal:true" closed="true" >
-    <div class="easyui-layout" data-options="fit:true">
-		<div style="text-align: center; position:relative; " data-options="region:'center'">
-			<!-- <input type="hidden" id="dialog_order_id" value="" />
-			
-			<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols="7"></textarea>
-			<input id="terefuse" type="hidden" />
-			<div style="margin-top: 30px">
-			-->
-			
-			<h5 id="reTitle" >确定要同意退款吗？</h5>
-			<input id="sub" type="button" class="button white" value="确定" style="margin-right: 50px;width:50px;height:30px" onclick="submitRefuse()" />
-			<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$('#win').window('close');"/>
-			<div id="refund_loading" style='display:none;position:absolute;cursor1:wait;left:50%;top:20px;transform: translateX(-50%);width:200px;height:32px;color:#000;'>
-		 </div>
-		</div>
-    </div>
-</div>
+<div id="win"  class="easyui-window" title="确认退款" style="width:400px;height:150px" data-options="modal:true" closed="true" ></div>
 
 </div>
 <script type="text/javascript">
 //进入触发 
 $(function() {
+	$('#win').append(refundWindow());
 	$('#orderRefundList').datagrid({   
 	    rowStyler:function(index,row){   
 	        if (row.orderStatus=="3"){   
 	            return 'color:#901622';   
 	        }
-	    }   
+	    }
 	});
 });
 
@@ -113,6 +96,20 @@ $(function() {
 		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
 	});
 
+	function refundWindow(){
+		var rwin = '';
+		rwin += '<div class="easyui-layout" data-options="fit:true">';
+		rwin += '<div style="text-align: center; position:relative;" data-options="region:\'center\'" >';
+		rwin += '<h5 id="reTitle" >确定要同意退款吗？</h5>';
+		rwin += '<input id="sub" type="button" class="button white" value="确定" style="margin-right: 50px;width:50px;height:30px" onclick="submitRefuse()" />';
+		rwin += '<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$(\'#win\').window(\'close\');"/>';
+		rwin += '<div id="refund_loading" style="display:none;position:absolute;cursor1:wait;left:50%;top:20px;transform: translateX(-50%);width:200px;height:32px;color:#000;">';
+		rwin += '</div></div></div>';
+		
+		return rwin;
+		
+	}
+	
 /* 	function agreeRefund(id){
 		$.dialog.confirm('确定同意退款吗？',function(r){
 			if(!r){
@@ -245,6 +242,7 @@ $(function() {
 	    
 		refundUrl = url;
 		refundGname = gname;
+		
 		$('#win').window('open');
 		
 	}
