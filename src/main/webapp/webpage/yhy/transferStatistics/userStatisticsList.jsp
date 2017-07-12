@@ -17,7 +17,7 @@
 			<t:dgCol title="居住地" field="address" width="120" align="center"></t:dgCol>
 			<t:dgCol title="用户来源渠道" field="wwwww" width="120" align="center"></t:dgCol>
 			<t:dgCol title="常用地址" field="commonAddr" width="120" align="center"></t:dgCol>
-			<t:dgCol title="登录次数" field="carType" width="120" align="center"></t:dgCol>
+			<t:dgCol title="登录次数" field="loginCount" width="120" align="center"></t:dgCol>
 		</t:datagrid>
 	</div>
 </div>

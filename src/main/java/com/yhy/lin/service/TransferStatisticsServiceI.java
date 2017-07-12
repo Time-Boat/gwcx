@@ -18,12 +18,6 @@ public interface TransferStatisticsServiceI extends CommonService {
 
 	public JSONObject getrefundDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,
 			String orderStartingstation, String orderTerminusstation, String lineName, String orderType);
-	
-	public JSONObject getChannelUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid,String account, String fc_begin,
-			String fc_end);
-	
-	public JSONObject getChannelOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String lineName,
-			String orderType,String account, String fc_begin, String fc_end);
 
 	public String getWhere2(String OrderId,String OrderStatus,String lineName, String orderType, String driverName, String fc_begin,
 			String fc_end);
@@ -31,5 +25,4 @@ public interface TransferStatisticsServiceI extends CommonService {
 	public String getWhere1(String orderId,String orderStartingstation, String orderTerminusstation, String lineName,
 			String orderType);
 	
-	public String getWhere4(String lineName, String orderType, String account, String fc_begin,String fc_end);
 }

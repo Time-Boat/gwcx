@@ -127,7 +127,7 @@
 						<value>app.do?completeOrder</value>
 						<value>app.do?feedback</value>
 						
-						
+						<value>app.do?modifyPayOrder</value>
 						<value>app.do?modifyOrder</value>
 						<value>app.do?updateUserInfo</value>
 						<value>app.do?getUserInfo</value>
@@ -135,6 +135,7 @@
 						<value>app.do?getMessage</value>
 						<value>app.do?delMessage</value>
 						<value>app.do?hasNewMessage</value>
+						<value>app.do?tokenLogin</value>
 						
 						<!-- 微信公众号 -->
 						<!-- 微信支付 -->

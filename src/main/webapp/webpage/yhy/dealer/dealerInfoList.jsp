@@ -48,7 +48,7 @@
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
    <t:dgCol title="渠道商账号" field="account"   width="120"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
-   <t:dgCol title="被扫描次数" field="scanCount"   width="120"></t:dgCol>
+   <t:dgCol title="推广用户数" field="scanCount"   width="120"></t:dgCol>
    <t:dgCol title="联系电话" field="phone"   width="120"></t:dgCol>
    <t:dgCol title="负责人" field="manager"   width="120"></t:dgCol>
    <t:dgCol title="地址" field="position"   width="120"></t:dgCol>

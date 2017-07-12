@@ -76,7 +76,7 @@
 </div> -->
 
 <div id="win"  class="easyui-window" title="确认退款" style="width:400px;height:150px"
-    data-options="modal:true" closed="true" hidden="true" >
+    data-options="modal:true" closed="true" >
     <div class="easyui-layout" data-options="fit:true">
 		<div style="text-align: center; position:relative; " data-options="region:'center'">
 			<!-- <input type="hidden" id="dialog_order_id" value="" />

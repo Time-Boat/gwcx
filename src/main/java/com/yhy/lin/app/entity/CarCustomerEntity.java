@@ -63,6 +63,19 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 此客户的微信唯一识别码  */
 	private java.lang.String openId;
 	
+	/** 渠道商绑定用户时间  */
+	private java.util.Date dealerBandingTime;
+	
+	private int loginCount;
+	
+	@Column(name = "DEALER_BANDING_TIME", nullable = true)
+	public java.util.Date getDealerBandingTime() {
+		return dealerBandingTime;
+	}
+	public void setDealerBandingTime(java.util.Date dealerBandingTime) {
+		this.dealerBandingTime = dealerBandingTime;
+	}
+	
 	@Column(name = "OPEN_ID", nullable = true, length = 32)
 	public java.lang.String getOpenId() {
 		return openId;
@@ -335,6 +348,18 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	public void setRemark(java.lang.String remark) {
 		this.remark = remark;
 	}
+	
+	/**
+	 * 登录次数
+	 * @return: 
+	 */
+	@Column(name = "login_count", nullable = true, length = 6)
+	public int getLoginCount() {
+		return loginCount;
+	}
+	public void setLoginCount(int loginCount) {
+		this.loginCount = loginCount;
+	}
 
 	@Override
 	@Transient
@@ -355,4 +380,6 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	public void setUserName(String userName) {
 
 	}
+	
+	
 }

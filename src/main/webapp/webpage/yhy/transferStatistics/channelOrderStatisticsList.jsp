@@ -6,7 +6,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 	<div region="center" style="padding: 0px; border: 0px">
-		<t:datagrid name="channelOrderStatList" title="订单收入统计" autoLoadData="true"
+		<t:datagrid name="channelOrderStatList" title="渠道订单统计" autoLoadData="true"
 			actionUrl="transferStatisticsController.do?channelOrderdatagrid"
 			fitColumns="true" idField="id" fit="true" queryMode="group"
 			checkbox="true">
@@ -57,12 +57,12 @@
 			});
 
 	function gettotal() {
-		var orderCompletedTime_begin = $("input[name='orderCompleteTimed_begin']")
++		var orderCompletedTime_begin = $("input[name='orderCompletedTime_begin']")
 				.val();
-		var orderCompletedTime_end = $("input[name='orderCompletedTimed_end']").val();
-		var account = $("input[name='account']").val();
+		var orderCompletedTime_end = $("input[name='orderCompletedTime_end']").val();
+		var accountId = $("select[name='accountId']").val();
 		var ordertype = $("select[name='ordertype']").val();
-
+		
 		var lineName = $("input[name='lineName']").val();
 
 		$.ajax({
@@ -73,7 +73,7 @@
 							+ "&ordertype="
 							+ ordertype
 							+ "&lineName="
-							+ lineName + "&account=" + account,
+							+ lineName + "&accountId=" + accountId,
 					dataType : 'json',
 					complete : function(data) {
 						var message = data.responseText;
@@ -92,8 +92,8 @@
 	 		var obj = eval('(' + json + ')');
 	 		var a1 = '<span style="display:-moz-inline-box;display:inline-block;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 	 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="渠道商名称">渠道商名称：</span>';
-	 		var a3 = '<select name="accountId" style="width: 150px">';
-	 		var c1 = '<option value="">选择渠道商</option>';
+	 		var a3 = '<select id="accountId" name="accountId" style="width: 150px">';
+	 		var c1 = '<option value="">--请选择--</option>';
 			for(var i=0;i<obj.data.length;i++){
 				c1 += '<option value="'+obj.data[i].id+'">'+obj.data[i].account+'</option>';
 			}

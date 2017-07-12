@@ -27,14 +27,14 @@ public class FeedbackInfoServiceImpl extends CommonServiceImpl implements Feedba
 		String sqlCnt = "select COUNT(*) from feedback f left join car_customer c on f.user_id=c.id";
 		
 		if (!sqlWhere.isEmpty()) {
-			sqlCnt += " where " + sqlWhere;
+			sqlCnt += sqlWhere;
 		}
 		
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		String sql= "select f.id,f.user_id,f.content,f.create_time,f.status,f.remark,c.real_name,c.phone from feedback f LEFT JOIN car_customer c on f.user_id=c.id ";
 		if (!sqlWhere.isEmpty()) {
-			sql += " where" + sqlWhere;
+			sql += sqlWhere;
 		}
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
@@ -56,18 +56,17 @@ public class FeedbackInfoServiceImpl extends CommonServiceImpl implements Feedba
 	public String getWhere(FeedbackInfoEntity feedbackInfo,String realName,String phone) {
 		StringBuffer sql = new StringBuffer();
 		
+		sql.append(" where 1 =1 ");
+		
 		if (StringUtil.isNotEmpty(realName)) {
-			
-			sql.append(" c.real_name like '%"+realName+"%'");
-			if (StringUtil.isNotEmpty(phone)) {
-				sql.append(" and  c.phone like '%" +phone + "%' ");
-			}
-		}else{
-			if (StringUtil.isNotEmpty(phone)) {
-				sql.append("  c.phone like '%" +phone + "%' ");
-			}
+			sql.append(" and c.real_name like '%"+realName+"%'");
 		}
 		
+		if (StringUtil.isNotEmpty(phone)) {
+			sql.append(" and  c.phone like '%" +phone + "%' ");
+		}
+		
+		sql.append(" ORDER BY c.create_time desc");
 		
 		return sql.toString();
 	}

@@ -76,7 +76,7 @@ public class CarCustomerServiceImpl extends CommonServiceImpl implements CarCust
 				// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 				String sqlCnt = "select count(*) from car_customer s";
 				if (!sqlWhere.isEmpty()) {
-					sqlCnt += " where" + sqlWhere;
+					sqlCnt += sqlWhere;
 				}
 				
 				Long iCount = getCountForJdbcParam(sqlCnt, null);
@@ -84,7 +84,7 @@ public class CarCustomerServiceImpl extends CommonServiceImpl implements CarCust
 				// 取出当前页的数据 
 				String sql = "select s.id,s.real_name,s.sex,s.phone,s.card_number,s.address,s.create_time,s.remark from car_customer s";
 				if (!sqlWhere.isEmpty()) {
-					sql += " where " + sqlWhere;
+					sql += sqlWhere;
 				}
 				
 				
@@ -106,17 +106,17 @@ public class CarCustomerServiceImpl extends CommonServiceImpl implements CarCust
 	
 	public String getSqlWhere2(String realName,String phone){
 		StringBuffer sqlWhere = new StringBuffer();
+		sqlWhere.append(" where 1=1");
 		
 		if(StringUtil.isNotEmpty(realName)){
-			sqlWhere.append("  s.real_name like '%"+realName+"%' ");
-			if(StringUtil.isNotEmpty(phone)){
-				sqlWhere.append(" and s.phone like '%"+phone+"%' ");
-			}
-		}else{
-			if(StringUtil.isNotEmpty(phone)){
-				sqlWhere.append(" s.phone like '%"+phone+"%' ");
-			}
+			sqlWhere.append("  and s.real_name like '%"+realName+"%' ");
 		}
+		
+		if(StringUtil.isNotEmpty(phone)){
+			sqlWhere.append(" and s.phone like '%"+phone+"%' ");
+		}
+		
+		sqlWhere.append(" order by s.create_time desc");
 		
 		return sqlWhere.toString();
 	}

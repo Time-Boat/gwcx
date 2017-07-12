@@ -9,6 +9,7 @@ import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.SortedMap;
@@ -434,9 +435,7 @@ public class WeixinPayController extends AppBaseController{
 					logger.info("用户扫描二维码进入");
 //					String partnerId = map.get("EventKey") + "";   //合作渠道商id
 					
-					//如果该用户已经注册并绑定了渠道商
-					CarCustomerEntity cc = systemService.findUniqueByProperty(CarCustomerEntity.class, "openId", fromUser);
-					if(cc != null){
+					if(!isNewAccount(fromUser)){
 						return null;
 					}
 					
@@ -486,6 +485,17 @@ public class WeixinPayController extends AppBaseController{
         
 	}
 	
+	//如果该微信用户已经注册并绑定了渠道商（一个微信用户只能算是一个渠道商）
+	public boolean isNewAccount(String openId){
+		List<CarCustomerEntity> cc = systemService.findByProperty(CarCustomerEntity.class, "openId", openId);
+		if(cc != null){     //...
+			if(cc.size() > 0){
+				return false;
+			}
+		}
+		return true;
+	}
+		
 	/**
 	 * 微信view菜单按钮授权跳转
 	 * 
@@ -513,12 +523,12 @@ public class WeixinPayController extends AppBaseController{
 				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
 			}
 			
-			//如果这个用户已经绑定了渠道商，则不需要再去获得他的openId
+			//如果这个用户已经绑定了渠道商，则不需要再去获得他的openId     新用户肯定是没有openId的...
 			CarCustomerEntity car = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", phone);
-			String openId = car.getOpenId();
-			if(StringUtil.isNotEmpty(openId)){
-				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
-			}
+//			String openId = car.getOpenId();
+//			if(StringUtil.isNotEmpty(openId)){
+//				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+//			}
 			
 			//解密的结果是不是正确的       解密耗时久，所以放在两个条件之后
 			String plaintext = PasswordUtil.decrypt(isNew, car.getToken(), PasswordUtil.getStaticSalt());
@@ -559,11 +569,13 @@ public class WeixinPayController extends AppBaseController{
 		String phone = request.getParameter("phone");
 		String redirect_uri = request.getParameter("redirect_uri");
 		
+		String url = "redirect:http://car.cywtrip.com/job/" + redirect_uri + ".html";
+		
 		logger.info("code:" + code);
 		logger.info("toIndex    redirect_uri:" + redirect_uri);
 		try {
 			if (!StringUtil.isNotEmpty(code)) {
-				return "redirect:http://car.cywtrip.com/job/" + redirect_uri + ".html";
+				return url;
 			}
 			
 			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AppGlobals.WECHAT_ID + "&secret="
@@ -575,6 +587,9 @@ public class WeixinPayController extends AppBaseController{
 			logger.info(jsonObject);
 			if (null != jsonObject) {
 				openId = jsonObject.getString("openid");
+				if(!isNewAccount(openId)){
+					return url;
+				}
 				logger.info("openid:" + openId);
 				
 				wxService.updateBandingInfo(openId, phone);
@@ -582,47 +597,7 @@ public class WeixinPayController extends AppBaseController{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return "redirect:http://car.cywtrip.com/job/" + redirect_uri + ".html";
+		return url;
 	}
-	
-//	/**
-//	 * 微信消息推送回调
-//	 * 
-//	 */
-//	@RequestMapping(params = "eventPush")
-//	public void eventPush(HttpServletRequest request, HttpServletResponse response, Model model)
-//			throws IOException {
-//		
-//		logger.info("进入eventPush回调url");
-//		
-//		String signature = request.getParameter("signature");  
-//        String timestamp = request.getParameter("timestamp");  
-//        String nonce = request.getParameter("nonce");  
-//        String echostr = request.getParameter("echostr");  
-//        
-//        PrintWriter out = response.getWriter();  
-//        if (checkSignature(signature, timestamp, nonce)){  
-//        	logger.info("eventPush: echostr=" + echostr);
-//        	out.print(echostr);
-//        }  
-//        out.close();
-//	}
-//
-//	public static boolean checkSignature(String signature, String timestamp,  
-//            String nonce) {
-//        String[] arr = new String[] { "longyouchuxing2017", timestamp, nonce };  
-//        // sort  
-//        Arrays.sort(arr);  
-//  
-//        // generate String  
-//        String content = arr[0]+arr[1]+arr[2];  
-//          
-//        // shal code  
-//        String temp = new Sha1Util().getSha1(content);  
-//        logger.info("eventPush: code=" + temp);
-//        logger.info("eventPush: signature=" + signature);
-//        
-//        return temp.equalsIgnoreCase(signature);  
-//    }  
 	
 }

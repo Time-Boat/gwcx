@@ -13,7 +13,7 @@
 			<t:dgCol title="手机号" field="phone" width="120" align="center"></t:dgCol>
 			<t:dgCol title="身份证号" field="cardNumber" width="120" align="center"></t:dgCol>
 			<t:dgCol title="居住地" field="address" width="120" align="center"></t:dgCol>
-			<t:dgCol title="登录次数" field="carType" width="120" align="center"></t:dgCol>
+			<t:dgCol title="登录次数" field="loginCount" width="120" align="center"></t:dgCol>
 		</t:datagrid>
 	</div>
 </div>
@@ -35,12 +35,10 @@
 						});
 			});
 	
-	
-	 
  	$(function(){
  		var json = $("#accounts").val();
  		var obj = eval('(' + json + ')');
- 		var a1 = '<span style="display:-moz-inline-box;display:inline-block;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+ 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="渠道商名称">渠道商名称：</span>';
  		var a3 = '<select name="accountId" style="width: 150px">';
  		var c1 = '<option value="">选择渠道商</option>';

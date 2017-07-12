@@ -26,7 +26,7 @@
 			<t:dgCol title="司机名称" field="driverName" align="center"></t:dgCol>
 			<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
 			<t:dgCol title="退票数量" field="orderNumbers" align="center"></t:dgCol>
-			<t:dgCol title="退款金额" field="orderTotalPrice" align="center"></t:dgCol>
+			<t:dgCol title="退款金额" field="refundPrice" align="center"></t:dgCol>
 		</t:datagrid>
 	</div>
 </div>

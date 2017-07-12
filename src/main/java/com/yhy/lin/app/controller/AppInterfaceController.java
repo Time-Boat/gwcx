@@ -42,8 +42,10 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.OpenCityEntity;
+import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -184,7 +186,88 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
+		// token登录接口
+		@RequestMapping(params = "tokenLogin")
+		public void TokenLogin(HttpServletRequest request, HttpServletResponse response) {
+			AppUtil.responseUTF8(response);
+			JSONObject returnJsonObj = new JSONObject();
 
+			String msg = "";
+			String statusCode = "";
+			JSONObject data = new JSONObject();
+			
+			String isNew = "";
+
+			try {
+				
+				String param = AppUtil.inputToStr(request);
+				System.out.println("appLogin    前端传递参数：" + param);
+				
+				JSONObject jsondata = JSONObject.fromObject(param);
+				//验证参数
+				checkParam(jsondata);
+				
+				String token = jsondata.getString("token");
+				try {
+					
+					checkToken(token);//验证token
+					
+					if(StringUtil.isNotEmpty(token)){
+						CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token",
+								token);
+						if(user!=null){
+							// 添加登陆日志
+							// String message = "app手机用户: " + user.getUserName()
+							// + "[" + user.getPhone() + "]" + "登录成功";
+							String message = "app手机用户: " + user.getPhone() + "登录成功";
+							systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
+
+							msg = "登录成功!";
+							data.put("token", token);
+							data.put("userId", user.getUserId());
+							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+							data.put("phone", user.getPhone());
+							data.put("isNew", isNew);
+							statusCode = AppGlobals.APP_SUCCESS;
+							//添加登录次数
+							StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count="+(user.getLoginCount()+1)+" where token ='"+token+"'");
+						      
+						    this.systemService.updateBySqlString(updateSql.toString());
+						}
+					}
+					
+				} catch (ParameterException e) {
+					// TODO: handle exception
+					statusCode = e.getCode();
+					msg = e.getErrorMessage();
+					logger.error(e.getErrorMessage());
+				}
+			}
+			catch (ParameterException e) {
+				statusCode = e.getCode();
+				msg = e.getErrorMessage();
+				logger.error(e.getErrorMessage());
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				msg = "登陆异常";
+				statusCode = AppGlobals.SYSTEM_ERROR;
+			}
+
+			returnJsonObj.put("code", statusCode);
+			returnJsonObj.put("msg", msg);
+			if (data.size() == 0) {
+				returnJsonObj.put("data", "");
+			} else {
+				returnJsonObj.put("data", data.toString());
+			}
+
+			responseOutWrite(response, returnJsonObj);
+		}
+	
 	// 短信发送接口
 	@RequestMapping(params = "getSmscode")
 	public void getSmscode(HttpServletRequest request, HttpServletResponse response) {
@@ -685,12 +768,14 @@ public class AppInterfaceController extends AppBaseController {
 	public void modifyPayOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		JSONObject data = new JSONObject();
+		
 		String msg = "";
 		String statusCode = "";
-
 		String param = "";
 
+		boolean b = false;
+		
 		// List<Map<String,Object>> list = null;
 		// List<TransferorderEntity> list = null;
 		TransferorderEntity t = null;
@@ -706,11 +791,22 @@ public class AppInterfaceController extends AppBaseController {
 			String token = jsondata.getString("token");
 			// 验证token
 			checkToken(token);
-
-			String orderId = jsondata.getString("orderId");
-
-			t = systemService.getEntity(TransferorderEntity.class, orderId);
 			
+			String orderId = jsondata.getString("orderId");
+			
+			String departTime = jsondata.getString("departTime");
+			
+			t = systemService.getEntity(TransferorderEntity.class, orderId);
+			t.setOrderStartime(departTime);
+			
+			//清空司机车辆信息和订单状态
+			t.setOrderStatus(1);
+			//删除和此订单关联的id
+			String delSql = "delete from order_linecardiver where id = ?";
+			systemService.executeSql(delSql, t.getId());
+			
+			b = true;
+			data.put("success", b);
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -725,19 +821,8 @@ public class AppInterfaceController extends AppBaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (t != null) {
-			returnJsonObj.put("data", t);
 
-			// 把json中的日期类型替换成字符串类型
-			Date date = t.getApplicationTime();
-			Date date1 = t.getOrderExpectedarrival();
-			JSONObject str = (JSONObject) returnJsonObj.get("data");
-			str.put("applicationTime", date.toString());
-			str.put("orderExpectedarrival", date1.toString());
-
-		} else {
-			returnJsonObj.put("data", "");
-		}
+		returnJsonObj.put("data", data);
 
 		responseOutWrite(response, returnJsonObj);
 	}

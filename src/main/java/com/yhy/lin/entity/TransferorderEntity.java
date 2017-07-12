@@ -63,7 +63,7 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String refundPrice;    //退款金额
 	
-	@Column(name = "order_completed_time")
+	@Column(name = "refund_completed_time")
 	public Date getRefundCompletedTime() {
 		return refundCompletedTime;
 	}
@@ -72,7 +72,7 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 		this.refundCompletedTime = refundCompletedTime;
 	}
 	
-	@Column(name = "refund_completed_time")
+	@Column(name = "order_completed_time")
 	public Date getOrderCompletedTime() {
 		return orderCompletedTime;
 	}

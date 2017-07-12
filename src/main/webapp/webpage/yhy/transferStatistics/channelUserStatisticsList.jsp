@@ -4,7 +4,7 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <div class="easyui-layout" fit="true">
 	<div region="center" style="padding: 0px; border: 0px">
-		<t:datagrid name="channelUserStatList" title="用户汇总统计"
+		<t:datagrid name="channelUserStatList" title="渠道用户统计"
 			actionUrl="transferStatisticsController.do?channelUserdatagrid" idField="id"
 			fit="true" checkbox="true" queryMode="group">
 			<t:dgCol title="渠道商名称" field="account" width="120" align="center" ></t:dgCol>

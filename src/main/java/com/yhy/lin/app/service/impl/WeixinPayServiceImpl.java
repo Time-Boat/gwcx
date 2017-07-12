@@ -39,7 +39,7 @@ public class WeixinPayServiceImpl extends CommonServiceImpl implements WeixinPay
 				+ " where cc.phone = ?";
 		
 		//获取openId绑定到数据库      	先绑定，在获取
-		int s = executeSql("update car_customer set open_id = ? where phone = ? ", openId, phone);
+		int s = executeSql("update car_customer set open_id = ?, dealer_banding_time=now() where phone = ? ", openId, phone);
 		logger.info("saveOpenId：" + s);
 		
 		List<Map<String,Object>> list = findForJdbc(sql, phone);

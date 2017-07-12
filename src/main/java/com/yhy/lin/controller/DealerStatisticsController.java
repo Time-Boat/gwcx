@@ -22,7 +22,7 @@ import com.yhy.lin.service.TransferStatisticsServiceI;
 import net.sf.json.JSONObject;
 
 /**
- * 接送机汇总统计
+ * 渠道商统计
  * 
  * @author
  *
@@ -70,23 +70,16 @@ public class DealerStatisticsController extends BaseController {
 		return json.toString();
 	}
 	
-	//干嘛用的
-//	@RequestMapping(params = "userdatagrid")
-//	public void userdatagrid(CarCustomerEntity carcustomer, HttpServletRequest request,
-//			HttpServletResponse response, DataGrid dataGrid) {
-//		String fc_begin = request.getParameter("createTime_begin");
-//		String fc_end = request.getParameter("createTime_end");
-//
-//		JSONObject jObject = dsService.getUserDatagrid(carcustomer, dataGrid, fc_begin, fc_end);
-//
-//		responseDatagrid(response, jObject);
-//	}
-
-	//用户列表
+	/**
+	 * 渠道商用户统计
+	 * @param carcustomer
+	 * @param request
+	 * @param response
+	 * @param dataGrid
+	 */
 	@RequestMapping(params = "dealerUserdatagrid")
 	public void dealerUserdatagrid(CarCustomerEntity carcustomer, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
-//		String id = request.getParameter("id");
 		String account = request.getParameter("accountId");
 		String fc_begin = request.getParameter("createTime_begin");
 		String fc_end = request.getParameter("createTime_end");
@@ -97,7 +90,7 @@ public class DealerStatisticsController extends BaseController {
 	}
 	
 	/**
-	 * 渠道商订单统计
+	 * 渠道商订单统计页面
 	 */
 	@RequestMapping(params = "dealerOrderStatisticsList")
 	public ModelAndView dealerOrderStatisticsList(HttpServletRequest request, HttpServletResponse response) {
@@ -105,7 +98,13 @@ public class DealerStatisticsController extends BaseController {
 		return new ModelAndView("yhy/dealerStatistics/dealerOrderStatisticsList");
 	}
 	
-	//列表
+	/**
+	 * 渠道商订单统计
+	 * @param transferorder
+	 * @param request
+	 * @param response
+	 * @param dataGrid
+	 */
 	@RequestMapping(params = "dealerOrderdatagrid")
 	public void dealerOrderdatagrid(TransferorderEntity transferorder, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
@@ -121,24 +120,6 @@ public class DealerStatisticsController extends BaseController {
 		responseDatagrid(response, jObject);
 	}
 	
-	//
-	@RequestMapping(params = "orderdatagrid")
-	public void orderdatagrid(TransferorderEntity transferorder, HttpServletRequest request,
-			HttpServletResponse response, DataGrid dataGrid) {
-
-		String orderId = request.getParameter("orderId");
-		String fc_begin = request.getParameter("applicationTime_begin");
-		String fc_end = request.getParameter("applicationTime_end");
-		String orderType = request.getParameter("ordertype");
-		String orderStatus = request.getParameter("orderStatus");
-		String lineName = request.getParameter("lineName");
-		String driverName = request.getParameter("driverName");
-
-		JSONObject jObject = dsService.getOrderDatagrid(transferorder, dataGrid,orderId,orderStatus, lineName, orderType,
-				 driverName, fc_begin, fc_end);
-		responseDatagrid(response, jObject);
-	}
-
 	/**
 	 * 渠道商订单统计
 	 */

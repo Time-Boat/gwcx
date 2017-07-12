@@ -252,6 +252,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 					TransferorderEntity trans = getEntity(TransferorderEntity.class, arrId[i]);
 					trans.setOrderStatus(4);
 					trans.setOrderPaystatus("2");
+					trans.setRefundCompletedTime(AppUtil.getDate());
+					logger.info("RefundCompletedTime：" + trans.getRefundCompletedTime());
 					//退款金额
 					double fee = (double)refundFee/100;
 					logger.info("refundFee：" + refundFee);
