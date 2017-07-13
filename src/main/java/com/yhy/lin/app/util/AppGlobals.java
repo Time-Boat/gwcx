@@ -27,6 +27,12 @@ public interface AppGlobals {
 	/** 参数异常 */
 	public static final String PARAMETER_ERROR = "997";
 	
+	/** 参数为空 */
+	public static final String PARAMETER_EMPTY_ERROR = "996";
+	
+	/** 参数为空 */
+	public static final String PARAMETER_EMPTY_ERROR_MSG = "参数为空";
+	
 	//自定义异常的时候传入进去了，所以这里暂时不需要定义
 //	/** 参数异常消息 */
 //	public static final String PARAMETER_ERROR_MSG = "参数为空！";

@@ -53,7 +53,7 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 更新时间 */
 	private java.util.Date codeUpdateTime;
 	/** 登录类型（保留） */
-	private java.lang.Integer loginType;
+	private java.lang.String loginType;
 	/** 状态：0.未校验；1.已校验； */
 	private java.lang.String status;
 	
@@ -66,12 +66,27 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 渠道商绑定用户时间  */
 	private java.util.Date dealerBandingTime;
 	
+	/** 用户登录次数*/
 	private int loginCount;
+	
+	/**
+	 * 登录次数
+	 * @return: 
+	 */
+	@Column(name = "LOGIN_COUNT", nullable = true,precision=6,scale=0)
+	public int getLoginCount() {
+		return loginCount;
+	}
+	
+	public void setLoginCount(int loginCount) {
+		this.loginCount = loginCount;
+	}
 	
 	@Column(name = "DEALER_BANDING_TIME", nullable = true)
 	public java.util.Date getDealerBandingTime() {
 		return dealerBandingTime;
 	}
+	
 	public void setDealerBandingTime(java.util.Date dealerBandingTime) {
 		this.dealerBandingTime = dealerBandingTime;
 	}
@@ -108,12 +123,12 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 		this.codeUpdateTime = codeUpdateTime;
 	}
 
-	@Column(name = "LOGIN_TYPE", nullable = true,precision=5,scale=0)
-	public java.lang.Integer getLoginType() {
+	@Column(name = "LOGIN_TYPE", nullable = true, length = 1)
+	public java.lang.String getLoginType() {
 		return loginType;
 	}
 
-	public void setLoginType(java.lang.Integer loginType) {
+	public void setLoginType(java.lang.String loginType) {
 		this.loginType = loginType;
 	}
 
@@ -349,18 +364,6 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 		this.remark = remark;
 	}
 	
-	/**
-	 * 登录次数
-	 * @return: 
-	 */
-	@Column(name = "login_count", nullable = true, length = 6)
-	public int getLoginCount() {
-		return loginCount;
-	}
-	public void setLoginCount(int loginCount) {
-		this.loginCount = loginCount;
-	}
-
 	@Override
 	@Transient
 	public String getUserId() {

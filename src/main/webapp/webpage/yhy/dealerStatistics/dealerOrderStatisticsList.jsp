@@ -81,7 +81,7 @@
 				"input[name='orderCompletedTime_begin']").val();
 		var orderCompletedTime_end = $("input[name='orderCompletedTime_end']")
 				.val();
-		var account = $("select[name='accountId']").val();
+		var accountId = $("select[name='accountId']").val();
 
 		var ordertype = $("select[name='ordertype']").val();
 
@@ -98,8 +98,8 @@
 							+ ordertype
 							+ "&lineName="
 							+ lineName
-							+ "&account="
-							+ account,
+							+ "&accountId="
+							+ accountId,
 					dataType : 'json',
 					complete : function(data) {
 						var message = data.responseText;

@@ -23,4 +23,6 @@ public interface DealerStatisticsServiceI extends CommonService {
 
 	public String getWhere4(String lineName, String orderType, String account, String fc_begin,String fc_end);
 	
+	public String getWhere(String account, String fc_begin,String fc_end);
+	
 }

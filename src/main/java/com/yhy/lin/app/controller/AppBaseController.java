@@ -81,9 +81,13 @@ public class AppBaseController extends BaseController {
 	}
 
 	/** 验证参数是否为空 (json) */
-	public static void checkParam(String strJson) throws ParameterException {
+	public static JSONObject checkParam(String strJson) throws ParameterException {
+		if(!StringUtil.isNotEmpty(strJson)){
+			throw new ParameterException(AppGlobals.PARAMETER_EMPTY_ERROR_MSG, AppGlobals.PARAMETER_EMPTY_ERROR);
+		}
 		JSONObject json = JSONObject.fromObject(strJson);
 		checkParam(json);
+		return json;
 	}
 
 	/** 验证参数是否为空 (param) */
@@ -96,7 +100,7 @@ public class AppBaseController extends BaseController {
 	}
 
 	/** 验证参数是否为空 (JSONObject) */
-	public static String checkParam(JSONObject param) throws ParameterException {
+	public static void checkParam(JSONObject param) throws ParameterException {
 		Set<String> set = param.keySet();
 		for (String p : set) {
 //			System.out.println(param.get(p));
@@ -105,7 +109,6 @@ public class AppBaseController extends BaseController {
 				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
 			}
 		}
-		return "";
 	}
 
 }

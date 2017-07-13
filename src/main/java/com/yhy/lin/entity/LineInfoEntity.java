@@ -10,7 +10,7 @@ import javax.persistence.Table;
 import org.jeecgframework.core.common.entity.IdEntity;
 
 /**
- * 验票员信息实体类表
+ * 线路信息实体类表
  * @author linj
  *
  */

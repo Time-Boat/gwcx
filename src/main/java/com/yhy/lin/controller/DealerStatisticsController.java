@@ -1,6 +1,7 @@
 package com.yhy.lin.controller;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -113,7 +114,7 @@ public class DealerStatisticsController extends BaseController {
 		String fc_end = request.getParameter("orderCompletedTime_end");
 		String orderType = request.getParameter("ordertype");
 		String lineName = request.getParameter("lineName");
-		String account = request.getParameter("account");
+		String account = request.getParameter("accountId");
 
 		JSONObject jObject = dsService.getDealerOrderDatagrid(transferorder, dataGrid, lineName, orderType,
 				account, fc_begin, fc_end);
@@ -132,7 +133,7 @@ public class DealerStatisticsController extends BaseController {
 		String fc_end = request.getParameter("orderCompletedTime_end");
 		String orderType = request.getParameter("ordertype");
 		String lineName = request.getParameter("lineName");
-		String account = request.getParameter("account");
+		String account = request.getParameter("accountId");
 
 		StringBuffer orsql = new StringBuffer();
 		orsql.append(
@@ -172,5 +173,38 @@ public class DealerStatisticsController extends BaseController {
 		jsonObj.put("sumPrice", sumPrice);
 		return jsonObj;
 	}
+	
+	/*
+	 * 用戶汇总统计
+	 */
+	@RequestMapping(params = "getUserTotal")
+	@ResponseBody
+	public JSONObject getUserTotal(HttpServletRequest request, HttpServletResponse response) {
+		JSONObject jsonObj = new JSONObject();
+		
+		String account = request.getParameter("accountId");
+		String fc_begin = request.getParameter("createTime_begin");
+		String fc_end = request.getParameter("createTime_end");
+		
+		StringBuffer orsql = new StringBuffer();
+		orsql.append("select count(*) from car_customer s, dealer_customer d,dealer_info f where s.open_id = d.open_id and f.id=d.dealer_id ");
+		
+		if (!dsService.getWhere(account,fc_begin, fc_end).isEmpty()) {
+			orsql.append(dsService.getWhere(account,fc_begin,fc_end));
+		}
+		List<Object> mlist = systemService.findListbySql(orsql.toString());
+		int sumUser = 0;
+		if (mlist.size() > 0) {
+			BigInteger ob = (BigInteger) mlist.get(0);
+			sumUser = ob.intValue();
+		} else {
+			sumUser = 0;
+		}
+
+		jsonObj.put("sumorder", sumUser);
+		
+		return jsonObj;
+	}
+
 
 }

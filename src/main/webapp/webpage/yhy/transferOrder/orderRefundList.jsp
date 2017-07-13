@@ -287,7 +287,7 @@ $(function() {
 				ids='';
 			}
 		});
-	} 
+	}
 	
 	function refundBegin(){
 		$('#refund_loading').html("");

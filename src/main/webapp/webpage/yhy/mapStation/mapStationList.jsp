@@ -1,66 +1,60 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/context/mytags.jsp"%>
-<t:base type="jquery,easyui,tools,DatePicker"></t:base>
-<script src="plug-in/tools/popup/userSelect.js"></script>
-<script src="plug-in/tools/popup/departSelect.js"></script>
-<div class="easyui-layout" fit="true">
-<div region="center" style="padding:0px;border:0px">
-<t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
-	idField="id" fit="true" queryMode="group" >
-	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
-	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="60"></t:dgCol>
-	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="60"></t:dgCol>
-	<t:dgCol title="线路备注" field="remark"  align="center" width="60"></t:dgCol>
-	
-	<t:dgCol title="线路类型" field="type" replace="公务班车_0,接送包车_1,接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="出车时间段" field="dispath" replace="5:00~23:00_0,23:00~5:00_1"  align="center" width="90"></t:dgCol>
-	<%--
-	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
-	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
-	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol>
-	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
-	<t:dgCol title="预计到达时间" field="lendTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group"  align="center" width="120"></t:dgCol>
-	 --%>
-	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="80"></t:dgCol>
-	 
-	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="130"></t:dgCol>
-	<t:dgCol title="所在城市" field="city"  align="center"></t:dgCol>
-	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
-	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
-	<%-- <t:dgToolBar operationCode="edit" title="站点挂接" icon="icon-edit" url="lineInfoController.do?addBusStop" funname="update"></t:dgToolBar>
-	 --%>
-	<t:dgCol title="操作" field="opt" width="100"></t:dgCol>
 
-	<%-- <t:dgDelOpt title="下架" url="lineInfoController.do?del&id={id}&deleteFlag=1" /> --%>
+	<head>
+	  <meta charset="utf-8" />
+	  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+	  <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+	  <style type="text/css">
+	    body,html,#container{
+	      height: 50%;
+	      margin: 0px;
+	    }
+	  </style>
+	  <title>快速入门</title>
+	</head>
+    
+    <t:base type="jquery,easyui,tools,DatePicker"></t:base>
+	<div id="container" tabindex="0"></div>
+	<div class="easyui-layout" fit="true" >
+	  <div region="center" style="padding-bottom:0px;border:10px">
+	  <t:datagrid name="openCityList" title="业务开通城市" actionUrl="mapStationController.do?datagrid" idField="id" fit="true" style="height:100px" >
+	   <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
+	   <t:dgCol title="省名称" field="provinceName" width="120"></t:dgCol>
+	   <t:dgCol title="城市名称" field="cityName" width="120"></t:dgCol>
+	   <t:dgCol title="城市开通业务id" field="cityBusiness" width="120"></t:dgCol>
+	   <t:dgCol title="创建人" field="createPeople" width="120"></t:dgCol>
+	   <t:dgCol title="城市开通状态" field="status" width="120" dictionary="openCity" ></t:dgCol>
+	   <t:dgCol title="备注" field="remark"   width="120"></t:dgCol>
+	   <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
+	   <t:dgDelOpt title="删除" url="openCityController.do?del&id={id}" />
+	   <t:dgToolBar title="录入" icon="icon-add" url="openCityController.do?addorupdate" funname="add"></t:dgToolBar>
+	   <t:dgToolBar title="编辑" icon="icon-edit" url="openCityController.do?addorupdate" funname="update"></t:dgToolBar>
+	   <t:dgToolBar title="查看" icon="icon-search" url="openCityController.do?addorupdate" funname="detail"></t:dgToolBar>
+	  </t:datagrid>
+	  </div>
+	</div>
 	
-	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
-	<t:dgToolBar operationCode="detail" title="线路查看" icon="icon-search" url="lineInfoSpecializedController.do?addorupdate" funname="detail" height="500"></t:dgToolBar>
-</t:datagrid> </div>
-</div>
-<div region="east" style="width: 390px;" split="true">
-<div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
-</div>
-<div id="tt"></div>
-</div>
-<script type="text/javascript">
-$(document).ready(function(){
-	$("input[name='createTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	$("input[name='createTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	$("input[name='birthday']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	$("input[name='lstartTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	$("input[name='lstartTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	$("input[name='lendTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	$("input[name='lendTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-});
-function addBusStop(id,name) {
-	$("#function-panelAddBusStop").panel(
-			{
-				title :'线路名称：'+name,
-				href:"lineInfoController.do?addBusStop&lineInfoId="+id+"&lineType=2"   //lineType=2为接送机跳转到的站点挂接界面
-			}
-		);
-}
-</script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
+    <script type="text/javascript" >
+        var map = new AMap.Map('container',{
+            resizeEnable: true,
+            zoom: 10,
+            center: [116.480983, 40.0958]
+        });
+        
+        AMap.plugin(['AMap.ToolBar','AMap.AdvancedInfoWindow'],function(){
+            //创建并添加工具条控件
+            var toolBar = new AMap.ToolBar();
+            map.addControl(toolBar);
+            //创建高级信息窗体并在指定位置打开
+            var infowindow = new AMap.AdvancedInfoWindow({
+              content: '<div class="info-title">高德地图</div><div class="info-content">'+
+                    '<img src="http://webapi.amap.com/images/amap.jpg">'+
+                    '高德是中国领先的数字地图内容、导航和位置服务解决方案提供商。<br>'+
+                    '<a target="_blank" href="http://mobile.amap.com/">点击下载高德地图</a></div>',
+              offset: new AMap.Pixel(0, -30)
+            });
+            infowindow.open(map,[116.480983, 39.989628]);
+        })
+    </script>

@@ -66,7 +66,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 	@Override
 	public JSONObject getDealerUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String account,String fc_begin,
 			String fc_end) {
-		String sqlWhere = getWhere3(account,fc_begin, fc_end);
+		String sqlWhere = getWhere(account,fc_begin, fc_end);
 
 		StringBuffer sql = new StringBuffer();
 		String sqlCnt = "select count(*) from car_customer s, dealer_customer d,dealer_info f where s.open_id = d.open_id and f.id=d.dealer_id";
@@ -165,7 +165,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		return jObject;
 	}
 	
-	public String getWhere3(String account,String fc_begin, String fc_end) {
+	public String getWhere(String account,String fc_begin, String fc_end) {
 		StringBuffer sql = new StringBuffer();
 		//渠道商
 		if (StringUtil.isNotEmpty(account)) {

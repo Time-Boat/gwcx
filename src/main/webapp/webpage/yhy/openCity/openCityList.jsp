@@ -3,7 +3,7 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <div class="easyui-layout" fit="true">
   <div region="center" style="padding:0px;border:0px">
-  <t:datagrid name="openCityList" title="业务开通城市" actionUrl="openCityController.do?datagrid" idField="id" fit="true">
+  <t:datagrid name="openCityList" title="业务开通城市" actionUrl="openCityController.do?datagrid" idField="id" fit="true" >
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="省名称" field="provinceName" width="120"></t:dgCol>
    <t:dgCol title="城市名称" field="cityName" width="120"></t:dgCol>

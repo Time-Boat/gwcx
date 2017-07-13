@@ -16,7 +16,9 @@ import org.jeecgframework.tag.core.easyui.TagUtil;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.CarCustomerServiceI;
+import com.yhy.lin.service.OpenCityServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -29,13 +31,16 @@ import net.sf.json.JSONObject;
  *
  */
 @Controller
-@RequestMapping("/MapStationController")
+@RequestMapping("/mapStationController")
 public class MapStationController extends BaseController {
 	/**
 	 * Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(MapStationController.class);
 
+	@Autowired
+	private OpenCityServiceI openCityService;
+	
 //	@Autowired
 //	private CarCustomerServiceI carCustomerService;
 
@@ -49,6 +54,18 @@ public class MapStationController extends BaseController {
 		return new ModelAndView("yhy/mapStation/mapStationList");
 	}
 
+	@RequestMapping(params = "datagrid")
+	public void datagrid(OpenCityEntity openCity,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+//		CriteriaQuery cq = new CriteriaQuery(OpenCityEntity.class, dataGrid);
+//		//查询条件组装器
+//		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, openCity, request.getParameterMap());
+//		this.openCityService.getDataGridReturn(cq, true);
+//		TagUtil.datagrid(response, dataGrid);
+		
+		JSONObject jObject = openCityService.getDatagrid(dataGrid);
+		responseDatagrid(response, jObject);
+	}
+	
 //	/**
 //	 * easyui AJAX请求数据
 //	 * 

@@ -24,5 +24,6 @@ public interface TransferStatisticsServiceI extends CommonService {
 
 	public String getWhere1(String orderId,String orderStartingstation, String orderTerminusstation, String lineName,
 			String orderType);
+	public String getWhere(String fc_begin,String fc_end);
 	
 }

@@ -37,6 +37,76 @@
 							});
 						});
 			});
-	
+
+	//初始化查询条件
+	$(function() {
+		$(".datagrid-toolbar")
+				.append(
+						"<div id='total' hidden='true'><label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;累计用户量：</label><label id='orderTotal'></label> </div>");
+		$("#total").show();
+		gettotal();
+	});
+
+	function gettotal() {
+		var createTime_begin = $("input[name='createTime_begin']").val();
+		var createTime_end = $("input[name='createTime_end']").val();
+
+		//用户汇总统计
+		$
+				.ajax({
+					url : "transferStatisticsController.do?getUserTotal&createTime_begin="
+							+ createTime_begin
+							+ "&createTime_end="
+							+ createTime_end,
+					dataType : 'json',
+					complete : function(data) {
+						var message = data.responseText;
+						var obj = eval('(' + message + ')');
+						$("#orderTotal").html(obj.sumorder + "人");
+						//刷新当前窗体
+						reloadTable();
+					}
+				});
+	}
+
+	function userStatListsearch() {
+		try {
+			if (!$("#userStatListForm").Validform({
+				tiptype : 3
+			}).check()) {
+				return false;
+			}
+		} catch (e) {
+		}
+		if (true) {
+			var queryParams = $('#userStatList').datagrid('options').queryParams;
+			$('#userStatListtb').find('*').each(function() {
+				queryParams[$(this).attr('name')] = $(this).val();
+			});
+			$('#userStatList')
+					.datagrid(
+							{
+								url : 'transferStatisticsController.do?userdatagrid&field=createTime,createTime_begin,createTime_end,realName,phone,cardNumber,address,wwwww,commonAddr,loginCount,',
+								pageNumber : 1
+							});
+		}
+		gettotal();
+	}
+
+	function searchReset(name) {
+		$("#" + name + "tb").find(":input").val("");
+		var queryParams = $('#userStatList').datagrid('options').queryParams;
+		$('#userStatListtb').find('*').each(function() {
+			queryParams[$(this).attr('name')] = $(this).val();
+		});
+		$('#userStatList')
+				.datagrid(
+						{
+							url : 'transferStatisticsController.do?userdatagrid&field=createTime,createTime_begin,createTime_end,realName,phone,cardNumber,address,wwwww,commonAddr,loginCount,',
+							pageNumber : 1
+						});
+		gettotal();
+	}
 </script>
+
 

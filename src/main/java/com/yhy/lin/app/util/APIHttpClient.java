@@ -26,9 +26,9 @@ public class APIHttpClient {
   
     // 接口地址 
 	//登录接口
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
+	private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
 	//上传订单接口地址
-	private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+	//private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
     //线路站点信息地址
     //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
     //获取机场站点或者火车站站点信息
@@ -231,7 +231,8 @@ public class APIHttpClient {
 //    	String url = AppGlobals.ACCESS_TOKEN_URL.replace("%1", "client_credential").replace("%2", AppGlobals.WECHAT_ID).replace("%3", AppGlobals.WECHAT_APP_SECRET);
 //        APIHttpClient ac = new APIHttpClient("https://mp.weixin.qq.com/cgi-bin/showqrcode?"
 //        		+ "ticket=gQHr8DwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAySElsNWs4Wm1jemsxMDAwMGcwM2IAAgS221NZAwQAAAAA");
-        			APIHttpClient ac = new APIHttpClient("http://localhost:8080/gwcx/wx.do?wxOauth2");
+//		APIHttpClient ac = new APIHttpClient("http://localhost:8080/gwcx/wx.do?wxOauth2");
+    	APIHttpClient ac = new APIHttpClient(apiURL);
         JsonArray arry = new JsonArray();
         JsonObject j = new JsonObject();
         System.out.println(ac.get());

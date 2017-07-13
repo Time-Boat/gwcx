@@ -45,7 +45,6 @@ import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.OpenCityEntity;
-import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -80,23 +79,16 @@ public class AppInterfaceController extends AppBaseController {
 		String statusCode = "";
 		JSONObject data = new JSONObject();
 		
+		//是否是新用户，用于渠道商的绑定
 		String isNew = "";
 
 		try {
-			// String mobile = request.getParameter("mobile");// 用户名
-			// String code = request.getParameter("code");// 验证码
-			
-//			String mobile = request.getParameter("mobile");		// 授权参数
-//			String code = request.getParameter("code");		// 授权参数
-//			String openId = request.getParameter("openId");		// 授权参数
-			
 			String param = AppUtil.inputToStr(request);
+			
 			System.out.println("appLogin    前端传递参数：" + param);
 //			
-			JSONObject jsondata = JSONObject.fromObject(param);
-//			
 			//验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 			
 			String mobile = jsondata.getString("mobile");
 			String code = jsondata.getString("code");
@@ -204,9 +196,8 @@ public class AppInterfaceController extends AppBaseController {
 				String param = AppUtil.inputToStr(request);
 				System.out.println("appLogin    前端传递参数：" + param);
 				
-				JSONObject jsondata = JSONObject.fromObject(param);
 				//验证参数
-				checkParam(jsondata);
+				JSONObject jsondata = checkParam(param);
 				
 				String token = jsondata.getString("token");
 				try {
@@ -305,7 +296,7 @@ public class AppInterfaceController extends AppBaseController {
 				// 存储验证码相关信息
 				if (user == null) {
 					sql = "insert into car_customer set id='" + UUIDGenerator.generate()
-							+ "',phone = ? ,create_time = ? " + ",status = '0',code_update_time = ? ,security_code = ?";
+							+ "',phone = ? ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
 					systemService.executeSql(sql, mobile, curTime, curTime, code);
 				} else {
 					sql = "update car_customer set status = '0',code_update_time = ? ,security_code = ? where phone = ? ";
@@ -351,10 +342,8 @@ public class AppInterfaceController extends AppBaseController {
 			
 			System.out.println("createOrder   前端传递参数：" + param);
 			
-			JSONObject jsondata = JSONObject.fromObject(param);
-			
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 			
 			String token = jsondata.getString("token");
 			// 验证token
@@ -676,7 +665,7 @@ public class AppInterfaceController extends AppBaseController {
 			if(messageId != null ){
 				//进入消息详情页后就将所有的消息改为已读
 				String sql = "update customer_message set status=1 where id=? ";
-				long l = systemService.executeSql(sql, messageId);
+				systemService.executeSql(sql, messageId);
 			}
 			
 			aod = appService.getOrderDetailById(orderId);
@@ -719,10 +708,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 			System.out.println("modifyOrder     前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
-
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 
 			String token = jsondata.getString("token");
 			// 验证token
@@ -783,10 +770,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 			System.out.println("modifyPayOrder     前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
-
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 
 			String token = jsondata.getString("token");
 			// 验证token
@@ -846,9 +831,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 			System.out.println("cancelOrder     前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 
 			String token = jsondata.getString("token");
 			// 验证token
@@ -858,8 +842,6 @@ public class AppInterfaceController extends AppBaseController {
 
 			// 需不需要做时间的判断 在发车1个小时之前才能取消订单 (是需要的...)
 			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
-			// 关联表，获取发车时间 (可以建个视图)
-			//Order_LineCarDiverEntity o = systemService.getEntity(Order_LineCarDiverEntity.class, orderId);
 
 			Date curDate = AppUtil.getDate();
 			String sTime = t.getOrderStartime();
@@ -924,10 +906,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 			System.out.println("completeOrder    前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
-
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 
 			String token = jsondata.getString("token");
 			// 验证token
@@ -1033,10 +1013,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request); 
 			System.out.println("feedback    前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
-			
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 			
 			// 验证token
 			String token = jsondata.getString("token");
@@ -1088,10 +1066,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 			System.out.println("getUserInfo     前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
-
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 
 			String token = jsondata.getString("token");
 			// 验证token
@@ -1153,10 +1129,8 @@ public class AppInterfaceController extends AppBaseController {
 			param = AppUtil.inputToStr(request);
 //			logger.info("前端传递参数：" + param);
 
-			JSONObject jsondata = JSONObject.fromObject(param);
-
 			// 验证参数
-			checkParam(jsondata);
+			JSONObject jsondata = checkParam(param);
 
 			String token = jsondata.getString("token");
 			// 验证token
@@ -1180,7 +1154,7 @@ public class AppInterfaceController extends AppBaseController {
 				imgUrl = AppGlobals.APP_USER_FILE_PATH + userId + "_" + System.currentTimeMillis()
 						+ pName.substring(pName.lastIndexOf("."), pName.length());
 				imagesBaseBM = imagesBaseBM.replaceAll(" ", "+");
-				boolean b = Base64ImageUtil.generateImage(imagesBaseBM, path + imgUrl);
+				Base64ImageUtil.generateImage(imagesBaseBM, path + imgUrl);
 				
 				cc.setCustomerImg(imgUrl);
 			}
@@ -1324,8 +1298,6 @@ public class AppInterfaceController extends AppBaseController {
 		boolean success = false;
 		String msg = "";
 		String statusCode = "";
-
-		String param = "";
 
 		try {
 //			param = AppUtil.inputToStr(request);

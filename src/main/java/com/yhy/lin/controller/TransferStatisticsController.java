@@ -1,6 +1,7 @@
 package com.yhy.lin.controller;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -108,7 +109,26 @@ public class TransferStatisticsController extends BaseController {
 	@ResponseBody
 	public JSONObject getUserTotal(HttpServletRequest request, HttpServletResponse response) {
 		JSONObject jsonObj = new JSONObject();
+		
+		String fc_begin = request.getParameter("createTime_begin");
+		String fc_end = request.getParameter("createTime_end");
+		StringBuffer orsql = new StringBuffer();
+		orsql.append("select COUNT(*) from car_customer s ");
+		
+		if (!transferStatisticsServiceI.getWhere(fc_begin, fc_end).isEmpty()) {
+			orsql.append(transferStatisticsServiceI.getWhere(fc_begin,fc_end));
+		}
+		List<Object> mlist = systemService.findListbySql(orsql.toString());
+		int sumUser = 0;
+		if (mlist.size() > 0) {
+			BigInteger ob = (BigInteger) mlist.get(0);
+			sumUser = ob.intValue();
+		} else {
+			sumUser = 0;
+		}
 
+		jsonObj.put("sumorder", sumUser);
+		
 		return jsonObj;
 	}
 
