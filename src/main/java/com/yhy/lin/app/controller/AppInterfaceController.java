@@ -848,8 +848,8 @@ public class AppInterfaceController extends AppBaseController {
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(departTime, curDate, 'm', "");
 
-			if (m < 60) {
-				msg = "距离发车时间不到一个小时，无法取消订单";
+			if (m < 240) {
+				msg = "距离发车时间不到4个小时，无法取消订单";
 				success = false;
 			} else {
 				// 记录取消订单之前的状态
