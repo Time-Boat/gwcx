@@ -1,5 +1,6 @@
 package com.yhy.lin.app.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -42,8 +43,8 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
-import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
@@ -179,85 +180,85 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 	
-		// token登录接口
-		@RequestMapping(params = "tokenLogin")
-		public void TokenLogin(HttpServletRequest request, HttpServletResponse response) {
-			AppUtil.responseUTF8(response);
-			JSONObject returnJsonObj = new JSONObject();
+	// token登录接口
+	@RequestMapping(params = "tokenLogin")
+	public void TokenLogin(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
 
-			String msg = "";
-			String statusCode = "";
-			JSONObject data = new JSONObject();
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+		
+		String isNew = "";
+
+		try {
 			
-			String isNew = "";
-
+			String param = AppUtil.inputToStr(request);
+			System.out.println("appLogin    前端传递参数：" + param);
+			
+			//验证参数
+			JSONObject jsondata = checkParam(param);
+			
+			String token = jsondata.getString("token");
 			try {
 				
-				String param = AppUtil.inputToStr(request);
-				System.out.println("appLogin    前端传递参数：" + param);
+				checkToken(token);//验证token
 				
-				//验证参数
-				JSONObject jsondata = checkParam(param);
-				
-				String token = jsondata.getString("token");
-				try {
-					
-					checkToken(token);//验证token
-					
-					if(StringUtil.isNotEmpty(token)){
-						CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token",
-								token);
-						if(user!=null){
-							// 添加登陆日志
-							// String message = "app手机用户: " + user.getUserName()
-							// + "[" + user.getPhone() + "]" + "登录成功";
-							String message = "app手机用户: " + user.getPhone() + "登录成功";
-							systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
+				if(StringUtil.isNotEmpty(token)){
+					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token",
+							token);
+					if(user!=null){
+						// 添加登陆日志
+						// String message = "app手机用户: " + user.getUserName()
+						// + "[" + user.getPhone() + "]" + "登录成功";
+						String message = "app手机用户: " + user.getPhone() + "登录成功";
+						systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
 
-							msg = "登录成功!";
-							data.put("token", token);
-							data.put("userId", user.getUserId());
-							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
-							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
-							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
-							data.put("phone", user.getPhone());
-							data.put("isNew", isNew);
-							statusCode = AppGlobals.APP_SUCCESS;
-							//添加登录次数
-							StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count="+(user.getLoginCount()+1)+" where token ='"+token+"'");
-						      
-						    this.systemService.updateBySqlString(updateSql.toString());
-						}
+						msg = "登录成功!";
+						data.put("token", token);
+						data.put("userId", user.getUserId());
+						// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+						data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+						data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+						data.put("phone", user.getPhone());
+						data.put("isNew", isNew);
+						statusCode = AppGlobals.APP_SUCCESS;
+						//添加登录次数
+						StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count="+(user.getLoginCount()+1)+" where token ='"+token+"'");
+					      
+					    this.systemService.updateBySqlString(updateSql.toString());
 					}
-					
-				} catch (ParameterException e) {
-					// TODO: handle exception
-					statusCode = e.getCode();
-					msg = e.getErrorMessage();
-					logger.error(e.getErrorMessage());
 				}
-			}
-			catch (ParameterException e) {
+				
+			} catch (ParameterException e) {
+				// TODO: handle exception
 				statusCode = e.getCode();
 				msg = e.getErrorMessage();
 				logger.error(e.getErrorMessage());
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-				msg = "登陆异常";
-				statusCode = AppGlobals.SYSTEM_ERROR;
-			}
-
-			returnJsonObj.put("code", statusCode);
-			returnJsonObj.put("msg", msg);
-			if (data.size() == 0) {
-				returnJsonObj.put("data", "");
-			} else {
-				returnJsonObj.put("data", data.toString());
-			}
-
-			responseOutWrite(response, returnJsonObj);
 		}
+		catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			msg = "登陆异常";
+			statusCode = AppGlobals.SYSTEM_ERROR;
+		}
+
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("msg", msg);
+		if (data.size() == 0) {
+			returnJsonObj.put("data", "");
+		} else {
+			returnJsonObj.put("data", data.toString());
+		}
+
+		responseOutWrite(response, returnJsonObj);
+	}
 	
 	// 短信发送接口
 	@RequestMapping(params = "getSmscode")
@@ -781,14 +782,44 @@ public class AppInterfaceController extends AppBaseController {
 			
 			String departTime = jsondata.getString("departTime");
 			
-			t = systemService.getEntity(TransferorderEntity.class, orderId);
-			t.setOrderStartime(departTime);
 			
-			//清空司机车辆信息和订单状态
-			t.setOrderStatus(1);
-			//删除和此订单关联的id
-			String delSql = "delete from order_linecardiver where id = ?";
-			systemService.executeSql(delSql, t.getId());
+			if(StringUtil.isNotEmpty(orderId)){
+				
+				t = systemService.getEntity(TransferorderEntity.class, orderId);
+				if(StringUtil.isNotEmpty(t)){
+					String lineId = t.getLineId();
+					LineInfoEntity lineinfo= systemService.getEntity(LineInfoEntity.class, lineId);
+					if(StringUtil.isNotEmpty(lineinfo)){
+						String lin = lineinfo.getLineTimes();
+						
+						Calendar calendar = Calendar.getInstance();
+						SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+						Date date = sdf.parse(departTime);
+						calendar.setTime(date);
+						if(StringUtil.isNotEmpty(lin)){
+							calendar.add(Calendar.MINUTE,Integer.parseInt(lin));
+							t.setOrderExpectedarrival(calendar.getTime());//设置预计到达时间
+						}else{
+							msg="没有得到线路时长";
+						}
+						
+					}else{
+						msg="没有得到线路";
+					}
+					
+					t.setOrderStartime(departTime);
+					
+					//清空司机车辆信息和订单状态
+					t.setOrderStatus(1);
+					//删除和此订单关联的id
+					String delSql = "delete from order_linecardiver where id = ?";
+					systemService.executeSql(delSql, t.getId());
+				}else{
+					msg="无效的订单";
+				}
+			}else{
+				msg="未获取到订单";
+			}
 			
 			b = true;
 			data.put("success", b);
@@ -837,12 +868,12 @@ public class AppInterfaceController extends AppBaseController {
 			String token = jsondata.getString("token");
 			// 验证token
 			checkToken(token);
-
+			
 			String orderId = jsondata.getString("orderId");
-
+			
 			// 需不需要做时间的判断 在发车1个小时之前才能取消订单 (是需要的...)
 			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
-
+			
 			Date curDate = AppUtil.getDate();
 			String sTime = t.getOrderStartime();
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
@@ -1206,7 +1237,7 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 			
-			String sql = "select count(*) from customer_message where user_id='" + userId + "' and status=0 ";
+			String sql = "select count(*) from car_customer where id='" + userId + "' and msg_status='0' ";
 			long c = appService.getCountForJdbc(sql);
 			if(c > 0){
 				success = true;
@@ -1264,7 +1295,8 @@ public class AppInterfaceController extends AppBaseController {
 			}
 
 			mList = appService.getMessageListById(userId, pageNo, maxPageItem);
-
+			systemService.updateBySqlString("update car_customer set msg_status='1' where id='" + userId + "'");
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {

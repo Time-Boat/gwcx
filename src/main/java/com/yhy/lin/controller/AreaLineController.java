@@ -23,6 +23,8 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import com.yhy.lin.entity.AreaLineEntity;
 import com.yhy.lin.service.AreaLineServiceI;
 
+import net.sf.json.JSONObject;
+
 /**   
  * @Title: Controller
  * @Description: 包车区域线路
@@ -66,11 +68,14 @@ public class AreaLineController extends BaseController {
 
 	@RequestMapping(params = "datagrid")
 	public void datagrid(AreaLineEntity areaLine,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(AreaLineEntity.class, dataGrid);
-		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, areaLine, request.getParameterMap());
-		this.areaLineService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+//		CriteriaQuery cq = new CriteriaQuery(AreaLineEntity.class, dataGrid);
+//		//查询条件组装器
+//		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, areaLine, request.getParameterMap());
+//		this.areaLineService.getDataGridReturn(cq, true);
+//		TagUtil.datagrid(response, dataGrid);
+		
+		JSONObject jObject  = areaLineService.getDatagrid(dataGrid);
+        responseDatagrid(response, jObject);
 	}
 
 	/**

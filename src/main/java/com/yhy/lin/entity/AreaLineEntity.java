@@ -1,19 +1,16 @@
 package com.yhy.lin.entity;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-import javax.persistence.SequenceGenerator;
 
 /**   
  * @Title: Entity
@@ -54,9 +51,9 @@ public class AreaLineEntity implements java.io.Serializable {
 	/**线路时长*/
 	private java.lang.String lineDuration;
 	/**城市id*/
-	private java.lang.String cityid;
+	private java.lang.String cityId;
 	/**城市名称*/
-	private java.lang.String cityname;
+	private java.lang.String cityName;
 	/**出车时间段*/
 	private java.lang.String dispath;
 	/**车辆类型*/
@@ -268,33 +265,33 @@ public class AreaLineEntity implements java.io.Serializable {
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  城市id
 	 */
-	@Column(name ="CITYID",nullable=true,length=32)
-	public java.lang.String getCityid(){
-		return this.cityid;
+	@Column(name ="CITY_ID",nullable=true,length=32)
+	public java.lang.String getCityId(){
+		return this.cityId;
 	}
 
 	/**
 	 *方法: 设置java.lang.String
 	 *@param: java.lang.String  城市id
 	 */
-	public void setCityid(java.lang.String cityid){
-		this.cityid = cityid;
+	public void setCityId(java.lang.String cityId){
+		this.cityId = cityId;
 	}
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  城市名称
 	 */
-	@Column(name ="CITYNAME",nullable=true,length=255)
-	public java.lang.String getCityname(){
-		return this.cityname;
+	@Column(name ="CITY_NAME",nullable=true,length=255)
+	public java.lang.String getCityName(){
+		return this.cityName;
 	}
 
 	/**
 	 *方法: 设置java.lang.String
 	 *@param: java.lang.String  城市名称
 	 */
-	public void setCityname(java.lang.String cityname){
-		this.cityname = cityname;
+	public void setCityName(java.lang.String cityName){
+		this.cityName = cityName;
 	}
 	/**
 	 *方法: 取得java.lang.String

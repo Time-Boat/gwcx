@@ -45,6 +45,7 @@ import com.yhy.lin.app.service.WeixinPayService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MD5Util;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.CommonUtil;
 import com.yhy.lin.app.wechat.MobiMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
@@ -377,16 +378,15 @@ public class WeixinPayController extends AppBaseController{
 					t.setOrderPaystatus("0");
 					t.setOrderPayNumber(orderPayNumber);
 
+					String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
+					
 					// 如果购买成功，将消息添加到消息中心
-					AppMessageListEntity app = new AppMessageListEntity();
-					app.setContent("您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName()
-							+ " 的车票，请等待管理员审核。");
-					app.setCreateTime(AppUtil.getCurTime());
-					app.setStatus("0"); // 消息状态 0：否 1：是
-					app.setUserId(t.getUserId());
-					app.setMsgType("0"); // 消息类型 0:新增 1:修改
-					app.setOrderId(t.getId());
+					AppMessageListEntity app = SendMessageUtil.buildAppMessage(t.getUserId(), content, "0", "0", t.getId());
+					
 					systemService.save(app);
+					
+					//新增消息后，要把对应的用户状态改一下
+					systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
 
 				} else {
 					t.setOrderStatus(6);

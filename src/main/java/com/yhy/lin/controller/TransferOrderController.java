@@ -46,6 +46,25 @@ public class TransferOrderController extends BaseController {
 	// 接送机订单处理
 	@RequestMapping(params = "transferOrderList")
 	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response) {
+		
+			String sql ="select l.id,l.name from lineinfo l";
+			List<Object> list = this.systemService.findListbySql(sql);
+			StringBuffer json = new StringBuffer("{'data':[");
+			if(list.size()>0){
+				for (int i = 0; i < list.size(); i++) {
+					Object[] ob = (Object[]) list.get(i);
+					String id = ob[0]+"";
+					String name = ob[1]+"";
+						json.append("{");
+						json.append("'id':'" +id + "',");
+						json.append("'name':'"+ name + "'");
+						json.append("},");
+				}
+			}
+			json.delete(json.length()-1, json.length());
+			json.append("]}");
+			
+			request.setAttribute("lineNameList",json.toString());
 		return new ModelAndView("yhy/transferOrder/transferOrderList");
 	}
 
@@ -59,18 +78,16 @@ public class TransferOrderController extends BaseController {
 	public void dataGrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		
-		String orderId = request.getParameter("orderId");
-		String orderType = request.getParameter("orderType");
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
-		String orderStatus = request.getParameter("orderStatus");
+		String lineId = request.getParameter("lineId");
 		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderId,orderType,orderStartingstation, orderTerminusstation,
-				orderStatus,fc_begin, fc_end, ddTime_begin,ddTime_end);
+		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+				,lineId,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);
 	}

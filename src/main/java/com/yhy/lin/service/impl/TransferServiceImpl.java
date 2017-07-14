@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -40,9 +41,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
 
 	@Override
-	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,String orderType,String orderStartingstation,String orderTerminusstation,String orderStatus, String fc_begin, String fc_end,
+	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder,orderId, orderType, orderStartingstation, orderTerminusstation, orderStatus, fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,orderStartingstation, orderTerminusstation,lineId, fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -100,7 +101,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		return jObject;
 	}
 
-	public String getWhere(TransferorderEntity transferorder,String orderId,String orderType,String orderStartingstation,String orderTerminusstation,String orderStatus, String fc_begin, String fc_end, String ddTime_begin,
+	public String getWhere(TransferorderEntity transferorder,String orderStartingstation,String orderTerminusstation,String lineId, String fc_begin, String fc_end, String ddTime_begin,
 			String ddTime_end) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -118,16 +119,20 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and a.order_expectedarrival between '" + ddTime_begin + "' and '" + ddTime_end + "'");
 		}
 		// 订单编号
-		if (StringUtil.isNotEmpty(orderId)) {
-			sql.append(" and  a.order_id like '%" + orderId + "%'");
+		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
+			sql.append(" and  a.order_id like '%" + transferorder.getOrderId() + "%'");
+		}
+		// 线路名称
+		if (StringUtil.isNotEmpty(lineId)) {
+			sql.append(" and  a.line_id = '" + lineId + "'");
 		}
 		// 订单类型
-		if (StringUtil.isNotEmpty(orderType)) {
-			sql.append(" and  a.order_type ='" + orderType + "'");
+		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
+			sql.append(" and  a.order_type ='" + transferorder.getOrderType() + "'");
 		}
 		// 订单状态
-		if (StringUtil.isNotEmpty(orderStatus)) {
-			sql.append(" and  a.order_status ='" + orderStatus + "'");
+		if (StringUtil.isNotEmpty(transferorder.getOrderStatus())) {
+			sql.append(" and  a.order_status ='" + transferorder.getOrderStatus() + "'");
 		}
 		// 起点站id
 		if (StringUtil.isNotEmpty(orderStartingstation)) {
@@ -268,7 +273,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		List<Order_LineCarDiverEntity> list = new ArrayList<Order_LineCarDiverEntity>();
 		List<TransferorderEntity> tList = new ArrayList<TransferorderEntity>();
 		List<AppMessageListEntity> mList = new ArrayList<AppMessageListEntity>();
-
+		
+		StringBuffer userIds = new StringBuffer();
+		
 		try {
 			for (int i = 0; i < orderIds.size(); i++) {
 				Order_LineCarDiverEntity order_LineCarDiver = new Order_LineCarDiverEntity();
@@ -293,23 +300,19 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 							.replace("%3", t.getOrderTerminusStationName()).replace("%4", t.getOrderStartime())
 							.replace("%5", d.getPhoneNumber()).replace("%6", licencePlateName);
 
-					AppMessageListEntity app = new AppMessageListEntity();
-					app.setContent(msgInfo);
-					app.setCreateTime(AppUtil.getCurTime());
-					app.setStatus("0");
-					app.setUserId(t.getUserId());
+					String type = "0";
 					// 这个订单是否已经被处理过
 					long l = getCountForJdbcParam("select count(1) from order_linecardiver where id=? ",
 							new Object[] { orderIds.get(i) });
 					// 被处理过 就将消息类型改为修改
 					if (l > 0) {
-						app.setMsgType("1");
-					} else {
-						app.setMsgType("0");
+						type = "1";
 					}
-					app.setOrderId(orderIds.get(i));
-					mList.add(app);
-
+					
+					mList.add(SendMessageUtil.buildAppMessage(t.getUserId(), msgInfo, "0", type, orderIds.get(i)));
+					
+					userIds.append("'" + t.getUserId() + "',");
+					
 					String strDate = "";
 
 					SimpleDateFormat sformat = DateUtils.datetimeFormat;
@@ -333,6 +336,13 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			// if(1==1) //测试spring事物
 			// throw new Exception("a");
 			saveAllEntitie(tList);
+			
+			//新增消息后，要把对应的用户状态改一下
+			int l = userIds.length();
+			if(l > 0){
+				updateBySqlString("update car_customer set msg_status='0' where id in (" + userIds.deleteCharAt(l-1) + ") ");
+			}
+			
 			b = true;
 		} catch (Exception e) {
 			e.printStackTrace();

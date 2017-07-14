@@ -37,19 +37,7 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							线路图片:
-						</label>
-					</td>
-					<td class="value">
-						<input class="inputxt" id="imagePath" name="imagePath" ignore="ignore"
-							   value="${areaLinePage.imagePath}">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							线路类型 2：接机 3：送机 4：接火车 5：送火车:
+							线路类型 :
 						</label>
 					</td>
 					<td class="value">
@@ -61,7 +49,7 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							线路状态0:启用  1:未启用:
+							线路状态:
 						</label>
 					</td>
 					<td class="value">
@@ -73,84 +61,12 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							线路创建时间:
-						</label>
-					</td>
-					<td class="value">
-						<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  style="width: 150px" id="createTime" name="createTime" ignore="ignore"
-							     value="<fmt:formatDate value='${areaLinePage.createTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							线路创建人:
-						</label>
-					</td>
-					<td class="value">
-						<input class="inputxt" id="createPeople" name="createPeople" ignore="ignore"
-							   value="${areaLinePage.createPeople}">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							线路编号:
-						</label>
-					</td>
-					<td class="value">
-						<input class="inputxt" id="lineNumber" name="lineNumber" ignore="ignore"
-							   value="${areaLinePage.lineNumber}">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							部门id 用于权限过滤:
-						</label>
-					</td>
-					<td class="value">
-						<input class="inputxt" id="departId" name="departId" ignore="ignore"
-							   value="${areaLinePage.departId}">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							线路的单价:
-						</label>
-					</td>
-					<td class="value">
-						<input class="inputxt" id="linePrice" name="linePrice" ignore="ignore"
-							   value="${areaLinePage.linePrice}" datatype="d">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							线路时长:
-						</label>
-					</td>
-					<td class="value">
-						<input class="inputxt" id="lineDuration" name="lineDuration" ignore="ignore"
-							   value="${areaLinePage.lineDuration}">
-						<span class="Validform_checktip"></span>
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
 							城市id:
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="cityid" name="cityid" ignore="ignore"
-							   value="${areaLinePage.cityid}">
+						<input class="inputxt" id="cityId" name="cityId" ignore="ignore"
+							   value="${areaLinePage.cityId}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -161,8 +77,8 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="cityname" name="cityname" ignore="ignore"
-							   value="${areaLinePage.cityname}">
+						<input class="inputxt" id="cityName" name="cityName" ignore="ignore"
+							   value="${areaLinePage.cityName}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

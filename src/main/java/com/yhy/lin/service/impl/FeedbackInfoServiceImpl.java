@@ -66,7 +66,7 @@ public class FeedbackInfoServiceImpl extends CommonServiceImpl implements Feedba
 			sql.append(" and  c.phone like '%" +phone + "%' ");
 		}
 		
-		sql.append(" ORDER BY c.create_time desc");
+		sql.append(" ORDER BY f.create_time desc");
 		
 		return sql.toString();
 	}

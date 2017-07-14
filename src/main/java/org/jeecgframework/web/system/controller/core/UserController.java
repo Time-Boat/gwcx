@@ -620,11 +620,47 @@ public class UserController extends BaseController {
 	 */
 	@RequestMapping(params = "datagridRole")
 	public void datagridRole(TSRole tsRole, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+		TSUser currentUser = null;
+		try {
+			currentUser = ResourceUtil.getSessionUserName();
+		} catch (RuntimeException e) {
+			//logger.warn("当前session为空,无法获取用户");
+		}
+		
 		CriteriaQuery cq = new CriteriaQuery(TSRole.class, dataGrid);
 		//查询条件组装器
 		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, tsRole);
 		this.systemService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		
+		List<TSRole> list =  dataGrid.getResults();
+		List<TSRole> dglist = new ArrayList<>(); 
+		DataGrid dg = new DataGrid();
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				String rolecode = list.get(i).getRoleCode();
+				if("adminjx".equals(rolecode) || "adminkf".equals(rolecode)){
+					dglist.add(list.get(i));
+				}
+			}
+		}
+		dg.setField(dataGrid.getField());
+		dg.setFooter(dataGrid.getFooter());
+		dg.setOrder(dataGrid.getOrder());
+		dg.setPage(dataGrid.getPage());
+		dg.setResults(dglist);
+		dg.setRows(dataGrid.getRows());
+		dg.setSort(dataGrid.getSort());
+		dg.setSqlbuilder(dataGrid.getSqlbuilder());
+		dg.setTotal(dglist.size());
+		dg.setTreefield(dataGrid.getTreefield());
+		
+		//如果是接送机小超管只显示技术经理和客服经理，其他无限制
+		if("接送机小超管".equals(currentUser.getUserName())){
+			TagUtil.datagrid(response, dg);
+		}else{
+			TagUtil.datagrid(response, dataGrid);
+		}
+		
 	}
 
 	/**

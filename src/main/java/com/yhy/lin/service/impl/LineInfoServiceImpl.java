@@ -125,9 +125,9 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		 sql.append("select a.id,a.name,a.startLocation,a.startX,a.startY,a.endLocation,a.endX,"
-		 		+ "a.endY,a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
-		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName ");
+		 sql.append("select a.id,a.name,a.startLocation,a.endLocation,"
+		 		+ " a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
+		 		+ " a.lineNumber,a.departId,a.lineTimes,a.settledCompanyId,a.settledCompanyName ");
 		 sql.append(" from lineinfo a  where 1=1 ");
 		 
 		if (!sqlWhere.isEmpty()) {
@@ -139,11 +139,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				new Db2Page("id")
 				,new Db2Page("name", "name", null)
 				,new Db2Page("startLocation", "startLocation", null)
-				,new Db2Page("startX", "startX", null)
-				,new Db2Page("startY", "startY", null)
 				,new Db2Page("endLocation", "endLocation", null)
-				,new Db2Page("endX", "endX", null)
-				,new Db2Page("endY", "endY", null)
 				,new Db2Page("imageurl", "imageurl", null)
 				,new Db2Page("type", "type", null)
 				,new Db2Page("status", "status", null)
@@ -152,8 +148,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("createTime", "createTime", null)
 				,new Db2Page("createPeople", "createPeople", null)
 				,new Db2Page("price", "price", null)
-				,new Db2Page("lstartTime", "lstartTime", null)
-				,new Db2Page("lendTime", "lendTime", null)
 				,new Db2Page("lineTimes", "lineTimes", null)
 				,new Db2Page("settledCompanyId", "settledCompanyId", null)
 				,new Db2Page("settledCompanyName", "settledCompanyName", null)

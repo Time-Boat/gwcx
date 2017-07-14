@@ -69,6 +69,18 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 用户登录次数*/
 	private int loginCount;
 	
+	/** 用户消息信息状态  0 未读     1已读*/
+	private java.lang.String msgStatus;
+	
+	@Column(name = "MSG_STATUS", nullable = true, length = 1)
+	public java.lang.String getMsgStatus() {
+		return msgStatus;
+	}
+
+	public void setMsgStatus(java.lang.String msgStatus) {
+		this.msgStatus = msgStatus;
+	}
+	
 	/**
 	 * 登录次数
 	 * @return: 
