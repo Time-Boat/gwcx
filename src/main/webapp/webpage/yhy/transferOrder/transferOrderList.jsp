@@ -57,7 +57,7 @@
 			var obj1 = eval('(' + json1 + ')');
 			var obj2 = eval('(' + json2 + ')');
 			
-			var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+			var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 	 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
 			var a3 = '<select name="lineId" style="width: 150px">';
 			var c1 = '<option value="">选择所属线路</option>';
@@ -69,7 +69,7 @@
 			
 			var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 	 		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
-			var aa3 = '<select name="driverName" style="width: 150px">';
+			var aa3 = '<select name="driverId" style="width: 150px">';
 			var cc1 = '<option value="">选择司机</option>';
 			for (var i = 0; i < obj2.data.length; i++) {
 				cc1 += '<option value="'+obj2.data[i].driverId+'">' + obj2.data[i].driverName

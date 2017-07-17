@@ -24,7 +24,7 @@
 			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
 			<t:dgCol title="司机名称" field="driverName" align="center" query="true"></t:dgCol>
 			<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
-			<t:dgCol title="订单来源渠道" field="orderFlightnumber" align="center"></t:dgCol>
+			<t:dgCol title="订单来源渠道" field="account" align="center"></t:dgCol>
 			<t:dgCol title="订单状态" field="orderStatus"
 				replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,取消订单待退款_3" query="true"
 				align="center"></t:dgCol>

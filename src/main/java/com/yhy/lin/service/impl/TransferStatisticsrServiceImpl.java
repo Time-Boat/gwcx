@@ -33,8 +33,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
-		sql.append(
-				"select s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count from car_customer s ");
+		sql.append("select s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,f.account from "
+				+ "car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on f.id=d.dealer_id");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -58,10 +58,15 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		
 		//dataGrid.setFooter("'loginCount':'" + count + "次','commonAddr':'合计:'");
 		// 将结果集转换成页面上对应的数据集
-		Db2Page[] db2Pages = { new Db2Page("id"), new Db2Page("createTime", "create_time", null),
-				new Db2Page("realName", "real_name", null), new Db2Page("phone", "phone", null),
-				new Db2Page("cardNumber", "card_number", null), new Db2Page("address", "address", null),
-				new Db2Page("commonAddr", "common_addr", null),new Db2Page("loginCount", "login_count", null)
+		Db2Page[] db2Pages = { new Db2Page("id"), 
+				new Db2Page("createTime", "create_time", null),
+				new Db2Page("realName", "real_name", null), 
+				new Db2Page("phone", "phone", null),
+				new Db2Page("cardNumber", "card_number", null),
+				new Db2Page("address", "address", null),
+				new Db2Page("commonAddr", "common_addr", null),
+				new Db2Page("loginCount", "login_count", null),
+				new Db2Page("account", "account", null)
 
 		};
 		JSONObject jObject = this.getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
@@ -86,9 +91,10 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 		sql.append(
 				"select a.id,a.applicationTime,a.order_id,l.name as line_name,l.type,a.order_startime,w.real_name,a.order_contactsname,"
-						+ "a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_status,a.order_numbers,a.order_totalPrice from "
+						+ "a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_status,a.order_numbers,a.order_totalPrice,fi.account from "
 						+ "transferorder a LEFT JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
-						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id");
+						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id "
+						+ "LEFT JOIN dealer_customer dc on w.open_id = dc.open_id LEFT JOIN dealer_info fi on fi.id=dc.dealer_id");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -117,15 +123,21 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				+ "元','orderStatus':'合计:'");
 
 		// 将结果集转换成页面上对应的数据集
-		Db2Page[] db2Pages = { new Db2Page("id"), new Db2Page("applicationTime", "applicationTime", null),
-				new Db2Page("orderId", "order_id", null), new Db2Page("lineName", "line_name", null),
-				new Db2Page("ordertype", "type", null), new Db2Page("orderStartime", "order_startime", null),
+		Db2Page[] db2Pages = { new Db2Page("id"), 
+				new Db2Page("applicationTime", "applicationTime", null),
+				new Db2Page("orderId", "order_id", null),
+				new Db2Page("lineName", "line_name", null),
+				new Db2Page("ordertype", "type", null), 
+				new Db2Page("orderStartime", "order_startime", null),
 				new Db2Page("realName", "real_name", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
-				new Db2Page("driverName", "driver_name", null), new Db2Page("licencePlate", "licence_plate", null),
-				new Db2Page("orderStatus", "order_status", null), new Db2Page("orderNumbers", "order_numbers", null),
-				new Db2Page("orderTotalPrice", "order_totalPrice", null)
+				new Db2Page("driverName", "driver_name", null), 
+				new Db2Page("licencePlate", "licence_plate", null),
+				new Db2Page("orderStatus", "order_status", null),
+				new Db2Page("orderNumbers", "order_numbers", null),
+				new Db2Page("orderTotalPrice", "order_totalPrice", null),
+				new Db2Page("account", "account", null)
 
 		};
 		JSONObject jObject = this.getJsonDatagridEasyUIs(mapList, iCount.intValue(), db2Pages, dataGrid);

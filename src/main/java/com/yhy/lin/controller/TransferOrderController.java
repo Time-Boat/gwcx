@@ -1,5 +1,6 @@
 package com.yhy.lin.controller;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +57,10 @@ public class TransferOrderController extends BaseController {
 		return new ModelAndView("yhy/transferOrder/transferOrderList");
 	}
 	
+	/**
+	 * 获得车牌号
+	 * @return
+	 */
 	public String getCarPlate(){
 		String sql = "select c.id,c.licence_plate from car_info c ";
 		List<Object> list = this.systemService.findListbySql(sql);
@@ -107,7 +112,7 @@ public class TransferOrderController extends BaseController {
 	public String getLine(){
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and t.org_code like '" + orgCode + "%' ";
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='1' and t.org_code like '" + orgCode + "%' ";
 		List<Object> list = this.systemService.findListbySql(sql);
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){
@@ -141,7 +146,7 @@ public class TransferOrderController extends BaseController {
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
-		String driverId = request.getParameter("driverName");
+		String driverId = request.getParameter("driverId");
 		String driverName ="";
 		if (StringUtil.isNotEmpty(driverId)) {
 			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
@@ -255,4 +260,26 @@ public class TransferOrderController extends BaseController {
 		return new ModelAndView("yhy/transferOrder/transferOrderDetial");
 	}
 
+	/**
+	 * 定时获取订单
+	 */
+	@RequestMapping(params = "getOrder")
+	@ResponseBody
+	public JSONObject getOrder(){
+		JSONObject jsonObj = new JSONObject();
+		String sql = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on "
+				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id "
+				+ "left join t_s_depart t on t.id = l.departId where a.applicationTime > DATE_SUB(NOW(), INTERVAL 30 MINUTE);";
+		List<Object> list = this.systemService.findListbySql(sql);
+		int num = 0;
+		if (list.size() > 0) {
+			BigInteger ob = (BigInteger) list.get(0);
+			num = ob.intValue();
+		}
+
+		jsonObj.put("num", num);
+		return jsonObj;
+		
+	}
+	
 }

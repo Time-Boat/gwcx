@@ -62,8 +62,7 @@
 		var createTime_end = $("input[name='createTime_end']").val();
 		var accountId = $("select[name='accountId']").val();
 		//渠道商用户统计
-		$
-				.ajax({
+		$.ajax({
 					url : "dealerStatisticsController.do?getUserTotal&createTime_begin="
 							+ createTime_begin
 							+ "&createTime_end="
