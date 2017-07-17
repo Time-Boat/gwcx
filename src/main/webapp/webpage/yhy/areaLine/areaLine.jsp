@@ -10,13 +10,14 @@
 		//线路类型和区域
 	  	function getLineType(){
 	  		var lt = $('#lineType');
-	  		var district = $('#district');
+	  		var district = $('#districtId');
+	  		var station = $('#stationId');
 	  		var city = $("#cityId").find("option:selected");
 	  		var business = city.attr("business");
 	  		if(business == null || business == ''){
 	  			lt.empty().append("<option value=''>--请选择线路类型--</option>");
 	  			district.empty().append("<option value=''>--请选择区域--</option>");
-	  			$('#stationId').empty().append("<option value=''>--请选择站点--</option>");
+	  			station.empty().append("<option value=''>--请选择站点--</option>");
 	  		}else{
 		  		if(business.indexOf('0') != -1){	
 		  			lt.append("<option value='0'>接送机</option>");
@@ -33,8 +34,8 @@
 						//console.log(data);
 						for(var i=0;i<data.districts[0].districts.length;i++){
 							var name = data.districts[0].districts[i].name;
-							var id = data.districts[0].districts[i].id;
-							district.append("<option value='" + id + "'>" + name + "</option>");
+							var adcode = data.districts[0].districts[i].adcode;
+							district.append("<option value='" + adcode + "'>" + name + "</option>");
 						}
 					}
 				});
@@ -99,12 +100,12 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							所属区域（高德）:
+							所属区域:
 						</label>
 					</td>
 					<td class="value">
 						<%-- <select id="district" name="district" datatype="*" value="${areaLinePage.district}"> --%>
-						<select id="district" name="district" datatype="*" >  <!-- this.options[this.options.selectedIndex].getAttribute('business') -->
+						<select id="districtId" name="districtId" datatype="*" >  <!-- this.options[this.options.selectedIndex].getAttribute('business') -->
 								<option value="">--请选择区域--</option>
 						</select> 
 						<span class="Validform_checktip"></span>

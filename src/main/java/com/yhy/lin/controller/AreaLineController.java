@@ -171,7 +171,6 @@ public class AreaLineController extends BaseController {
 	@RequestMapping(params = "getStation")
 	@ResponseBody
 	public JSONObject getStation(AreaLineEntity areaLine, HttpServletRequest request) {
-		String message = null;
 		
 		//站点类型    0：机场站点     1：火车站点
 		String type = request.getParameter("type");

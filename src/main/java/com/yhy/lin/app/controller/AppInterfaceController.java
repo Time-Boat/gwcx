@@ -1197,15 +1197,11 @@ public class AppInterfaceController extends AppBaseController {
 			systemService.save(cc);
 			
 			//查询用户信息，然后返回给前端
-			AppCustomerEntity a = null;
-			a = new AppCustomerEntity();
-			a.setCardNumber(cc.getCardNumber());
-			a.setUserId(cc.getId());
-			a.setCustomerImg(cc.getCustomerImg());
-			a.setPhone(cc.getPhone());
-			a.setRealName(cc.getRealName());
-			
-			data.put("data", a);
+			data.put("customerImg", cc.getCustomerImg());
+			data.put("phone", cc.getPhone());
+			data.put("token", cc.getToken());
+			data.put("userId", cc.getUserId());
+			data.put("userName", cc.getUserName());
 			
 			success = true;
 			statusCode = AppGlobals.APP_SUCCESS;

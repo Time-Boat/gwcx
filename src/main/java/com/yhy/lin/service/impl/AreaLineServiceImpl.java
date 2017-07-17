@@ -34,10 +34,10 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 		StringBuffer sql = new StringBuffer();
 		
 		// 取出当前页的数据 
-		sql.append("select c.city as cityName,a.id,a.name,a.station_id,a.line_type,a.status,a.remark,a.create_time,a.create_people,"
-				+ "a.dispath,d.name as startname "
-				+ "from area_line a inner join t_s_depart b on a.depart_id =b.ID left join cities c on a.city_id = c.cityId "
-				+ "left join busstopinfo d on d.id=a.station_id ");
+		sql.append(" select c.city as cityName,ar.area as district,a.id,a.name,a.station_id,a.line_type,a.status,a.remark,a.create_time,a.create_people, "
+				+ " a.car_type,a.dispath,d.name as startname,d.name as station_name "
+				+ " from area_line a inner join t_s_depart b on a.depart_id =b.ID left join cities c on a.city_id = c.cityId "
+				+ " left join areas as ar on a.district_id = ar.areaId left join busstopinfo d on d.id=a.station_id ");
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from area_line a inner join t_s_depart b on a.depart_id = b.ID ";
@@ -61,6 +61,8 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 				,new Db2Page("dispath", "dispath", null)
 				,new Db2Page("carType", "car_type", null)
 				,new Db2Page("district", "district", null)
+				,new Db2Page("stationName", "station_name", null)
+				,new Db2Page("status", "status", null)
 				,new Db2Page("remark", "remark", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

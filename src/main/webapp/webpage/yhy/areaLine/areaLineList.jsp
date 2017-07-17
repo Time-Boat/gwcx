@@ -6,9 +6,9 @@
   <t:datagrid name="areaLineList" title="包车区域线路" actionUrl="areaLineController.do?datagrid" idField="id" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="线路名称" field="name" width="120"></t:dgCol>
-   <t:dgCol title="机场或火车站站点" field="stationId" width="120"></t:dgCol>
+   <t:dgCol title="机场或火车站站点" field="stationName" width="120"></t:dgCol>
    <%-- <t:dgCol title="线路图片" field="imagePath" width="120"></t:dgCol> --%>
-   <t:dgCol title="线路类型" field="lineType"  width="120"></t:dgCol>
+   <t:dgCol title="线路类型" field="lineType" replace="接送机线路_0,接送火车线路_1" width="120"></t:dgCol>
    <t:dgCol title="线路状态" field="status" dictionary="lineStatus" width="120"></t:dgCol>
    <t:dgCol title="线路创建时间" field="createTime" formatter="yyyy-MM-dd hh:mm:ss" width="120"></t:dgCol>
    <t:dgCol title="线路创建人" field="createPeople" width="120"></t:dgCol>
@@ -19,8 +19,8 @@
    <%-- <t:dgCol title="城市id" field="cityId" width="120"></t:dgCol> --%>
    <t:dgCol title="城市名称" field="cityName" width="120"></t:dgCol>
    <t:dgCol title="出车时间段" field="dispath" dictionary="dispathtime" width="120"></t:dgCol>
-   <t:dgCol title="车辆类型" field="carType" width="120" ></t:dgCol>
-   <t:dgCol title="所属区域（高德）" field="district" width="120"></t:dgCol>
+   <t:dgCol title="车辆类型" field="carType" dictionary="car_type" width="120" ></t:dgCol>
+   <t:dgCol title="所属区域" field="district" width="120"></t:dgCol>
    <%-- <t:dgCol title="区域id （高德）" field="districtId" width="120"></t:dgCol> --%>
    <t:dgCol title="备注" field="remark" width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
