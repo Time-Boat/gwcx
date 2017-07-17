@@ -34,7 +34,7 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 		StringBuffer sql = new StringBuffer();
 		
 		// 取出当前页的数据 
-		sql.append("select c.cityId,c.city,a.id,a.name,a.station_id,a.line_type,a.status,a.remark,a.create_time,a.create_people,"
+		sql.append("select c.city as cityName,a.id,a.name,a.station_id,a.line_type,a.status,a.remark,a.create_time,a.create_people,"
 				+ "a.dispath,d.name as startname "
 				+ "from area_line a inner join t_s_depart b on a.depart_id =b.ID left join cities c on a.city_id = c.cityId "
 				+ "left join busstopinfo d on d.id=a.station_id ");
@@ -57,7 +57,7 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 				,new Db2Page("lineType", "line_type", null)
 				,new Db2Page("createTime", "create_time", null)
 				,new Db2Page("createPeople", "create_people", null)
-				,new Db2Page("cityName", "city_name", null)
+				,new Db2Page("cityName")
 				,new Db2Page("dispath", "dispath", null)
 				,new Db2Page("carType", "car_type", null)
 				,new Db2Page("district", "district", null)

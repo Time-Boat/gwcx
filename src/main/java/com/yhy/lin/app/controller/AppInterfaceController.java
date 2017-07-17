@@ -1195,6 +1195,18 @@ public class AppInterfaceController extends AppBaseController {
 			cc.setRealName(userName);
 			
 			systemService.save(cc);
+			
+			//查询用户信息，然后返回给前端
+			AppCustomerEntity a = null;
+			a = new AppCustomerEntity();
+			a.setCardNumber(cc.getCardNumber());
+			a.setUserId(cc.getId());
+			a.setCustomerImg(cc.getCustomerImg());
+			a.setPhone(cc.getPhone());
+			a.setRealName(cc.getRealName());
+			
+			data.put("data", a);
+			
 			success = true;
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
@@ -1207,8 +1219,8 @@ public class AppInterfaceController extends AppBaseController {
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
+		
 		data.put("success", success);
-		data.put("imgUrl", imgUrl);
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data);

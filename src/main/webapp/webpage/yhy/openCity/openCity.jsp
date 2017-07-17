@@ -15,7 +15,7 @@
   	function changeProvince(){
   		var  cateOne = $("#provinceId").find("option:selected").val();
   	    if(cateOne == '') {
-  	         $("#cityId").empty().append("<option value=''>---请选择城市----</option>");
+  	        $("#cityId").empty().append("<option value=''>---请选择城市----</option>");
   	        return false;
   	    }
   	    

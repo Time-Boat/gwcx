@@ -75,7 +75,7 @@
     </div>
 </div> -->
 
-<div id="win"  class="easyui-window" title="确认退款" style="width:400px;height:150px" data-options="modal:true" closed="true" ></div>
+<div id="win" class="easyui-window" title="确认退款" style="width:400px;height:150px;" data-options="modal:true" closed="true" ></div>
 
 </div>
 <script type="text/javascript">

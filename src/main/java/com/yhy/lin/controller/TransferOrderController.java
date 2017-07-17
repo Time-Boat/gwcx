@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.SendMessageUtil;
+import com.yhy.lin.entity.CarInfoEntity;
+import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 import com.yhy.lin.service.TransferServiceI;
@@ -47,26 +50,83 @@ public class TransferOrderController extends BaseController {
 	@RequestMapping(params = "transferOrderList")
 	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response) {
 		
-			String sql ="select l.id,l.name from lineinfo l";
-			List<Object> list = this.systemService.findListbySql(sql);
-			StringBuffer json = new StringBuffer("{'data':[");
-			if(list.size()>0){
-				for (int i = 0; i < list.size(); i++) {
-					Object[] ob = (Object[]) list.get(i);
-					String id = ob[0]+"";
-					String name = ob[1]+"";
-						json.append("{");
-						json.append("'id':'" +id + "',");
-						json.append("'name':'"+ name + "'");
-						json.append("},");
-				}
-			}
-			json.delete(json.length()-1, json.length());
-			json.append("]}");
-			
-			request.setAttribute("lineNameList",json.toString());
+		request.setAttribute("carplateList",getCarPlate());	
+		request.setAttribute("driverList",getDriver());	
+		request.setAttribute("lineNameList",getLine());
 		return new ModelAndView("yhy/transferOrder/transferOrderList");
 	}
+	
+	public String getCarPlate(){
+		String sql = "select c.id,c.licence_plate from car_info c ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String licencePlate = ob[1]+"";
+					json.append("{");
+					json.append("'carId':'" +id + "',");
+					json.append("'licencePlate':'"+ licencePlate + "'");
+					json.append("},");
+				}
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
+	}
+	
+	/**
+	 * 获取司机
+	 * @return
+	 */
+	public String getDriver(){
+		String sql = "select d.id,d.name from driversinfo d ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String name = ob[1]+"";
+					json.append("{");
+					json.append("'driverId':'" +id + "',");
+					json.append("'driverName':'"+ name + "'");
+					json.append("},");
+				}
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
+	}
+	
+	
+	/**
+	 * 获取线路
+	 */
+	public String getLine(){
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		// 添加了权限
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and t.org_code like '" + orgCode + "%' ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String name = ob[1]+"";
+					json.append("{");
+					json.append("'lineId':'" +id + "',");
+					json.append("'lineName':'"+ name + "'");
+					json.append("},");
+				}
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		
+		return json.toString();
+	}
+	
 
 	// 接送机订单查询
 	@RequestMapping(params = "transferOrderSearchList")
@@ -81,13 +141,25 @@ public class TransferOrderController extends BaseController {
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
+		String driverId = request.getParameter("driverName");
+		String driverName ="";
+		if (StringUtil.isNotEmpty(driverId)) {
+			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
+			 driverName = dr.getName();
+		}
+		String plate ="";
+		String carId = request.getParameter("carId");
+		if (StringUtil.isNotEmpty(carId)) {
+			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
+			 plate = dr.getLicencePlate();
+		}
 		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
 		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation, orderTerminusstation
-				,lineId,fc_begin, fc_end, ddTime_begin,ddTime_end);
+				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);
 	}

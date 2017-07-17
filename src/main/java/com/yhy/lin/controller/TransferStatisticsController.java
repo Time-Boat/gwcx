@@ -206,18 +206,17 @@ public class TransferStatisticsController extends BaseController {
 		}
 		List<Object> mlist = systemService.findListbySql(resql.toString());
 		int sumorder;
-		BigDecimal sumPrice =new BigDecimal("0");
+		BigDecimal sumPrice = new BigDecimal("0");
 		if (mlist.size() > 0) {
 			Object[] ob = (Object[]) mlist.get(0);
 			if (ob[0] != null) {
 				String obnum = ob[0] + "";
 				sumorder = Integer.parseInt(obnum.substring(0, obnum.indexOf(".")));
+				BigDecimal bsum = (BigDecimal) ob[1];
+				sumPrice=sumPrice.add(bsum);
 			} else {
 				sumorder = 0;
 			}
-
-			BigDecimal bsum = (BigDecimal) ob[1];
-			sumPrice=sumPrice.add(bsum);
 			
 		} else {
 			sumorder = 0;

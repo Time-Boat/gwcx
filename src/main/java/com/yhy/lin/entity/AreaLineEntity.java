@@ -52,8 +52,6 @@ public class AreaLineEntity implements java.io.Serializable {
 	private java.lang.String lineDuration;
 	/**城市id*/
 	private java.lang.String cityId;
-	/**城市名称*/
-	private java.lang.String cityName;
 	/**出车时间段*/
 	private java.lang.String dispath;
 	/**车辆类型*/
@@ -277,22 +275,7 @@ public class AreaLineEntity implements java.io.Serializable {
 	public void setCityId(java.lang.String cityId){
 		this.cityId = cityId;
 	}
-	/**
-	 *方法: 取得java.lang.String
-	 *@return: java.lang.String  城市名称
-	 */
-	@Column(name ="CITY_NAME",nullable=true,length=255)
-	public java.lang.String getCityName(){
-		return this.cityName;
-	}
 
-	/**
-	 *方法: 设置java.lang.String
-	 *@param: java.lang.String  城市名称
-	 */
-	public void setCityName(java.lang.String cityName){
-		this.cityName = cityName;
-	}
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  出车时间段

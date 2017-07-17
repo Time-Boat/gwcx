@@ -1,5 +1,8 @@
 package com.yhy.lin.controller;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,8 +22,12 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.AreaLineEntity;
+import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.AreaLineServiceI;
 
 import net.sf.json.JSONObject;
@@ -109,6 +116,11 @@ public class AreaLineController extends BaseController {
 	public AjaxJson save(AreaLineEntity areaLine, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		
+		areaLine.setDepartId(ResourceUtil.getSessionUserName().getCurrentDepart().getId());
+		areaLine.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
+		areaLine.setCreateTime(AppUtil.getDate());;
+		
 		if (StringUtil.isNotEmpty(areaLine.getId())) {
 			message = "包车区域线路更新成功";
 			AreaLineEntity t = areaLineService.get(AreaLineEntity.class, areaLine.getId());
@@ -136,11 +148,37 @@ public class AreaLineController extends BaseController {
 	 */
 	@RequestMapping(params = "addorupdate")
 	public ModelAndView addorupdate(AreaLineEntity areaLine, HttpServletRequest req) {
+		
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
+		
+		List<BusStopInfoEntity> stations = systemService.findHql("from BusStopInfoEntity where station_type != ?", 0);
+		req.setAttribute("stations", stations);
+		
 		if (StringUtil.isNotEmpty(areaLine.getId())) {
 			areaLine = areaLineService.getEntity(AreaLineEntity.class, areaLine.getId());
 			req.setAttribute("areaLinePage", areaLine);
 		}
 		return new ModelAndView("yhy/areaLine/areaLine");
+	}
+	
+	/**
+	 * 获取站点
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	@RequestMapping(params = "getStation")
+	@ResponseBody
+	public JSONObject getStation(AreaLineEntity areaLine, HttpServletRequest request) {
+		String message = null;
+		
+		//站点类型    0：机场站点     1：火车站点
+		String type = request.getParameter("type");
+		List<Map<String,Object>> list = systemService.findForJdbc("select id,name from busstopinfo where station_type=?", "0".equals(type) ? "2" : "1");
+		JSONObject obj = new JSONObject();
+		obj.put("data", list);
+		return obj;
 	}
 	
 }

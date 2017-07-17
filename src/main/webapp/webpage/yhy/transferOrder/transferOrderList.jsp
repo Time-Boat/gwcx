@@ -37,6 +37,9 @@
 	</t:datagrid>
 </div>
 </div>
+<input type="text" value="${carplateList}" id="carpaltes" />
+<input type="text" value="${driverList}" id="driverNames" />
+<input type="text" value="${lineNameList}" id="lineNames" />
 <script type="text/javascript">
 	//进入触发 
 	$(function() {
@@ -47,6 +50,67 @@
 		        }
 		    }   
 		});
+			var json1 = $("#carpaltes").val();
+			var json2= $("#driverNames").val();
+			var json = $("#lineNames").val();
+			var obj = eval('(' + json + ')');
+			var obj1 = eval('(' + json1 + ')');
+			var obj2 = eval('(' + json2 + ')');
+			
+			var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
+			var a3 = '<select name="lineId" style="width: 150px">';
+			var c1 = '<option value="">选择所属线路</option>';
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName
+						+ '</option>';
+			}
+			var a4 = '</select></span>';
+			
+			var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	 		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
+			var aa3 = '<select name="driverName" style="width: 150px">';
+			var cc1 = '<option value="">选择司机</option>';
+			for (var i = 0; i < obj2.data.length; i++) {
+				cc1 += '<option value="'+obj2.data[i].driverId+'">' + obj2.data[i].driverName
+						+ '</option>';
+			}
+			var aa4 = '</select></span>';
+			
+			var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	 		var aaa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车票号">车牌号：</span>';
+			var aaa3 = '<select name="carId" style="width: 150px">';
+			var ccc1 = '<option value="">选择车牌号</option>';
+			for (var i = 0; i < obj1.data.length; i++) {
+				ccc1 += '<option value="'+obj1.data[i].carId+'">' + obj1.data[i].licencePlate
+						+ '</option>';
+			}
+			var aaa4 = '</select></span>';
+			
+			$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2+aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
+			/* 
+			var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	 		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机名称">司机名称：</span>';
+			var aa3 = '<select name="driverId" style="width: 150px">';
+			var cc1 = '<option value="">选择司机</option>';
+			for (var i = 0; i < obj2.data.length; i++) {
+				cc1 += '<option value="'+obj.data[i].driverid+'">' + obj.data[i].drivername
+						+ '</option>';
+			}
+			var aa4 = '</select></span>';
+			$("#transferOrderListForm").append(aa1 + aa2 + aa3 + cc1 + aa4);
+			
+			var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	 		var aaa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车牌号">车牌号：</span>';
+			var aaa3 = '<select name="carId" style="width: 150px">';
+			var ccc1 = '<option value="">选择车牌号</option>';
+			for (var i = 0; i < obj1.data.length; i++) {
+				ccc1 += '<option value="'+obj.data[i].carid+'">' + obj.data[i].licencePlate
+						+ '</option>';
+			}
+			var aaa4 = '</select></span>';
+			$("#transferOrderListForm").append(aaa1 + aaa2 + aaa3 + ccc1 + aaa4); */
+			
 	});
 
 	$(document).ready(function(){

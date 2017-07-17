@@ -41,9 +41,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
 
 	@Override
-	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId, String fc_begin, String fc_end,
+	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder,orderStartingstation, orderTerminusstation,lineId, fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -101,15 +101,13 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		return jObject;
 	}
 
-	public String getWhere(TransferorderEntity transferorder,String orderStartingstation,String orderTerminusstation,String lineId, String fc_begin, String fc_end, String ddTime_begin,
+	public String getWhere(TransferorderEntity transferorder,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
 			String ddTime_end) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		StringBuffer sql = new StringBuffer(" where 1=1 ");
+		StringBuffer sql = new StringBuffer(" where t.org_code like '" + orgCode + "%' ");
 
-		sql.append(" and t.org_code like '" + orgCode + "%' ");
-		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
@@ -126,6 +124,16 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if (StringUtil.isNotEmpty(lineId)) {
 			sql.append(" and  a.line_id = '" + lineId + "'");
 		}
+		//司机
+		if (StringUtil.isNotEmpty(driverId)) {
+			sql.append(" and  d.name like '%" + driverId + "%'");
+		}
+				
+		//车牌号
+		if (StringUtil.isNotEmpty(carId)) {
+			sql.append(" and  c.licence_plate = '" + carId + "'");
+		}
+		
 		// 订单类型
 		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
 			sql.append(" and  a.order_type ='" + transferorder.getOrderType() + "'");
