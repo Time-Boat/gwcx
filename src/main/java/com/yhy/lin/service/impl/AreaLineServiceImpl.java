@@ -36,7 +36,7 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 		// 取出当前页的数据 
 		sql.append(" select c.city as cityName,ar.area as district,a.id,a.name,a.station_id,a.line_type,a.status,a.remark,a.create_time,a.create_people, "
 				+ " a.car_type,a.dispath,d.name as startname,d.name as station_name "
-				+ " from area_line a inner join t_s_depart b on a.depart_id =b.ID left join cities c on a.city_id = c.cityId "
+				+ " from area_line a left join t_s_depart b on a.depart_id =b.ID left join cities c on a.city_id = c.cityId "
 				+ " left join areas as ar on a.district_id = ar.areaId left join busstopinfo d on d.id=a.station_id ");
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
@@ -64,6 +64,45 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 				,new Db2Page("stationName", "station_name", null)
 				,new Db2Page("status", "status", null)
 				,new Db2Page("remark", "remark", null)
+		};
+		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+		return jObject;
+	}
+
+	@Override
+	public JSONObject getAreaStationDatagrid(DataGrid dataGrid) {
+		StringBuffer sqlWhere = new StringBuffer();
+//		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+//		if(StringUtil.isNotEmpty(orgCode)){
+//			sqlWhere.append(" and org_code like '"+orgCode+"%'");
+//		}
+		
+		String p = sqlWhere.toString();
+		
+		StringBuffer sql = new StringBuffer();
+		
+		// 取出当前页的数据 
+		sql.append(" select ast.id as station_id,asl.id,asl.distance,asl.price,asl.duration,ast.name "
+				+ " from area_line al join area_station_line asl on al.id = asl.area_line_id join area_station ast on ast.id = asl.area_station_id ");
+		
+		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
+		String sqlCnt = "select count(*) from area_line al join area_station_line asl on al.id=asl.area_line_id join area_station ast on ast.id = asl.area_station_id ";
+		if (StringUtil.isNotEmpty(p)) {
+			sqlCnt += " where 1=1 " + sqlWhere;
+			sql.append(sqlWhere);
+		}
+		
+		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		
+		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
+		// 将结果集转换成页面上对应的数据集
+		Db2Page[] db2Pages = {
+				new Db2Page("id")
+				,new Db2Page("stationId", "station_id", null)
+				,new Db2Page("name", "name", null)
+				,new Db2Page("distance", "distance", null)
+				,new Db2Page("price", "price", null)
+				,new Db2Page("duration", "duration", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;

@@ -112,7 +112,7 @@ public class TransferOrderController extends BaseController {
 	public String getLine(){
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='1' and t.org_code like '" + orgCode + "%' ";
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%' ";
 		List<Object> list = this.systemService.findListbySql(sql);
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){

@@ -180,4 +180,52 @@ public class AreaLineController extends BaseController {
 		return obj;
 	}
 	
+	/**
+	 * 线路挂接页面
+	 */
+	@RequestMapping(params = "areaAddStation")
+	public ModelAndView areaAddStation(HttpServletRequest request, HttpServletResponse response) {
+		request.setAttribute("lineInfoId", request.getParameter("lineInfoId"));
+		request.setAttribute("lineType", request.getParameter("lineType"));
+		return new ModelAndView("yhy/areaLine/areaLineAddStationList");
+	}
+	
+	/**
+	 * 获取站点信息
+	 */	
+	@RequestMapping(params = "areaStationDatagrid")
+	public void areaStationDatagrid(HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+		
+		JSONObject jObject  = areaLineService.getAreaStationDatagrid(dataGrid);
+        responseDatagrid(response, jObject);
+	}
+	
+	/**
+	 * 获取站点信息
+	 */	
+	@RequestMapping(params = "addOrUpdateStation")
+	public ModelAndView addOrUpdateStation(HttpServletRequest request, HttpServletResponse response) {
+		
+		return new ModelAndView("yhy/areaLine/areaLineAddStation");
+	}
+	
+	/**
+	 * 删除站点信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "delAreaStation")
+	@ResponseBody
+	public AjaxJson delAreaStation(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+//		areaLine = systemService.getEntity(AreaLineEntity.class, areaLine.getId());
+//		message = "包车区域线路删除成功";
+//		areaLineService.delete(areaLine);
+//		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+//		
+//		j.setMsg(message);
+		return j;
+	}
+	
 }

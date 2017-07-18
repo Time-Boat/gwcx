@@ -497,7 +497,7 @@ public class WeixinPayController extends AppBaseController{
 	}
 		
 	/**
-	 * 微信view菜单按钮授权跳转
+	 * 授权跳转
 	 * 
 	 */
 	@RequestMapping(params = "wxOauth2")
@@ -556,7 +556,7 @@ public class WeixinPayController extends AppBaseController{
 	}
 	
 	/**
-	 * 微信view菜单按钮授权跳转
+	 * 跳转到主页
 	 * 
 	 */
 	@RequestMapping(params = "toIndex")

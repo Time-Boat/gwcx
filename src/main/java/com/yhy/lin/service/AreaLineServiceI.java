@@ -9,4 +9,6 @@ public interface AreaLineServiceI extends CommonService{
 
 	JSONObject getDatagrid(DataGrid dataGrid);
 
+	JSONObject getAreaStationDatagrid(DataGrid dataGrid);
+
 }

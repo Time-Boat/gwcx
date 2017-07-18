@@ -7,23 +7,38 @@
   <t:base type="jquery,easyui,tools,DatePicker"></t:base>
   <script type="text/javascript">
 		
+  		$(function(){
+  			getLineType();
+  		});
+  
 		//线路类型和区域
 	  	function getLineType(){
 	  		var lt = $('#lineType');
 	  		var district = $('#districtId');
 	  		var station = $('#stationId');
+	  		
 	  		var city = $("#cityId").find("option:selected");
 	  		var business = city.attr("business");
+	  		
+	  		var dis_t = $('#districtId_t').val();
+	  		var lt_t = $('#lineType_t').val();
+	  		
+	  		console.log("dis_t : " + dis_t);
+	  		console.log("lt_t : " + lt_t);
+	  		
 	  		if(business == null || business == ''){
 	  			lt.empty().append("<option value=''>--请选择线路类型--</option>");
 	  			district.empty().append("<option value=''>--请选择区域--</option>");
 	  			station.empty().append("<option value=''>--请选择站点--</option>");
 	  		}else{
-		  		if(business.indexOf('0') != -1){	
-		  			lt.append("<option value='0'>接送机</option>");
+	  			if(lt_t != '' || lt_t != null){
+	  				getStation(lt_t);
+	  			}
+		  		if(business.indexOf('0') != -1){
+		  			lt.append("<option <c:if test='${areaLinePage.lineType == 0}'>selected</c:if> value='0'>接送机</option>");
 		  		}
 		  		if(business.indexOf('1') != -1){
-		  			lt.append("<option value='1'>接送火车</option>");
+		  			lt.append("<option <c:if test='${areaLinePage.lineType == 1}'>selected</c:if> value='1'>接送火车</option>");
 		  		}
 		  		
 		  		//获取区域信息
@@ -35,7 +50,11 @@
 						for(var i=0;i<data.districts[0].districts.length;i++){
 							var name = data.districts[0].districts[i].name;
 							var adcode = data.districts[0].districts[i].adcode;
-							district.append("<option value='" + adcode + "'>" + name + "</option>");
+							if(adcode == dis_t){
+								district.append("<option value='" + adcode + "' selected >" + name + "</option>");
+							}else{
+								district.append("<option value='" + adcode + "' >" + name + "</option>");
+							}
 						}
 					}
 				});
@@ -45,6 +64,9 @@
 	  	//获取站点信息
 	  	function getStation(value){
 	  		console.log(value);
+	  		var st_t = $('#stationId_t').val();
+	  		console.log("stationId_t : " + value);
+	  		
 	  		$('#stationId').empty().append("<option value=''>--请选择站点--</option>");
 	  		if(value == '' || value == null){
 	  		}else{
@@ -56,7 +78,11 @@
 						var obj = json.data;
 						console.log(obj);
 						for(var i=0;i<obj.length;i++){
-							$('#stationId').append("<option value='" + obj[i].id + "'>" + obj[i].name + "</option>");
+							if(obj[i].id == st_t){
+								$('#stationId').append("<option value='" + obj[i].id + "' selected >" + obj[i].name + "</option>");
+							}else{
+								$('#stationId').append("<option value='" + obj[i].id + "'>" + obj[i].name + "</option>");
+							}
 						}
 					}
 				});
@@ -68,6 +94,11 @@
  <body style="overflow-y: hidden" scroll="no">
   <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="areaLineController.do?save">
 			<input id="id" name="id" type="hidden" value="${areaLinePage.id }">
+			
+			<input id="districtId_t" name="districtId_t" type="hidden" value="${areaLinePage.districtId }">
+			<input id="lineType_t" name="lineType_t" type="hidden" value="${areaLinePage.lineType }">
+			<input id="stationId_t" name="stationId_t" type="hidden" value="${areaLinePage.stationId }" >
+			
 			<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 				<tr>
 					<td align="right">

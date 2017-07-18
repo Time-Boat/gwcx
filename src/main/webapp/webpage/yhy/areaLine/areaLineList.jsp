@@ -28,6 +28,33 @@
    <t:dgToolBar title="录入" icon="icon-add" url="areaLineController.do?addorupdate" funname="add"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="areaLineController.do?addorupdate" funname="update"></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="areaLineController.do?addorupdate" funname="detail"></t:dgToolBar>
+   
+   <t:dgFunOpt funname="areaAddStation(id,name)" title="站点管理"></t:dgFunOpt>
+   
   </t:datagrid>
   </div>
  </div>
+<div region="east" style="width: 390px;" split="true">
+<div tools="#areaLine" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAreaAddStation"></div>
+</div>
+<div id="areaLine"></div>
+</div>
+<script type="text/javascript">
+/* $(document).ready(function(){
+	$("input[name='createTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+	$("input[name='createTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+	$("input[name='birthday']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+	$("input[name='lstartTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+	$("input[name='lstartTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+	$("input[name='lendTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+	$("input[name='lendTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+}); */
+function areaAddStation(id,name) {
+	$("#function-panelAreaAddStation").panel(
+			{
+				title :'线路名称：'+name,
+				href:"areaLineController.do?areaAddStation&lineInfoId="+id+"&lineType=2"   //lineType=2为接送机跳转到的站点挂接界面
+			}
+		);
+}
+</script>
