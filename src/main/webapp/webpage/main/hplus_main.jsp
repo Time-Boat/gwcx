@@ -23,7 +23,6 @@
     <link href="plug-in-ui/hplus/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
     <link href="plug-in-ui/hplus/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
     <link rel="stylesheet" href="plug-in/ace/assets/css/font-awesome.min.css" />
-    <link rel="stylesheet" href="plug-in/jquery/jquery.toast.css" />
     <!--[if IE 7]>
     <link rel="stylesheet" href="plug-in/ace/assets/css/font-awesome-ie7.min.css" />
     <![endif]-->
@@ -31,10 +30,10 @@
     <link href="plug-in-ui/hplus/css/plugins/sweetalert/sweetalert.css" rel="stylesheet">
     <link href="plug-in-ui/hplus/css/animate.css" rel="stylesheet">
     <link href="plug-in-ui/hplus/css/style.css?v=4.1.0" rel="stylesheet">
-    <style type="text/css">
+    <!-- <style type="text/css">
     	a{color:#4BD700;text-decoration:none}
     	a:hover,a:focus{color:#FFF;}
-    </style>
+    </style> -->
 </head>
 
 <body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
@@ -593,8 +592,6 @@
 </div>
 
 <!-- 全局js -->
-<script src="plug-in/jquery/jquery.toast.js" ></script>
-<script src="plug-in/jquery/jquery-1.11.2.min.js"></script>
 <script src="plug-in-ui/hplus/js/jquery.min.js?v=2.1.4"></script>
 <script src="plug-in-ui/hplus/js/bootstrap.min.js?v=3.3.6"></script>
 <script src="plug-in-ui/hplus/js/plugins/metisMenu/jquery.metisMenu.js"></script>
@@ -663,10 +660,6 @@
         createdetailwindow("消息", addurl, 800, 400);
     }
     
-    function popup(){
-    	addOneTab("弹窗", "transferOrderController.do?transferOrderList"); 
-    }
-    
     (function (jQuery){
 
     	this.version = '@1.3';
@@ -722,7 +715,7 @@
 
     		}
 
-    		if($.browser.is=='chrome'){
+    		/* if($.browser.is=='chrome'){
 
     			setTimeout(function(){
 
@@ -734,7 +727,7 @@
 
     			},this.anims.speed-(this.anims.speed/5));
 
-    		}
+    		} */
 
     		this.rmmessage(this.time);
 
@@ -823,7 +816,7 @@
 				var obj = eval('(' + message + ')');
 				if(obj.num>0){
 					$.messager.lays(300, 200);
-			    	$.messager.show('订单提醒', '<a onclick="popup()">有'+obj.num+'份最新的订单，请及时处理！</a> ',0);
+			    	$.messager.show('订单提醒', '订单信息：有'+obj.num+'份最新的订单，请及时处理! ',0);
 				}else{
 					$.messager.lays(300, 200);
 			    	$.messager.show('订单提醒', '订单信息：&nbsp;暂无订单！',0);
@@ -834,8 +827,14 @@
 		});
     	
     }
+    
+	/* function popup(){
+    	
+    	addOneTab("接送订单处理", "transferOrderController.do?transferOrderList","icon-add");
+    	reloadTable();
+    } */
  
-  setInterval("getOrder()",600000);
+  setInterval("getOrder()",3000);
 </script>
  
 </body>

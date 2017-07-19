@@ -17,10 +17,27 @@
 	    	height:20%;
 	    }
 	    
-	    td{
-	 		height:30px;
-	    }
-	    
+	     #tip {
+            background-color: #ddf;
+            color: #333;
+            border: 1px solid silver;
+            box-shadow: 3px 4px 3px 0px silver;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            line-height: 20px;
+        }
+        #tip input[type="text"] {
+            height: 25px;
+            border: 0;
+            padding-left: 5px;
+            width: 280px;
+            border-radius: 3px;
+            outline: none;
+        }
+        
 	  </style>
 	  <title>快速入门</title>
 	</head>
@@ -95,14 +112,15 @@
 		</table>
     </t:formvalid>
     <div id="container" tabindex="0" style="height:80%;" ></div>
-    
+    <input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" onfocus='this.value=""'/>
     <!-- script必须放在body中。。 -->
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
+    <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
     <script type="text/javascript" >
         var map = new AMap.Map('container',{
             resizeEnable: true,
-            zoom: 10,
-            center: [116.480983, 40.0958]
+            zoom: 10,//地图显示的缩放级别
+            center: [116.480983, 40.0958]//地图中心点
         });
         
         AMap.plugin(['AMap.ToolBar','AMap.AdvancedInfoWindow'],function(){
@@ -119,6 +137,31 @@
             });
             infowindow.open(map,[116.480983, 39.989628]);
         })
+        
+        //搜索框
+        var windowsArr = [];
+	    var marker = [];
+	    var map = new AMap.Map("mapContainer", {
+	            resizeEnable: true,
+	            center: [116.397428, 39.90923],
+	            zoom: 13,
+	            keyboardEnable: false
+	    });
+	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+	      var autoOptions = {
+	        city: "北京", //城市，默认全国
+	        input: "keyword"//使用联想输入的input的id
+	      };
+	      autocomplete= new AMap.Autocomplete(autoOptions);
+	      var placeSearch = new AMap.PlaceSearch({
+	            city:'北京',
+	            map:map
+	      })
+	      AMap.event.addListener(autocomplete, "select", function(e){
+	         //TODO 针对选中的poi实现自己的功能
+	         placeSearch.search(e.poi.name)
+	      });
+	    });
     </script>
     
     

@@ -32,11 +32,11 @@ public class SendMessageUtil {
 	 * @param paramValue	短信模板对应的value值
 	 * @param templateCode	阿里大于上配置的模板id
 	 * @param signName		模板签名
-	 * @return body			用于判断短信是否发送成功
+	 * @return boolean		用于判断短信是否发送成功
 	 */
-	public static String sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
+	public static boolean sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
 
-		String body = "";
+		boolean b = false;
 
 		// 生成4位数的验证码
 //		String code = StringUtil.numRandom(4);
@@ -60,11 +60,11 @@ public class SendMessageUtil {
 		AlibabaAliqinFcSmsNumSendResponse rsp = null;
 		try {
 			rsp = client.execute(req);
-			body = rsp.getBody();
+			b = rsp.getResult().getSuccess();
 		} catch (ApiException e) {
 			e.printStackTrace();
 		}
-		return body;
+		return b;
 	}
 	
 	/**

@@ -283,10 +283,10 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 			logger.info("验证码: " + code);
 			// 发送端短消息
-//			String body = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
+//			boolean b = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
 //					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-			String body = "true";
-			if (body.contains("true")) {
+			boolean b = true;
+			if (b) {
 
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
 				UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);

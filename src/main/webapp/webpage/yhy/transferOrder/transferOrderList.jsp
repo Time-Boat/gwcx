@@ -9,37 +9,38 @@
 			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
-		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
 		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,待付款_6" query="true" align="center"></t:dgCol>
-		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
-		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
-		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
-		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
-		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
-		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
-		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
-		<t:dgCol title="单价(人/元)" field="orderUnitprice" align="center"></t:dgCol>
-		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
-		<t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
-		<t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol>
-		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
-		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
-		<t:dgCol title="购票人手机号" field="custphone" align="center"></t:dgCol>
-		<t:dgCol title="支付状态" field="orderPaystatus"  replace="已付款_0,未付款_3" align="center"></t:dgCol>
-		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
-		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
-		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
+		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
+		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
+		<t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
+		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
+		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
+		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
+		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
+		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
+		<t:dgCol title="单价(人/元)" field="orderUnitprice" align="center"></t:dgCol>
+		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
+		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
+		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
+		
+		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
+		<t:dgCol title="购票人手机号" field="custphone" align="center"></t:dgCol>
+		<t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol>
+		<t:dgCol title="支付状态" field="orderPaystatus"  replace="已付款_0,未付款_3" align="center"></t:dgCol>
+		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
+		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
 	</t:datagrid>
 </div>
 </div>
-<input type="text" value="${carplateList}" id="carpaltes" />
-<input type="text" value="${driverList}" id="driverNames" />
-<input type="text" value="${lineNameList}" id="lineNames" />
+<input type="hidden" value="${carplateList}" id="carpaltes" />
+<input type="hidden" value="${driverList}" id="driverNames" />
+<input type="hidden" value="${lineNameList}" id="lineNames" />
 <script type="text/javascript">
 	//进入触发 
 	$(function() {
@@ -219,4 +220,4 @@
 	}
 	
 </script>
- 
+
