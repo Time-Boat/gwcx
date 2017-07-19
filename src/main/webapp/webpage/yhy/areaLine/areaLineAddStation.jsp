@@ -17,7 +17,10 @@
 	    	height:20%;
 	    }
 	    
-	     #tip {
+	    body {
+            font-size: 12px;
+        }
+        #tip {
             background-color: #ddf;
             color: #333;
             border: 1px solid silver;
@@ -111,19 +114,21 @@
 			</tr>
 		</table>
     </t:formvalid>
-    <div id="container" tabindex="0" style="height:80%;" ></div>
-    <input type="text" id="keyword" name="keyword" value="请输入关键字：(选定后搜索)" onfocus='this.value=""'/>
+    <div id="container" tabindex="0" style="height:80%;" >
+    	<input type="text" id="keyword" placeholder="请输入关键字" style="z-index: 9999;position:absolute;margin:10px;" name="keyword" />
+    </div>
     <!-- script必须放在body中。。 -->
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
     <script type="text/javascript" >
         var map = new AMap.Map('container',{
-            resizeEnable: true,
-            zoom: 10,//地图显示的缩放级别
-            center: [116.480983, 40.0958]//地图中心点
+            resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
+            zoom: 10,						//地图显示的缩放级别
+            center: [116.480983, 40.0958],  //地图中心点
+        	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
         });
         
-        AMap.plugin(['AMap.ToolBar','AMap.AdvancedInfoWindow'],function(){
+        /* AMap.plugin(['AMap.ToolBar','AMap.AdvancedInfoWindow'],function(){
             //创建并添加工具条控件
             var toolBar = new AMap.ToolBar();
             map.addControl(toolBar);
@@ -136,17 +141,11 @@
               offset: new AMap.Pixel(0, -30)
             });
             infowindow.open(map,[116.480983, 39.989628]);
-        })
+        }) */
         
         //搜索框
         var windowsArr = [];
 	    var marker = [];
-	    var map = new AMap.Map("mapContainer", {
-	            resizeEnable: true,
-	            center: [116.397428, 39.90923],
-	            zoom: 13,
-	            keyboardEnable: false
-	    });
 	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
 	      var autoOptions = {
 	        city: "北京", //城市，默认全国

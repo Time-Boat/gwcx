@@ -48,7 +48,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	// noRollbackFor={UserAccountException.class},
 	// readOnly=true//, timeout=30 //timeout 允许在执行第一条sql之后保持连接30秒
 	)
-	public void saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId) {
+	public String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId) {
 		
 		// 生成订单号
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
@@ -81,6 +81,8 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		save(t);
 		save(c);
+		
+		return t.getId();
 	}
 
 	@Override

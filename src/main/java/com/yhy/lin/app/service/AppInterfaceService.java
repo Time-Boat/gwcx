@@ -20,7 +20,7 @@ import com.yhy.lin.entity.TransferorderEntity;
 public interface AppInterfaceService extends CommonService{
 
 	/** 保存订单信息，记录常用站点，添加到消息中心 */
-	void saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId);
+	String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId);
 
 	/** 获取机场站点或者火车站站点信息 */
 	List<AppStationInfoEntity> getPTStation(String serveType, String cityId);

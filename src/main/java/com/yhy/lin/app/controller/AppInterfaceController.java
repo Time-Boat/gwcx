@@ -195,7 +195,7 @@ public class AppInterfaceController extends AppBaseController {
 		try {
 			
 			String param = AppUtil.inputToStr(request);
-			System.out.println("appLogin    前端传递参数：" + param);
+			System.out.println("tokenLogin    前端传递参数：" + param);
 			
 			//验证参数
 			JSONObject jsondata = checkParam(param);
@@ -225,7 +225,7 @@ public class AppInterfaceController extends AppBaseController {
 						data.put("isNew", isNew);
 						statusCode = AppGlobals.APP_SUCCESS;
 						//添加登录次数
-						StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count="+(user.getLoginCount()+1)+" where token ='"+token+"'");
+						StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count=" + (user.getLoginCount() + 1) + " where token ='"+token+"'");
 					      
 					    this.systemService.updateBySqlString(updateSql.toString());
 					}
@@ -418,10 +418,10 @@ public class AppInterfaceController extends AppBaseController {
 					default:
 						break;
 					}
-	
-					appService.saveOrder(t, orderPrefix, commonAddrId);
+
+					String orderId = appService.saveOrder(t, orderPrefix, commonAddrId);
 					logger.info("保存订单成功，订单状态为未支付");
-					data.put("orderId", t.getId());
+					data.put("orderId", orderId);
 				}
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
@@ -437,6 +437,8 @@ public class AppInterfaceController extends AppBaseController {
 			e.printStackTrace();
 		}
 
+		logger.info("createOrder    orderId:" + data.toString());
+		
 		data.put("success", success);
 
 		returnJsonObj.put("msg", msg);

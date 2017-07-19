@@ -135,7 +135,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 
 		sql.append(" and order_status in('3','4','5') ");
 
-		sql.append(" order by a.order_status,a.refund_time ");
+		sql.append(" order by a.order_status,a.refund_time desc");
 
 		return sql.toString();
 	}
