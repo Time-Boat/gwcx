@@ -206,15 +206,14 @@ public class AppInterfaceController extends AppBaseController {
 				checkToken(token);//验证token
 				
 				if(StringUtil.isNotEmpty(token)){
-					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token",
-							token);
+					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
 					if(user!=null){
 						// 添加登陆日志
 						// String message = "app手机用户: " + user.getUserName()
 						// + "[" + user.getPhone() + "]" + "登录成功";
 						String message = "app手机用户: " + user.getPhone() + "登录成功";
 						systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
-
+						
 						msg = "登录成功!";
 						data.put("token", token);
 						data.put("userId", user.getUserId());

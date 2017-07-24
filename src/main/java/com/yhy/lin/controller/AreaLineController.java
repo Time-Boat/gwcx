@@ -199,7 +199,7 @@ public class AreaLineController extends BaseController {
 	
 	/**
 	 * 获取站点信息
-	 */	
+	 */
 	@RequestMapping(params = "areaStationDatagrid")
 	public void areaStationDatagrid(HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		String areaLineId = request.getParameter("areaLineId");
@@ -216,6 +216,11 @@ public class AreaLineController extends BaseController {
 		String areaLineId = request.getParameter("areaLineId");
 		request.setAttribute("areaLineId", areaLineId);
 		
+		AreaLineEntity areaLine = areaLineService.get(AreaLineEntity.class, areaLineId);
+		
+		systemService.findForJdbc("select * from area_line al join citys ", areaLineId);
+		
+		request.setAttribute("lineCity", areaLine.getCityId());
 		//as.getId() 是关联表的id
 		if(StringUtil.isNotEmpty(as.getId())){
 			

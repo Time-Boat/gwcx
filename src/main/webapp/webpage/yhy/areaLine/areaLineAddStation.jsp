@@ -54,7 +54,7 @@
 	  </style>
 	  <title>站点信息</title>
 	</head>
- <body style="overflow-y: hidden" scroll="no">
+ <body style="overflow-y: hidden" scroll="no" onload="loadMapStation()" >
  
     <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="areaLineController.do?saveAreaStation">
     	<input type="hidden" id="areaLineId" name="areaLineId" value="${areaLineId}" />
@@ -140,197 +140,101 @@
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
-        var map = new AMap.Map('container',{	
-            resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
-            zoom: 10,						//地图显示的缩放级别
-            center: [116.480983, 40.0958],  //地图中心点
-        	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
-        });
-        
-        /* AMap.plugin(['AMap.ToolBar','AMap.AdvancedInfoWindow'],function(){
-            //创建并添加工具条控件
-            var toolBar = new AMap.ToolBar();
-            map.addControl(toolBar);
-            //创建高级信息窗体并在指定位置打开
-            var infowindow = new AMap.AdvancedInfoWindow({
-              content: '<div class="info-title">高德地图</div><div class="info-content">'+
-                    '<img src="http://webapi.amap.com/images/amap.jpg">'+
-                    '高德是中国领先的数字地图内容、导航和位置服务解决方案提供商。<br>'+
-                    '<a target="_blank" href="http://mobile.amap.com/">点击下载高德地图</a></div>',
-              offset: new AMap.Pixel(0, -30)
+    	function loadMapStation(){
+    		var xxx = $('#areaStationX').val();
+        	var yyy = $('#areaStationY').val();
+        	
+        	var map = new AMap.Map('container',{	
+                resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
+                zoom: 10,						//地图显示的缩放级别
+                center: [xxx, yyy],  //地图中心点
+            	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
-            infowindow.open(map,[116.480983, 39.989628]);
-        }) */
-        
-        //搜索框
-        /* var windowsArr = [];
-	    var marker = [];
-	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
-	      var autoOptions = {
-	        city: "北京", //城市，默认全国
-	        input: "keyword"//使用联想输入的input的id
-	      };
-	      autocomplete= new AMap.Autocomplete(autoOptions);
-	      var placeSearch = new AMap.PlaceSearch({
-	            city:'北京',
-	            map:map
-	      })
-	      AMap.event.addListener(autocomplete, "select", function(e){
-	         //TODO 针对选中的poi实现自己的功能
-	         placeSearch.search(e.poi.name)
-	      });
-	    }); */
-	    
-	    /* AMap.plugin('AMap.Autocomplete',function(){//回调函数
-	        //实例化Autocomplete
-	        var autoOptions = {
-	            city: "", //城市，默认全国
-	            input:"input_id"//使用联想输入的input的id
-	        };
-	        autocomplete= new AMap.Autocomplete(autoOptions);
-	        //TODO: 使用autocomplete对象调用相关功能
-	    }) */
-	    
-	    /* AMapUI.loadUI(['misc/PoiPicker'], function(PoiPicker) {
+            
+    	    //经纬度获取详细地址
+    	    AMap.service('AMap.Geocoder',function(){//回调函数
+    	        //实例化Geocoder
+    	        geocoder = new AMap.Geocoder({
+    	            city: "010"//城市，默认：“全国”
+    	        });
+    	        //TODO: 使用geocoder 对象完成相关功能
+    	    })
+    	    
+    	    AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
+    			
+    	    	//创建marker对象
+            	var marker = new AMap.Marker({
+            		title: "点击测试",
+            		map: map,
+            		bubble: true
+        		});
+    	    	
+    	        var infoWindow = new SimpleInfoWindow({
+    	            infoTitle: '<strong>这里是标题</strong>',
+    	            infoBody: '<p class="my-desc"><strong>这里是内容。</strong> <br/> 高德地图 JavaScript API，是由 JavaScript 语言编写的应用程序接口，' +
+    	                '它能够帮助您在网站或移动端中构建功能丰富、交互性强的地图应用程序</p>',
 
-	        var poiPicker = new PoiPicker({
-	            city:'贵阳',
-	            input: 'keyword'
-	        });
-
-	        //初始化poiPicker
-	        poiPickerReady(poiPicker);
-	    });
-
-	    function poiPickerReady(poiPicker) {
-
-	        window.poiPicker = poiPicker;
-
-	        var marker = new AMap.Marker();
-
-	        var infoWindow = new AMap.InfoWindow({
-	            offset: new AMap.Pixel(0, -20)
-	        });
-
-	        //选取了某个POI
-	        poiPicker.on('poiPicked', function(poiResult) {
-
-	            var source = poiResult.source,
-	                poi = poiResult.item,
-	                info = {
-	                    source: source,
-	                    id: poi.id,
-	                    name: poi.name,
-	                    location: poi.location.toString(),
-	                    address: poi.address
-	                };
-
-	            marker.setMap(map);
-	            infoWindow.setMap(map);
-
-	            marker.setPosition(poi.location);
-	            infoWindow.setPosition(poi.location);
-				
-	            infoWindow.setContent('POI信息: <pre>' + JSON.stringify(info, null, 2) + '</pre>');
-	            infoWindow.open(map, marker.getPosition());
-
-	            //map.setCenter(marker.getPosition());
-	        });
-
-	        poiPicker.onCityReady(function() {
-	            poiPicker.suggest('美食');
-	        });
-	    } */
-	    
-	    //经纬度获取详细地址
-	    AMap.service('AMap.Geocoder',function(){//回调函数
-	        //实例化Geocoder
-	        geocoder = new AMap.Geocoder({
-	            city: "010"//城市，默认：“全国”
-	        });
-	        //TODO: 使用geocoder 对象完成相关功能
-	    })
-	    
-	    AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
-			
-	    	//创建marker对象
-        	var marker = new AMap.Marker({
-        		title: "点击测试",
-        		map: map,
-        		bubble: true
-    		});
-	    	
-	    	
-	        var infoWindow = new SimpleInfoWindow({
-	            infoTitle: '<strong>这里是标题</strong>',
-	            infoBody: '<p class="my-desc"><strong>这里是内容。</strong> <br/> 高德地图 JavaScript API，是由 JavaScript 语言编写的应用程序接口，' +
-	                '它能够帮助您在网站或移动端中构建功能丰富、交互性强的地图应用程序</p>',
-
-	            //基点指向marker的头部位置
-	            offset: new AMap.Pixel(0, -31)
-	        });
-			
-	      	//点击事件
-		    map.on('click', function(e) {
-		    	marker.setPosition(e.lnglat);
-		    	openInfoWin();
-		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
-	    		geocoder.getAddress(e.lnglat, function(status, result) {
-	    		    if (status === 'complete' && result.info === 'OK') {
-	    		       //获得了有效的地址信息:
-	    		       //即，result.regeocode.formattedAddress
-	    		       console.log(result);
-	    		       infoWindow.setInfoTitle('<strong>' + result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.district + '</strong>');
-	    		       infoWindow.setInfoBody('<p class="my-desc"><strong>详细地址:</strong> <br/>' + result.regeocode.formattedAddress + '</p>');
-	    		       infoWindow.setPosition(e.lnglat);
-	    		       
-	    		       //给表单赋值
-	    		       $('#areaStationX').val(e.lnglat.getLng());
-	    		       $('#areaStationY').val(e.lnglat.getLat());
-	    		       $('#location').val(result.regeocode.formattedAddress);
-	    		    }else{
-	    		       infoWindow.setInfoTitle("获取地址失败");
-		    		   infoWindow.setInfoBody("");
-	    		    }
-	    		});
-		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
-		    });
-	      	
-	        function openInfoWin() {
-	            infoWindow.open(map, marker.getPosition());
-	        }
-			
-	        //marker 点击时打开
-	        AMap.event.addListener(marker, 'click', function() {
-	            openInfoWin();
-	        });
-			
-	        openInfoWin();
-	    });
-	    
-	    
-	    
-	    
-	    
-	    var windowsArr = [];
-	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
-	      var autoOptions = {
-	        city: "北京", //城市，默认全国
-	        input: "keyword"//使用联想输入的input的id
-	      };
-	      autocomplete= new AMap.Autocomplete(autoOptions);
-	      var placeSearch = new AMap.PlaceSearch({
-	            city:'北京',
-	            map:map
-	      })
-	      AMap.event.addListener(autocomplete, "select", function(e){
-	         //TODO 针对选中的poi实现自己的功能
-	         placeSearch.search(e.poi.name)
-	         console.log(e);
-	      });
-	    });
-	    
-	    
+    	            //基点指向marker的头部位置
+    	            offset: new AMap.Pixel(0, -31)
+    	        });
+    			
+    	      	//点击事件
+    		    map.on('click', function(e) {
+    		    	marker.setPosition(e.lnglat);
+    		    	openInfoWin();
+    		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
+    	    		geocoder.getAddress(e.lnglat, function(status, result) {
+    	    		    if (status === 'complete' && result.info === 'OK') {
+    	    		       //获得了有效的地址信息:
+    	    		       //即，result.regeocode.formattedAddress
+    	    		       console.log(result);
+    	    		       infoWindow.setInfoTitle('<strong>' + result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.district + '</strong>');
+    	    		       infoWindow.setInfoBody('<p class="my-desc"><strong>详细地址:</strong> <br/>' + result.regeocode.formattedAddress + '</p>');
+    	    		       infoWindow.setPosition(e.lnglat);
+    	    		       
+    	    		       //给表单赋值
+    	    		       $('#areaStationX').val(e.lnglat.getLng());
+    	    		       $('#areaStationY').val(e.lnglat.getLat());
+    	    		       $('#location').val(result.regeocode.formattedAddress);
+    	    		    }else{
+    	    		       infoWindow.setInfoTitle("获取地址失败");
+    		    		   infoWindow.setInfoBody("");
+    	    		    }
+    	    		});
+    		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
+    		    });
+    	      	
+    	        function openInfoWin() {
+    	            infoWindow.open(map, marker.getPosition());
+    	        }
+    			
+    	        //marker 点击时打开
+    	        AMap.event.addListener(marker, 'click', function() {
+    	            openInfoWin();
+    	        });
+    			
+    	        openInfoWin();
+    	    });
+    	    
+    	    var windowsArr = [];
+    	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+    	      var autoOptions = {
+    	        //city: "北京", //城市，默认全国
+    	        input: "keyword"//使用联想输入的input的id
+    	      };
+    	      autocomplete= new AMap.Autocomplete(autoOptions);
+    	      var placeSearch = new AMap.PlaceSearch({
+    	            //city:'北京',
+    	            map:map
+    	      })
+    	      AMap.event.addListener(autocomplete, "select", function(e){
+    	         //TODO 针对选中的poi实现自己的功能
+    	         placeSearch.search(e.poi.name)
+    	         console.log(e);
+    	      });
+    	    });
+    	}
+    	
 	    </script>
     </script>
     

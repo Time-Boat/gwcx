@@ -56,7 +56,7 @@ function delAreaStation(stationId,id){
 					tip(obj.msg);
 					$('#reaLineStationList').datagrid('reload');
 				}
-			);		
+			);
 	    }
 	});
 }
