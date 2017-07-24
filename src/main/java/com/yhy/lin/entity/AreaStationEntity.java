@@ -34,9 +34,9 @@ public class AreaStationEntity implements java.io.Serializable {
 	/**站点名称*/
 	private java.lang.String name;
 	/**站点的经度*/
-	private java.lang.String x;
+	private java.lang.String areaStationX;
 	/**站点的纬度*/
-	private java.lang.String y;
+	private java.lang.String areaStationY;
 	/**所属区域*/
 	private java.lang.String areaId;
 	/**站点创建时间*/
@@ -90,33 +90,33 @@ public class AreaStationEntity implements java.io.Serializable {
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  站点的经度
 	 */
-	@Column(name ="X",nullable=true,length=100)
-	public java.lang.String getX(){
-		return this.x;
+	@Column(name ="AREA_STATION_X",nullable=true,length=100)
+	public java.lang.String getAreaStationX(){
+		return this.areaStationX;
 	}
 
 	/**
 	 *方法: 设置java.lang.String
 	 *@param: java.lang.String  站点的经度
 	 */
-	public void setX(java.lang.String x){
-		this.x = x;
+	public void setAreaStationX(java.lang.String areaStationX){
+		this.areaStationX = areaStationX;
 	}
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  站点的纬度
 	 */
-	@Column(name ="Y",nullable=true,length=100)
-	public java.lang.String getY(){
-		return this.y;
+	@Column(name ="AREA_STATION_Y",nullable=true,length=100)
+	public java.lang.String getAreaStationY(){
+		return this.areaStationY;
 	}
 
 	/**
 	 *方法: 设置java.lang.String
 	 *@param: java.lang.String  站点的纬度
 	 */
-	public void setY(java.lang.String y){
-		this.y = y;
+	public void setAreaStationY(java.lang.String areaStationY){
+		this.areaStationY = areaStationY;
 	}
 	/**
 	 *方法: 取得java.lang.String

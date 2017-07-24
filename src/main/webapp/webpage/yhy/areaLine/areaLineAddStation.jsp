@@ -22,6 +22,7 @@
         }
         #tip {
             background-color: #ddf;
+            background:url("resource/***.gif") no-repeat scroll right center transparent; 
             color: #333;
             border: 1px solid silver;
             box-shadow: 3px 4px 3px 0px silver;
@@ -41,12 +42,25 @@
             outline: none;
         }
         
+        #keyword {
+	        position: absolute;
+	        z-index: 9999;
+	        top: 50px;
+	        right: 30px;
+	        width: 300px;
+	        background:url(plug-in/easyui/themes/metrole/icons/le_search.png) no-repeat scroll right center #fff;
+	    }
+        
 	  </style>
-	  <title>快速入门</title>
+	  <title>站点信息</title>
 	</head>
  <body style="overflow-y: hidden" scroll="no">
  
-    <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="areaLineController.do?save">
+    <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="areaLineController.do?saveAreaStation">
+    	<input type="hidden" id="areaLineId" name="areaLineId" value="${areaLineId}" />
+    	
+    	<%-- <input type="hidden" id="areaLineId" name="areaLineId" value="${areaLineId}" /> --%>
+    	
     	<table style="width: 100%;height: 100%" cellpadding="0" cellspacing="1" class="formtable">
 			<tr>
 				<td align="center">
@@ -65,8 +79,8 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
-						   value="${areaLinePage.name}"> 元/人
+					<input class="inputxt" style="height: 30px;" id="price" name="price" ignore="ignore"
+						   value="${areaLinePage.price}"> 元/人
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -75,8 +89,8 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
-						   value="${areaLinePage.name}"> 分钟
+					<input class="inputxt" style="height: 30px;" id="duration" name="duration" ignore="ignore"
+						   value="${areaLinePage.duration}"> 分钟
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
@@ -87,8 +101,8 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
-						   value="${areaLinePage.name}">
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="location" name="location" ignore="ignore"
+						   value="${areaLinePage.location}">
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -97,8 +111,8 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
-						   value="${areaLinePage.name}"> 
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="areaStationX" name="areaStationX" ignore="ignore"
+						   value="${areaLinePage.areaStationX}">
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -107,21 +121,25 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
-						   value="${areaLinePage.name}"> 
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="areaStationY" name="areaStationY" ignore="ignore"
+						   value="${areaLinePage.areaStationY}">
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
 		</table>
     </t:formvalid>
     <div id="container" tabindex="0" style="height:80%;" >
-    	<input type="text" id="keyword" placeholder="请输入关键字" style="z-index: 9999;position:absolute;margin:10px;" name="keyword" />
+    	<div >
+	    	<input type="text" id="keyword" placeholder="请输入关键字" name="keyword" />
+    	</div>
     </div>
     <!-- script必须放在body中。。 -->
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
+    <script src="https://webapi.amap.com/js/marker.js"></script>
+    <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
-        var map = new AMap.Map('container',{
+        var map = new AMap.Map('container',{	
             resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
             zoom: 10,						//地图显示的缩放级别
             center: [116.480983, 40.0958],  //地图中心点
@@ -144,7 +162,7 @@
         }) */
         
         //搜索框
-        var windowsArr = [];
+        /* var windowsArr = [];
 	    var marker = [];
 	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
 	      var autoOptions = {
@@ -160,7 +178,159 @@
 	         //TODO 针对选中的poi实现自己的功能
 	         placeSearch.search(e.poi.name)
 	      });
+	    }); */
+	    
+	    /* AMap.plugin('AMap.Autocomplete',function(){//回调函数
+	        //实例化Autocomplete
+	        var autoOptions = {
+	            city: "", //城市，默认全国
+	            input:"input_id"//使用联想输入的input的id
+	        };
+	        autocomplete= new AMap.Autocomplete(autoOptions);
+	        //TODO: 使用autocomplete对象调用相关功能
+	    }) */
+	    
+	    /* AMapUI.loadUI(['misc/PoiPicker'], function(PoiPicker) {
+
+	        var poiPicker = new PoiPicker({
+	            city:'贵阳',
+	            input: 'keyword'
+	        });
+
+	        //初始化poiPicker
+	        poiPickerReady(poiPicker);
 	    });
+
+	    function poiPickerReady(poiPicker) {
+
+	        window.poiPicker = poiPicker;
+
+	        var marker = new AMap.Marker();
+
+	        var infoWindow = new AMap.InfoWindow({
+	            offset: new AMap.Pixel(0, -20)
+	        });
+
+	        //选取了某个POI
+	        poiPicker.on('poiPicked', function(poiResult) {
+
+	            var source = poiResult.source,
+	                poi = poiResult.item,
+	                info = {
+	                    source: source,
+	                    id: poi.id,
+	                    name: poi.name,
+	                    location: poi.location.toString(),
+	                    address: poi.address
+	                };
+
+	            marker.setMap(map);
+	            infoWindow.setMap(map);
+
+	            marker.setPosition(poi.location);
+	            infoWindow.setPosition(poi.location);
+				
+	            infoWindow.setContent('POI信息: <pre>' + JSON.stringify(info, null, 2) + '</pre>');
+	            infoWindow.open(map, marker.getPosition());
+
+	            //map.setCenter(marker.getPosition());
+	        });
+
+	        poiPicker.onCityReady(function() {
+	            poiPicker.suggest('美食');
+	        });
+	    } */
+	    
+	    //经纬度获取详细地址
+	    AMap.service('AMap.Geocoder',function(){//回调函数
+	        //实例化Geocoder
+	        geocoder = new AMap.Geocoder({
+	            city: "010"//城市，默认：“全国”
+	        });
+	        //TODO: 使用geocoder 对象完成相关功能
+	    })
+	    
+	    AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
+			
+	    	//创建marker对象
+        	var marker = new AMap.Marker({
+        		title: "点击测试",
+        		map: map,
+        		bubble: true
+    		});
+	    	
+	    	
+	        var infoWindow = new SimpleInfoWindow({
+	            infoTitle: '<strong>这里是标题</strong>',
+	            infoBody: '<p class="my-desc"><strong>这里是内容。</strong> <br/> 高德地图 JavaScript API，是由 JavaScript 语言编写的应用程序接口，' +
+	                '它能够帮助您在网站或移动端中构建功能丰富、交互性强的地图应用程序</p>',
+
+	            //基点指向marker的头部位置
+	            offset: new AMap.Pixel(0, -31)
+	        });
+			
+	      	//点击事件
+		    map.on('click', function(e) {
+		    	marker.setPosition(e.lnglat);
+		    	openInfoWin();
+		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
+	    		geocoder.getAddress(e.lnglat, function(status, result) {
+	    		    if (status === 'complete' && result.info === 'OK') {
+	    		       //获得了有效的地址信息:
+	    		       //即，result.regeocode.formattedAddress
+	    		       console.log(result);
+	    		       infoWindow.setInfoTitle('<strong>' + result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.district + '</strong>');
+	    		       infoWindow.setInfoBody('<p class="my-desc"><strong>详细地址:</strong> <br/>' + result.regeocode.formattedAddress + '</p>');
+	    		       infoWindow.setPosition(e.lnglat);
+	    		       
+	    		       //给表单赋值
+	    		       $('#areaStationX').val(e.lnglat.getLng());
+	    		       $('#areaStationY').val(e.lnglat.getLat());
+	    		       $('#location').val(result.regeocode.formattedAddress);
+	    		    }else{
+	    		       infoWindow.setInfoTitle("获取地址失败");
+		    		   infoWindow.setInfoBody("");
+	    		    }
+	    		});
+		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
+		    });
+	      	
+	        function openInfoWin() {
+	            infoWindow.open(map, marker.getPosition());
+	        }
+			
+	        //marker 点击时打开
+	        AMap.event.addListener(marker, 'click', function() {
+	            openInfoWin();
+	        });
+			
+	        openInfoWin();
+	    });
+	    
+	    
+	    
+	    
+	    
+	    var windowsArr = [];
+	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+	      var autoOptions = {
+	        city: "北京", //城市，默认全国
+	        input: "keyword"//使用联想输入的input的id
+	      };
+	      autocomplete= new AMap.Autocomplete(autoOptions);
+	      var placeSearch = new AMap.PlaceSearch({
+	            city:'北京',
+	            map:map
+	      })
+	      AMap.event.addListener(autocomplete, "select", function(e){
+	         //TODO 针对选中的poi实现自己的功能
+	         placeSearch.search(e.poi.name)
+	         console.log(e);
+	      });
+	    });
+	    
+	    
+	    </script>
     </script>
     
     

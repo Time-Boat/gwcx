@@ -3,7 +3,7 @@
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 <t:datagrid name="reaLineStationList" title="区域线路站点"
-            actionUrl="areaLineController.do?areaStationDatagrid" fit="true" fitColumns="true" idField="id">
+            actionUrl="areaLineController.do?areaStationDatagrid&areaLineId=${areaLineId}" fit="true" fitColumns="true" idField="id">
 	<t:dgCol title="站点ID" field="stationId" hidden="true"></t:dgCol>
 	<t:dgCol title="关联表ID" field="id" hidden="true" ></t:dgCol>
 	<t:dgCol title="站点名称" field="name"   align="center"></t:dgCol>
@@ -12,9 +12,8 @@
 	<t:dgCol title="公里数" field="duration" align="center" ></t:dgCol>
 	<t:dgCol title="common.operation" field="opt"></t:dgCol>
 	<t:dgFunOpt title="删除关联站点" funname="delAreaStation(stationId,id)" />
-	<t:dgToolBar title="添加站点挂接" icon="icon-add" url="areaLineController.do?addOrUpdateStation" funname="add"></t:dgToolBar><%-- operationCode="addSite" --%>
-	<t:dgToolBar title="站点时间、序号编辑" icon="icon-edit" url="areaLineController.do?addOrUpdateStation" funname="update"></t:dgToolBar><%-- operationCode="editSite" --%>
-
+	<t:dgToolBar title="添加站点挂接" icon="icon-add" url="areaLineController.do?addOrUpdateStation&areaLineId=${areaLineId}" funname="add"></t:dgToolBar><%-- operationCode="addSite" --%>
+	<t:dgToolBar title="编辑" icon="icon-edit" url="areaLineController.do?addOrUpdateStation&areaLineId=${areaLineId}" funname="update"></t:dgToolBar>
 </t:datagrid>
 </div>
 </div>
@@ -25,7 +24,7 @@ function add(title,addurl,gname,width,height) {
 	createwindow(title, addurl,"1000px","600px");
 }
 
-function update(title,url,id,width,height,isRestful) {
+/* function update(title,url,id,width,height,isRestful) {
 	gridname=id;
 	var rowsData = $('#'+id).datagrid('getSelections');
 	if (!rowsData || rowsData.length==0) {
@@ -39,26 +38,11 @@ function update(title,url,id,width,height,isRestful) {
 	if(isRestful!='undefined'&&isRestful){
 		url += '/'+rowsData[0].id;
 	}else{
-		if(rowsData[0].id==null){
-			rowsData[0].id = '';
-		}
-		if(rowsData[0].line_busstopId==null){
-			rowsData[0].line_busstopId = '';
-		}
-		if(rowsData[0].name==null){
-			rowsData[0].name = '';
-		}
-		if(rowsData[0].siteOrder==null){
-			rowsData[0].siteOrder = '';
-		}
-		if(rowsData[0].arrivalTime==null){
-			rowsData[0].arrivalTime = '';
-		}
 		url += '&id='+rowsData[0].id + '&line_busstopId=' + rowsData[0].line_busstopId + '&name=' + rowsData[0].name+'&siteOrder='+rowsData[0].siteOrder+'&arrivalTime='+rowsData[0].arrivalTime;
 	}
 	createwindow(title,url,width,height);
 }
-
+*/
 function delAreaStation(stationId,id){
 	$.dialog.confirm('确定要删除该记录吗？',function(r){
 	    if (r){

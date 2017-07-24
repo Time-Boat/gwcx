@@ -3,6 +3,8 @@ package com.yhy.lin.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.entity.AreaStationEntity;
+import com.yhy.lin.entity.AreaStationLineEntity;
 import com.yhy.lin.service.AreaLineServiceI;
 
 import net.sf.json.JSONObject;
@@ -70,12 +72,12 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 	}
 
 	@Override
-	public JSONObject getAreaStationDatagrid(DataGrid dataGrid) {
+	public JSONObject getAreaStationDatagrid(DataGrid dataGrid, String areaLineId) {
 		StringBuffer sqlWhere = new StringBuffer();
-//		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-//		if(StringUtil.isNotEmpty(orgCode)){
-//			sqlWhere.append(" and org_code like '"+orgCode+"%'");
-//		}
+		
+		if(StringUtil.isNotEmpty(areaLineId)){
+			sqlWhere.append(" and al.id = '" + areaLineId + "' ");
+		}
 		
 		String p = sqlWhere.toString();
 		
@@ -107,5 +109,5 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
 	}
-	
+
 }

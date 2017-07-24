@@ -134,6 +134,7 @@
 						<value>app.do?checkTicket</value>
 						<value>app.do?getMessage</value>
 						<value>app.do?delMessage</value>
+						<value>app.do?delOrder</value>
 						<value>app.do?hasNewMessage</value>
 						<value>app.do?tokenLogin</value>
 						

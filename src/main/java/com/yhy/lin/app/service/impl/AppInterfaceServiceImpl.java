@@ -193,7 +193,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		sql.append(
 				"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
 						+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? "
-						+ "ORDER BY INSTR('2,1,3,4,6,5,0',order_status),a.order_startime asc ");
+						+ "and delete_flag='0' ORDER BY INSTR('2,1,3,4,6,5,0',order_status),a.order_startime asc ");
 
 //		if (StringUtil.isNotEmpty(orderStatus)) {
 //			sql.append(" and order_paystatus = '" + orderStatus + "'");

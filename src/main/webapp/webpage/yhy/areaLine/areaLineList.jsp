@@ -53,7 +53,7 @@ function areaAddStation(id,name) {
 	$("#function-panelAreaAddStation").panel(
 			{
 				title :'线路名称：'+name,
-				href:"areaLineController.do?areaAddStation&lineInfoId="+id+"&lineType=2"   //lineType=2为接送机跳转到的站点挂接界面
+				href:"areaLineController.do?areaAddStation&areaLineId="+id
 			}
 		);
 }

@@ -287,7 +287,7 @@ public class AppInterfaceController extends AppBaseController {
 //					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
 			boolean b = true;
 			if (b) {
-
+				
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
 				UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
 				
@@ -378,9 +378,13 @@ public class AppInterfaceController extends AppBaseController {
 				statusCode = "888";
 				success = false;
 			} else {
+				
+				String orderId = "";
+				
 				//如果是未支付的订单，进行修改之后，判断这个id是不是存在的如果是存在的，直接修改内容
 				if(StringUtil.isNotEmpty(t.getId())){
 					
+					orderId = t.getId();
 					appService.saveOrUpdate(t);
 					
 				} else {
@@ -419,10 +423,12 @@ public class AppInterfaceController extends AppBaseController {
 						break;
 					}
 
-					String orderId = appService.saveOrder(t, orderPrefix, commonAddrId);
+					orderId = appService.saveOrder(t, orderPrefix, commonAddrId);
 					logger.info("保存订单成功，订单状态为未支付");
-					data.put("orderId", orderId);
 				}
+				
+				data.put("orderId", orderId);
+				
 				statusCode = AppGlobals.APP_SUCCESS;
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;
@@ -436,7 +442,7 @@ public class AppInterfaceController extends AppBaseController {
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
-
+		
 		logger.info("createOrder    orderId:" + data.toString());
 		
 		data.put("success", success);
@@ -581,6 +587,58 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	/**
+	 * 删除订单
+	 */
+	@RequestMapping(params = "delOrder")
+	public void delOrder(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		boolean success = false;
+		String msg = "";
+		String statusCode = "";
+			try {
+				String param = AppUtil.inputToStr(request); 
+				//验证参数
+				JSONObject jsondata = checkParam(param);
+				
+				String orderId = jsondata.getString("orderId");
+				TransferorderEntity t = this.systemService.getEntity(TransferorderEntity.class, orderId);
+				if (t!=null) {
+					//订单已经完成、取消订单完成退款、拒绝退款的订单更改delete_flag
+					if(t.getOrderStatus()==0 || t.getOrderStatus()==4 || t.getOrderStatus()==5){
+						String sql = "update transferorder set delete_flag='1' where id in ('"+orderId+"')";
+						systemService.updateBySqlString(sql.toString());
+						statusCode = AppGlobals.APP_SUCCESS;
+						returnJsonObj.put("success", true);
+						msg = AppGlobals.APP_SUCCESS_MSG;
+					}else if(t.getOrderStatus()==6){
+						systemService.delete(t);
+						returnJsonObj.put("success", true);
+						statusCode = AppGlobals.APP_SUCCESS;
+						msg = AppGlobals.APP_SUCCESS_MSG;
+					}else{
+						statusCode = "666";
+						msg = "订单不能被删除";
+						returnJsonObj.put("success", success);
+					}
+				}else{
+					statusCode = AppGlobals.SYSTEM_ERROR;
+					msg = AppGlobals.SYSTEM_ERROR_MSG;
+				}
+				
+				
+			} catch (Exception e) {
+				statusCode = AppGlobals.SYSTEM_ERROR;
+				msg = AppGlobals.SYSTEM_ERROR_MSG;
+				e.printStackTrace();
+			}
+
+			returnJsonObj.put("msg", msg);
+			returnJsonObj.put("code", statusCode);
+			responseOutWrite(response, returnJsonObj);
+			
+	}
 
 	/** 获取用户订单列表 get */
 	@RequestMapping(params = "getOrderList")
@@ -722,6 +780,21 @@ public class AppInterfaceController extends AppBaseController {
 
 			t = systemService.getEntity(TransferorderEntity.class, orderId);
 			
+			if (t != null) {
+				returnJsonObj.put("data", t);
+
+				// 把json中的日期类型替换成字符串类型
+				Date date = t.getApplicationTime();
+				Date date1 = t.getOrderExpectedarrival();
+				JSONObject str = (JSONObject) returnJsonObj.get("data");
+				str.put("applicationTime", date.toString());
+				str.put("orderExpectedarrival", date1.toString());
+
+			} else {
+				returnJsonObj.put("data", "");
+				throw new Exception();
+			}
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -736,19 +809,6 @@ public class AppInterfaceController extends AppBaseController {
 
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
-		if (t != null) {
-			returnJsonObj.put("data", t);
-
-			// 把json中的日期类型替换成字符串类型
-			Date date = t.getApplicationTime();
-			Date date1 = t.getOrderExpectedarrival();
-			JSONObject str = (JSONObject) returnJsonObj.get("data");
-			str.put("applicationTime", date.toString());
-			str.put("orderExpectedarrival", date1.toString());
-
-		} else {
-			returnJsonObj.put("data", "");
-		}
 
 		responseOutWrite(response, returnJsonObj);
 	}

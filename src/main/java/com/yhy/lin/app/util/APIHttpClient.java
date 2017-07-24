@@ -26,9 +26,9 @@ public class APIHttpClient {
   
     // 接口地址 
 	//登录接口
-	private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
+	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
 	//上传订单接口地址
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+	private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
     //线路站点信息地址
     //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
     //获取机场站点或者火车站站点信息
@@ -239,31 +239,31 @@ public class APIHttpClient {
         
         
         //登录接口
-        j.addProperty("mobile", "15527916902");  
-        j.addProperty("code", "1325");  
+        //j.addProperty("mobile", "15527916902");  
+        //j.addProperty("code", "1325");  
         
         //接送机订单测试
-//        j.addProperty("orderType", "2");  
-//        j.addProperty("orderStartingStationId", "4028b8815c380cd3015c3829c1530033");  
-//        j.addProperty("orderTerminusStationId", "4028b8815c380cd3015c3823b3f00023");  
-//        j.addProperty("orderStartime", "2017-05-28 16:12:00");  
-//        j.addProperty("orderExpectedarrival", "2017-05-28 18:12:00");  
-//        j.addProperty("orderUnitprice", "20");  
-//        j.addProperty("orderNumbers", "2");  
-//        j.addProperty("orderContactsname", "张三");  
-//        j.addProperty("orderContactsmobile", "15527987654");  
-//        j.addProperty("orderFlightnumber", "Z-15");
-//        j.addProperty("orderStatus", "1");
-//        j.addProperty("orderTrainnumber", "");  
-//        j.addProperty("orderPaytype", "1"); 
-//        j.addProperty("orderPaystatus", "0");  
-//        j.addProperty("orderTerminusStationName", "龙里车站"); 
-//        j.addProperty("orderStartingStationName", "一龙洞堡机场"); 
-//        j.addProperty("userId", "4028820d5beb2c65015beb3fa78b0185"); 
-//        j.addProperty("orderTotalPrice", "40"); 
-//        j.addProperty("cityName", "贵阳市"); 
-//        j.addProperty("cityId", "520100"); 
-//        j.addProperty("token", "ca3fd93703461e577b11a30b8a50ecb6"); 
+        j.addProperty("orderType", "2");  
+        j.addProperty("orderStartingStationId", "4028b8815c380cd3015c3829c1530033");  
+        j.addProperty("orderTerminusStationId", "4028b8815c380cd3015c3823b3f00023");  
+        j.addProperty("orderStartime", "2017-08-28 16:12:00");  
+        j.addProperty("orderExpectedarrival", "2017-08-28 18:12:00");  
+        j.addProperty("orderUnitprice", "20");  
+        j.addProperty("orderNumbers", "2");  
+        j.addProperty("orderContactsname", "张三");  
+        j.addProperty("orderContactsmobile", "15527987654");  
+        j.addProperty("orderFlightnumber", "Z-15");
+        j.addProperty("orderStatus", "1");
+        j.addProperty("orderTrainnumber", "");  
+        j.addProperty("orderPaytype", "1"); 
+        j.addProperty("orderPaystatus", "0");  
+        j.addProperty("orderTerminusStationName", "龙里车站"); 
+        j.addProperty("orderStartingStationName", "一龙洞堡机场"); 
+        j.addProperty("userId", "4028820d5beb2c65015beb3fa78b0185"); 
+        j.addProperty("orderTotalPrice", "40"); 
+        j.addProperty("cityName", "贵阳市"); 
+        j.addProperty("cityId", "520100"); 
+        j.addProperty("token", "ca3fd93703461e577b11a30b8a50ecb6"); 
       	
         //取消订单
 //		j.addProperty("orderId", "4028b8815c26b59b015c26c92ae80010"); 

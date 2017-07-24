@@ -29,6 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.gson.Gson;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
@@ -233,6 +234,7 @@ public class BusStopInfoController extends BaseController {
 		        String lineInfoId = request.getParameter("lineInfoId");
 		        //公务车线路为1    接送机线路为2
 		        String lineType = request.getParameter("lineType");
+		        LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, lineInfoId);
 		        
 		        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
 		        List<String> idsList = extractIdListByComma(ids);
@@ -253,14 +255,20 @@ public class BusStopInfoController extends BaseController {
 		        }
 		        //原设定是修改站点的挂接状态，占时不适用   (为啥不适用呢...)
 		        System.out.println("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
-		        StringBuffer updateSql = new StringBuffer("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+") ");
+		        StringBuffer updateSql = new StringBuffer();
+		        if (StringUtil.isNotEmpty(line.getType())) {
+		        	 updateSql.append("update busstopinfo set status=CONCAT(status,'" + line.getType() + "') where id in ("+sql.toString()+") ");
+		        	 updateSql.append(" and station_type = '0' ");
+		        	 systemService.updateBySqlString(updateSql.toString());
+				        
+				        systemService.saveAllEntitie(list);
+				        message="站点挂接成功";
+		        }
+		        
 		        //只有站点类型是普通站点的时候，才修改它的状态，让其只能在一条线路中使用
 		        //如果是机场站点或者火车站点，则可以重复使用
-		        updateSql.append(" and station_type = '0' ");
-		        systemService.updateBySqlString(updateSql.toString());
 		        
-		        systemService.saveAllEntitie(list);
-		        message="站点挂接成功";
+		        
 	        }catch (Exception e) {
 	        	message = "站点挂接失败";
 			}

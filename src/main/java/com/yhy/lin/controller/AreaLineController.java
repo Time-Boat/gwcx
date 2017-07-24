@@ -20,13 +20,17 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.AreaLineEntity;
+import com.yhy.lin.entity.AreaStationEntity;
+import com.yhy.lin.entity.AreaStationLineEntity;
 import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.AreaLineServiceI;
 
@@ -119,7 +123,7 @@ public class AreaLineController extends BaseController {
 		
 		areaLine.setDepartId(ResourceUtil.getSessionUserName().getCurrentDepart().getId());
 		areaLine.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
-		areaLine.setCreateTime(AppUtil.getDate());;
+		areaLine.setCreateTime(AppUtil.getDate());
 		
 		if (StringUtil.isNotEmpty(areaLine.getId())) {
 			message = "包车区域线路更新成功";
@@ -185,8 +189,7 @@ public class AreaLineController extends BaseController {
 	 */
 	@RequestMapping(params = "areaAddStation")
 	public ModelAndView areaAddStation(HttpServletRequest request, HttpServletResponse response) {
-		request.setAttribute("lineInfoId", request.getParameter("lineInfoId"));
-		request.setAttribute("lineType", request.getParameter("lineType"));
+		request.setAttribute("areaLineId", request.getParameter("areaLineId"));
 		return new ModelAndView("yhy/areaLine/areaLineAddStationList");
 	}
 	
@@ -195,8 +198,8 @@ public class AreaLineController extends BaseController {
 	 */	
 	@RequestMapping(params = "areaStationDatagrid")
 	public void areaStationDatagrid(HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		
-		JSONObject jObject  = areaLineService.getAreaStationDatagrid(dataGrid);
+		String areaLineId = request.getParameter("areaLineId");
+		JSONObject jObject  = areaLineService.getAreaStationDatagrid(dataGrid, areaLineId);
         responseDatagrid(response, jObject);
 	}
 	
@@ -204,10 +207,69 @@ public class AreaLineController extends BaseController {
 	 * 获取站点信息
 	 */	
 	@RequestMapping(params = "addOrUpdateStation")
-	public ModelAndView addOrUpdateStation(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView addOrUpdateStation(AreaStationEntity as, HttpServletRequest request, HttpServletResponse response) {
+		
+		String areaLineId = request.getParameter("areaLineId");
+		request.setAttribute("areaLineId", areaLineId);
+		
+		//as.getId() 是关联表的id
+		if(StringUtil.isNotEmpty(as.getId())){
+			
+			AreaStationLineEntity asl = systemService.getEntity(AreaStationLineEntity.class, as.getId());
+			
+			if(asl != null){
+				request.setAttribute("asLine", asl);
+				
+				as = systemService.getEntity(AreaStationEntity.class, asl.getAreaStationId());
+				request.setAttribute("aStation", as);
+			}
+		}
+		
+//		// 获取部门信息
+//		List<TSDepart> departList = systemService.getList(TSDepart.class);
+//		request.setAttribute("departList", departList);
+//		if (StringUtil.isNotEmpty(lineInfo.getId())) {
+//			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
+//			request.setAttribute("lineInfo", lineInfo);
+//		}
+//		//获取已开通的城市列表
+//		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+//		request.setAttribute("cities", cities);
+//		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
+//		if (list.size() > 0) {
+//			request.setAttribute("list", list);
+//		}
 		
 		return new ModelAndView("yhy/areaLine/areaLineAddStation");
 	}
+	
+	/**
+	 * 保存站点信息
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "saveAreaStation")
+	@ResponseBody
+	public AjaxJson saveAreaStation(AreaStationEntity as, AreaStationLineEntity asl, HttpServletRequest request) {
+		
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		as.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
+		as.setCreateTime(AppUtil.getDate());
+		
+//		areaLineService.saveAreaStation(as, asl);
+		
+//		areaLine = systemService.getEntity(AreaLineEntity.class, areaLine.getId());
+		message = "站点添加成功";
+		systemService.saveOrUpdate(as);
+		asl.setAreaStationId(as.getId());
+		systemService.saveOrUpdate(asl);
+		systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
+//		
+		j.setMsg(message);
+		return j;
+	}
+	
 	
 	/**
 	 * 删除站点信息
