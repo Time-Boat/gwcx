@@ -59,7 +59,8 @@
     <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="areaLineController.do?saveAreaStation">
     	<input type="hidden" id="areaLineId" name="areaLineId" value="${areaLineId}" />
     	
-    	<%-- <input type="hidden" id="areaLineId" name="areaLineId" value="${areaLineId}" /> --%>
+    	<input type="hidden" id="slId" name="slId" value="${asLine.id}" />
+    	<input type="hidden" id="stationId" name="stationId" value="${aStation.id}" />
     	
     	<table style="width: 100%;height: 100%" cellpadding="0" cellspacing="1" class="formtable">
 			<tr>
@@ -70,7 +71,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
-						   value="${areaLinePage.name}">
+						   value="${aStation.name}">
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -80,7 +81,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" style="height: 30px;" id="price" name="price" ignore="ignore"
-						   value="${areaLinePage.price}"> 元/人
+						   value="${asLine.price}"> 元/人
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -90,7 +91,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" style="height: 30px;" id="duration" name="duration" ignore="ignore"
-						   value="${areaLinePage.duration}"> 分钟
+						   value="${asLine.duration}"> 分钟
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
@@ -102,7 +103,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" readonly="readonly" style="height: 30px;" id="location" name="location" ignore="ignore"
-						   value="${areaLinePage.location}">
+						   value="${aStation.location}">
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -112,7 +113,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" readonly="readonly" style="height: 30px;" id="areaStationX" name="areaStationX" ignore="ignore"
-						   value="${areaLinePage.areaStationX}">
+						   value="${aStation.areaStationX}">
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
@@ -122,7 +123,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" readonly="readonly" style="height: 30px;" id="areaStationY" name="areaStationY" ignore="ignore"
-						   value="${areaLinePage.areaStationY}">
+						   value="${aStation.areaStationY}">
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>

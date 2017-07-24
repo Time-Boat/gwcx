@@ -166,6 +166,10 @@ public class AreaLineController extends BaseController {
 		return new ModelAndView("yhy/areaLine/areaLine");
 	}
 	
+
+//----------------------------------------站点-----------------------------------------------
+	
+	
 	/**
 	 * 获取站点
 	 * 
@@ -256,16 +260,32 @@ public class AreaLineController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		as.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
 		as.setCreateTime(AppUtil.getDate());
+		//站点id
+		String stationId = request.getParameter("stationId");
+		//关联表id
+		String slId = request.getParameter("slId");
 		
-//		areaLineService.saveAreaStation(as, asl);
+		if (StringUtil.isNotEmpty(stationId)) {
+			message = "包车区域线路更新成功";
+			AreaStationEntity t = areaLineService.get(AreaStationEntity.class, stationId);
+			AreaStationLineEntity t1 = areaLineService.get(AreaStationLineEntity.class, slId);
+			try {
+				MyBeanUtils.copyBeanNotNull2Bean(as, t);
+				MyBeanUtils.copyBeanNotNull2Bean(asl, t1);
+				areaLineService.saveOrUpdate(t);
+				areaLineService.saveOrUpdate(t1);
+			} catch (Exception e) {
+				e.printStackTrace();
+				message = "包车区域线路更新失败";
+			}
+		}else{
+			message = "站点添加成功";
+			systemService.saveOrUpdate(as);
+			asl.setAreaStationId(as.getId());
+			systemService.saveOrUpdate(asl);
+		}
 		
-//		areaLine = systemService.getEntity(AreaLineEntity.class, areaLine.getId());
-		message = "站点添加成功";
-		systemService.saveOrUpdate(as);
-		asl.setAreaStationId(as.getId());
-		systemService.saveOrUpdate(asl);
 		systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
-//		
 		j.setMsg(message);
 		return j;
 	}
@@ -281,12 +301,19 @@ public class AreaLineController extends BaseController {
 	public AjaxJson delAreaStation(HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-//		areaLine = systemService.getEntity(AreaLineEntity.class, areaLine.getId());
-//		message = "包车区域线路删除成功";
-//		areaLineService.delete(areaLine);
-//		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-//		
-//		j.setMsg(message);
+		
+		String slId = request.getParameter("id");
+		
+		String stationId = request.getParameter("stationId");
+		
+		AreaStationEntity station = areaLineService.get(AreaStationEntity.class, stationId);
+		AreaStationLineEntity stationLine = systemService.getEntity(AreaStationLineEntity.class, slId);
+		message = "站点删除成功";
+		areaLineService.delete(station);
+		areaLineService.delete(stationLine);
+		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		
+		j.setMsg(message);
 		return j;
 	}
 	
