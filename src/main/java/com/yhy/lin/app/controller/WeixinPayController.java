@@ -192,7 +192,7 @@ public class WeixinPayController extends AppBaseController{
 
 			// 这里notify_url是 支付完成后微信发给该链接信息，可以判断会员是否支付成功，改变订单状态等。
 //			String notify_url = baseUrl + "/wx/notifyUrl.do";
-			String notify_url = "http://car.cywtrip.com:8080/gwcx/wx/notifyUrl.do";
+			String notify_url = "http://car.cywtrip.com/gwcx/wx/notifyUrl.do";
 
 			SortedMap<String, String> packageParams = new TreeMap<String, String>();
 			packageParams.put("appid", AppGlobals.WECHAT_ID);
@@ -273,28 +273,28 @@ public class WeixinPayController extends AppBaseController{
 	public String weixinReceive(HttpServletRequest request, HttpServletResponse response, Model model) {
 		logger.info("==开始进入h5支付回调方法==");
 		String xml_review_result = WeixinPayUtil.getXmlRequest(request);
-		System.out.println("微信支付结果:" + xml_review_result);
+		logger.info("微信支付结果:" + xml_review_result);
 		Map resultMap = null;
 		try {
 			resultMap = WeixinPayUtil.doXMLParse(xml_review_result);
-			System.out.println("resultMap:" + resultMap);
+			logger.info("resultMap:" + resultMap);
 			if (resultMap != null && resultMap.size() > 0) {
 				String sign_receive = (String) resultMap.get("sign");
-				System.out.println("sign_receive:" + sign_receive);
+				logger.info("sign_receive:" + sign_receive);
 				resultMap.remove("sign");
 				String checkSign = WeixinPayUtil.getSign(resultMap, AppGlobals.WECHAT_KEY);
-				System.out.println("checkSign:" + checkSign);
+				logger.info("checkSign:" + checkSign);
 
 				// 签名校验成功
 				if (checkSign != null && sign_receive != null && checkSign.equals(sign_receive.trim())) {
-					System.out.println("weixin receive check Sign sucess");
+					logger.info("weixin receive check Sign sucess");
 					try {
 						// 获得返回结果
 						String return_code = (String) resultMap.get("return_code");
 
 						if ("SUCCESS".equals(return_code)) {
 							String out_trade_no = (String) resultMap.get("out_trade_no");
-							System.out.println("weixin pay sucess,out_trade_no:" + out_trade_no);
+							logger.info("weixin pay sucess,out_trade_no:" + out_trade_no);
 							// 处理支付成功以后的逻辑，这里是写入相关信息到文本文件里面，如果有订单的处理订单
 							try {
 								SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh24:mi:ss");
@@ -314,7 +314,7 @@ public class WeixinPayController extends AppBaseController{
 					}
 				} else {
 					// 签名校验失败
-					System.out.println("weixin receive check Sign fail");
+					logger.info("weixin receive check Sign fail");
 					String checkXml = "<xml><return_code><![CDATA[FAIL]]></return_code>"
 							+ "<return_msg><![CDATA[check sign fail]]></return_msg></xml>";
 					WeixinPayUtil.getTradeOrder("http://weixin.xinfor.com/wx/notifyUrl", checkXml);
@@ -343,14 +343,15 @@ public class WeixinPayController extends AppBaseController{
 		String id = request.getParameter("orderId");
 		String status = request.getParameter("status");
 		String orderPayNumber = request.getParameter("orderPayNumber");
-		System.out.println("toWXPaySuccess, orderId: " + id);
-		System.out.println("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
+		logger.info("toWXPaySuccess, orderId: " + id);
+		logger.info("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
 		try {
-			Map resultMap = WeixinPayUtil.checkWxOrderPay(id);
-			System.out.println("resultMap:" + resultMap);
+			//用商户单号查询订单状态
+			Map resultMap = WeixinPayUtil.checkWxOrderPay(orderPayNumber);
+			logger.info("resultMap:" + resultMap);
 			String return_code = (String) resultMap.get("return_code");
 			String result_code = (String) resultMap.get("result_code");
-			System.out.println("return_code:" + return_code + ",result_code:" + result_code);
+			logger.info("return_code:" + return_code + ",result_code:" + result_code);
 			if ("SUCCESS".equals(return_code)) {
 				if ("SUCCESS".equals(result_code)) {
 					model.addAttribute("orderId", id);
@@ -369,9 +370,9 @@ public class WeixinPayController extends AppBaseController{
 				// 如果成功，处理业务逻辑
 				request.setAttribute("status", status);
 
-				System.out.println("toWXPaySuccess   status:" + status);
-				System.out.println("toWXPaySuccess   id:" + id);
-
+				logger.info("toWXPaySuccess   status:" + status);
+				logger.info("toWXPaySuccess   id:" + id);
+				
 				TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
 				if ("0".equals(status)) {
 					t.setOrderStatus(1);

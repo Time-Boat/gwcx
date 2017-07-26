@@ -53,7 +53,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				+ " left join driversinfo d on b.driverId =d.id "
 				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ";
 		if (!sqlWhere.isEmpty()) {
-			sqlCnt += sqlWhere;
+			//sqlCnt += sqlWhere;
 		}
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
@@ -63,7 +63,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
 		if (!sqlWhere.isEmpty()) {
-			sql.append(sqlWhere);
+			//sql.append(sqlWhere);
 		}
 
 		System.out.println(sql.toString());
@@ -229,8 +229,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				logger.info("退款金额：" + refundFee);
 				
 //				refundReqData.setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
+				System.out.println("商户号：" + t.getOrderPayNumber());
 				refundReqData.setParams(transactionID, t.getOrderPayNumber(), outRefundNo, totalFee, refundFee);
-				
+				//refundReqData.setParams("4005282001201707252629347549", "", outRefundNo, totalFee, refundFee);
+					
 				refundRequest.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
 		
 				refundReqData.setSign(refundRequest.createSign(refundReqData.getParameters()));
@@ -240,6 +242,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				// LogUtils.trace(info);
 				
 				String result = refundRequest.httpsRequest(AppGlobals.REFUND_URL, info, path);
+				
+				logger.info("result : " + result);
 				
 				Map<String, String> getMap = MobiMessage.parseXml(result);
 				if ("SUCCESS".equals(getMap.get("result_code")) && "OK".equals(getMap.get("return_msg"))) {

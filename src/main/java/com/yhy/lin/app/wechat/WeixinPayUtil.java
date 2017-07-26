@@ -72,12 +72,11 @@ public class WeixinPayUtil {
 			HttpEntity entity = null;
 			String jsonStr = null;
 			
-			
 		    synchronized(httpclient){
-		    		response = httpclient.execute(httpost);
-	                entity = response.getEntity();
-	                jsonStr = EntityUtils.toString(entity, "UTF-8");
-	                EntityUtils.consume(entity);
+	    		response = httpclient.execute(httpost);
+                entity = response.getEntity();
+                jsonStr = EntityUtils.toString(entity, "UTF-8");
+                EntityUtils.consume(entity);
 		    }
 			
 			//关闭资源    
@@ -328,7 +327,8 @@ public class WeixinPayUtil {
 		
 		logger.error("checkWxOrderPay  xml: " + xml);
 		String resultMsg = getTradeOrder("https://api.mch.weixin.qq.com/pay/orderquery", xml);
-		logger.error("orderquery,result   xml: " + xml);
+		logger.error("checkWxOrderPay  resultMsg: " + resultMsg);
+		
 		if (StringUtils.isNotBlank(resultMsg)) {
 			Map resultMap = WeixinPayUtil.doXMLParse(resultMsg);
 			if (resultMap != null && resultMap.size() > 0) {
@@ -406,6 +406,15 @@ public class WeixinPayUtil {
 	}
 	
 	public static void main(String[] args) {
+		
+		try {
+			Map map = checkWxOrderPay("ff8080815d644158015d79902a3100f4");
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
 //		 String sign = "";
 //		 SortedMap<String, String> storeMap = new TreeMap<String, String>();

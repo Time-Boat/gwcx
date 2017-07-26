@@ -7,30 +7,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.jeecgframework.core.common.controller.BaseController;
+import org.jeecgframework.core.common.model.json.AjaxJson;
+import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.constant.Globals;
+import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
-import org.jeecgframework.core.common.model.json.AjaxJson;
-import org.jeecgframework.core.common.model.json.DataGrid;
-import org.jeecgframework.core.constant.Globals;
-import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
-import org.jeecgframework.web.system.pojo.base.TSDepart;
-import org.jeecgframework.web.system.service.SystemService;
-import org.jeecgframework.core.util.MyBeanUtils;
-import org.jeecgframework.core.util.ResourceUtil;
-
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.AreaLineEntity;
 import com.yhy.lin.entity.AreaStationEntity;
 import com.yhy.lin.entity.AreaStationLineEntity;
 import com.yhy.lin.entity.BusStopInfoEntity;
-import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.AreaLineServiceI;
 
@@ -218,9 +213,13 @@ public class AreaLineController extends BaseController {
 		
 		AreaLineEntity areaLine = areaLineService.get(AreaLineEntity.class, areaLineId);
 		
-		systemService.findForJdbc("select * from area_line al join citys ", areaLineId);
+		List<Map<String,Object>> map = systemService.findForJdbc("select c.city from area_line al join cities c on al.city_id = c.cityId where al.id = ?", areaLineId);
 		
-		request.setAttribute("lineCity", areaLine.getCityId());
+		if(map.size() > 0){
+			String city = map.get(0).get("city") + "";
+			request.setAttribute("lineCity", city);
+		}
+		
 		//as.getId() 是关联表的id
 		if(StringUtil.isNotEmpty(as.getId())){
 			
