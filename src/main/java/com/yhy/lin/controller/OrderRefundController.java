@@ -51,9 +51,12 @@ public class OrderRefundController extends BaseController {
 			DataGrid dataGrid) {
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
+		String rf_begin = request.getParameter("refundTime_begin");
+		String rf_end = request.getParameter("refundTime_end");
+		
 		String orderStartingstation =request.getParameter("orderStartingstation");
 		String orderTerminusstation =request.getParameter("orderTerminusstation");
-		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end, orderStartingstation,
+		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end,rf_begin,rf_end,orderStartingstation,
 				orderTerminusstation);
 
 		responseDatagrid(response, jObject);

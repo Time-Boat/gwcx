@@ -34,6 +34,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
@@ -254,6 +255,12 @@ public class WeixinPayController extends AppBaseController{
 			model.addAttribute("orderId", orderId);
 			model.addAttribute("orderPayNumber", orderPayNumber);
 			model.addAttribute("payPrice", total_fee);
+			
+			//将商户单号保存到指定的订单
+			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
+			t.setOrderPayNumber(orderPayNumber);
+			systemService.save(t);
+			
 			return new ModelAndView("yhy/wechat/jsapi");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -269,11 +276,18 @@ public class WeixinPayController extends AppBaseController{
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/notifyUrl")
+	@RequestMapping("/notifyUrl")
 	public String weixinReceive(HttpServletRequest request, HttpServletResponse response, Model model) {
 		logger.info("==开始进入h5支付回调方法==");
 		String xml_review_result = WeixinPayUtil.getXmlRequest(request);
+		
 		logger.info("微信支付结果:" + xml_review_result);
+		
+		String resultJson = "<xml><return_code><![CDATA[%1]]></return_code><return_msg><![CDATA[%2]]></return_msg></xml>";
+		
+		String rc = "";
+		String rm = "";
+		
 		Map resultMap = null;
 		try {
 			resultMap = WeixinPayUtil.doXMLParse(xml_review_result);
@@ -293,23 +307,46 @@ public class WeixinPayController extends AppBaseController{
 						String return_code = (String) resultMap.get("return_code");
 
 						if ("SUCCESS".equals(return_code)) {
+							//将推送给用户的消息放到这里
+							//nonceStr商户单号，和订单号绑定，唯一的
 							String out_trade_no = (String) resultMap.get("out_trade_no");
 							logger.info("weixin pay sucess,out_trade_no:" + out_trade_no);
 							// 处理支付成功以后的逻辑，这里是写入相关信息到文本文件里面，如果有订单的处理订单
 							try {
-								SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh24:mi:ss");
-								String content = out_trade_no + "        " + sdf.format(new Date());
-								String fileUrl = System.getProperty("user.dir") + File.separator + "WebContent"
-										+ File.separator + "data" + File.separator + "order.txt";
-								TxtUtil.writeToTxt(content, fileUrl);
+//								SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//								String content = out_trade_no + "        " + sdf.format(new Date());
+//								String fileUrl = System.getProperty("user.dir") + File.separator + "WebContent"
+//										+ File.separator + "data" + File.separator + "order.txt";
+//								TxtUtil.writeToTxt(content, fileUrl);
+								
+								//通过商户单号查找订单数据
+								TransferorderEntity t = systemService.findUniqueByProperty(TransferorderEntity.class, "orderPayNumber", out_trade_no);
+
+								String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
+								// 如果购买成功，将消息添加到消息中心
+								AppMessageListEntity app = SendMessageUtil.buildAppMessage(t.getUserId(), content, "0", "0", t.getId());
+								systemService.save(app);
+								//新增消息后，要把对应的用户状态改一下
+								systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
+
+								logger.info("消息保存成功 ");
+								
+								rc = "SUCCESS";
+								rm = "OK";
 							} catch (Exception e) {
+								rc = "FAIL";
+								rm = "服务器异常";
 								e.printStackTrace();
 							}
 						} else {
+							rc = "FAIL";
+							rm = "通信错误";
 							model.addAttribute("payResult", "0");
 							model.addAttribute("err_code_des", "通信错误");
 						}
 					} catch (Exception e) {
+						rc = "FAIL";
+						rm = "服务器异常";
 						e.printStackTrace();
 					}
 				} else {
@@ -323,12 +360,25 @@ public class WeixinPayController extends AppBaseController{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		
+		PrintWriter pw = null;
+		try {
+			pw = response.getWriter();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String result = resultJson.replace("%1", rc).replace("%2", rm);
+		logger.info("payResult : " + result);
+		pw.write(result);
+		pw.flush();
+		pw.close();
+		
 		return null;
 	}
 
 	/**
-	 * 页面js返回支付成功后，查询微信后台是否支付成功，然后跳转结果页面
+	 * 页面js返回支付成功后，查询微信后台是否支付成功，然后跳转结果页面    (不知道什么鬼，有时候会被调用两次，所以把这个业务逻辑放到notifyUrl中)
+	 * 这个方法中只需要判断订单是否成功，然后跳转到相应的界面就行了
 	 * 
 	 * @param request
 	 * @param response
@@ -339,55 +389,56 @@ public class WeixinPayController extends AppBaseController{
 	@RequestMapping(params = "success")
 	public ModelAndView toWXPaySuccess(HttpServletRequest request, HttpServletResponse response, Model model)
 			throws IOException {
-
+		
+		logger.info("进入toWXPaySuccess回调");
 		String id = request.getParameter("orderId");
 		String status = request.getParameter("status");
-		String orderPayNumber = request.getParameter("orderPayNumber");
-		logger.info("toWXPaySuccess, orderId: " + id);
-		logger.info("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
+//		String orderPayNumber = request.getParameter("orderPayNumber");
+//		logger.info("toWXPaySuccess, orderId: " + id);
+//		logger.info("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
 		try {
 			//用商户单号查询订单状态
-			Map resultMap = WeixinPayUtil.checkWxOrderPay(orderPayNumber);
-			logger.info("resultMap:" + resultMap);
-			String return_code = (String) resultMap.get("return_code");
-			String result_code = (String) resultMap.get("result_code");
-			logger.info("return_code:" + return_code + ",result_code:" + result_code);
-			if ("SUCCESS".equals(return_code)) {
-				if ("SUCCESS".equals(result_code)) {
-					model.addAttribute("orderId", id);
-					model.addAttribute("payResult", "1");
-				} else {
-					String err_code = (String) resultMap.get("err_code");
-					String err_code_des = (String) resultMap.get("err_code_des");
-					System.out.println("weixin resultCode:" + result_code + ",err_code:" + err_code + ",err_code_des:"
-							+ err_code_des);
-
-					model.addAttribute("err_code", err_code);
-					model.addAttribute("err_code_des", err_code_des);
-					model.addAttribute("payResult", "0");
-				}
+//			Map resultMap = WeixinPayUtil.checkWxOrderPay(orderPayNumber);
+//			logger.info("resultMap:" + resultMap);
+//			String return_code = (String) resultMap.get("return_code");
+//			String result_code = (String) resultMap.get("result_code");
+//			logger.info("return_code:" + return_code + ",result_code:" + result_code);
+//			if ("SUCCESS".equals(return_code)) {
+//				if ("SUCCESS".equals(result_code)) {
+//					model.addAttribute("orderId", id);
+//					model.addAttribute("payResult", "1");
+//				} else {
+//					String err_code = (String) resultMap.get("err_code");
+//					String err_code_des = (String) resultMap.get("err_code_des");
+//					System.out.println("weixin resultCode:" + result_code + ",err_code:" + err_code + ",err_code_des:"
+//							+ err_code_des);
+//
+//					model.addAttribute("err_code", err_code);
+//					model.addAttribute("err_code_des", err_code_des);
+//					model.addAttribute("payResult", "0");
+//				}
 
 				// 如果成功，处理业务逻辑
 				request.setAttribute("status", status);
 
-				logger.info("toWXPaySuccess   status:" + status);
-				logger.info("toWXPaySuccess   id:" + id);
+//				logger.info("toWXPaySuccess   status:" + status);
+//				logger.info("toWXPaySuccess   id:" + id);
 				
 				TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
 				if ("0".equals(status)) {
 					t.setOrderStatus(1);
 					t.setOrderPaystatus("0");
-					t.setOrderPayNumber(orderPayNumber);
-
-					String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
-					
-					// 如果购买成功，将消息添加到消息中心
-					AppMessageListEntity app = SendMessageUtil.buildAppMessage(t.getUserId(), content, "0", "0", t.getId());
-					
-					systemService.save(app);
-					
-					//新增消息后，要把对应的用户状态改一下
-					systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
+//					t.setOrderPayNumber(orderPayNumber);
+//
+//					String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
+//					
+//					// 如果购买成功，将消息添加到消息中心
+//					AppMessageListEntity app = SendMessageUtil.buildAppMessage(t.getUserId(), content, "0", "0", t.getId());
+//					
+//					systemService.save(app);
+//					
+//					//新增消息后，要把对应的用户状态改一下
+//					systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
 
 				} else {
 					t.setOrderStatus(6);
@@ -395,10 +446,10 @@ public class WeixinPayController extends AppBaseController{
 				}
 				systemService.save(t);
 
-			} else {
-				model.addAttribute("payResult", "0");
-				model.addAttribute("err_code_des", "通信错误");
-			}
+//			} else {
+//				model.addAttribute("payResult", "0");
+//				model.addAttribute("err_code_des", "通信错误");
+//			}
 
 		} catch (Exception e) {
 			e.printStackTrace();

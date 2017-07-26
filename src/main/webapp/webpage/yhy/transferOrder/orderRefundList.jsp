@@ -44,7 +44,7 @@
 		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
 		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
 		<t:dgCol title="支付状态" field="orderPaystatus" replace="已付款_0,退款中_1,已退款_2,已拒绝_4" align="center"></t:dgCol>
-		<t:dgCol title="申请退款时间" field="refundTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
+		<t:dgCol title="申请退款时间" field="refundTime" formatter="yyyy-MM-dd hh:mm:ss" align="center" query="true" queryMode="group" ></t:dgCol>
 		<t:dgCol title="退款金额" field="refundPrice" align="center"></t:dgCol>
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
@@ -94,6 +94,9 @@ $(function() {
 	$(document).ready(function(){
 		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
+		$("input[name='refundTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
+		$("input[name='refundTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
+	
 	});
 
 	function refundWindow(){

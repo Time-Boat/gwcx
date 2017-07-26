@@ -44,8 +44,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
-			String orderStartingstation,String orderTerminusstation) {
-		String sqlWhere = getWhere(transferorder, fc_begin, fc_end, orderStartingstation, orderTerminusstation);
+			String rf_begin,String rf_end,String orderStartingstation,String orderTerminusstation) {
+		String sqlWhere = getWhere(transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -53,7 +53,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				+ " left join driversinfo d on b.driverId =d.id "
 				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ";
 		if (!sqlWhere.isEmpty()) {
-			//sqlCnt += sqlWhere;
+			sqlCnt += sqlWhere;
 		}
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
@@ -63,7 +63,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
 		if (!sqlWhere.isEmpty()) {
-			//sql.append(sqlWhere);
+			sql.append(sqlWhere);
 		}
 
 		System.out.println(sql.toString());
@@ -93,7 +93,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		return jObject;
 	}
 
-	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String orderStartingstation,
+	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end,String orderStartingstation,
 			String orderTerminusstation) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -107,6 +107,11 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
 		}
+		//申请退款时间
+		if (StringUtil.isNotEmpty(rf_begin) && StringUtil.isNotEmpty(rf_end)) {
+			sql.append(" and a.refund_time between '" + rf_begin + "' and '" + rf_end + "'");
+		}
+		
 		// 订单编号
 		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
 			sql.append(" and  a.order_id like '%" + transferorder.getOrderId() + "%'");

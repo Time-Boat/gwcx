@@ -39,7 +39,7 @@ System.out.println("in jsapi.jsp");
 		       			url += "1"
 		       			//alert(res.err_msg);
 		       		}
-		    		window.location.replace(url);
+		    		window.location.replace(url + "&isFirst=" + isFirst);
 		       }
 		   ); 
 		}
@@ -51,6 +51,8 @@ System.out.println("in jsapi.jsp");
 			  $('#weiXinPay').click();
 			}    
 			    */
+		
+		
 	    function callpay(){
 			if (typeof WeixinJSBridge == "undefined"){
 			   if( document.addEventListener ){

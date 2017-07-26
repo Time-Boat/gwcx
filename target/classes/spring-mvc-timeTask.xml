@@ -25,12 +25,24 @@
 		<property name="targetMethod" value="work" />
 		<property name="concurrent" value="true" />
 	</bean>
+	
+	<!-- 定时任务配置   taskDemoService 可配置到管理界面 -->
+	<bean id="orderTimeServiceTaskJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="orderTimeService" />
+		<property name="targetMethod" value="work" />
+		<property name="concurrent" value="true" />
+	</bean>
 
 	<bean id="taskDemoServiceTaskCronTrigger" class="org.jeecgframework.core.timer.DataBaseCronTriggerBean">
 		<property name="jobDetail" ref="taskDemoServiceTaskJob" />
 		<property name="cronExpression" value="*/1 * * * * ?" />
 	</bean>
 	
+	<bean id="orderTimeCronTrigger" class="org.jeecgframework.core.timer.DataBaseCronTriggerBean">
+		<property name="jobDetail" ref="orderTimeServiceTaskJob" />
+		<property name="cronExpression" value="0 0/10 * * * ?" />
+	</bean>
 	
 	<!-- 定时任务配置   smsSendTask 可配置到管理界面 -->
 	<bean id="smsSendTaskJob"
@@ -51,6 +63,8 @@
 		<property name="triggers">
 			<list>
 				<ref bean="taskDemoServiceTaskCronTrigger" />
+				
+				<ref bean="orderTimeCronTrigger" />
 				<!--
 				<ref bean="smsSendTaskCronTrigger" />
 				-->

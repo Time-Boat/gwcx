@@ -44,7 +44,7 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	private Short deleteFlag;// 状态: 0:不删除  1：删除
 	/**创建时间*/
 	private Date createTime;
-	/**线路创建人*/
+	/**线路创建人名字*/
 	private String createPeople;
 	/**线路价格 */
 	private BigDecimal price;
@@ -67,6 +67,9 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	private String  cityName;
 	
 	private String dispath;
+	
+	//线路创建人id
+	private String createUserId;
 	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
@@ -236,6 +239,14 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	}
 	public void setDispath(String dispath) {
 		this.dispath = dispath;
+	}
+	
+	@Column(name = "createUserId")
+	public String getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
 	}
 	
 }

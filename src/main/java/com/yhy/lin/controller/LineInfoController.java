@@ -18,6 +18,7 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -220,8 +221,11 @@ public class LineInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		lineInfo.setDeleteFlag((short) 0);
-		lineInfo.setDepartId(ResourceUtil.getSessionUserName().getCurrentDepart().getId());
-		lineInfo.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
+		TSUser user = ResourceUtil.getSessionUserName();
+		
+		lineInfo.setDepartId(user.getCurrentDepart().getId());
+		lineInfo.setCreatePeople(user.getUserName());
+		lineInfo.setCreateUserId(user.getId());
 		String settledCompanyId = request.getParameter("settledCompany");// 合作公司的id
 		String cityId = request.getParameter("city");
 		if(StringUtil.isNotEmpty(cityId)){

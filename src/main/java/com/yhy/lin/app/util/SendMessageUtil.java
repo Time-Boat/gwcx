@@ -20,6 +20,15 @@ public class SendMessageUtil {
 	// 验证码信息模板对应签名
 	public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "登录验证";
 	
+	//订单提醒
+	public static final String TEMPLATE_SMS_CODE_SIGN_ORDER = "大鱼测试";
+	//接送机、接送火车订单提醒信息模板
+	public static final String TEMPLATE_ARRANGE_ORDER = "SMS_78580203";//SMS_78570092
+	//接送机订单提醒
+	public static final String TEMPLATE_ARRANGE_AIRORDER = "SMS_78745200";//SMS_78570092
+	//接送火车订单提醒
+	public static final String TEMPLATE_ARRANGE_TRORDER = "SMS_78935036";//SMS_78570092
+	
 	// 安排车辆信息模板
 	public static final String TEMPLATE_ARRANGE_CAR = "SMS_70420532";//SMS_69620002
 	// 安排车辆信息模板对应签名

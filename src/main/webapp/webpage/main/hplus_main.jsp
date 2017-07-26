@@ -1025,12 +1025,34 @@
 			complete : function(data) {
 				var message = data.responseText;
 				var obj = eval('(' + message + ')');
-				if(obj.num>0){
+				if(obj.ordairs>0 && obj.ordtrs>0){
 					$.toast({
 			    	    heading: '消息提醒',
 			    	    icon: 'info',
 			    	    text: ['&nbsp;','&nbsp;',
-					    	    '有'+obj.num+'份最新的订单，请及时处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
+					    	    '有'+obj.ordairs+'份最新的接送机订单，'+obj.ordtrs+'份最新的接送火车订单，请及时处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
+			    	    position: 'bottom-right',
+			    	    bgColor: '#2F4050',
+			    	    hideAfter: false,
+			    	    stack: true
+			    	})
+				}else if(obj.ordairs>0 && obj.ordtrs==0){
+					$.toast({
+			    	    heading: '消息提醒',
+			    	    icon: 'info',
+			    	    text: ['&nbsp;','&nbsp;',
+					    	    '有'+obj.ordairs+'份最新的接送机订单，请及时处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
+			    	    position: 'bottom-right',
+			    	    bgColor: '#2F4050',
+			    	    hideAfter: false,
+			    	    stack: true
+			    	})
+				}else if(obj.ordairs==0 && obj.ordtrs>0){
+					$.toast({
+			    	    heading: '消息提醒',
+			    	    icon: 'info',
+			    	    text: ['&nbsp;','&nbsp;',
+					    	    '有'+obj.ordtrs+'份最新的接送火车订单，请及时处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
 			    	    position: 'bottom-right',
 			    	    bgColor: '#2F4050',
 			    	    hideAfter: false,

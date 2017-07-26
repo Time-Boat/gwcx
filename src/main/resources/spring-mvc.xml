@@ -142,7 +142,7 @@
 						<!-- 微信支付 -->
 						<value>wx.do?userAuth</value>
 						<value>wx.do?toPay</value>
-						<value>wx/notifyUrl.do</value>
+						<value>wx/notifyUrl.do?null</value>
 						<value>wx.do?success</value>
 						
 						<!-- 微信消息推送 -->

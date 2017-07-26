@@ -151,7 +151,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	}
 	
 	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,LineInfoEntity lineInfo){
-		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' "); 
+		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' and a.station_type = '0' "); 
 		if(StringUtil.isNotEmpty(lineInfo.getCityId())){
 			sqlWhere.append(" and  a.cityId = '"+lineInfo.getCityId()+"' ");
 		}
@@ -173,18 +173,6 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		//线路类型 0：班车 1：包车 2：接机 3：送机 4：接火车 5：送火车
 		//站点类型 0：普通站点    1：火车站点    2：飞机站点、
 		//接送机业务只能选择机场站点
-		switch (lineInfo.getType()) {
-		case "2":
-		case "3":
-			sqlWhere.append(" and  a.station_type != '1'");
-			break;
-		case "4":
-		case "5":
-			sqlWhere.append(" and  a.station_type != '2'");
-			break;
-		default:
-			break;
-		}
 		
 		return sqlWhere.toString();
 	}
