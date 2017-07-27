@@ -51,6 +51,17 @@
 	        background:url(plug-in/easyui/themes/metrole/icons/le_search.png) no-repeat scroll right center #fff;
 	    }
         
+        #panel {
+            position: fixed;
+            background-color: white;
+            max-height: 90%;
+            overflow-y: auto;
+            top: 10px;
+            right: 10px;
+            width: 280px;
+            z-index: 9999;
+        }
+        
 	  </style>
 	  <title>站点信息</title>
 	</head>
@@ -132,10 +143,11 @@
     <div id="container" tabindex="0" style="height:80%;" >
     	<div >
 	    	<input type="text" id="keyword" placeholder="请输入关键字" name="keyword" />
+	    	<div id="panel"></div>
     	</div>
     </div>
     <!-- script必须放在body中。。 -->
-    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123&plugin=AMap.Driving" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
@@ -143,8 +155,11 @@
     
     	//地图对象
     	var map;
+    	//窗体对象
+    	var infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
     	
     	function loadMapStation(){
+    		
     		var asx = $('#areaStationX').val();
         	var asy = $('#areaStationY').val();
         	
@@ -195,15 +210,17 @@
         	        //TODO: 使用geocoder 对象完成相关功能
         	    })
         	    
-        	    AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
-        			
-        	        var infoWindow = new SimpleInfoWindow({
+        	    /* var infoWindow = new SimpleInfoWindow({
         	            //基点指向marker的头部位置
         	            offset: new AMap.Pixel(0, -31)
-        	        });
+        	        }); */
+        	    
+        	    //AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
+        	    	createMarker();
         	        
         	      	//点击事件
         		    map.on('click', function(e) {
+        		    	createMarker();
         		    	marker.setPosition(e.lnglat);
         		    	openInfoWin();
         		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
@@ -212,9 +229,12 @@
         	    		       //获得了有效的地址信息:
         	    		       //即，result.regeocode.formattedAddress
         	    		       console.log(result);
-        	    		       infoWindow.setInfoTitle('<strong>' + result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.district + '</strong>');
-        	    		       infoWindow.setInfoBody('<p class="my-desc"><strong>详细地址:</strong> <br/>' + result.regeocode.formattedAddress + '</p>');
+        	    		       //infoWindow.setInfoTitle('<strong>' + result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.district + '</strong>');
+        	    		       //infoWindow.setInfoBody('<p class="my-desc"><strong>详细地址:</strong> <br/>' + result.regeocode.formattedAddress + '</p>');
         	    		       infoWindow.setPosition(e.lnglat);
+        	    		       
+        	    		       infoWindow.setContent('<p class="my-desc">' + result.regeocode.formattedAddress + '</p>');//点击以后窗口展示的内容
+                               infoWindow.open(map, e.lnglat);
         	    		       
         	    		       //给表单赋值
         	    		       $('#areaStationX').val(e.lnglat.getLng());
@@ -238,9 +258,8 @@
         	        });
         			
         	        //openInfoWin();
-        	    });
+        	    //});
         	    
-        	    var windowsArr = [];
 	    	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
 					var autoOptions = {
 						city: city, //城市，默认全国
@@ -253,30 +272,91 @@
 					})
 					AMap.event.addListener(autocomplete, "select", function(e){
 						//TODO 针对选中的poi实现自己的功能
-						placeSearch.search(e.poi.name)
+						//placeSearch.search(e.poi.name)
 						console.log(e);
+						placeSearch.setCity(e.poi.adcode);
+		                   if (e.poi && e.poi.location) {
+		                        map.setZoom(10);
+		                        map.setCenter(e.poi.location);
+		                    }
+		                 //选择下拉列表中的一条信息时触发的方法
+		                 placeSearch.search(e.poi.name, function(status, result) {
+		                    if (status === 'complete' && result.info === 'OK') { 
+		                    	console.log(result);
+		                    }
+		                });  //关键字查询查询
+		                
+		                //切换点击marker时触发
+		                AMap.event.addListener(placeSearch, 'selectChanged', function(results) {
+		                     //获取当前选中的结果数据
+                             //infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
+                             //infoWindow.open(map, e.target.getPosition());
+                               
+		                     console.log(results.selected.data);
+                             //给表单赋值
+                   	         $('#location').val(results.selected.data.name);
+                   	         $('#areaStationX').val(results.selected.data.location.lat);
+                   	         $('#areaStationY').val(results.selected.data.location.lng);
+                   	      	 map.remove(marker);
+		                });
 					});
 	    	    });
+	    	    drawLine();
         	}
        	}
     	
-    	//如果已经创建marker，就不再创建   
-    	var isFirst = false;
+    	var newmarkers = [];
+    	
     	var marker;
     	function createMarker(){
-    		//创建marker对象
-    		if(!isFirst){
-    			isFirst = true;
-    			marker = new AMap.Marker({
-            		title: "点击测试",
-            		map: map,
-            		bubble: true
-        		});
+    		if(typeof(marker) != "undefined"){
+    			map.remove(marker);
     		}
-	      	
-        	//map.remove(marker);
+    		
+    		//创建marker对象
+   			marker = new AMap.Marker({
+           		title: "点击测试",
+           		map: map,
+           		bubble: false
+       		});
     	}
     	
+    	function markerClick(e){
+    		var hs = e.target.extData;
+            infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
+            infoWindow.open(map, e.target.getPosition());
+            
+            //给表单赋值
+	         $('#areaStationX').val(hs['getLat']);
+	         $('#areaStationY').val(hs['getLng']);
+	         $('#location').val(hs['address']);
+             
+            console.log(hs);
+        }
+    	
+    	// 添加点聚合
+        function addCluster() {
+            map.plugin(["AMap.MarkerClusterer"], function() {
+            	var cluster = new AMap.MarkerClusterer(map, newmarkers);
+            });       
+        };
+        
+        function drawLine(){
+            //构造路线导航类
+            var driving = new AMap.Driving({
+                map: map,
+                panel: "panel"
+            }); 
+            // 根据起终点经纬度规划驾车导航路线
+            driving.search(new AMap.LngLat(116.379028, 39.865042), new AMap.LngLat(116.427281, 39.903719));
+            
+            //setTimeout("a()", 5000);
+        }
+        
+        /* function a(){
+        	$('#panel dl').css("display","none");
+        } */
+        
 	    </script>
     </script>
     
