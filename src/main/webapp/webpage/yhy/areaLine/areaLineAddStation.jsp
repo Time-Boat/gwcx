@@ -66,7 +66,6 @@
 	  <title>站点信息</title>
 	</head>
  <body style="overflow-y: hidden" scroll="no" onload="loadMapStation()" >
- 
     <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="areaLineController.do?saveAreaStation">
     	<input type="hidden" id="areaLineId" name="areaLineId" value="${areaLineId}" />
     	<input type="hidden" id="slId" name="slId" value="${asLine.id}" />
@@ -357,7 +356,6 @@
         	$('#panel dl').css("display","none");
         } */
         
-	    </script>
     </script>
     
     

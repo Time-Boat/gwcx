@@ -5,7 +5,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center"  style="padding:0px;border:0px">
-	<t:datagrid name="busStopInfoList" title="站点信息管理(接送机)" autoLoadData="true" actionUrl="busStopInfoController.do?datagrid"  fitColumns="true"
+	<t:datagrid name="busStopInfoList" title="站点信息管理" autoLoadData="true" actionUrl="busStopInfoController.do?datagrid"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" >
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="站点名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
@@ -15,7 +15,7 @@
 	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
 	<t:dgCol title="所在城市" field="cityName" query="true" align="center"></t:dgCol>
 	<t:dgCol title="备注" field="remark" align="center" width="80"></t:dgCol>
-	<t:dgToolBar operationCode="add" title="添加站点" icon="icon-add" url="busStopInfoController.do?addorupdate" funname="add"></t:dgToolBar>
+	<t:dgToolBar operationCode="add" title="添加站点" icon="icon-add" url="busStopInfoController.do?addorupdate" height="800" width="1200" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="修改站点" icon="icon-edit" url="busStopInfoController.do?addorupdate" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="50"></t:dgCol>
 	<t:dgDelOpt title="下架" url="busStopInfoController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" />

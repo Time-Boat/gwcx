@@ -1243,7 +1243,7 @@ public class AppInterfaceController extends AppBaseController {
 			String path = AppGlobals.IMAGE_BASE_FILE_PATH;
 			if(StringUtil.isNotEmpty(imagesBaseBM)){
 				// 获取图片存储路径
-				imgUrl = AppGlobals.APP_USER_FILE_PATH + userId + "_" + System.currentTimeMillis()
+				imgUrl = AppGlobals.APP_USER_FILE_PATH + userId //+ "_" + System.currentTimeMillis()
 						+ pName.substring(pName.lastIndexOf("."), pName.length());
 				imagesBaseBM = imagesBaseBM.replaceAll(" ", "+");
 				Base64ImageUtil.generateImage(imagesBaseBM, path + imgUrl);
