@@ -56,8 +56,8 @@
             background-color: white;
             max-height: 90%;
             overflow-y: auto;
-            top: 10px;
-            right: 10px;
+            top: 260px;
+            right: 50px;
             width: 280px;
             z-index: 9999;
         }
@@ -125,18 +125,18 @@
 						   value="${asLine.duration}"> 分钟
 					<span class="Validform_checktip"></span>
 				</td>
-			</tr>
-			<tr>
 				<td align="center">
 					<label class="Validform_label">
-						所选地址:
+						公里数:
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="location" name="location" ignore="ignore"
-						   value="${aStation.location}">
+					<input class="inputxt" style="height: 30px;" id="distance" name="distance" ignore="ignore"
+						   value="${asLine.distance}"> 公里
 					<span class="Validform_checktip"></span>
 				</td>
+			</tr>
+			<tr>
 				<td align="center">
 					<label class="Validform_label">
 						经度:
@@ -155,6 +155,16 @@
 				<td class="value">
 					<input class="inputxt" readonly="readonly" style="height: 30px;" id="areaStationY" name="areaStationY" ignore="ignore"
 						   value="${aStation.areaStationY}">
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						所选地址:
+					</label>
+				</td>
+				<td class="value" colspan="3" >
+					<input class="inputxt" readonly="readonly" style="height: 30px;width:100%;" id="location" name="location" ignore="ignore"
+						   value="${aStation.location}">
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
@@ -426,31 +436,22 @@
         	
         	//切换点击marker时触发
             AMap.event.addListener(driving, 'complete', function(result) {
+            	 $('#panel dl').css("display","none");
                  console.log(result);
                  if(result.info == 'OK'){
                 	 var route = result.routes[0];
+                	 console.log(route);
                 	 //公里数
-                	 var distance = route.distance;
+                	 var distance = (route.distance/1000).toFixed(2);
                 	 //所需时间
-                	 var time = route.time;
+                	 var time = (route.time/60).toFixed(0);
+                	 $('#duration').val(time);
+                	 $('#distance').val(distance);
+                	 
+                	 console.log(distance + " ----- " + time);
                  }
             });
-        	
-            //setTimeout("a()", 5000);
         }
         
-        /* function a(){
-        	$('#panel dl').css("display","none");
-        } */
-        
     </script>
-    
-    
-    
-    
-    
-    
-    
-    
-    
  </body>

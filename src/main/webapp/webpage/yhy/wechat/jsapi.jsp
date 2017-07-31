@@ -37,9 +37,9 @@ System.out.println("in jsapi.jsp");
 		       			//alert('支付取消');
 		       		}else{
 		       			url += "1"
-		       			//alert(res.err_msg);
+		       			
 		       		}
-		    		window.location.replace(url + "&isFirst=" + isFirst);
+		    		window.location.replace(url);
 		       }
 		   ); 
 		}

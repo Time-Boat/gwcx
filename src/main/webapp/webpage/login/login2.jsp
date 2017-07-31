@@ -45,11 +45,11 @@
         <ul class="loginInfo">
             <li>
 	            <span>用户名：</span>
-	            <input type="text"  class="userName" value="admin" name="userName" id="userName"/>
+	            <input type="text"  class="userName" name="userName" id="userName"/>
             </li>
             <li>
             	<span>密 &nbsp;码：</span>
-            	<input type="password" name="password" class="password"  value="123456" name="password"  id="password"/>
+            	<input type="password" name="password" class="password" name="password"  id="password"/>
             </li>
 			<li>
             	<span>验证码：</span>

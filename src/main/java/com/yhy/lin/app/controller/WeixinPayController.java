@@ -1,17 +1,10 @@
 package com.yhy.lin.app.controller;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -20,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
-import oracle.net.aso.MD5;
-import sun.misc.BASE64Decoder;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -32,26 +23,18 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 
 import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
-import com.yhy.lin.app.entity.RefundReqData;
 import com.yhy.lin.app.service.WeixinPayService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
-import com.yhy.lin.app.util.MD5Util;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.CommonUtil;
-import com.yhy.lin.app.wechat.MobiMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.app.wechat.Sha1Util;
-import com.yhy.lin.app.wechat.TxtUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.app.wechat.menu.MenuContext;
 import com.yhy.lin.entity.DealerCustomerEntity;
@@ -122,10 +105,10 @@ public class WeixinPayController extends AppBaseController{
 	public ModelAndView toPay(HttpServletRequest request, HttpServletResponse response, Model model) {
 		try {
 			String orderId = request.getParameter("orderId");
-			System.out.println("in toPay,orderId:" + orderId);
+			logger.info("in toPay,orderId:" + orderId);
 
 			String totalFeeStr = request.getParameter("totalFee");
-			System.out.println("totalFeeStr:" + totalFeeStr);
+			logger.info("totalFeeStr:" + totalFeeStr);
 			Float totalFee = 0.0f;
 
 			if (StringUtils.isNotBlank(totalFeeStr)) {
@@ -135,22 +118,22 @@ public class WeixinPayController extends AppBaseController{
 			// 网页授权后获取传递的参数
 			String userId = request.getParameter("userId");
 			String code = request.getParameter("code");
-			System.out.println("code:" + code);
+			logger.info("code:" + code);
 			if (!StringUtil.isNotEmpty(code)) {
 				return null;
 			}
-			System.out.println("userId:" + userId);
+			logger.info("userId:" + userId);
 			
 			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AppGlobals.WECHAT_ID + "&secret="
 					+ AppGlobals.WECHAT_APP_SECRET + "&code=" + code + "&grant_type=authorization_code";
 			// 获取统一下单需要的openid
 			String openId = "";
-			System.out.println("URL:" + URL);
+			logger.info("URL:" + URL);
 			JSONObject jsonObject = CommonUtil.httpsRequest(URL, "GET", null);
-			System.out.println(jsonObject);
+			logger.info(jsonObject);
 			if (null != jsonObject) {
 				openId = jsonObject.getString("openid");
-				System.out.println("openid:" + openId);
+				logger.info("openid:" + openId);
 			}
 			
 			//微信订单号    要存在订单表中
@@ -211,20 +194,20 @@ public class WeixinPayController extends AppBaseController{
 			reqHandler.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
 			
 			String sign = reqHandler.createSign(packageParams);
-			System.out.println("sign:" + sign);
+			logger.info("sign:" + sign);
 			String xml = "<xml>" + "<appid>" + AppGlobals.WECHAT_ID + "</appid>" + "<mch_id>" + AppGlobals.MCH_ID
 					+ "</mch_id>" + "<nonce_str>" + nonce_str + "</nonce_str>" + "<sign>" + sign + "</sign>"
 					+ "<body><![CDATA[" + body + "]]></body>" + "<out_trade_no>" + out_trade_no + "</out_trade_no>"
 					+ "<total_fee>" + total_fee + "" + "</total_fee>" + "<spbill_create_ip>" + spbill_create_ip
 					+ "</spbill_create_ip>" + "<notify_url>" + notify_url + "</notify_url>" + "<trade_type>"
 					+ AppGlobals.TRADE_TYPE + "</trade_type>" + "<openid>" + openId + "</openid>" + "</xml>";
-			System.out.println("xml：" + xml);
+			logger.info("xml：" + xml);
 
 			String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 			String prepay_id = "";
 			try {
 				prepay_id = WeixinPayUtil.getPayNo(createOrderURL, xml);
-				System.out.println("prepay_id:" + prepay_id);
+				logger.info("prepay_id:" + prepay_id);
 				if (prepay_id.equals("")) {
 					request.setAttribute("ErrorMsg", "统一支付接口获取预支付订单出错");
 					response.sendRedirect("error.jsp");
@@ -242,7 +225,7 @@ public class WeixinPayController extends AppBaseController{
 			finalpackage.put("package", packages);
 			finalpackage.put("signType", AppGlobals.SIGN_TYPE);
 			String finalsign = reqHandler.createSign(finalpackage); // 生成签名
-			System.out.println("/jsapi?appid=" + AppGlobals.WECHAT_ID + "&timeStamp=" + timestamp + "&nonceStr="
+			logger.info("/jsapi?appid=" + AppGlobals.WECHAT_ID + "&timeStamp=" + timestamp + "&nonceStr="
 					+ nonce_str + "&package=" + packages + "&sign=" + finalsign);
 
 			model.addAttribute("appid", AppGlobals.WECHAT_ID);
@@ -261,6 +244,7 @@ public class WeixinPayController extends AppBaseController{
 			t.setOrderPayNumber(orderPayNumber);
 			systemService.save(t);
 			
+			logger.info("to_pay : success");
 			return new ModelAndView("yhy/wechat/jsapi");
 		} catch (Exception e) {
 			e.printStackTrace();
