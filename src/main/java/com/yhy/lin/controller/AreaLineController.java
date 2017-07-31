@@ -211,13 +211,19 @@ public class AreaLineController extends BaseController {
 		String areaLineId = request.getParameter("areaLineId");
 		request.setAttribute("areaLineId", areaLineId);
 		
-		AreaLineEntity areaLine = areaLineService.get(AreaLineEntity.class, areaLineId);
+		List<Map<String,Object>> mapList = systemService.findForJdbc(
+				"select c.city,bs.name,bs.x,bs.y from area_line al join cities c on al.city_id = c.cityId join busstopinfo bs on bs.id=al.station_id where al.id = ?"
+				, areaLineId);
 		
-		List<Map<String,Object>> map = systemService.findForJdbc("select c.city from area_line al join cities c on al.city_id = c.cityId where al.id = ?", areaLineId);
-		
-		if(map.size() > 0){
-			String city = map.get(0).get("city") + "";
-			request.setAttribute("lineCity", city);
+		if(mapList.size() > 0){
+			Map<String,Object> map = mapList.get(0);
+			request.setAttribute("lineCity", map.get("city"));
+			
+			JSONObject json = new JSONObject();
+			json.put("stationX", map.get("x"));
+			json.put("stationY", map.get("y"));
+			json.put("stationName", map.get("name"));
+			request.setAttribute("stationInfo", json.toString().replaceAll("\"", "'"));
 		}
 		
 		//as.getId() 是关联表的id
@@ -232,21 +238,6 @@ public class AreaLineController extends BaseController {
 				request.setAttribute("aStation", as);
 			}
 		}
-		
-//		// 获取部门信息
-//		List<TSDepart> departList = systemService.getList(TSDepart.class);
-//		request.setAttribute("departList", departList);
-//		if (StringUtil.isNotEmpty(lineInfo.getId())) {
-//			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
-//			request.setAttribute("lineInfo", lineInfo);
-//		}
-//		//获取已开通的城市列表
-//		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
-//		request.setAttribute("cities", cities);
-//		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
-//		if (list.size() > 0) {
-//			request.setAttribute("list", list);
-//		}
 		
 		return new ModelAndView("yhy/areaLine/areaLineAddStation");
 	}

@@ -72,7 +72,7 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="startDate" name="startDate" ignore="ignore">
+					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" style="width: 150px" id="startDate" name="startDate" ignore="ignore">
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>

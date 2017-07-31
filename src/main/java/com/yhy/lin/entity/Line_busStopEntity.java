@@ -20,6 +20,8 @@ public class Line_busStopEntity extends IdEntity implements java.io.Serializable
 	private Integer siteOrder =0;
 	/**预计到站时间*/
 	private String arrivalTime;
+	/**机场或火车站点id*/
+	private String siteId;
 	
 	@Column(name = "lineId")
 	public String getLineId() {
@@ -49,7 +51,12 @@ public class Line_busStopEntity extends IdEntity implements java.io.Serializable
 	public void setArrivalTime(String arrivalTime) {
 		this.arrivalTime = arrivalTime;
 	}
-	
-	
+	@Column(name = "siteId")
+	public String getSiteId() {
+		return siteId;
+	}
+	public void setSiteId(String siteId) {
+		this.siteId = siteId;
+	}
 	
 }

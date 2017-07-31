@@ -227,7 +227,7 @@ public class TransferOrderController extends BaseController {
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+		JSONObject jObject = transferService.getDatagrid1(transferorder, dataGrid,orderStartingstation, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);
@@ -257,7 +257,7 @@ public class TransferOrderController extends BaseController {
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid1(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+		JSONObject jObject = transferService.getDatagrid2(transferorder, dataGrid,orderStartingstation, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);
@@ -357,8 +357,52 @@ public class TransferOrderController extends BaseController {
 		return new ModelAndView("yhy/transferOrder/transferOrderDetial");
 	}
 
+
 	/**
-	 * 定时获取订单
+	 * 提醒未处理的订单
+	 */
+	@RequestMapping(params = "getOrderStartime")
+	@ResponseBody
+	public JSONObject getOrderStartime(){
+		JSONObject jsonObj = new JSONObject();
+		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		StringBuffer sql = new StringBuffer();
+		sql.append("select COUNT(ts.org_code),t.order_type from transferorder t LEFT JOIN lineinfo l on t.line_id=l.id "
+				+ "LEFT JOIN  t_s_depart ts on ts.ID=l.departId where t.order_status='1' and t.order_type in('2','3','4','5') "
+				+ "and t.order_startime >= NOW() and t.order_startime<=date_add(NOW(),INTERVAL 11 HOUR)");
+		if (StringUtil.isNotEmpty(orgCode)) {
+			sql.append(" and ts.org_code = '" + orgCode + "'");
+		}
+		sql.append(" GROUP BY t.order_type");
+		List<Object> list = this.systemService.findListbySql(sql.toString());
+		int ordair = 0;
+		int ordtr = 0;
+		
+		if (list.size() > 0) {
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				BigInteger num = (BigInteger) ob[0];
+				int oderType = (int) ob[1];
+				 if(oderType==2 || oderType==3){
+					 ordair+=num.intValue();
+				 }
+				 if(oderType==4 || oderType==5){
+					 ordtr+=num.intValue();
+				 }
+				 
+				 jsonObj.put("ordair", ordair);
+				 jsonObj.put("ordtr", ordtr);
+			}
+			
+		}
+		
+		return jsonObj;
+	}
+	
+	
+	
+	/**
+	 * 提醒未处理的订单
 	 */
 	@RequestMapping(params = "getOrder")
 	@ResponseBody

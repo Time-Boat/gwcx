@@ -79,6 +79,7 @@ public class LineInfoController extends BaseController {
 	public void datagrid(LineInfoEntity lineInfos, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		String linetype = request.getParameter("linetype");// 线路类型
+		String cityID  = request.getParameter("cityID");// 城市
 		String beginTime = request.getParameter("createTime_begin");
 		String endTime = request.getParameter("createTime_end");
 		String lstartTime_begin = request.getParameter("lstartTime_begin");
@@ -91,7 +92,7 @@ public class LineInfoController extends BaseController {
 			jObject = lineInfoService.getDatagrid(lineInfos, beginTime, endTime, dataGrid, lstartTime_begin,
 					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ");
 		} else {
-			jObject = lineInfoService.getDatagrid3(lineInfos, beginTime, endTime, dataGrid, lstartTime_begin,
+			jObject = lineInfoService.getDatagrid3(lineInfos,cityID, beginTime, endTime, dataGrid, lstartTime_begin,
 					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ");
 		}
 		responseDatagrid(response, jObject);
@@ -143,6 +144,9 @@ public class LineInfoController extends BaseController {
 		try {
 			Line_busStopEntity lines = systemService.getEntity(Line_busStopEntity.class, id);
 			LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
+			if (StringUtil.isNotEmpty(lines.getSiteId())) {
+				lines.setSiteId("");
+			}
 			
 			systemService.deleteEntityById(Line_busStopEntity.class, id);
 			
@@ -297,6 +301,15 @@ public class LineInfoController extends BaseController {
 		 List<Line_busStopEntity> list = new ArrayList<Line_busStopEntity>();
 		 String startlocaid = request.getParameter("startLocation");
 		 String endlocaid = request.getParameter("endLocation");
+		 
+		 if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
+			 lin_busStop.setSiteId(startlocaid);
+			 lin_busStop1.setSiteId(startlocaid);
+		 }else if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
+			 lin_busStop.setSiteId(endlocaid);
+			 lin_busStop1.setSiteId(endlocaid);
+			 
+		 }
 			
 			StringBuffer str = new StringBuffer();
 			StringBuffer str1 = new StringBuffer();
@@ -458,7 +471,7 @@ public class LineInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "getProvinceJson")
 	@ResponseBody
-	public JSONArray getLineJson(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+	public JSONArray getLineJson(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
         String city = request.getParameter("city");
         String type = request.getParameter("type");
         String starts = request.getParameter("starts");
@@ -564,6 +577,142 @@ public class LineInfoController extends BaseController {
         }
        
 		return jsonArray;
+	}
+	
+	/**
+	 * 根据城市添加城市站点
+	 */
+	@RequestMapping(params = "getEndlocation")
+	@ResponseBody
+	public JSONArray getEndlocation(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
+		String city = request.getParameter("city");
+        String type = request.getParameter("type");
+        String starts = request.getParameter("starts");
+        String startLocation = request.getParameter("startLocation");
+        JSONObject jsonObj = new JSONObject(); 
+        JSONArray jsonArray = new JSONArray();
+        
+        StringBuffer st = new StringBuffer();
+        
+        if(StringUtil.isNotEmpty(type)){
+        	if("2".equals(type) || "4".equals(type)){
+        		st.append("select DISTINCT b.id,b.name from busstopinfo b  where 1=1 ");
+        		
+        		if(StringUtil.isNotEmpty(city)){
+                	st.append(" and b.cityId='"+city+"'");
+                }
+        		st.append("and b.station_type = '0'");
+        		
+        		if(StringUtil.isNotEmpty(startLocation)){
+        			st.append(" and b.id not in (select g.id from line_busstop f LEFT JOIN busstopinfo g on g.id=f.busStopsId where f.siteId='");
+        			st.append(startLocation+"'");
+        		}
+        		st.append(" and g.status like '%"+type+"%')");
+        		
+        	}
+        	
+        	if("3".equals(type) || "5".equals(type)){
+        		st.append("select DISTINCT b.id,b.name from busstopinfo b  where 1=1 ");
+                if(StringUtil.isNotEmpty(city)){
+                	st.append(" and b.cityId='"+city+"'");
+                }
+                if("3".equals(type)){
+                	st.append("and b.station_type = '2'");
+                }
+                if("5".equals(type)){
+                	st.append("and b.station_type = '1'");
+                }
+                
+                if(StringUtil.isNotEmpty(startLocation)){
+                	st.append(" and b.id not in (select lb.siteId from line_busstop lb LEFT JOIN busstopinfo a on a.id=lb.busStopsId where lb.siteId is not null");
+                	st.append(" and lb.busStopsId='"+startLocation+"'");
+                	st.append(" and a.status like '%"+type+"%')");
+        		}
+        	}
+        }
+        
+        System.out.println(st.toString());
+        List<Object> bList =systemService.findListbySql(st.toString());
+        
+        if(bList.size()>0){
+        	for (int i = 0; i < bList.size(); i++) {
+        		Object [] ob = (Object[]) bList.get(i);
+				String id = (String) ob[0];
+				String name = (String) ob[1];
+				jsonObj.put("stopid", id);
+				jsonObj.put("name", name);
+            	jsonArray.add(jsonObj);
+			}
+        	
+        }
+        return jsonArray;
+	}
+	
+	/**
+	 * 根据城市添加城市站点
+	 */
+	@RequestMapping(params = "getStartLocation")
+	@ResponseBody
+	public JSONArray getStartLocation(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
+        String city = request.getParameter("city");
+        String type = request.getParameter("type");
+        String endLocation = request.getParameter("ends");
+        
+        JSONObject jsonObj = new JSONObject(); 
+        JSONArray jsonArray = new JSONArray();
+        
+        StringBuffer st = new StringBuffer();
+        
+        if(StringUtil.isNotEmpty(type)){
+        	if("2".equals(type) || "4".equals(type)){
+        		st.append("select DISTINCT b.id,b.name from busstopinfo b LEFT JOIN line_busstop a on b.id=a.busStopsId where  1=1 ");
+                if(StringUtil.isNotEmpty(city)){
+                	st.append(" and b.cityId='"+city+"'");
+                }
+                if("2".equals(type)){
+                	st.append("and b.station_type = '2'");
+                }
+                if("4".equals(type)){
+                	st.append("and b.station_type = '1'");
+                }
+        		
+        		if(StringUtil.isNotEmpty(endLocation)){
+        			Line_busStopEntity lb = this.systemService.getEntity(Line_busStopEntity.class, endLocation);
+        			st.append(" and a.siteId!='");
+    				st.append(lb.getSiteId()+"'");
+        		}
+        	}
+        	
+        	if("3".equals(type) || "5".equals(type)){
+        		st.append("select DISTINCT b.id,b.name from busstopinfo b LEFT JOIN line_busstop a on b.id=a.busStopsId where 1=1");
+                if(StringUtil.isNotEmpty(city)){
+                	st.append(" and b.cityId='"+city+"'");
+                }
+                st.append("and b.station_type = '0'");
+                
+        		if(StringUtil.isNotEmpty(endLocation)){
+        			st.append(" and a.siteId!='");
+    				st.append(endLocation+"'");
+        		}
+        		
+        	}
+        }
+        
+        List<Object> bList =systemService.findListbySql(st.toString());
+        
+        if(bList.size()>0){
+        	for (int i = 0; i < bList.size(); i++) {
+        		Object [] ob = (Object[]) bList.get(i);
+				String id = (String) ob[0];
+				String name = (String) ob[1];
+				jsonObj.put("stopid", id);
+				jsonObj.put("name", name);
+            	jsonArray.add(jsonObj);
+			}
+        	
+        }
+        
+        return jsonArray;
 	}
 
 }

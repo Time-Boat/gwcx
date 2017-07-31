@@ -26,8 +26,8 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	private JdbcDao jdbcDao;
 	
 	@Override
-	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid){
-		String sqlWhere = getBusSqlWhere(busStopInfo);
+	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid,String cityID){
+		String sqlWhere = getBusSqlWhere(busStopInfo,cityID);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from busstopinfo a ";
 		if (!sqlWhere.isEmpty()) {
@@ -63,12 +63,16 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return jObject;
 	}
 
-	public String getBusSqlWhere(BusStopInfoEntity busStopInfo) {
+	public String getBusSqlWhere(BusStopInfoEntity busStopInfo,String cityID) {
 		StringBuffer sqlWhere = new StringBuffer(" a.deleteFlag='0' ");
 
 		if (StringUtil.isNotEmpty(busStopInfo.getName())) {
 			
 			sqlWhere.append(" and  a.name like '%"+busStopInfo.getName()+"%'");
+		}
+		if (StringUtil.isNotEmpty(cityID)) {
+			
+			sqlWhere.append(" and  a.cityId= '"+cityID+"'");
 		}
 		if (StringUtil.isNotEmpty(busStopInfo.getCityName())) {
 			sqlWhere.append(" and  a.cityName like '%" + busStopInfo.getCityName() + "%' ");

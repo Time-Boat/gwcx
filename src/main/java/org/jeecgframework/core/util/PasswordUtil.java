@@ -121,9 +121,14 @@ public class PasswordUtil {
 		}
 
 		catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
-		return new String(passDec);
+		if(passDec == null){
+			return new String(passDec);
+		}else{
+			return "";
+		}
+		
 	}
 
 	/**

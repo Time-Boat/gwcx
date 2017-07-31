@@ -13,10 +13,10 @@
 	<%-- <t:dgCol title="状态" field="status" replace="启用_0,禁用_1" align="center" query="true"  width="60"></t:dgCol> --%>
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center" width="200"></t:dgCol>
 	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="所在城市" field="cityName" query="true" align="center"></t:dgCol>
+	<t:dgCol title="所在城市" field="cityName" align="center"></t:dgCol>
 	<t:dgCol title="备注" field="remark" align="center" width="80"></t:dgCol>
 	<t:dgToolBar operationCode="add" title="添加站点" icon="icon-add" url="busStopInfoController.do?addorupdate" height="800" width="1200" funname="add"></t:dgToolBar>
-	<t:dgToolBar operationCode="edit" title="修改站点" icon="icon-edit" url="busStopInfoController.do?addorupdate" funname="update"></t:dgToolBar>
+	<t:dgToolBar operationCode="edit" title="修改站点" icon="icon-edit" url="busStopInfoController.do?addorupdate" width="1200" height="800" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="50"></t:dgCol>
 	<t:dgDelOpt title="下架" url="busStopInfoController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" />
 	<%-- <t:dgToolBar title="批量下架" icon="icon-remove" url="busStopInfoController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar> --%>
@@ -24,11 +24,27 @@
 </t:datagrid>
 </div>
 </div>
+<input type="hidden" value="${cityList}" id="citylie" />
 <script type="text/javascript">
 	$(document).ready(function(){
 		$("input[name='createTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='createTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='birthday']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 	
+	});
+	
+	$(function() {
+		var json = $("#citylie").val();
+		var obj = eval('(' + json + ')');
+		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
+		var a3 = '<select name="cityID" style="width: 150px">';
+		var c1 = '<option value="">选择城市</option>';
+		for (var i = 0; i < obj.data.length; i++) {
+			c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
+					+ '</option>';
+		}
+		var a4 = '</select></span>';
+		$("#busStopInfoListForm").append(a1 + a2 + a3 + c1 + a4);
 	});
 </script>

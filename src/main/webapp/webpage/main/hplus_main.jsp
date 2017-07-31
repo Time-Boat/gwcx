@@ -1017,6 +1017,54 @@
     	addOneTab("弹窗", "transferOrderController.do?transferOrderList"); 
     } */
     
+    function getOrderStartime(){
+    	$.ajax({
+			url : "transferOrderController.do?getOrderStartime",
+			dataType : 'json',
+			complete : function(data) {
+				var message = data.responseText;
+				var obj = eval('(' + message + ')');
+				if(obj.ordair>0 && obj.ordtr>0){
+					$.toast({
+			    	    heading: '消息提醒',
+			    	    icon: 'info',
+			    	    text: ['&nbsp;','&nbsp;',
+					    	    '还有'+obj.ordair+'条接送机订单，'+obj.ordtr+'条接送火车订单不到11小时就发车了，请尽快处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
+			    	    position: 'bottom-right',
+			    	    bgColor: '#2F4050',
+			    	    hideAfter: false,
+			    	    stack: true
+			    	})
+				}else if(obj.ordair>0 && obj.ordtr==0){
+					$.toast({
+			    	    heading: '消息提醒',
+			    	    icon: 'info',
+			    	    text: ['&nbsp;','&nbsp;',
+					    	    '还有'+obj.ordair+'条接送机订单不到11小时就发车了，请尽快处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
+			    	    position: 'bottom-right',
+			    	    bgColor: '#2F4050',
+			    	    hideAfter: false,
+			    	    stack: true
+			    	})
+				}else if(obj.ordair==0 && obj.ordtr>0){
+					$.toast({
+			    	    heading: '消息提醒',
+			    	    icon: 'info',
+			    	    text: ['&nbsp;','&nbsp;',
+					    	    '还有'+obj.ordtrs+'条接送火车订单不到11小时就发车了，请尽快处理！</a> ','&nbsp;','&nbsp;','&nbsp;'],
+			    	    position: 'bottom-right',
+			    	    bgColor: '#2F4050',
+			    	    hideAfter: false,
+			    	    stack: true
+			    	})
+				}
+				//刷新当前窗体
+				//reloadTable();
+			}
+		});
+    }
+    
+    //提醒未处理订单
     function getOrder(){
     	
     	$.ajax({
@@ -1069,6 +1117,7 @@
     });
  
   setInterval("getOrder()",600000);
+  setInterval("getOrderStartime()",3000);
 </script>
  
 </body>

@@ -16,5 +16,5 @@ public interface BusStopInfoServiceI extends CommonService{
 	//根据城市查找站点
 	public JSONObject getLineDataGrid(String city,DataGrid dataGrid);
 	
-	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid);
+	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid,String cityID);
 }

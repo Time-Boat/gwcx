@@ -40,6 +40,7 @@
 	<t:dgToolBar operationCode="detail" title="线路查看" icon="icon-search" url="lineInfoSpecializedController.do?addorupdate" funname="detail" height="500"></t:dgToolBar>
 </t:datagrid> </div>
 </div>
+<input type="hidden" value="${cityList}" id="citylie" />
 <div region="east" style="width: 390px;" split="true">
 <div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
@@ -63,4 +64,18 @@ function addBusStop(id,name) {
 			}
 		);
 }
+$(function() {
+	var json = $("#citylie").val();
+	var obj = eval('(' + json + ')');
+	var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
+	var a3 = '<select name="cityID" style="width: 150px">';
+	var c1 = '<option value="">选择城市</option>';
+	for (var i = 0; i < obj.data.length; i++) {
+		c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
+				+ '</option>';
+	}
+	var a4 = '</select></span>';
+	$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);
+});
 </script>

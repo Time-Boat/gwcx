@@ -149,7 +149,7 @@
     	</div>
     </div>
     <!-- script必须放在body中。。 -->
-    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123&plugin=AMap.Driving" ></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
@@ -159,6 +159,7 @@
     	function changeCity(value){
     		console.log(value);
     		var city = $("#city option:selected").text();
+    		placeSearch.setCity(city);
     		console.log(city.trim());
     		map.setCity(city.trim());
     		map.setZoom(10);
@@ -188,6 +189,12 @@
 			afterLoad();
     	}
     	
+    	//打开窗体
+    	function openInfoWin(content, position) {
+    		infoWindow.setContent('<p class="my-desc">' + content + '</p>');//点击以后窗口展示的内容
+            infoWindow.open(map, position);
+        }
+    	
        	function afterLoad(){
        		//经纬度获取详细地址
        	    AMap.service('AMap.Geocoder',function(){//回调函数
@@ -203,51 +210,42 @@
        	            offset: new AMap.Pixel(0, -31)
        	        }); */
        	    
-       	    //AMapUI.loadUI(['overlay/SimpleInfoWindow'], function(SimpleInfoWindow) {
-       	    	createMarker();
-       	        
-       	      	//点击事件
-       		    map.on('click', function(e) {
-       		    	createMarker();
-       		    	marker.setPosition(e.lnglat);
-       		    	openInfoWin();
-       		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
-       	    		geocoder.getAddress(e.lnglat, function(status, result) {
-       	    		    if (status === 'complete' && result.info === 'OK') {
-       	    		       //获得了有效的地址信息:
-       	    		       //即，result.regeocode.formattedAddress
-       	    		       console.log(result);
-       	    		       //infoWindow.setInfoTitle('<strong>' + result.regeocode.addressComponent.province + ' ' + result.regeocode.addressComponent.district + '</strong>');
-       	    		       //infoWindow.setInfoBody('<p class="my-desc"><strong>详细地址:</strong> <br/>' + result.regeocode.formattedAddress + '</p>');
-       	    		       infoWindow.setPosition(e.lnglat);
-       	    		       
-       	    		       infoWindow.setContent('<p class="my-desc">' + result.regeocode.formattedAddress + '</p>');//点击以后窗口展示的内容
-                              infoWindow.open(map, e.lnglat);
-       	    		       
-       	    		       //给表单赋值
-       	    		       $('#x').val(e.lnglat.getLng());
-       	    		       $('#y').val(e.lnglat.getLat());
-       	    		       $('#stopLocation').val(result.regeocode.formattedAddress);
-       	    		    }else{
-       	    		       infoWindow.setInfoTitle("获取地址失败");
-       		    		   infoWindow.setInfoBody("");
-       	    		    }
-       	    		});
-       		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
-       		    });
-       	      	
-       	        function openInfoWin() {
-       	            infoWindow.open(map, marker.getPosition());
-       	        }
-       			
-       	        //marker 点击时打开
-       	        AMap.event.addListener(marker, 'click', function() {
-       	            openInfoWin();
-       	        });
-       			
-       	        //openInfoWin();
-       	    //});
-       	    
+    	    createMarker();
+      	    	
+   	    	var location = $('#stopLocation').val();
+   	    	if(location != null && location != ""){
+   	    		openInfoWin(location, marker.getPosition());
+   	    	}
+   	      	//点击事件
+   		    map.on('click', function(e) {
+   		    	createMarker();
+   		    	marker.setPosition(e.lnglat);
+   		    	openInfoWin("正在获取位置信息...", e.lnglat);
+   		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
+   	    		geocoder.getAddress(e.lnglat, function(status, result) {
+   	    		    if (status === 'complete' && result.info === 'OK') {
+   	    		       //获得了有效的地址信息:
+   	    		       //即，result.regeocode.formattedAddress
+   	    		       console.log(result);
+   	    		       
+                       openInfoWin(result.regeocode.formattedAddress, e.lnglat);
+   	    		       
+   	    		       //给表单赋值
+   	    		       $('#x').val(e.lnglat.getLng());
+   	    		       $('#y').val(e.lnglat.getLat());
+   	    		       $('#stopLocation').val(result.regeocode.formattedAddress);
+   	    		    }else{
+   	    		    	openInfoWin("获取地址失败", marker.getPosition());
+   	    		    }
+   	    		});
+   		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
+   		    });
+   	      	
+   	        //marker 点击时打开
+   	        AMap.event.addListener(marker, 'click', function() {
+   	            openInfoWin("正在获取位置信息...", marker.getPosition());
+   	        });
+       		
     	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
 				var autoOptions = {
 					city: city, //城市，默认全国
@@ -281,11 +279,11 @@
                             //infoWindow.open(map, e.target.getPosition());
                               
 	                     console.log(results.selected.data);
-                            //给表单赋值
-                  	         $('#stopLocation').val(results.selected.data.name);
-                  	         $('#x').val(results.selected.data.location.lat);
-                  	         $('#y').val(results.selected.data.location.lng);
-                  	      	 map.remove(marker);
+                         //给表单赋值
+               	         $('#stopLocation').val(results.selected.data.name);
+               	         $('#x').val(results.selected.data.location.lng);
+               	         $('#y').val(results.selected.data.location.lat);
+               	      	 map.remove(marker);
 	                });
 				});
     	    });
@@ -301,8 +299,9 @@
    			marker = new AMap.Marker({
            		title: "点击测试",
            		map: map,
-           		bubble: false
+           		bubble: true
        		});
+   			
     	}
     	
     	function markerClick(e){

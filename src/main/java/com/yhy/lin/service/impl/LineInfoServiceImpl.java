@@ -24,8 +24,8 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	private JdbcDao JdbcDao;
 	
 	@Override
-	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType){
-		String sqlWhere = getSqlWhere(lineInfo,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType);
+	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType){
+		String sqlWhere = getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID ";
@@ -76,13 +76,16 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		return jObject;
 	}
 
-	public String getSqlWhere(LineInfoEntity lineInfo,String startTime,
+	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType){
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		StringBuffer sqlWhere = new StringBuffer();
 		if(StringUtil.isNotEmpty(orgCode)){
 			sqlWhere.append(" and org_code like '"+orgCode+"%'");
+		}
+		if(StringUtil.isNotEmpty(cityid)){
+			sqlWhere.append(" and a.cityId = '"+cityid+"'");
 		}
 		sqlWhere.append(" and a.deleteFlag='0'");
 		if(StringUtil.isNotEmpty(lineInfo.getName())){

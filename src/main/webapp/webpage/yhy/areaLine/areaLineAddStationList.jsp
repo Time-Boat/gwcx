@@ -12,17 +12,17 @@
 	<t:dgCol title="公里数" field="distance" align="center" ></t:dgCol>
 	<t:dgCol title="common.operation" field="opt"></t:dgCol>
 	<t:dgFunOpt title="删除关联站点" funname="delAreaStation(stationId,id)" />
-	<t:dgToolBar title="添加站点挂接" icon="icon-add" url="areaLineController.do?addOrUpdateStation&areaLineId=${areaLineId}" funname="add"></t:dgToolBar><%-- operationCode="addSite" --%>
+	<t:dgToolBar title="添加站点挂接" icon="icon-add" url="areaLineController.do?addOrUpdateStation&areaLineId=${areaLineId}" funname="add" width="1200" height="800"  ></t:dgToolBar><%-- operationCode="addSite" --%>
 	<t:dgToolBar title="编辑" icon="icon-edit" url="areaLineController.do?addOrUpdateStation&areaLineId=${areaLineId}" funname="update" width="1200" height="800" ></t:dgToolBar>
 </t:datagrid>
 </div>
 </div>
 <script type="text/javascript">
 
-function add(title,addurl,gname,width,height) {
+/* function add(title,addurl,gname,width,height) {
 	gridname=gname;
 	createwindow(title, addurl,"1200px","800px");
-}
+} */
 
 /* function update(title,url,id,width,height,isRestful) {
 	gridname=id;

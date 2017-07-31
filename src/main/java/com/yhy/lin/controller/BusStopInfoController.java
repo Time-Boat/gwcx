@@ -61,7 +61,32 @@ public class BusStopInfoController extends BaseController {
 	//接送机
 	@RequestMapping(params="busStopInfoList2")
 	public ModelAndView stopList2(HttpServletRequest request){
+		request.setAttribute("cityList",getOpencity());	
 		return new ModelAndView("yhy/busStop/busStopInfoList2");
+	}
+	
+	/**
+	 * 获得开通城市
+	 * @return
+	 */
+	public String getOpencity(){
+		String sql = "select op.city_id,op.city_name from open_city op where op.status='0' ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String cityName = ob[1]+"";
+					json.append("{");
+					json.append("'cityID':'" +id + "',");
+					json.append("'cityName':'"+ cityName + "'");
+					json.append("},");
+				}
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
 	}
 	
 	@RequestMapping(params="datagrid")
@@ -73,7 +98,8 @@ public class BusStopInfoController extends BaseController {
 		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, busStopInfo,request.getParameterMap());
 		this.busStopInfoService.getDataGridReturn(cq, true);
 		TagUtil.datagrid(response, dataGrid);*/
-		JSONObject jObject = busStopInfoService.getDatagrid(busStopInfo, dataGrid);
+		String cityID = request.getParameter("cityID");
+		JSONObject jObject = busStopInfoService.getDatagrid(busStopInfo, dataGrid,cityID);
 		responseDatagrid(response, jObject);
 	}
 	
@@ -244,6 +270,16 @@ public class BusStopInfoController extends BaseController {
 		        	Line_busStopEntity lin_busStop = new Line_busStopEntity();
 		        	lin_busStop.setLineId(lineInfoId);
 		        	lin_busStop.setBusStopsId(idsList.get(i));
+		        	if("2".equals(line.getType()) || "4".equals(line.getType())){
+		        		if (StringUtil.isNotEmpty(line.getStartLocation())) {
+		        			lin_busStop.setSiteId(line.getStartLocation());
+		        		}
+		        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
+		        		if (StringUtil.isNotEmpty(line.getEndLocation())) {
+		        			lin_busStop.setSiteId(line.getEndLocation());
+		        		}
+	        		}
+		        	
 		        	if(StringUtil.isNotEmpty(idsList.get(i))){
 		        		if(i==(idsList.size()-1)){
 		        			sql.append("'"+idsList.get(i)+"'");

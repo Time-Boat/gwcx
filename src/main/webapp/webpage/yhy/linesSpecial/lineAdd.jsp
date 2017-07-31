@@ -19,7 +19,7 @@
     	$("#endLocation").empty();//先置空 
     	
     		$.ajax({
-     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type+'&starts='+starts+'&ends='+ends+'&ids='+ids,
+     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type+'&starts='+starts+'&ends='+ends+'&startLocation='+startLocation+'&endLocation='+endLocation+'&ids='+ids,
      		   dataType: 'json',
      		   complete: function(data,status) {
      			   var message=data.responseText;
@@ -116,8 +116,64 @@
     }
     //进入触发 
     $(function(){
-    	getAddr();
+    	//getStartLocation();
     });
+    
+    function aaaa(){
+    		getStartLocation();
+    		getEndlocation();
+    	
+    }
+    
+    //给起点站点赋值
+    function getStartLocation(){
+    	
+    	var city = $('#city option:selected').val();//获取选中城市
+    	var type = $('#type option:selected').val();//获取选中线路类型 
+    	var endLocation = $('#endLocation option:selected').val();//获取选中起点 
+    	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
+		var ends =  $("#ends").val();//获取终点 
+		$("#startLocation").empty();//先置空 
+		 $("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+    	$.ajax({
+   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type='+type+'&ends='+ends,
+   		   dataType: 'json',
+   		   complete: function(data,status) {
+   			   var message=data.responseText;
+   			   var info = eval(message);
+   			 	if(info.length>0){
+   			 	
+				 for(var i=0;i<info.length;i++){
+					
+ 					 $("#startLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+ 			  		}
+			  	}
+   		   }
+     	});
+    }
+    
+  	//给终点站点赋值
+    function getEndlocation(){
+    	var city = $('#city option:selected').val();//获取选中城市
+    	var type = $('#type option:selected').val();//获取选中线路类型 
+    	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
+    	var starts =  $("#starts").val();//获取起点
+    	$("#endLocation").empty();//先置空 
+    	$.ajax({
+  		   url: 'lineInfoController.do?getEndlocation&city='+city+'&type='+type+'&starts='+starts+'&startLocation='+startLocation,
+  		   dataType: 'json',
+  		   complete: function(data,status) {
+  			   var message=data.responseText;
+  			   var info = eval(message);
+  			 $("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+  			 if(info.length>0){
+				 for(var i=0;i<info.length;i++){
+  					 $("#endLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+  			  }
+			   }
+  		   }
+    	});
+    }
     
 </script>
 </head>
@@ -143,7 +199,7 @@
 				<label class="Validform_label"> 选择线路城市: </label>
 			</td>
 			<td class="value">
-				<select id="city" name="city" datatype="*" onChange="getAddr()">
+				<select id="city" name="city" datatype="*" >
 						<option value="">--请选择城市--</option>
 						<c:forEach var="c" items="${cities}">
 							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if> >
@@ -161,7 +217,7 @@
 			</td>
 			<td class="value">
 				
-				<t:dictSelect id="type" field="type" extendJson="{onchange:getAddr()}" typeGroupCode="transferTy" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
+				<t:dictSelect id="type" field="type" extendJson="{onchange:getStartLocation()}" typeGroupCode="transferTy" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>
@@ -184,7 +240,7 @@
 				<label class="Validform_label"> 起始发车地址: </label>
 			</td>
 			<td class="value">
-				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" >  
+				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" onChange="getEndlocation()">  
                 </select>
 				<span class="Validform_checktip"></span>
 			</td>
