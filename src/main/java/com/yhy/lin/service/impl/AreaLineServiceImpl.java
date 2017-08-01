@@ -84,7 +84,7 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 		StringBuffer sql = new StringBuffer();
 		
 		// 取出当前页的数据 
-		sql.append(" select ast.id as station_id,asl.id,asl.distance,asl.price,asl.duration,ast.name "
+		sql.append(" select ast.id as station_id,asl.id,ast.name,ast.location,ast.create_time  "
 				+ " from area_line al join area_station_line asl on al.id = asl.area_line_id join area_station ast on ast.id = asl.area_station_id ");
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
@@ -102,9 +102,8 @@ public class AreaLineServiceImpl extends CommonServiceImpl implements AreaLineSe
 				new Db2Page("id")
 				,new Db2Page("stationId", "station_id", null)
 				,new Db2Page("name", "name", null)
-				,new Db2Page("distance", "distance", null)
-				,new Db2Page("price", "price", null)
-				,new Db2Page("duration", "duration", null)
+				,new Db2Page("location", "location", null)
+				//,new Db2Page("createTime", "create_time", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;

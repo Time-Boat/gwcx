@@ -116,14 +116,9 @@
     }
     //进入触发 
     $(function(){
-    	//getStartLocation();
+  		$('#ends').val($('#endLocation option:selected').text());
+  		$('#starts').val($('#startLocation option:selected').text());
     });
-    
-    function aaaa(){
-    		getStartLocation();
-    		getEndlocation();
-    	
-    }
     
     //给起点站点赋值
     function getStartLocation(){
@@ -132,20 +127,34 @@
     	var type = $('#type option:selected').val();//获取选中线路类型 
     	var endLocation = $('#endLocation option:selected').val();//获取选中起点 
     	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
-		var ends =  $("#ends").val();//获取终点 
+    	var ids= $("#id").val();
+    	var starts = $("#starts").val();//获取起点
+		var ends = $("#ends").val();//获取终点 
 		$("#startLocation").empty();//先置空 
-		 $("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+		$("#endLocation").empty();//先置空 
+		
+		
     	$.ajax({
-   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type='+type+'&ends='+ends,
+   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type='+type+'&ends='+ends+'&ids='+ids+'&starts='+starts,
    		   dataType: 'json',
    		   complete: function(data,status) {
    			   var message=data.responseText;
    			   var info = eval(message);
+   				/* if(ids!=""){
+   					$("#startLocation").append($('<option value="'+startLocation+'">'+info[0].startname+'</option>'));
+   					$("#endLocation").append($('<option value="'+endLocation+'">'+info[0].endname+'</option>'));
+   				}else{
+   					$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+   					$("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+   				} */
+   				
    			 	if(info.length>0){
-   			 	
+   			 	 $("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+   			 	$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
 				 for(var i=0;i<info.length;i++){
-					
- 					 $("#startLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+					 if(starts!=info[i].stopid){
+						 $("#startLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+					 }
  			  		}
 			  	}
    		   }
@@ -158,6 +167,7 @@
     	var type = $('#type option:selected').val();//获取选中线路类型 
     	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
     	var starts =  $("#starts").val();//获取起点
+    	var ends =  $("#ends").val();//获取终点 
     	$("#endLocation").empty();//先置空 
     	$.ajax({
   		   url: 'lineInfoController.do?getEndlocation&city='+city+'&type='+type+'&starts='+starts+'&startLocation='+startLocation,
@@ -168,8 +178,8 @@
   			 $("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
   			 if(info.length>0){
 				 for(var i=0;i<info.length;i++){
-  					 $("#endLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
-  			  }
+						 $("#endLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+  			  	 }
 			   }
   		   }
     	});
@@ -199,7 +209,7 @@
 				<label class="Validform_label"> 选择线路城市: </label>
 			</td>
 			<td class="value">
-				<select id="city" name="city" datatype="*" >
+				<select id="city" name="city" datatype="*" onchange="getStartLocation()">
 						<option value="">--请选择城市--</option>
 						<c:forEach var="c" items="${cities}">
 							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if> >
@@ -241,6 +251,12 @@
 			</td>
 			<td class="value">
 				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" onChange="getEndlocation()">  
+                <option value="">--请选择发车地址--</option>
+						<c:forEach var="b" items="${startList}">
+							<option value="${b.id}" <c:if test="${lineInfo.startLocation == b.id}" >selected="selected"</c:if> >
+								${b.name}
+							</option>
+						</c:forEach>
                 </select>
 				<span class="Validform_checktip"></span>
 			</td>
@@ -250,7 +266,13 @@
 				<label class="Validform_label"> 终点位置地址:  </label>
 			</td>
 			<td class="value">
-				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" >  
+				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" > 
+				<option value="">--请选择终点位置地址--</option>
+						<c:forEach var="b" items="${endList}">
+							<option value="${b.id}" <c:if test="${lineInfo.endLocation == b.id}" >selected="selected"</c:if> >
+								${b.name}
+							</option>
+						</c:forEach> 
                 </select>
 				<span class="Validform_checktip"></span>
 			</td>

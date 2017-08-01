@@ -573,7 +573,6 @@ public class LineInfoController extends BaseController {
 				jsonObj.put("endname", endname);
             	jsonArray.add(jsonObj);
 			}
-        	
         }
        
 		return jsonArray;
@@ -587,7 +586,6 @@ public class LineInfoController extends BaseController {
 	public JSONArray getEndlocation(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
 		String city = request.getParameter("city");
         String type = request.getParameter("type");
-        String starts = request.getParameter("starts");
         String startLocation = request.getParameter("startLocation");
         JSONObject jsonObj = new JSONObject(); 
         JSONArray jsonArray = new JSONArray();
@@ -656,8 +654,6 @@ public class LineInfoController extends BaseController {
 	public JSONArray getStartLocation(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
         String city = request.getParameter("city");
         String type = request.getParameter("type");
-        String endLocation = request.getParameter("ends");
-        
         JSONObject jsonObj = new JSONObject(); 
         JSONArray jsonArray = new JSONArray();
         
@@ -676,11 +672,6 @@ public class LineInfoController extends BaseController {
                 	st.append("and b.station_type = '1'");
                 }
         		
-        		if(StringUtil.isNotEmpty(endLocation)){
-        			Line_busStopEntity lb = this.systemService.getEntity(Line_busStopEntity.class, endLocation);
-        			st.append(" and a.siteId!='");
-    				st.append(lb.getSiteId()+"'");
-        		}
         	}
         	
         	if("3".equals(type) || "5".equals(type)){
@@ -689,13 +680,9 @@ public class LineInfoController extends BaseController {
                 	st.append(" and b.cityId='"+city+"'");
                 }
                 st.append("and b.station_type = '0'");
-                
-        		if(StringUtil.isNotEmpty(endLocation)){
-        			st.append(" and a.siteId!='");
-    				st.append(endLocation+"'");
-        		}
-        		
         	}
+        }else{
+        	st.append("select DISTINCT b.id,b.name from busstopinfo b LEFT JOIN line_busstop a on b.id=a.busStopsId where  1=1");
         }
         
         List<Object> bList =systemService.findListbySql(st.toString());
@@ -709,7 +696,6 @@ public class LineInfoController extends BaseController {
 				jsonObj.put("name", name);
             	jsonArray.add(jsonObj);
 			}
-        	
         }
         
         return jsonArray;

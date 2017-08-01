@@ -50,6 +50,14 @@
 	        width: 300px;
 	        background:url(plug-in/easyui/themes/metrole/icons/le_search.png) no-repeat scroll right center #fff;
 	    }
+	    
+	    #control {
+	        position: absolute;
+	        z-index: 9999;
+	        top: 50px;
+	        right: 30px;
+	        width: 300px;
+	    }
         
         #panel {
             position: fixed;
@@ -95,6 +103,80 @@
     	
     	<table style="width: 100%;height: 100%" cellpadding="0" cellspacing="1" class="formtable">
 			<tr>
+				<td class="value" align="center" colspan="2" >
+					<label class="Validform_label">
+						接机线路信息
+					</label>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						到该站点价格:
+					</label>
+				</td>
+				<td class="value">
+					<input class="inputxt" style="height: 30px;" id="priceBack" name="priceBack" ignore="ignore"
+						   value="${asLine.priceBack}"> 元/人
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						所需时长:
+					</label>
+				</td>
+				<td class="value">
+					<input class="inputxt" style="height: 30px;" id="durationBack" name="durationBack" ignore="ignore"
+						   value="${asLine.durationBack}"> 分钟
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						公里数:
+					</label>
+				</td>
+				<td class="value">
+					<input class="inputxt" style="height: 30px;" id="distanceBack" name="distanceBack" ignore="ignore"
+						   value="${asLine.distanceBack}"> 公里
+					<span class="Validform_checktip"></span>
+				</td>
+			</tr>
+			<tr>
+				<td class="value" align="center" colspan="2" >
+					<label class="Validform_label">
+						送机线路信息
+					</label>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						到该站点价格:
+					</label>
+				</td>
+				<td class="value">
+					<input class="inputxt" style="height: 30px;" id="priceGo" name="priceGo" ignore="ignore"
+						   value="${asLine.priceGo}"> 元/人
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						所需时长:
+					</label>
+				</td>
+				<td class="value">
+					<input class="inputxt" style="height: 30px;" id="durationGo" name="durationGo" ignore="ignore"
+						   value="${asLine.durationGo}"> 分钟
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="center">
+					<label class="Validform_label">
+						公里数:
+					</label>
+				</td>
+				<td class="value">
+					<input class="inputxt" style="height: 30px;" id="distanceGo" name="distanceGo" ignore="ignore"
+						   value="${asLine.distanceGo}"> 公里
+					<span class="Validform_checktip"></span>
+				</td>
+			</tr>
+			<tr>
 				<td align="center">
 					<label class="Validform_label">
 						站点名称:
@@ -105,38 +187,6 @@
 						   value="${aStation.name}">
 					<span class="Validform_checktip"></span>
 				</td>
-				<td align="center">
-					<label class="Validform_label">
-						到该站点价格:
-					</label>
-				</td>
-				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="price" name="price" ignore="ignore"
-						   value="${asLine.price}"> 元/人
-					<span class="Validform_checktip"></span>
-				</td>
-				<td align="center">
-					<label class="Validform_label">
-						所需时长:
-					</label>
-				</td>
-				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="duration" name="duration" ignore="ignore"
-						   value="${asLine.duration}"> 分钟
-					<span class="Validform_checktip"></span>
-				</td>
-				<td align="center">
-					<label class="Validform_label">
-						公里数:
-					</label>
-				</td>
-				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="distance" name="distance" ignore="ignore"
-						   value="${asLine.distance}"> 公里
-					<span class="Validform_checktip"></span>
-				</td>
-			</tr>
-			<tr>
 				<td align="center">
 					<label class="Validform_label">
 						经度:
@@ -171,11 +221,15 @@
 		</table>
     </t:formvalid>
     <div id="container" tabindex="0" style="height:80%;" >
-    	<div >
+    	<div>
 	    	<input type="text" id="keyword" placeholder="请输入关键字" name="keyword" />
 	    	<div id="panel"></div>
     	</div>
+    	<div>
+   			<input type="button" id="control" style="background-color: #f00" value="起始点切换"/>
+		</div>
     </div>
+	
     <!-- script必须放在body中。。 -->
     <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123&plugin=AMap.Driving,AMap.Autocomplete,AMap.PlaceSearch" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
@@ -190,6 +244,25 @@
     	//构造路线导航类
     	var driving;
     	
+    	//true是接机   false是送机
+        var isVisible = true;
+        AMap.event.addDomListener(document.getElementById('control'), 'click', function() {
+        	driving.clear();
+            if (isVisible) {
+            	console.log("接机");
+                isVisible = false;
+                driving.search(markerTP.getPosition(), marker.getPosition());
+                markerTP.setContent('<div class="marker-route marker-marker-bus-from "></div>');
+                marker.setContent('<div class="marker-route amap-marker-background"></div>');
+            } else {
+            	console.log("送机");
+                isVisible = true;
+                driving.search(marker.getPosition(), markerTP.getPosition());
+                markerTP.setContent('<div class="marker-route amap-marker-background"></div>');
+                marker.setContent('<div class="marker-route marker-marker-bus-from "></div>');
+            }
+        }, false);
+        
     	function loadMapStation(){
     		/* 
     		var asx = $('#areaStationX').val();
@@ -367,8 +440,6 @@
               	      	 map.remove(marker);
                 });
 			});
-    	   	//画线路
-    	    //drawLine();
        	}
        	
        	//创建站点的marker对象
@@ -378,12 +449,19 @@
     			map.remove(marker);
     		}
     		
+    		var content;
+    		if (isVisible) {
+            	content = '<div class="marker-route marker-marker-bus-from"></div>';
+            } else {
+    			content = '<div class="marker-route amap-marker-background"></div>';
+            }
+    		
     		//创建marker对象
    			marker = new AMap.Marker({
-           		title: "点击测试",
+           		title: "",
            		map: map,
            		bubble: true,
-           	 	content: '<div class="marker-route marker-marker-bus-from "></div>'   //自定义点标记覆盖物内容
+           	 	content: content   //自定义点标记覆盖物内容
        		});
     	}
     	
@@ -432,8 +510,17 @@
         	
             // 根据起终点经纬度规划驾车导航路线
             //driving.search(new AMap.LngLat(116.379028, 39.865042), new AMap.LngLat(116.427281, 39.903719));
-        	driving.search(markerTP.getPosition(), marker.getPosition());
         	
+        	if(isVisible){
+				driving.search(markerTP.getPosition(), marker.getPosition());
+			}else{
+				driving.search(marker.getPosition(), markerTP.getPosition());
+			}
+			
+			/* clock = window.setInterval("computeInfo()",500); 
+			
+			completed = false; */
+			
         	//切换点击marker时触发
             AMap.event.addListener(driving, 'complete', function(result) {
             	 $('#panel dl').css("display","none");
@@ -445,13 +532,46 @@
                 	 var distance = (route.distance/1000).toFixed(2);
                 	 //所需时间
                 	 var time = (route.time/60).toFixed(0);
-                	 $('#duration').val(time);
-                	 $('#distance').val(distance);
-                	 
+                	 if(isVisible){
+                		 console.log(1111);
+                		 $('#durationBack').val(time);
+                    	 $('#distanceBack').val(distance);
+                	 }else{
+                		 console.log(2222);
+                		 $('#durationGo').val(time);
+                    	 $('#distanceGo').val(distance);
+                	 }
+                	 /* if(completed){
+                		 isVisible = !isVisible;
+                		 completed = false;
+                	 } 
+                	 completed = true; */
                 	 console.log(distance + " ----- " + time);
                  }
             });
         }
+        
+        /* //计算起始点的信息
+        function computeInfo(){
+        	console.log(completed);
+        	if(!completed) return;
+        	if(isVisible){
+        		//isVisible = !isVisible;
+        		driving.search(marker.getPosition(), markerTP.getPosition());
+        	}else{
+        		driving.search(markerTP.getPosition(), marker.getPosition());
+        		//isVisible = !isVisible;
+        	}
+        	
+        	window.clearInterval(clock); 
+        }
+        //第一线路计算
+        var completed = false;
+        
+		//重复执行某个方法 
+		var clock;
+		//去掉定时器的方法  */
+		
         
     </script>
  </body>

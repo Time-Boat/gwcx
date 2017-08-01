@@ -33,6 +33,13 @@
 		<property name="targetMethod" value="work" />
 		<property name="concurrent" value="true" />
 	</bean>
+	
+	<bean id="editOrderStatusServiceTaskJob"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject" ref="editOrderStatusService" />
+		<property name="targetMethod" value="work" />
+		<property name="concurrent" value="true" />
+	</bean>
 
 	<bean id="taskDemoServiceTaskCronTrigger" class="org.jeecgframework.core.timer.DataBaseCronTriggerBean">
 		<property name="jobDetail" ref="taskDemoServiceTaskJob" />
@@ -41,7 +48,12 @@
 	
 	<bean id="orderTimeCronTrigger" class="org.jeecgframework.core.timer.DataBaseCronTriggerBean">
 		<property name="jobDetail" ref="orderTimeServiceTaskJob" />
-		<property name="cronExpression" value="0 0/10 * * * ?" />
+		<property name="cronExpression" value="0 0/30 * * * ?" />
+	</bean>
+	
+	<bean id="editOrderStatusTrigger" class="org.jeecgframework.core.timer.DataBaseCronTriggerBean">
+		<property name="jobDetail" ref="editOrderStatusServiceTaskJob" />
+		<property name="cronExpression" value="0 0/1 * * * ?" />
 	</bean>
 	
 	<!-- 定时任务配置   smsSendTask 可配置到管理界面 -->
@@ -65,6 +77,8 @@
 				<ref bean="taskDemoServiceTaskCronTrigger" />
 				
 				<ref bean="orderTimeCronTrigger" />
+				
+				<ref bean="editOrderStatusTrigger" />
 				<!--
 				<ref bean="smsSendTaskCronTrigger" />
 				-->

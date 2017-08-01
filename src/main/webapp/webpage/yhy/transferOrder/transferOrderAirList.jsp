@@ -9,7 +9,7 @@
 			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
-		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
+		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
 		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
@@ -99,8 +99,8 @@
 	});
 
 	$(document).ready(function(){
-		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
+		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'});});
+		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'});});	
 		$("input[name='orderExpectedarrival_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});

@@ -16,7 +16,7 @@
 	    <t:dgCol title="单价(元/人)" field="orderUnitprice" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="申请时间" field="applicationTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
-		<t:dgCol title="发车时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
+		<t:dgCol title="发车时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
 		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
 		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
@@ -28,8 +28,8 @@
 </div>
 <script type="text/javascript">
 	$(document).ready(function(){
-		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
+		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'});});
+		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'});});	
 		$("input[name='orderExpectedarrival_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
