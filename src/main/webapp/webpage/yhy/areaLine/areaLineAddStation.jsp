@@ -55,8 +55,9 @@
 	        position: absolute;
 	        z-index: 9999;
 	        top: 50px;
-	        right: 30px;
-	        width: 300px;
+	        left: 56px;
+	        width: 125px;
+	        height: 30px;
 	    }
         
         #panel {
@@ -90,6 +91,59 @@
         	/* 终点图标   */
             background-position: -334px -135px;   
         }
+        
+        
+        /* blue */
+		.blue {
+			color: #d9eef7;
+			border: solid 1px #0076a3;
+			background: #0095cd;
+			background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+			background: -moz-linear-gradient(top,  #00adee,  #0078a5);
+			filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');
+		}
+		.blue:hover {
+			background: #007ead;
+			background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
+			background: -moz-linear-gradient(top,  #0095cc,  #00678e);
+			filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0095cc', endColorstr='#00678e');
+		}
+		.blue:active {
+			color: #80bed6;
+			background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));
+			background: -moz-linear-gradient(top,  #0078a5,  #00adee);
+			filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
+		}
+		
+		.button {
+			display: inline-block;
+			zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
+			*display: inline;
+			vertical-align: baseline;
+			margin: 0 2px;
+			outline: none;
+			cursor: pointer;
+			text-align: center;
+			text-decoration: none;
+			font: 14px/100% Arial, Helvetica, sans-serif;
+			padding: .5em 2em .55em;
+			-webkit-border-radius: .5em; 
+			-moz-border-radius: .5em;
+			border-radius: .5em;
+			-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+			-moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+			box-shadow: 0 1px 2px rgba(0,0,0,.2);
+			color: #fff;
+		}
+		.button:hover {
+			text-decoration: none;
+			color: #fff;
+		}
+		.button:active {
+			position: relative;
+			top: 1px;
+		}
+
 	  </style>
 	  <title>站点信息</title>
 	</head>
@@ -226,7 +280,7 @@
 	    	<div id="panel"></div>
     	</div>
     	<div>
-   			<input type="button" id="control" style="background-color: #f00" value="起始点切换"/>
+   			<input type="button" id="control" class="button blue" value="起始点切换" />
 		</div>
     </div>
 	
@@ -316,28 +370,28 @@
         	//如果是新增操作，就定位到机场站点或火车站点，如果是修改操作，就定位到被修改的站点位置
         	if(asx != null && asx != '' && asy != null && asy != ''){
         	}else{
-        		if(json != null && json != ""){
-            		//var obj = $.parseJSON(json);
-            		console.log("stationX" + obj.stationX);
-            		asx = obj.stationX;
-            		asy = obj.stationY;
-            		location = obj.stationName;
-            	}
-        		
-        		if(asx == null || asx == '' || asy == null || asy == ''){
-            		asx = 116.397497;
-            		asy = 39.908698;
-            		location = "北京天安门"
-            	}
+        		asx = obj.stationX;
+        		asy = obj.stationY;
+        		location = obj.stationName;
         	}
+        	
         	map = new AMap.Map('container',{	
                 resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
                 zoom: 12,						//地图显示的缩放级别
                 center: [asx, asy],  //地图中心点
             	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
-        	//创建机场或火车站点
-        	createMarkerForTP(obj.stationX, obj.stationY);
+        	
+        	if(json != null && json != ""){
+        		console.log("stationX" + obj.stationX);
+        		//asx = obj.stationX;
+        		//asy = obj.stationY;
+        		//location = obj.stationName;
+        		//创建机场或火车站点
+        	}
+        	
+           	createMarkerForTP(obj.stationX, obj.stationY);
+        	
         	openInfoWin(location, new AMap.LngLat(asx,asy));
 			afterLoad();
        	}
@@ -358,8 +412,11 @@
        	        //TODO: 使用geocoder 对象完成相关功能
        	    })
        	    
+       	    var asx = $('#areaStationX').val();
+        	var asy = $('#areaStationY').val();
 	    	createMarker();
-       		
+       	 	marker.setPosition(new AMap.LngLat(asx,asy));
+       	 	
 	      	//点击事件
 		    map.on('click', function(e) {
 		    	createMarker();
@@ -369,13 +426,17 @@
 		    	
 		    	if(typeof(driving) != "undefined"){
 		    		driving.clear();
+		    		$('#durationBack').val("");
+	                $('#distanceBack').val("");
+					$('#durationGo').val("");
+					$('#distanceGo').val("");
 	    		}
 		    	
 		    	geocoder.getAddress(e.lnglat, function(status, result) {
 	    		    if (status === 'complete' && result.info === 'OK') {
 						//获得了有效的地址信息:
 						//即，result.regeocode.formattedAddress
-						console.log(result);
+						//console.log(result);
 						
 						openInfoWin(result.regeocode.formattedAddress, e.lnglat);
 						         
@@ -398,7 +459,6 @@
 	        });
 	      	
 	        var city = $('#lineCity').val();
-	        console.log(city);
 			var autoOptions = {
 				city: city, //城市，默认全国
 				input: "keyword"//使用联想输入的input的id
@@ -424,21 +484,21 @@
                     if (status === 'complete' && result.info === 'OK') { 
                     	console.log(result);
                     }
-                });  //关键字查询查询
+                 });  //关键字查询查询
                 
-                //切换点击marker时触发
-                AMap.event.addListener(placeSearch, 'selectChanged', function(results) {
+                 //切换点击marker时触发
+                 AMap.event.addListener(placeSearch, 'selectChanged', function(results) {
                      //获取当前选中的结果数据
-                        //infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
-                        //infoWindow.open(map, e.target.getPosition());
+                     //infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
+                     //infoWindow.open(map, e.target.getPosition());
                              
-                     console.log(results.selected.data);
-                        //给表单赋值
-              	         $('#location').val(results.selected.data.name);
-              	         $('#areaStationX').val(results.selected.data.location.lng);
-              	         $('#areaStationY').val(results.selected.data.location.lat);
-              	      	 map.remove(marker);
-                });
+					 console.log(results.selected.data);
+					 //给表单赋值
+					 $('#location').val(results.selected.data.name);
+					 $('#areaStationX').val(results.selected.data.location.lng);
+					 $('#areaStationY').val(results.selected.data.location.lat);
+					 map.remove(marker);
+                 });
 			});
        	}
        	
@@ -511,11 +571,11 @@
             // 根据起终点经纬度规划驾车导航路线
             //driving.search(new AMap.LngLat(116.379028, 39.865042), new AMap.LngLat(116.427281, 39.903719));
         	
-        	if(isVisible){
-				driving.search(markerTP.getPosition(), marker.getPosition());
-			}else{
+        	if(isVisible){ 
 				driving.search(marker.getPosition(), markerTP.getPosition());
-			}
+			}else{
+				driving.search(markerTP.getPosition(), marker.getPosition());
+			} 
 			
 			/* clock = window.setInterval("computeInfo()",500); 
 			
@@ -524,10 +584,10 @@
         	//切换点击marker时触发
             AMap.event.addListener(driving, 'complete', function(result) {
             	 $('#panel dl').css("display","none");
-                 console.log(result);
+                 //console.log(result);
                  if(result.info == 'OK'){
                 	 var route = result.routes[0];
-                	 console.log(route);
+                	 //console.log(route);
                 	 //公里数
                 	 var distance = (route.distance/1000).toFixed(2);
                 	 //所需时间
