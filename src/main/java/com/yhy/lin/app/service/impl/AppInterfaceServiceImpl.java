@@ -1,5 +1,7 @@
 package com.yhy.lin.app.service.impl;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +27,8 @@ import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.TransferorderEntity;
+
+import sun.print.resources.serviceui;
 
 /**
 * Description : 
@@ -52,7 +56,30 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		// 生成订单号
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
+		t.getLineId();
+		String str = "line";
+		String orderstart=t.getOrderStartime();
+		try {
+			if(StringUtil.isNotEmpty(orderstart)){
+				Date w = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(orderstart);
+				long nowLong = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmm").format(w));
+				String s = nowLong+"";
+				String a = s.substring(10);
+				String b = s.substring(0, 10);
+				System.out.println(b);
+				if(Integer.parseInt(a)<30){
+					t.setLineOrderCode(str+b+"A");
+				}else{
+					t.setLineOrderCode(str+b+"B");
+				}
+			}
+			
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
+		//t.setLineOrderCode(lineOrderCode);
 		// 做了一个视图，确保查出的线路的唯一性
 //		Map<String, Object> map = findOneForJdbc("select * from order_line_view where busStopsId=? ", commonAddrId);
 //		if (map.size() > 0) {

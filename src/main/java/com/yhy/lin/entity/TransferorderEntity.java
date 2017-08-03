@@ -63,6 +63,8 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String refundPrice;    //退款金额
 	
+	private String lineOrderCode;//线路订单码
+	
 	@Column(name = "refund_completed_time")
 	public Date getRefundCompletedTime() {
 		return refundCompletedTime;
@@ -351,4 +353,12 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 		this.applicationTime = applicationTime;
 	}
 
+	@Column(name = "lineOrderCode")
+	public String getLineOrderCode() {
+		return lineOrderCode;
+	}
+
+	public void setLineOrderCode(String lineOrderCode) {
+		this.lineOrderCode = lineOrderCode;
+	}
 }

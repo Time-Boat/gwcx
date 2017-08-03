@@ -395,42 +395,6 @@
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 起始位置X坐标: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="startX" value="${lineInfo.startX}" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 起始位置Y坐标: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="startY" value="${lineInfo.startY}" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 终点位置X坐标: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="endX" value="${lineInfo.endX}" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 终点位置Y坐标: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="endY" value="${lineInfo.endY}" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
 		 --%>
 	</table>
 </t:formvalid>

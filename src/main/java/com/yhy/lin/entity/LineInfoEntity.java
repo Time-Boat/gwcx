@@ -22,16 +22,8 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	private String name;
 	/**起始位置*/
 	private String startLocation;
-	/**起始位置X坐标*/
-	private String startX;
-	/**起始位置Y坐标*/
-	private String startY;
 	/**终点位置*/
 	private String endLocation;
-	/**终点位置X坐标*/
-	private String endX;
-	/**终点位置Y坐标*/
-	private String endY;
 	/**线路备注*/
 	private String remark;
 	/**线路图片*/
@@ -93,40 +85,12 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	public void setStartLocation(String startLocation) {
 		this.startLocation = startLocation;
 	}
-	@Column(name = "startX")
-	public String getStartX() {
-		return startX;
-	}
-	public void setStartX(String startX) {
-		this.startX = startX;
-	}
-	@Column(name = "startY")
-	public String getStartY() {
-		return startY;
-	}
-	public void setStartY(String startY) {
-		this.startY = startY;
-	}
 	@Column(name = "endLocation")
 	public String getEndLocation() {
 		return endLocation;
 	}
 	public void setEndLocation(String endLocation) {
 		this.endLocation = endLocation;
-	}
-	@Column(name = "endX")
-	public String getEndX() {
-		return endX;
-	}
-	public void setEndX(String endX) {
-		this.endX = endX;
-	}
-	@Column(name = "endY")
-	public String getEndY() {
-		return endY;
-	}
-	public void setEndY(String endY) {
-		this.endY = endY;
 	}
 	@Column(name = "remark")
 	public String getRemark() {

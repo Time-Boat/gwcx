@@ -212,12 +212,13 @@ public class AreaLineController extends BaseController {
 		request.setAttribute("areaLineId", areaLineId);
 		
 		List<Map<String,Object>> mapList = systemService.findForJdbc(
-				"select c.city,bs.name,bs.x,bs.y from area_line al join cities c on al.city_id = c.cityId join busstopinfo bs on bs.id=al.station_id where al.id = ?"
+				"select c.city,c.cityId,bs.name,bs.x,bs.y from area_line al join cities c on al.city_id = c.cityId join busstopinfo bs on bs.id=al.station_id where al.id = ?"
 				, areaLineId);
 		
 		if(mapList.size() > 0){
 			Map<String,Object> map = mapList.get(0);
 			request.setAttribute("lineCity", map.get("city"));
+			request.setAttribute("cityCode", map.get("cityId"));
 			
 			JSONObject json = new JSONObject();
 			json.put("stationX", map.get("x"));

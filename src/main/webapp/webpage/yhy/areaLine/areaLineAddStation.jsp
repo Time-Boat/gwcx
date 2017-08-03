@@ -66,7 +66,7 @@
             max-height: 90%;
             overflow-y: auto;
             top: 260px;
-            right: 50px;
+            left: 58px;
             width: 280px;
             z-index: 9999;
         }
@@ -94,7 +94,7 @@
         
         
         /* blue */
-		.blue {
+		.control_blue {
 			color: #d9eef7;
 			border: solid 1px #0076a3;
 			background: #0095cd;
@@ -102,20 +102,20 @@
 			background: -moz-linear-gradient(top,  #00adee,  #0078a5);
 			filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');
 		}
-		.blue:hover {
+		.control_blue:hover {
 			background: #007ead;
 			background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
 			background: -moz-linear-gradient(top,  #0095cc,  #00678e);
 			filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0095cc', endColorstr='#00678e');
 		}
-		.blue:active {
+		.control_blue:active {
 			color: #80bed6;
 			background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));
 			background: -moz-linear-gradient(top,  #0078a5,  #00adee);
 			filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
 		}
 		
-		.button {
+		.control {
 			display: inline-block;
 			zoom: 1; /* zoom and *display = ie7 hack for display:inline-block */
 			*display: inline;
@@ -135,11 +135,11 @@
 			box-shadow: 0 1px 2px rgba(0,0,0,.2);
 			color: #fff;
 		}
-		.button:hover {
+		.control:hover {
 			text-decoration: none;
 			color: #fff;
 		}
-		.button:active {
+		.control:active {
 			position: relative;
 			top: 1px;
 		}
@@ -154,6 +154,7 @@
     	<input type="hidden" id="stationId" name="stationId" value="${aStation.id}" />
     	<input type="hidden" id="lineCity" name="lineCity" value="${lineCity}" />
     	<input type="hidden" id="stationInfo" name="stationInfo" value="${stationInfo}" />
+    	<input type="hidden" id="cityCode" name="cityCode" value="${cityCode}" />
     	
     	<table style="width: 100%;height: 100%" cellpadding="0" cellspacing="1" class="formtable">
 			<tr>
@@ -280,7 +281,7 @@
 	    	<div id="panel"></div>
     	</div>
     	<div>
-   			<input type="button" id="control" class="button blue" value="起始点切换" />
+   			<input type="button" id="control" class="control control_blue" value="起始点切换" />
 		</div>
     </div>
 	
@@ -314,7 +315,14 @@
                 driving.search(marker.getPosition(), markerTP.getPosition());
                 markerTP.setContent('<div class="marker-route amap-marker-background"></div>');
                 marker.setContent('<div class="marker-route marker-marker-bus-from "></div>');
-            }
+            } 
+            /* 
+            var json = $('#stationInfo').val();
+        	console.log("aaaa:" + json);
+        	var obj = eval('(' + json + ')');
+        	
+            createMarkerForTP();*/
+            
         }, false);
         
     	function loadMapStation(){
@@ -367,8 +375,13 @@
         	
         	var location = $('#location').val();
         	
+        	console.log("objX  " + obj.stationX + "     objY" + obj.stationY);
+           	console.log("areaStationX  " + asx + "     areaStationY" + asy);
+           	
+           	var b = false;
         	//如果是新增操作，就定位到机场站点或火车站点，如果是修改操作，就定位到被修改的站点位置
         	if(asx != null && asx != '' && asy != null && asy != ''){
+        		b = true;
         	}else{
         		asx = obj.stationX;
         		asy = obj.stationY;
@@ -382,16 +395,17 @@
             	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
         	
-        	if(json != null && json != ""){
-        		console.log("stationX" + obj.stationX);
-        		//asx = obj.stationX;
-        		//asy = obj.stationY;
-        		//location = obj.stationName;
-        		//创建机场或火车站点
-        	}
-        	
-           	createMarkerForTP(obj.stationX, obj.stationY);
-        	
+           	createMarkerForTP();
+           	markerTP.setPosition(new AMap.LngLat(obj.stationX, obj.stationY));
+           	
+           	console.log('--' + b + '--');
+           	if(b){
+	           	createMarker();
+	       	 	marker.setPosition(new AMap.LngLat(asx,asy));
+	       	 	
+	       	 	drawLine(new AMap.LngLat(asx,asy));
+           	} 
+       	 	
         	openInfoWin(location, new AMap.LngLat(asx,asy));
 			afterLoad();
        	}
@@ -401,7 +415,7 @@
        		infoWindow.setContent('<p class="my-desc">' + content + '</p>');//点击以后窗口展示的内容
             infoWindow.open(map, position);
         }
-        	
+        
        	function afterLoad(){
        		//经纬度获取详细地址
        	    AMap.service('AMap.Geocoder',function(){//回调函数
@@ -412,11 +426,6 @@
        	        //TODO: 使用geocoder 对象完成相关功能
        	    })
        	    
-       	    var asx = $('#areaStationX').val();
-        	var asy = $('#areaStationY').val();
-	    	createMarker();
-       	 	marker.setPosition(new AMap.LngLat(asx,asy));
-       	 	
 	      	//点击事件
 		    map.on('click', function(e) {
 		    	createMarker();
@@ -430,33 +439,47 @@
 	                $('#distanceBack').val("");
 					$('#durationGo').val("");
 					$('#distanceGo').val("");
+					$('#priceGo').val("");
+					$('#priceBack').val("");
+					
 	    		}
 		    	
 		    	geocoder.getAddress(e.lnglat, function(status, result) {
 	    		    if (status === 'complete' && result.info === 'OK') {
 						//获得了有效的地址信息:
 						//即，result.regeocode.formattedAddress
-						//console.log(result);
+						console.log(result);
+	    		    	
+	    		    	//城市编码
+						var adCode = result.regeocode.addressComponent.adcode;
+						var cityCode = $('#cityCode').val();
+						console.log(adCode + "-----" + cityCode);
+						//判断点击的marker是否在同一个城市内，通过城市编码的前四位来判断
+	    		    	if(cityCode.substr(0,4) == adCode.substr(0,4)){
+	    		    		openInfoWin(result.regeocode.formattedAddress, e.lnglat);
+							
+							//给表单赋值
+							$('#areaStationX').val(e.lnglat.getLng());
+							$('#areaStationY').val(e.lnglat.getLat());
+							$('#location').val(result.regeocode.formattedAddress);
+							drawLine(e.lnglat);
+	    		    	}else{
+	    		    		openInfoWin("只限于" + $('#lineCity').val() + "地区", marker.getPosition());
+	    		    	}
 						
-						openInfoWin(result.regeocode.formattedAddress, e.lnglat);
-						         
-						//给表单赋值
-						$('#areaStationX').val(e.lnglat.getLng());
-						$('#areaStationY').val(e.lnglat.getLat());
-						$('#location').val(result.regeocode.formattedAddress);
 	    		    }else{
 	    		    	openInfoWin("获取地址失败", marker.getPosition());
 	    		    }
 	    		});
-	    		drawLine();
+	    		
 		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
 		    });
       		
 	      	//插件在script的url头拼接了
 	        //marker 点击时打开
-	        AMap.event.addListener(marker, 'click', function() {
+	        /* AMap.event.addListener(marker, 'click', function() {
 	        	openInfoWin("正在获取位置信息...", marker.getPosition());
-	        });
+	        }); */
 	      	
 	        var city = $('#lineCity').val();
 			var autoOptions = {
@@ -464,8 +487,9 @@
 				input: "keyword"//使用联想输入的input的id
 			};
 			
-			autocomplete= new AMap.Autocomplete(autoOptions);
+			autocomplete = new AMap.Autocomplete(autoOptions);
 			var placeSearch = new AMap.PlaceSearch({
+				citylimit: true,
 				city: city,
 				map: map
 			});
@@ -491,13 +515,38 @@
                      //获取当前选中的结果数据
                      //infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
                      //infoWindow.open(map, e.target.getPosition());
-                             
+                     
 					 console.log(results.selected.data);
 					 //给表单赋值
 					 $('#location').val(results.selected.data.name);
 					 $('#areaStationX').val(results.selected.data.location.lng);
 					 $('#areaStationY').val(results.selected.data.location.lat);
-					 map.remove(marker);
+					 
+					 console.log("marker:" + typeof(marker));
+					 if(typeof(marker) != "undefined"){
+						 //map.remove(marker);
+					 }
+					 createMarker()
+					 marker.setPosition(new AMap.LngLat(results.selected.data.location.lng, results.selected.data.location.lat));
+					 
+		    		 $('#durationBack').val("");
+	                 $('#distanceBack').val("");
+					 $('#durationGo').val("");
+					 $('#distanceGo').val("");
+					 $('#priceGo').val("");
+					 $('#priceBack').val("");
+					 
+					 console.log("driving:" + typeof(driving));
+					 if(typeof(driving) != "undefined"){
+		    			 if(isVisible){ 
+	    					 driving.search(new AMap.LngLat(results.selected.data.location.lng, results.selected.data.location.lat), markerTP.getPosition());
+	    				 }else{
+	    					 driving.search(markerTP.getPosition(), new AMap.LngLat(results.selected.data.location.lng, results.selected.data.location.lat));
+	    				 } 
+		    		 }else{
+						 drawLine(new AMap.LngLat(results.selected.data.location.lng, results.selected.data.location.lat));
+		    		 }
+					 
                  });
 			});
        	}
@@ -521,18 +570,19 @@
            		title: "",
            		map: map,
            		bubble: true,
+           		offset: new AMap.Pixel(-14, -35),
+           		zIndex: 99999,
+           		topWhenClick: true,
            	 	content: content   //自定义点标记覆盖物内容
        		});
     	}
     	
     	//创建机场或火车站点的marker对象
     	var markerTP;
-    	function createMarkerForTP(x,y){
-    		console.log("x:" + x + "----- y:" + y);
+    	function createMarkerForTP(){
     		//创建marker对象
    			markerTP = new AMap.Marker({
            		title: "",
-           	 	center: [x, y],
            		map: map,
            		bubble: true,
            	 	content: '<div class="marker-route amap-marker-background"></div>'   //自定义点标记覆盖物内容
@@ -554,10 +604,10 @@
             console.log(hs);
         }
     	
-        function drawLine(){
+        function drawLine(lnglat){
         	
         	var drivingOption = {
-       	        policy: AMap.DrivingPolicy.LEAST_FEE,                 //最经济模式。。。
+       	        policy: AMap.DrivingPolicy.LEAST_DISTANCE,                 //最短距离模式。。。
        	     	hideMarkers: true,   //设置隐藏路径规划的起始点图标
         		showTraffic: false,  //设置是否显示实时路况信息
         		autoFitView: true,   //是否自动调整地图视野
@@ -572,10 +622,10 @@
             //driving.search(new AMap.LngLat(116.379028, 39.865042), new AMap.LngLat(116.427281, 39.903719));
         	
         	if(isVisible){ 
-				driving.search(marker.getPosition(), markerTP.getPosition());
+				driving.search(lnglat, markerTP.getPosition());
 			}else{
-				driving.search(markerTP.getPosition(), marker.getPosition());
-			} 
+				driving.search(markerTP.getPosition(), lnglat);
+			}
 			
 			/* clock = window.setInterval("computeInfo()",500); 
 			
@@ -593,13 +643,13 @@
                 	 //所需时间
                 	 var time = (route.time/60).toFixed(0);
                 	 if(isVisible){
-                		 console.log(1111);
-                		 $('#durationBack').val(time);
-                    	 $('#distanceBack').val(distance);
-                	 }else{
                 		 console.log(2222);
                 		 $('#durationGo').val(time);
                     	 $('#distanceGo').val(distance);
+                	 }else{
+                		 console.log(1111);
+                		 $('#durationBack').val(time);
+                    	 $('#distanceBack').val(distance);
                 	 }
                 	 /* if(completed){
                 		 isVisible = !isVisible;

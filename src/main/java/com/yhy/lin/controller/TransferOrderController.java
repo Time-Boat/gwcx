@@ -44,6 +44,12 @@ public class TransferOrderController extends BaseController {
 
 	@Autowired
 	private TransferServiceI transferService;
+	// 接送车司机安排
+	@RequestMapping(params = "transferDriverList")
+	public ModelAndView transferDriverList(HttpServletRequest request, HttpServletResponse response) {
+		
+		return new ModelAndView("yhy/transferOrder/transferDriverList");
+	}
 
 	// 接送火车订单处理
 	@RequestMapping(params = "transferOrderList")
@@ -83,6 +89,11 @@ public class TransferOrderController extends BaseController {
 					json.append("'licencePlate':'"+ licencePlate + "'");
 					json.append("},");
 				}
+			}else{
+				json.append("{");
+				json.append("'carId':'',");
+				json.append("'licencePlate':''");
+				json.append("},");
 			}
 		json.delete(json.length()-1, json.length());
 		json.append("]}");
@@ -107,6 +118,11 @@ public class TransferOrderController extends BaseController {
 					json.append("'driverName':'"+ name + "'");
 					json.append("},");
 				}
+			}else{
+				json.append("{");
+				json.append("'driverId':'',");
+				json.append("'driverName':''");
+				json.append("},");
 			}
 		json.delete(json.length()-1, json.length());
 		json.append("]}");
@@ -120,7 +136,7 @@ public class TransferOrderController extends BaseController {
 	public String getLine(){
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type  in('2','3');";
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type in('2','3');";
 		List<Object> list = this.systemService.findListbySql(sql);
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){
@@ -133,11 +149,46 @@ public class TransferOrderController extends BaseController {
 					json.append("'lineName':'"+ name + "'");
 					json.append("},");
 				}
+			}else{
+				json.append("{");
+				json.append("'lineId':'',");
+				json.append("'lineName':''");
+				json.append("},");
 			}
 		json.delete(json.length()-1, json.length());
 		json.append("]}");
 		
 		return json.toString();
+	}
+	
+	@RequestMapping(params = "driverdatagrid")
+	public void driverdatagrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
+			DataGrid dataGrid) {
+		
+		String orderStartingstation = request.getParameter("orderStartingstation");
+		String orderTerminusstation = request.getParameter("orderTerminusstation");
+		String lineId = request.getParameter("lineId");
+		String driverId = request.getParameter("driverId");
+		String driverName ="";
+		if (StringUtil.isNotEmpty(driverId)) {
+			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
+			 driverName = dr.getName();
+		}
+		String plate ="";
+		String carId = request.getParameter("carId");
+		if (StringUtil.isNotEmpty(carId)) {
+			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
+			 plate = dr.getLicencePlate();
+		}
+		
+		String fc_begin = request.getParameter("orderStartime_begin");
+		String fc_end = request.getParameter("orderStartime_end");
+		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
+		String ddTime_end = request.getParameter("orderExpectedarrival_end");
+		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
+		
+		responseDatagrid(response, jObject);
 	}
 	
 	@RequestMapping(params = "datagrid")
@@ -189,6 +240,11 @@ public class TransferOrderController extends BaseController {
 					json.append("'lineName':'"+ name + "'");
 					json.append("},");
 				}
+			}else{
+				json.append("{");
+				json.append("'lineId':'',");
+				json.append("'lineName':''");
+				json.append("},");
 			}
 		json.delete(json.length()-1, json.length());
 		json.append("]}");
