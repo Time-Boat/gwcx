@@ -14,9 +14,9 @@ import net.sf.json.JSONObject;
 public interface TransferServiceI extends CommonService {
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
 			String fc_end,String ddTime_begin, String ddTime_end);
-	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
+	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
 			String fc_end,String ddTime_begin, String ddTime_end);
-	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
+	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
 			String fc_end,String ddTime_begin, String ddTime_end);
 	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
 			String fc_end,String ddTime_begin, String ddTime_end);

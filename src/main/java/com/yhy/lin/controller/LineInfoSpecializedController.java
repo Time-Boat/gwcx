@@ -20,6 +20,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
+import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.LineInfoServiceI;
 
@@ -108,10 +109,10 @@ public class LineInfoSpecializedController extends BaseController{
 		}
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
-		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
-		if(list.size()>0){
-			req.setAttribute("list", list);
-		}
+//		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
+//		if(list.size()>0){
+//			req.setAttribute("list", list);
+//		}
 			
 		return new ModelAndView("yhy/linesSpecial/lineAdd");
 	}
@@ -190,8 +191,8 @@ public class LineInfoSpecializedController extends BaseController{
         		if(StringUtil.isNotEmpty(busid)){
         			st.append(" and b.id not in (select g.id from line_busstop f LEFT JOIN busstopinfo g on g.id=f.busStopsId where f.siteId='");
         			st.append(busid+"'");
+        			st.append(" and g.status like '%"+type+"%')");
         		}
-        		st.append(" and g.status like '%"+type+"%')");
         		
         	}
         	
@@ -229,4 +230,37 @@ public class LineInfoSpecializedController extends BaseController{
 			}
 		return buslist;
 	}
+	
+	/**
+	 * 去线路添加页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "lineMap")
+	public ModelAndView lineMap(LineInfoEntity lineInfo, HttpServletRequest req) {
+		//获取部门信息
+		String lineId = req.getParameter("id");	
+		
+		List<Line_busStopEntity> lbs = systemService.findListbySql(
+				"select b.* from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
+				+ "where lineId = " + lineId);
+		
+		
+		
+		
+		return new ModelAndView("yhy/linesSpecial/lineMap");
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

@@ -142,18 +142,29 @@ public class LineInfoController extends BaseController {
 		String zdId = request.getParameter("zdId");
 		AjaxJson j = new AjaxJson();
 		try {
-			Line_busStopEntity lines = systemService.getEntity(Line_busStopEntity.class, id);
-			LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
-			if (StringUtil.isNotEmpty(lines.getSiteId())) {
-				lines.setSiteId("");
+			
+			if (StringUtil.isNotEmpty(zdId)) {
+				BusStopInfoEntity bus = this.systemService.getEntity(BusStopInfoEntity.class, zdId);
+				if("1".equals(bus.getStationType())){
+					message = "火车站点不可删除";
+				}else if("2".equals(bus.getStationType())){
+					message = "机场站点不可删除";
+				}else{
+					Line_busStopEntity lines = systemService.getEntity(Line_busStopEntity.class, id);
+					LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
+					if (StringUtil.isNotEmpty(lines.getSiteId())) {
+						lines.setSiteId("");
+					}
+					
+					systemService.deleteEntityById(Line_busStopEntity.class, id);
+					
+					//将站点状态改为0
+					systemService.updateBySqlString("update busstopinfo set status=REPLACE(status,'"+lin.getType()+"','') where id='"+zdId+"'");
+					
+					message = "删除成功";
+				}
 			}
 			
-			systemService.deleteEntityById(Line_busStopEntity.class, id);
-			
-			//将站点状态改为0
-			systemService.updateBySqlString("update busstopinfo set status=REPLACE(status,'"+lin.getType()+"','') where id='"+zdId+"'");
-			
-			message = "删除成功";
 		} catch (Exception e) {
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
@@ -424,10 +435,17 @@ public class LineInfoController extends BaseController {
 	public void nullTobusStopInfoList(BusStopInfoEntity busStopInfo, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
 		String lineInfoId = request.getParameter("lineInfoId");
+		String siteid="";
 		if(StringUtil.isNotEmpty(lineInfoId)){
 			LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
+			List<Line_busStopEntity> Linelist =  this.systemService.findByProperty(Line_busStopEntity.class, "lineId", lineInfoId);
+			if(Linelist.size()>0){
+				 siteid = Linelist.get(Linelist.size()-1).getSiteId();
+				
+			}
+			
 			String lineType = request.getParameter("lineType");
-			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType, lineInfo);
+			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType, lineInfo,siteid);
 			responseDatagrid(response, jObject);
 		}
 		
@@ -622,9 +640,8 @@ public class LineInfoController extends BaseController {
                 }
                 
                 if(StringUtil.isNotEmpty(startLocation)){
-                	st.append(" and b.id not in (select lb.siteId from line_busstop lb LEFT JOIN busstopinfo a on a.id=lb.busStopsId where lb.siteId is not null");
-                	st.append(" and lb.busStopsId='"+startLocation+"'");
-                	st.append(" and a.status like '%"+type+"%')");
+                	st.append(" and b.id not in (select l.endLocation from lineinfo l LEFT JOIN busstopinfo b on b.id=l.endLocation where b.station_type!='0' and l.startLocation='");
+                	st.append(startLocation+"')");
         		}
         	}
         }

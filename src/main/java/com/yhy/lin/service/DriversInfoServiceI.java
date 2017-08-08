@@ -8,5 +8,7 @@ import net.sf.json.JSONObject;
 public interface DriversInfoServiceI extends CommonService{
 
 	JSONObject getDatagrid(DataGrid dataGrid, String sex, String name, String phoneNumber,String status);
+	
+	JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status);
 
 }

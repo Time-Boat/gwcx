@@ -50,11 +50,29 @@ public class TransferOrderController extends BaseController {
 		
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
 	}
+	
+	// 接送车司机安排
+	@RequestMapping(params = "getOrderdetail")
+	public ModelAndView getOrderdetail(HttpServletRequest request, HttpServletResponse response) {
+		String orderType = request.getParameter("lineType");
+		String lineOrderCode = request.getParameter("lineOrderCode");
+		if("2".equals(orderType) || "3".equals(orderType)){
+			return transferOrderAirList(request, response,lineOrderCode);
+		}
+		if("4".equals(orderType) || "5".equals(orderType)){
+			return transferOrderList(request, response,lineOrderCode);
+		}
+			
+		return new ModelAndView("yhy/transferOrder/transferDriverList");
+	}
+	
+	
 
 	// 接送火车订单处理
 	@RequestMapping(params = "transferOrderList")
-	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode) {
 		
+		request.setAttribute("lineOrderCode",lineOrderCode);	
 		request.setAttribute("carplateList",getCarPlate());	
 		request.setAttribute("driverList",getDriver());	
 		request.setAttribute("lineNameList",getLine1());
@@ -63,8 +81,9 @@ public class TransferOrderController extends BaseController {
 	
 	// 接送机订单处理
 	@RequestMapping(params = "transferOrderAirList")
-	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode) {
 			
+		request.setAttribute("lineOrderCode",lineOrderCode);
 		request.setAttribute("carplateList",getCarPlate());	
 		request.setAttribute("driverList",getDriver());	
 		request.setAttribute("lineNameList",getLine());
@@ -185,7 +204,7 @@ public class TransferOrderController extends BaseController {
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+		JSONObject jObject = transferService.getDatagrid3(transferorder, dataGrid,orderStartingstation, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 		
 		responseDatagrid(response, jObject);
@@ -263,6 +282,7 @@ public class TransferOrderController extends BaseController {
 	public void airdatagrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		
+		String lineOrderCode = request.getParameter("lineOrderCode");
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
@@ -283,7 +303,7 @@ public class TransferOrderController extends BaseController {
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid1(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+		JSONObject jObject = transferService.getDatagrid1(transferorder, dataGrid,lineOrderCode,orderStartingstation, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);
@@ -293,6 +313,7 @@ public class TransferOrderController extends BaseController {
 	public void traindatagrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		
+		String lineOrderCode = request.getParameter("lineOrderCode");
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
@@ -313,7 +334,7 @@ public class TransferOrderController extends BaseController {
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid2(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+		JSONObject jObject = transferService.getDatagrid2(transferorder, dataGrid,lineOrderCode,orderStartingstation, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 
 		responseDatagrid(response, jObject);

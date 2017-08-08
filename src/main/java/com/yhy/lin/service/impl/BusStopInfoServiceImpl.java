@@ -124,14 +124,15 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	
 	//根据线路lineInfoId，拿到对应线路的未挂接的站点信息   import com.yhy.lin.entity.LineInfoEntity;
 	@Override
-	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType,LineInfoEntity lineInfo){
-		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType, lineInfo);
+	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType,LineInfoEntity lineInfo,String siteid){
+		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType, lineInfo,siteid);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		//where c.lineId is NULL 这个条件是为了不重复添加站点
 		String sqlCnt = "select count(*) from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL ";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt +=  sqlWhere;
 		}
+		System.out.println(sqlCnt+"sqlCnt");
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
@@ -154,7 +155,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return jObject;
 	}
 	
-	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,LineInfoEntity lineInfo){
+	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,LineInfoEntity lineInfo,String siteid){
 		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' and a.station_type = '0' "); 
 		if(StringUtil.isNotEmpty(lineInfo.getCityId())){
 			sqlWhere.append(" and  a.cityId = '"+lineInfo.getCityId()+"' ");

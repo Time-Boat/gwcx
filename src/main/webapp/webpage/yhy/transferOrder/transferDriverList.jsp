@@ -5,33 +5,18 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
-	<t:datagrid name="transferOrderList" title="接送车司机安排" autoLoadData="true" actionUrl="transferOrderController.do?airdatagrid" fitColumns="true"
-			    idField="id" fit="true" queryMode="group" checkbox="true"  >
+	<t:datagrid name="transferDriverList" title="接送车司机安排" autoLoadData="true" actionUrl="transferOrderController.do?driverdatagrid" 
+			    idField="id" fit="true" queryMode="group" checkbox="true" onDblClick="transferOrderList">
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
-		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
-		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
+		<t:dgCol title="线路订单码" field="lineOrderCode" query="true"></t:dgCol>
 		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
-		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
+		<t:dgCol title="线路类型" field="lineType" dictionary="transferTy" align="center"></t:dgCol>
+		<t:dgCol title="司机姓名" field="driverName" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
-		<t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
-		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
-		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
-		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
-		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
-		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3" query="true" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,待付款_6,已审核_7" query="true" align="center"></t:dgCol>
-		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
-		<t:dgCol title="单价(人/元)" field="orderUnitprice" align="center"></t:dgCol>
-		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
-		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
-		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
+		<t:dgCol title="车票数量" field="orderNumber" align="center"></t:dgCol>
+		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		
-		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
-		<t:dgCol title="购票人手机号" field="custphone" align="center"></t:dgCol>
-		<t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol>
-		<t:dgCol title="支付状态" field="orderPaystatus"  replace="已付款_0,未付款_3" align="center"></t:dgCol>
-		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
 		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
@@ -44,20 +29,7 @@
 <script type="text/javascript">
 	//进入触发 
 	$(function() {
-		$('#transferOrderList').datagrid({   
-		    rowStyler:function(index,row){
-		    	if (row.orderStatus=="0"){   
-		            return 'color:#999';   
-		        }
-		        if (row.orderStatus=="1"){   
-		            return 'color:red';   
-		        }
-		        if (row.orderStatus=="2"){   
-		            return 'color:#5400FF';   
-		        }
-		        
-		    }   
-		});
+		
 			var json1 = $("#carpaltes").val();
 			var json2= $("#driverNames").val();
 			var json = $("#lineNames").val();
@@ -96,13 +68,6 @@
 			var aaa4 = '</select></span>';
 			
 			$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2+aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
-	});
-
-	$(document).ready(function(){
-		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'});});
-		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'});});	
-		$("input[name='orderExpectedarrival_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
 
 	//安排车辆司机 
@@ -201,6 +166,27 @@
 		}
 		
 	  	return false;
+	}
+	
+	function addTab(title, url){
+		if ($('.page-tabs J_menuTabs').tabs('exists', title)){
+			$('.page-tabs J_menuTabs').tabs('select', title);
+		} else {
+			var content = '<iframe scrolling="auto" frameborder="0"  src="'+url+'" style="width:100%;height:100%;"></iframe>';
+			$('.page-tabs J_menuTabs').tabs('add',{
+				title:title,
+				content:content,
+				closable:true
+			});
+		}
+	}
+
+	
+	function transferOrderList(rowIndex,rowData) {
+		///addTab("接送机订单处理","transferOrderController.do?getOrderdetail&lineOrderCode="+rowData.lineOrderCode+"&lineType="+rowData.lineType);
+		
+		addOneTab("接送机订单处理", "transferOrderController.do?getOrderdetail&lineOrderCode="+rowData.lineOrderCode+"&lineType="+rowData.lineType); 
+		//detail('接送机订单处理','transferOrderController.do?detail','outsideCarRecordList');
 	}
 	
 </script>

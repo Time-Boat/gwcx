@@ -90,6 +90,27 @@ public class DriversInfoController extends BaseController {
 		
 		responseDatagrid(response, jObject);
 	}
+	
+	/**
+	 * easyui AJAX请求数据
+	 * 
+	 * @param request
+	 * @param response
+	 * @param dataGrid
+	 * @param user
+	 */
+	@RequestMapping(params = "driverdatagrid")
+	public void driverdatagrid(DriversInfoEntity driversInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+		
+		String sex = request.getParameter("sex");
+		String name = request.getParameter("name");
+		String phoneNumber = request.getParameter("phoneNumber");
+		String status =  request.getParameter("status");
+		
+		JSONObject jObject = driversInfoService.getDatagrid1(dataGrid ,sex ,name ,phoneNumber,status);
+		
+		responseDatagrid(response, jObject);
+	}
 
 	/**
 	 * 删除司机信息表

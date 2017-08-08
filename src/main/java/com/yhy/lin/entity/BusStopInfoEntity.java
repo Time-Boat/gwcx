@@ -156,6 +156,4 @@ public class BusStopInfoEntity implements java.io.Serializable {
 		this.cityName = cityName;
 	}
 	
-	
-	
 }
