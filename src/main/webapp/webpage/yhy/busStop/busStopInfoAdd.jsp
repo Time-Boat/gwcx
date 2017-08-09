@@ -66,7 +66,7 @@
 	<title>新增验票员</title>
 
 	</head>
-<body style="overflow-y: hidden" scroll="no" onload="loadMapStation()" >
+<body style="overflow-y: hidden" scroll="no" onload="loadMapStationBs()" >
 	<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="busStopInfoController.do?save">
 		<input id="id" name="id" type="hidden" value="${busStopInfo.id }">
 		
@@ -169,8 +169,10 @@
     	var map;
     	//窗体对象
     	var infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
+    	//搜索对象
+    	var placeSearch;
     	
-    	function loadMapStation(){
+    	function loadMapStationBs(){
     		
     		var asx = $('#x').val();
         	var asy = $('#y').val();
@@ -186,7 +188,7 @@
             	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
         	
-			afterLoad();
+			afterLoadBs();
     	}
     	
     	//打开窗体
@@ -195,7 +197,7 @@
             infoWindow.open(map, position);
         }
     	
-       	function afterLoad(){
+       	function afterLoadBs(){
        		//经纬度获取详细地址
        	    AMap.service('AMap.Geocoder',function(){//回调函数
        	        //实例化Geocoder
@@ -205,12 +207,7 @@
        	        //TODO: 使用geocoder 对象完成相关功能
        	    })
        	    
-       	    /* var infoWindow = new SimpleInfoWindow({
-       	            //基点指向marker的头部位置
-       	            offset: new AMap.Pixel(0, -31)
-       	        }); */
-       	    
-    	    createMarker();
+    	    createMarkerBs();
       	    	
    	    	var location = $('#stopLocation').val();
    	    	if(location != null && location != ""){
@@ -218,25 +215,41 @@
    	    	}
    	      	//点击事件
    		    map.on('click', function(e) {
-   		    	createMarker();
+   		    	createMarkerBs();
    		    	marker.setPosition(e.lnglat);
    		    	openInfoWin("正在获取位置信息...", e.lnglat);
    		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
    	    		geocoder.getAddress(e.lnglat, function(status, result) {
-   	    		    if (status === 'complete' && result.info === 'OK') {
-   	    		       //获得了有效的地址信息:
-   	    		       //即，result.regeocode.formattedAddress
-   	    		       console.log(result);
-   	    		       
-                       openInfoWin(result.regeocode.formattedAddress, e.lnglat);
-   	    		       
-   	    		       //给表单赋值
-   	    		       $('#x').val(e.lnglat.getLng());
-   	    		       $('#y').val(e.lnglat.getLat());
-   	    		       $('#stopLocation').val(result.regeocode.formattedAddress);
-   	    		    }else{
-   	    		    	openInfoWin("获取地址失败", marker.getPosition());
-   	    		    }
+   	    			var cityCode = $('#city').val();
+   	    			if(cityCode == "" || cityCode == null){
+						   openInfoWin(" 请先选择城市 ", marker.getPosition());
+				    }else{
+	   	    		    if (status === 'complete' && result.info === 'OK') {
+	   	    		       //获得了有效的地址信息:
+	   	    		       //即，result.regeocode.formattedAddress
+	   	    		       console.log(result);
+	   	    		       
+	                       openInfoWin(result.regeocode.formattedAddress, e.lnglat);
+	   	    		       
+	                       //城市编码
+						   var adCode = result.regeocode.addressComponent.adcode;
+						   console.log(adCode + "-----" + cityCode);
+						   
+						   //判断点击的marker是否在同一个城市内，通过城市编码的前四位来判断
+		   	    		   if(cityCode.substr(0,4) == adCode.substr(0,4)){
+						       openInfoWin(result.regeocode.formattedAddress, e.lnglat);
+								
+						       //给表单赋值
+		   	    		       $('#x').val(e.lnglat.getLng());
+		   	    		       $('#y').val(e.lnglat.getLat());
+		   	    		       $('#stopLocation').val(result.regeocode.formattedAddress);
+			   		       }else{
+			   		    	   openInfoWin("只限于" + $("#city option:selected").text() + "地区", marker.getPosition());
+			   		       }
+	   	    		    }else{
+	   	    		    	openInfoWin("获取地址失败", marker.getPosition());
+	   	    		    }
+				    }
    	    		});
    		        //console.log('您在[ '+e.lnglat.getLng()+','+e.lnglat.getLat()+' ]的位置点击了地图！');
    		    });
@@ -252,7 +265,7 @@
 					input: "keyword"//使用联想输入的input的id
 				};
 				autocomplete= new AMap.Autocomplete(autoOptions);
-				var placeSearch = new AMap.PlaceSearch({
+				placeSearch = new AMap.PlaceSearch({
 					city:city,
 					map:map
 				})
@@ -290,7 +303,7 @@
        	}
     	
     	var marker;
-    	function createMarker(){
+    	function createMarkerBs(){
     		if(typeof(marker) != "undefined"){
     			map.remove(marker);
     		}

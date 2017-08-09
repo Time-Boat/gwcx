@@ -2,11 +2,11 @@ package com.yhy.lin.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.tools.ant.types.CommandlineJava.SysProperties;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.util.StringUtil;
@@ -17,13 +17,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.google.gson.JsonObject;
 import com.yhy.lin.entity.BusStopInfoEntity;
-import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.LineInfoServiceI;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -236,26 +237,28 @@ public class LineInfoSpecializedController extends BaseController{
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unused")
 	@RequestMapping(params = "lineMap")
 	public ModelAndView lineMap(LineInfoEntity lineInfo, HttpServletRequest req) {
 		//获取部门信息
+		
 		String lineId = req.getParameter("id");	
 		
-		List<Line_busStopEntity> lbs = systemService.findListbySql(
-				"select b.* from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
-				+ "where lineId = " + lineId);
+//		List<Line_busStopEntity> lbs = systemService.findListbySql(
+//				"select b.* from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
+//				+ "where lineId = '2c9a500d5cd3ee4a015cd3f80c130010'");
+//				+ "where lineId = '" + lineId + "'");
 		
+		List<Map<String, Object>> lbs = systemService.findForJdbc(
+				"select b.name,b.x,b.y,b.stopLocation,lb.siteOrder from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
+				+ "where lineId = '" + lineId + "' order by siteOrder ");
 		
+		String json = JSONArray.fromObject(lbs).toString().replaceAll("\"", "'");
 		
+		req.setAttribute("stations", json);
 		
 		return new ModelAndView("yhy/linesSpecial/lineMap");
 	}
-	
-	
-	
-	
-	
-	
 	
 	
 	
