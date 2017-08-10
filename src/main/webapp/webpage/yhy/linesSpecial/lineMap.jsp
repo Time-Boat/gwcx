@@ -171,6 +171,7 @@
            		content: style,
            		topWhenClick: true,
        		});
+    		
    			marker.setPosition(LngLat);
    			
    			marker.on('click', function(){

@@ -713,8 +713,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
 					contents.add(new String[] { t.getOrderContactsname(), t.getOrderStartingStationName() + " ",
 							" " + t.getOrderTerminusStationName(), strDate, t.getOrderContactsmobile() });
-					// contents.add(new String[] {"某" , "吗", "吗"
-					// , "吗", t.getOrderContactsmobile()});
 
 				}
 			}

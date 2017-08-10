@@ -52,6 +52,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		String sqlCnt = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ " left join driversinfo d on b.driverId =d.id "
 				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ";
+		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
 		}
@@ -62,10 +63,11 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
+		
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
-
+		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
@@ -208,9 +210,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		try {
 			for(int i=0;i<arrId.length;i++){
 				Date now = new Date();
-				String outRefundNo = "NO" + dateFormat.format(now.getTime());
+				//确保在同一时间内的outRefundNo不一样，不然会出现退款失败的问题
+				String outRefundNo = "NO" + System.currentTimeMillis() + StringUtil.numRandom(6);
 				// 获得退款的传入参数
-				String transactionID = "";
+				//String transactionID = "";
 				String outTradeNo = arrId[i];
 				
 				TransferorderEntity t = get(TransferorderEntity.class, outTradeNo);
@@ -224,7 +227,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				int refundFee = 0;
 				
 				//可以用策略模式    需要改进
-				if (m < 24) {
+				if (m < 10) {
 					refundFee = totalFee/2;
 				} else {
 					refundFee = totalFee;
@@ -234,8 +237,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				logger.info("退款金额：" + refundFee);
 				
 //				refundReqData.setParams(transactionID, outTradeNo, outRefundNo, totalFee, refundFee);
-				System.out.println("商户号：" + t.getOrderPayNumber());
-				refundReqData.setParams(transactionID, t.getOrderPayNumber(), outRefundNo, totalFee, refundFee);
+				System.out.println("交易单号：" + t.getOrderPayNumber());
+//				refundReqData.setParams(transactionID, t.getOrderPayNumber(), outRefundNo, totalFee, refundFee);
+				refundReqData.setParams(t.getOrderPayNumber(), "", outRefundNo, totalFee, refundFee);
 				//refundReqData.setParams("4005282001201707252629347549", "", outRefundNo, totalFee, refundFee);
 					
 				refundRequest.init(AppGlobals.WECHAT_ID, AppGlobals.WECHAT_APP_SECRET, AppGlobals.WECHAT_KEY);
@@ -300,7 +304,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		map.put("success", success+"");
 		return map;
 	}
-
+	
 	/**
 	 * 1.添加事务注解 使用propagation 指定事务的传播行为，即当前的事务方法被另外一个事务方法调用时如何使用事务。
 	 * 默认取值为REQUIRED，即使用调用方法的事务 REQUIRES_NEW：使用自己的事务，调用的事务方法的事务被挂起。

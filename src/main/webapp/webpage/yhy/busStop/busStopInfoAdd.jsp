@@ -78,7 +78,7 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" style="height: 30px;" id="name" name="name" ignore="ignore"
+					<input class="inputxt" style="height: 30px;" id="name" name="name" dataType="*"
 						   value="${busStopInfo.name }">
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
@@ -86,14 +86,14 @@
 					<label class="Validform_label">站点类型: </label>
 				</td>
 				<td class="value">
-					<t:dictSelect field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" ></t:dictSelect>	
+					<t:dictSelect field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" datatype="*" ></t:dictSelect>	
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
 				<td align="center">
 					<label class="Validform_label"> 选择线路城市: </label>
 				</td>
 				<td class="value">
-					<select name="city" id="city" onchange="changeCity(this.value)" >
+					<select name="city" id="city" onchange="changeCity(this.value)" dataType="*" >
 							<option value="">--请选择城市--</option>
 							<c:forEach var="c" items="${cities}">
 								<option value="${c.cityId}" <c:if test="${busStopInfo.cityId == c.cityId}" >selected="selected"</c:if>  >
@@ -111,7 +111,7 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="stopLocation" name="stopLocation" ignore="ignore"
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="stopLocation" name="stopLocation" dataType="*"
 						   value="${busStopInfo.stopLocation }">
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
@@ -121,7 +121,7 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="x" name="x" ignore="ignore"
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="x" name="x" dataType="*"
 						   value="${busStopInfo.x}">
 					<span class="Validform_checktip"></span>
 				</td>
@@ -131,13 +131,12 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="y" name="y" ignore="ignore"
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="y" name="y" dataType="*"
 						   value="${busStopInfo.y}">
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
 			</tr>
 		</table>
-		
 		
 	</t:formvalid>
 	<t:authFilter name="formtableId"></t:authFilter>
@@ -158,6 +157,7 @@
     	//跳转城市
     	function changeCity(value){
     		console.log(value);
+    		cityCode = value;
     		var city = $("#city option:selected").text();
     		placeSearch.setCity(city);
     		console.log(city.trim());
@@ -171,6 +171,8 @@
     	var infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
     	//搜索对象
     	var placeSearch;
+    	//城市编码
+    	var cityCode = $('#city').val();
     	
     	function loadMapStationBs(){
     		
@@ -220,7 +222,7 @@
    		    	openInfoWin("正在获取位置信息...", e.lnglat);
    		    	//var lnglatXY=[116.396574, 39.992706];//地图上所标点的坐标
    	    		geocoder.getAddress(e.lnglat, function(status, result) {
-   	    			var cityCode = $('#city').val();
+   	    			
    	    			if(cityCode == "" || cityCode == null){
 						   openInfoWin(" 请先选择城市 ", marker.getPosition());
 				    }else{
@@ -288,15 +290,23 @@
 	                //切换点击marker时触发
 	                AMap.event.addListener(placeSearch, 'selectChanged', function(results) {
 	                     //获取当前选中的结果数据
-                            //infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
-                            //infoWindow.open(map, e.target.getPosition());
-                              
-	                     console.log(results.selected.data);
-                         //给表单赋值
-               	         $('#stopLocation').val(results.selected.data.name);
-               	         $('#x').val(results.selected.data.location.lng);
-               	         $('#y').val(results.selected.data.location.lat);
-               	      	 map.remove(marker);
+                         //infoWindow.setContent(hs['address']);//点击以后窗口展示的内容
+                         //infoWindow.open(map, e.target.getPosition());
+                         
+	                	if(cityCode == "" || cityCode == null){
+							   openInfoWin(" 请先选择城市 ", marker.getPosition());
+					    }else{
+							if(cityCode.substr(0,4) == results.selected.data.adcode.substr(0,4)){
+							 	console.log(results.selected.data);
+							    //给表单赋值
+							    $('#stopLocation').val(results.selected.data.name);
+							    $('#x').val(results.selected.data.location.lng);
+							    $('#y').val(results.selected.data.location.lat);
+								map.remove(marker);
+							}else{
+							    openInfoWin("只限于" + $("#city option:selected").text() + "地区", marker.getPosition());
+							}
+					    }
 	                });
 				});
     	    });

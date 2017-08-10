@@ -884,7 +884,6 @@ public class AppInterfaceController extends AppBaseController {
 			
 			String departTime = jsondata.getString("departTime");
 			
-			
 			if(StringUtil.isNotEmpty(orderId)){
 				
 				t = systemService.getEntity(TransferorderEntity.class, orderId);

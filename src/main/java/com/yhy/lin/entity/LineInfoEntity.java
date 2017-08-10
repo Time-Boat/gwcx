@@ -52,7 +52,8 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	private String  settledCompanyId;
 	//入驻公司姓名
 	private String  settledCompanyName;
-	
+	//线路编号
+	private String lineNumber;
 
 	private String  cityId;
 	
@@ -211,6 +212,14 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	}
 	public void setCreateUserId(String createUserId) {
 		this.createUserId = createUserId;
+	}
+	
+	@Column(name = "lineNumber")
+	public String getLineNumber() {
+		return lineNumber;
+	}
+	public void setLineNumber(String lineNumber) {
+		this.lineNumber = lineNumber;
 	}
 	
 }

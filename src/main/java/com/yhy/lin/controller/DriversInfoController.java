@@ -25,8 +25,10 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
@@ -145,6 +147,8 @@ public class DriversInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		String cityId = request.getParameter("city");
+		TSUser user = ResourceUtil.getSessionUserName();
+		driversInfo.setDepartId(user.getCurrentDepart().getId());
 		if (StringUtil.isNotEmpty(driversInfo.getId())) {
 			driversInfo.setCityId(cityId);
 			message = "司机信息表更新成功";

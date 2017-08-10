@@ -11,6 +11,8 @@ import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
+import org.jeecgframework.web.system.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,6 +28,7 @@ import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 import sun.print.resources.serviceui;
@@ -38,7 +41,10 @@ import sun.print.resources.serviceui;
 @Service("AppInterfaceService")
 @Transactional
 public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInterfaceService {
-
+	
+	@Autowired
+	private SystemService systemService;
+	
 	/**
 	 * 1.添加事务注解 使用propagation 指定事务的传播行为，即当前的事务方法被另外一个事务方法调用时如何使用事务。
 	 * 默认取值为REQUIRED，即使用调用方法的事务 REQUIRES_NEW：使用自己的事务，调用的事务方法的事务被挂起。
@@ -56,8 +62,8 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		// 生成订单号
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
-		t.getLineId();
-		String str = "line";
+		LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, t.getLineId());
+		String str = line.getLineNumber();
 		String orderstart=t.getOrderStartime();
 		try {
 			if(StringUtil.isNotEmpty(orderstart)){
@@ -65,7 +71,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 				long nowLong = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmm").format(w));
 				String s = nowLong+"";
 				String a = s.substring(10);
-				String b = s.substring(0, 10);
+				String b = s.substring(2, 10);
 				System.out.println(b);
 				if(Integer.parseInt(a)<30){
 					t.setLineOrderCode(str+b+"A");

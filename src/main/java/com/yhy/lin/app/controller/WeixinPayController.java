@@ -43,8 +43,8 @@ import com.yhy.lin.entity.TransferorderEntity;
 /**
  * 微信支付Controller
  * 
- * @author Jeff Xu
- * @since 2016-08-11
+ * @author liu
+ * @since 2017-07-11
  */
 
 @Controller
@@ -239,7 +239,7 @@ public class WeixinPayController extends AppBaseController{
 			model.addAttribute("orderPayNumber", orderPayNumber);
 			model.addAttribute("payPrice", total_fee);
 			
-			//将商户单号保存到指定的订单
+			//将订单号保存到指定的订单
 			TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, orderId);
 			t.setOrderPayNumber(orderPayNumber);
 			systemService.save(t);
@@ -303,9 +303,15 @@ public class WeixinPayController extends AppBaseController{
 //										+ File.separator + "data" + File.separator + "order.txt";
 //								TxtUtil.writeToTxt(content, fileUrl);
 								
-								//通过商户单号查找订单数据
+								//交易单号
+								String transactionId = (String)resultMap.get("transaction_id");
+								logger.info("weixin pay sucess,transaction_id:" + transactionId);
+								
+								//通过订单号查找订单数据
 								TransferorderEntity t = systemService.findUniqueByProperty(TransferorderEntity.class, "orderPayNumber", out_trade_no);
-
+								//修改订单号为交易单号，测试交易单号批量退款的时候是不是更精准一些
+								t.setOrderPayNumber(transactionId);
+								
 								String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
 								// 如果购买成功，将消息添加到消息中心
 								AppMessageListEntity app = SendMessageUtil.buildAppMessage(t.getUserId(), content, "0", "0", t.getId());
@@ -313,6 +319,8 @@ public class WeixinPayController extends AppBaseController{
 								//新增消息后，要把对应的用户状态改一下
 								systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
 
+								systemService.saveOrUpdate(t);
+								
 								logger.info("消息保存成功 ");
 								
 								rc = "SUCCESS";

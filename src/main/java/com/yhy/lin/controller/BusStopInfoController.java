@@ -32,7 +32,9 @@ import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
+import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
+import com.yhy.lin.service.StartOrEndServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -51,6 +53,9 @@ public class BusStopInfoController extends BaseController {
 	
 	@Autowired
 	private BusStopInfoServiceI busStopInfoService;
+	
+	@Autowired
+	private StartOrEndServiceI startOrEndService;
 	
 	//班车站点
 	@RequestMapping(params="busStopInfoList")
@@ -246,6 +251,20 @@ public class BusStopInfoController extends BaseController {
 		return j;		
 	}
 	
+	/**
+	 * 获取站点挂接站点序号
+	 */
+	private synchronized int getMaxSiteOrder(){
+		int siteOreder=0;
+		String sql= "select b.siteOrder from  line_busstop b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
+		List<Object> bList =systemService.findListbySql(sql.toString());
+		if(bList.size()>0){
+			 siteOreder = (int) bList.get(0);
+		}
+		return siteOreder;
+	}
+	
+	
 	 /**
      * 挂接站点保存
      * @param req request
@@ -259,7 +278,7 @@ public class BusStopInfoController extends BaseController {
 	        try{
 		        String lineInfoId = request.getParameter("lineInfoId");
 		        //公务车线路为1    接送机线路为2
-		        String lineType = request.getParameter("lineType");
+		       // String lineType = request.getParameter("lineType");
 		        LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, lineInfoId);
 		        
 		        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
@@ -270,15 +289,31 @@ public class BusStopInfoController extends BaseController {
 		        	Line_busStopEntity lin_busStop = new Line_busStopEntity();
 		        	lin_busStop.setLineId(lineInfoId);
 		        	lin_busStop.setBusStopsId(idsList.get(i));
+		        	int site = getMaxSiteOrder();
+		        	int pum = site+1+i;
+		        	lin_busStop.setSiteOrder(pum);
+		        	
+		        	StartOrEndEntity st = new StartOrEndEntity();
 		        	if("2".equals(line.getType()) || "4".equals(line.getType())){
-		        		if (StringUtil.isNotEmpty(line.getStartLocation())) {
-		        			lin_busStop.setSiteId(line.getStartLocation());
-		        		}
+		        		
+						if (StringUtil.isNotEmpty(line.getStartLocation())) {
+							st.setStartid(line.getStartLocation());
+						}
+						if (StringUtil.isNotEmpty(ids)) {
+							st.setEndid(idsList.get(i));
+						}
+						st.setLinetype(line.getType());
+						
 		        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
-		        		if (StringUtil.isNotEmpty(line.getEndLocation())) {
-		        			lin_busStop.setSiteId(line.getEndLocation());
-		        		}
+		        		if (StringUtil.isNotEmpty(ids)) {
+							st.setStartid(idsList.get(i));
+						}
+						if (StringUtil.isNotEmpty(line.getEndLocation())) {
+							st.setEndid(line.getEndLocation());
+						}
+						st.setLinetype(line.getType());
 	        		}
+		        	startOrEndService.save(st);
 		        	
 		        	if(StringUtil.isNotEmpty(idsList.get(i))){
 		        		if(i==(idsList.size()-1)){
@@ -290,7 +325,7 @@ public class BusStopInfoController extends BaseController {
 		        	list.add(lin_busStop);
 		        }
 		        //原设定是修改站点的挂接状态，占时不适用   (为啥不适用呢...)
-		        System.out.println("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
+		        /*System.out.println("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
 		        StringBuffer updateSql = new StringBuffer();
 		        if (StringUtil.isNotEmpty(line.getType())) {
 		        	 updateSql.append("update busstopinfo set status=CONCAT(status,'" + line.getType() + "') where id in ("+sql.toString()+") ");
@@ -299,8 +334,9 @@ public class BusStopInfoController extends BaseController {
 				        
 				        systemService.saveAllEntitie(list);
 				        message="站点挂接成功";
-		        }
-		        
+		        }*/
+		        systemService.saveAllEntitie(list);
+		        message="站点挂接成功";
 		        //只有站点类型是普通站点的时候，才修改它的状态，让其只能在一条线路中使用
 		        //如果是机场站点或者火车站点，则可以重复使用
 		        

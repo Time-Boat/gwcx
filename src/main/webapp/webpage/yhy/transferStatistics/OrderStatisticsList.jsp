@@ -6,30 +6,28 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 	<div region="center" style="padding: 0px; border: 0px">
-		<t:datagrid name="OrderStatList" title="订单收入统计" autoLoadData="true"
-			actionUrl="transferStatisticsController.do?orderdatagrid"
-			fitColumns="true" idField="id" fit="true" queryMode="group"
-			checkbox="true">
+		<t:datagrid name="OrderStatList" title="订单收入统计" autoLoadData="true" checkbox="true" fit="true"
+			actionUrl="transferStatisticsController.do?orderdatagrid" idField="id" queryMode="group">
 			<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 			<t:dgCol title="下单时间" field="applicationTime" editor="datebox"
-				formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group"
+				formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" width="100"
 				align="center"></t:dgCol>
-			<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
-			<t:dgCol title="线路名称" field="lineName" query="true" align="center"></t:dgCol>
-			<t:dgCol title="线路类型" field="ordertype"
+			<t:dgCol title="订单编号" field="orderId" query="true" align="center" width="150"></t:dgCol>
+			<t:dgCol title="线路名称" field="lineName" query="true" align="center" width="80"></t:dgCol>
+			<t:dgCol title="线路类型" field="ordertype" width="60"
 				replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
-			<t:dgCol title="发车时间" field="orderStartime" align="center"></t:dgCol>
-			<t:dgCol title="下单联系人" field="realName" align="center"></t:dgCol>
-			<t:dgCol title="乘车联系人" field="orderContactsname" align="center"></t:dgCol>
-			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
-			<t:dgCol title="司机名称" field="driverName" align="center" query="true"></t:dgCol>
-			<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
-			<t:dgCol title="订单来源渠道" field="account" align="center"></t:dgCol>
-			<t:dgCol title="订单状态" field="orderStatus"
+			<t:dgCol title="发车时间" field="orderStartime" align="center" width="120"></t:dgCol>
+			<t:dgCol title="下单联系人" field="realName" align="center" width="80"></t:dgCol>
+			<t:dgCol title="乘车联系人" field="orderContactsname" align="center" width="80"></t:dgCol>
+			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center" width="80"></t:dgCol>
+			<t:dgCol title="司机名称" field="driverName" align="center" query="true" width="80"></t:dgCol>
+			<t:dgCol title="车牌号" field="licencePlate" align="center" width="80"></t:dgCol>
+			<t:dgCol title="订单来源渠道" field="account" align="center" width="80"></t:dgCol>
+			<t:dgCol title="订单状态" field="orderStatus" width="80"
 				replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,取消订单待退款_3" query="true"
 				align="center"></t:dgCol>
-			<t:dgCol title="订单数量" field="orderNumbers" align="center"></t:dgCol>
-			<t:dgCol title="合计价格" field="orderTotalPrice" align="center"></t:dgCol>
+			<t:dgCol title="订单数量" field="orderNumbers" align="center" width="80"></t:dgCol>
+			<t:dgCol title="合计价格" field="orderTotalPrice" align="center" width="80"></t:dgCol>
 		</t:datagrid>
 	</div>
 

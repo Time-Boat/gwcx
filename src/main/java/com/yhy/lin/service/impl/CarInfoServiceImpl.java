@@ -20,6 +20,7 @@ import java.util.Map;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 
 @Service("carInfoService")
@@ -30,11 +31,17 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType) {
 		
 		StringBuffer queryCondition = new StringBuffer(" where delete_flag = '0' ");
+		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
 		if(StringUtil.isNotEmpty(userCar)){
 			queryCondition.append(" and c.status = '" + userCar + "' ");
 			if(StringUtil.isNotEmpty(lpId)){
 				queryCondition.append(" or c.id = '" + lpId + "' ");
 			}
+		}
+		
+		if(StringUtil.isNotEmpty(orgCode)){
+			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
 		}
 		
 		if(StringUtil.isNotEmpty(businessType)){
@@ -53,14 +60,13 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 			queryCondition.append(" and c.status = '"+status+"' ");
 		}
 		
-		String sqlCnt = "select count(1) from car_info c left join driversinfo d on c.driver_id = d.id  " + queryCondition.toString();
+		String sqlCnt = "select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select c.*,d.name,d.driving_license,d.id as driverId from car_info c left join driversinfo d on c.driver_id = d.id   " + queryCondition.toString());
+	    sql.append("select c.*,d.name,d.driving_license,d.id as driverId from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID" + queryCondition.toString());
 		
-		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 					Db2Page[] db2Pages = {

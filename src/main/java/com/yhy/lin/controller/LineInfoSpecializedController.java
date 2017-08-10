@@ -260,10 +260,4 @@ public class LineInfoSpecializedController extends BaseController{
 		return new ModelAndView("yhy/linesSpecial/lineMap");
 	}
 	
-	
-	
-	
-	
-	
-	
 }

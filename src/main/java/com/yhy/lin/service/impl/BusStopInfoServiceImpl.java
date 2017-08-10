@@ -124,24 +124,41 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	
 	//根据线路lineInfoId，拿到对应线路的未挂接的站点信息   import com.yhy.lin.entity.LineInfoEntity;
 	@Override
-	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,String lineInfoId, DataGrid dataGrid, String lineType,LineInfoEntity lineInfo,String siteid){
-		String sqlWhere = getSqlWhere2(busStopInfo, lineInfoId, lineType, lineInfo,siteid);
+	public JSONObject getDatagrid3a(BusStopInfoEntity busStopInfo,DataGrid dataGrid,LineInfoEntity lineInfo){
+		String sqlWhere = getSqlWhere2(busStopInfo,lineInfo);
+		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		//where c.lineId is NULL 这个条件是为了不重复添加站点
-		String sqlCnt = "select count(*) from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL ";
-		if (!sqlWhere.isEmpty()) {
-			sqlCnt +=  sqlWhere;
+		StringBuffer sqlCnt = new StringBuffer();
+		sqlCnt.append("select count(*) from busstopinfo a where 1=1 ");
+		if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
+			sqlCnt.append("and a.id not in(select se.endId from start_end se where se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 		}
-		System.out.println(sqlCnt+"sqlCnt");
-		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
+			sqlCnt.append("and a.id not in(select se.startId from start_end se where se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+		}
+		
+		if (!sqlWhere.isEmpty()) {
+			sqlCnt.append(sqlWhere);
+		}
+		System.out.println(sqlCnt.toString()+"sqlCnt");
+		Long iCount = getCountForJdbcParam(sqlCnt.toString(), null);
 		
 		// 取出当前页的数据 
-		String sql = "select a.id ,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL";
+		StringBuffer sql = new StringBuffer();
+		sql.append("select a.id ,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from busstopinfo a  where 1=1 ");
+		if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
+			sql.append("and a.id not in(select se.endId from start_end se where se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+		}
+		if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
+			sql.append("and a.id not in(select se.startId from start_end se where se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+		}
+		//String sql = "select a.id ,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL";
 		if (!sqlWhere.isEmpty()) {
-			sql +=  sqlWhere;
+			sql.append(sqlWhere);
 		}
 		System.out.println(sql.toString());
-		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
+		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
 				new Db2Page("id","id")
@@ -155,7 +172,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return jObject;
 	}
 	
-	public String getSqlWhere2(BusStopInfoEntity busStopInfo,String lineInfoId, String lineType,LineInfoEntity lineInfo,String siteid){
+	public String getSqlWhere2(BusStopInfoEntity busStopInfo,LineInfoEntity lineInfo){
 		StringBuffer sqlWhere = new StringBuffer(" and a.deleteFlag='0' and a.station_type = '0' "); 
 		if(StringUtil.isNotEmpty(lineInfo.getCityId())){
 			sqlWhere.append(" and  a.cityId = '"+lineInfo.getCityId()+"' ");
@@ -163,9 +180,6 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		
 		/**是否已挂接站点，0：未挂接      1：挂接公务车站点     2：挂接接机站点  3:挂机送机站点  4：挂接接火车站站点   5：挂接送火车站站点*/
 		//因为站点是公务车和接送机业务都能使用，公务车中一条线路使用了这个站点之后，其他公务车的线路就不能再使用了，但是机场线路可以使用，所以这里做了一个区分，看站点是挂在公务车类型下还是挂在接送机类型下
-		if(StringUtil.isNotEmpty(lineInfo.getType())){
-			sqlWhere.append(" and  a.status not like '%"+lineInfo.getType()+"%' ");
-		}
 		
 		if(StringUtil.isNotEmpty(busStopInfo.getName())){
 			sqlWhere.append(" and  a.name like '%" + busStopInfo.getName() + "%'");

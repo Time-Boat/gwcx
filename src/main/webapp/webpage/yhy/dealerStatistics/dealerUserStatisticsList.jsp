@@ -8,10 +8,10 @@
 			actionUrl="dealerStatisticsController.do?dealerUserdatagrid"
 			idField="id" fit="true" checkbox="true" queryMode="group">
 			<t:dgCol title="渠道商名称" field="account" width="120" align="center"></t:dgCol>
-			<t:dgCol title="注册时间" field="createTime" editor="datebox"
+			<t:dgCol title="注册时间" field="createTime" editor="datebox" width="150"
 				formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group"
 				align="center"></t:dgCol>
-			<t:dgCol title="用户名" field="realName" width="120" align="center"></t:dgCol>
+			<t:dgCol title="用户名" field="realName" width="50" align="center"></t:dgCol>
 			<t:dgCol title="手机号" field="phone" width="120" align="center"></t:dgCol>
 			<t:dgCol title="身份证号" field="cardNumber" width="120" align="center"></t:dgCol>
 			<t:dgCol title="居住地" field="address" width="120" align="center"></t:dgCol>

@@ -18,8 +18,10 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSType;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
@@ -133,7 +135,8 @@ public class CarInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 
 		String beforeDriverId = "";
-		
+		TSUser user = ResourceUtil.getSessionUserName();
+		carInfo.setDepartId(user.getCurrentDepart().getId());
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			message = "车辆信息更新成功";
 			CarInfoEntity t = carInfoService.get(CarInfoEntity.class, carInfo.getId());

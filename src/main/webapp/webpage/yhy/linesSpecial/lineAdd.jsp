@@ -116,6 +116,14 @@
     }
     //进入触发 
     $(function(){
+    	var types= $("#types").val();
+    	var dispaths= $("#dispaths").val();
+    	if(types!=""){
+    		 $("#type").attr("disabled", "disabled");
+    	}
+    	if(dispaths!=""){
+    		$("#dispath").attr("disabled", "disabled");
+    	}
   		$('#ends').val($('#endLocation option:selected').text());
   		$('#starts').val($('#startLocation option:selected').text());
     });
@@ -135,7 +143,7 @@
 		
 		
     	$.ajax({
-   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type='+type+'&ends='+ends+'&ids='+ids+'&starts='+starts,
+   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type='+type,
    		   dataType: 'json',
    		   complete: function(data,status) {
    			   var message=data.responseText;
@@ -170,7 +178,7 @@
     	var ends =  $("#ends").val();//获取终点 
     	$("#endLocation").empty();//先置空 
     	$.ajax({
-  		   url: 'lineInfoController.do?getEndlocation&city='+city+'&type='+type+'&starts='+starts+'&startLocation='+startLocation,
+  		   url: 'lineInfoController.do?getEndlocation&city='+city+'&type='+type+'&startLocation='+startLocation,
   		   dataType: 'json',
   		   complete: function(data,status) {
   			   var message=data.responseText;
@@ -192,6 +200,8 @@
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
 	<input id="ends" name="endLocations" type="hidden" value="${lineInfo.endLocation}">
 	<input id="starts" name="startLocations" type="hidden" value="${lineInfo.startLocation}">
+	<input id="types" name="types" type="hidden" value="${lineInfo.type}">
+	<input id="dispaths" name="dispaths" type="hidden" value="${lineInfo.dispath}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 		
 		<tr>
@@ -199,8 +209,10 @@
 				<label class="Validform_label"> 线路名称: </label>
 			</td>
 			<td class="value" width="85%">
-			<input id="name" name="name" value="${lineInfo.name}" type="text" style="width: 60%" class="inputxt"  datatype="*"> 
-				<span class="Validform_checktip"></span> 
+				
+                    <input id="name" name="name" <c:if test="${lineInfo.name!=null }"> readonly='readonly' </c:if> value="${lineInfo.name}" type="text" style="width: 60%" class="inputxt"  datatype="*" /> 
+					<span class="Validform_checktip"></span> 
+			
 			</td>
 		</tr>
 		
@@ -209,10 +221,10 @@
 				<label class="Validform_label"> 选择线路城市: </label>
 			</td>
 			<td class="value">
-				<select id="city" name="city" datatype="*" onchange="getStartLocation()">
+				<select id="city" name="city" datatype="*" onchange="getStartLocation()" <c:if test="${lineInfo.cityId!=null }">  disabled="disabled" </c:if>>
 						<option value="">--请选择城市--</option>
 						<c:forEach var="c" items="${cities}">
-							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if> >
+							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if>>
 								${c.cityName}
 							</option>
 						</c:forEach>
@@ -239,7 +251,7 @@
 			</td>
 			<td class="value">
 				
-				<t:dictSelect field="dispath" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
+				<t:dictSelect id="dispath" field="dispath" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>
@@ -250,7 +262,7 @@
 				<label class="Validform_label"> 起始发车地址: </label>
 			</td>
 			<td class="value">
-				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" onChange="getEndlocation()">  
+				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" onChange="getEndlocation()" <c:if test="${lineInfo.startLocation!=null }">  disabled="disabled" </c:if>>  
                 <option value="">--请选择发车地址--</option>
 						<c:forEach var="b" items="${startList}">
 							<option value="${b.id}" <c:if test="${lineInfo.startLocation == b.id}" >selected="selected"</c:if> >
@@ -266,7 +278,7 @@
 				<label class="Validform_label"> 终点位置地址:  </label>
 			</td>
 			<td class="value">
-				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" > 
+				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" <c:if test="${lineInfo.endLocation!=null }">  disabled="disabled" </c:if>> 
 				<option value="">--请选择终点位置地址--</option>
 						<c:forEach var="b" items="${endList}">
 							<option value="${b.id}" <c:if test="${lineInfo.endLocation == b.id}" >selected="selected"</c:if> >

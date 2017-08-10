@@ -26,15 +26,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.alibaba.druid.pool.vendor.SybaseExceptionSorter;
 import com.google.gson.Gson;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.OpenCityEntity;
+import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
 import com.yhy.lin.service.LineInfoServiceI;
+import com.yhy.lin.service.StartOrEndServiceI;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -49,6 +50,7 @@ import net.sf.json.JSONObject;
 @Controller
 @RequestMapping("lineInfoController")
 public class LineInfoController extends BaseController {
+	
 	private static final Logger logger = Logger.getLogger(LineInfoController.class);
 	@Autowired
 	private SystemService systemService;
@@ -58,6 +60,9 @@ public class LineInfoController extends BaseController {
 
 	@Autowired
 	private LineInfoServiceI lineInfoService;
+	
+	@Autowired
+	private StartOrEndServiceI startOrEndService;
 
 	/**
 	 * 线路管理跳转页面
@@ -145,15 +150,37 @@ public class LineInfoController extends BaseController {
 			
 			if (StringUtil.isNotEmpty(zdId)) {
 				BusStopInfoEntity bus = this.systemService.getEntity(BusStopInfoEntity.class, zdId);
+				Line_busStopEntity lines = systemService.getEntity(Line_busStopEntity.class, id);
 				if("1".equals(bus.getStationType())){
 					message = "火车站点不可删除";
 				}else if("2".equals(bus.getStationType())){
 					message = "机场站点不可删除";
+				}else if(lines.getSiteOrder()==99){
+					message = "终点站点不可删除";
 				}else{
-					Line_busStopEntity lines = systemService.getEntity(Line_busStopEntity.class, id);
 					LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
-					if (StringUtil.isNotEmpty(lines.getSiteId())) {
-						lines.setSiteId("");
+					if (StringUtil.isNotEmpty(lines)) {
+						List<Line_busStopEntity> list = this.systemService.findByQueryString("from Line_busStopEntity where siteOrder!='99' and siteOrder>"+lines.getSiteOrder());
+						if(list.size()>0){
+							for (int i = 0; i < list.size(); i++) {
+								Line_busStopEntity buss =  list.get(i);
+								int order = buss.getSiteOrder();
+								if(order>1){
+									buss.setSiteOrder(order-1);
+								}
+							}
+							
+						}
+					}
+					
+					//删除起点和终点关联表
+					if("2".equals(lin.getType()) || "4".equals(lin.getType())){
+						List<StartOrEndEntity> list=  systemService.findHql("from StartOrEndEntity where startid=? and endid=? and linetype=?", lin.getStartLocation(),zdId,lin.getType());
+						systemService.delete(list.get(0));
+					}
+					if("3".equals(lin.getType()) || "5".equals(lin.getType())){
+						List<StartOrEndEntity> list= systemService.findHql("from StartOrEndEntity where startid=? and endid=? and linetype=?", zdId,lin.getEndLocation(),lin.getType());
+						systemService.delete(list.get(0));
 					}
 					
 					systemService.deleteEntityById(Line_busStopEntity.class, id);
@@ -166,6 +193,7 @@ public class LineInfoController extends BaseController {
 			}
 			
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 		j.setMsg(message);
@@ -197,8 +225,9 @@ public class LineInfoController extends BaseController {
 			// 批量逻辑删除
 			lineInfoService.updateAllEntitie(list);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		//systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 		j.setMsg(message);
 		return j;
 	}
@@ -226,6 +255,23 @@ public class LineInfoController extends BaseController {
 		}
 		return new ModelAndView("yhy/lines/lineAdd");
 	}
+	
+	//获取最大的线路编码
+	private synchronized String getMaxLocalCode(String cityid){
+			String code="";
+			String sql= "select a.lineNumber from lineinfo a where a.cityId='"+cityid+"'  ORDER BY a.createTime desc";
+			List<Object> bList =systemService.findListbySql(sql.toString());
+			if(bList.size()>0){
+				String pum = (String) bList.get(0);
+				//String pum = (String) ob[0];
+				if(StringUtil.isNotEmpty(pum)){
+					code=pum.substring(6);
+				}
+			}else{
+				code="10000";
+			}
+			return code;
+	}
 
 	/**
 	 * 线路保存
@@ -246,6 +292,7 @@ public class LineInfoController extends BaseController {
 		if(StringUtil.isNotEmpty(cityId)){
 			List<CitiesEntity> listCity = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
 			if (StringUtil.isNotEmpty(listCity)) {
+				
 				lineInfo.setCityId(cityId);
 				lineInfo.setCityName(listCity.get(0).getCity());
 			}
@@ -260,7 +307,18 @@ public class LineInfoController extends BaseController {
 		if (StringUtil.isNotEmpty(lineInfo.getId())) {
 			try {
 				LineInfoEntity l = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
+				
+				/*//修改起点和终点数据
+				List<StartOrEndEntity> list= systemService.findHql("from StartOrEndEntity where startid=? and endid=? and linetype=? ", l.getStartLocation(),l.getEndLocation(),l.getType());
+				StartOrEndEntity addrs = list.get(0);
+				if (StringUtil.isNotEmpty(addrs)) {
+					addrs.setStartid(lineInfo.getStartLocation());
+					addrs.setEndid(lineInfo.getEndLocation());
+					addrs.setLinetype(lineInfo.getType());
+				}*/
+				
 				MyBeanUtils.copyBeanNotNull2Bean(lineInfo, l);
+				//startOrEndService.saveOrUpdate(addrs);
 				lineInfoService.saveOrUpdate(l);
 				message = "线路修改成功！";
 				// -----数据修改日志[类SVN]------------
@@ -276,6 +334,26 @@ public class LineInfoController extends BaseController {
 			}
 		} else {
 			try {
+				
+				String code = getMaxLocalCode(cityId);
+				if(code!=null){
+					int pum = Integer.parseInt(code)+1;
+					String linecode = cityId+pum;
+					lineInfo.setLineNumber(linecode);//设置线路编号
+				}
+				
+				StartOrEndEntity st = new StartOrEndEntity();
+				if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {
+					st.setStartid(lineInfo.getStartLocation());
+				}
+				if (StringUtil.isNotEmpty(lineInfo.getEndLocation())) {
+					st.setEndid(lineInfo.getEndLocation());
+				}
+				if (StringUtil.isNotEmpty(lineInfo.getType())) {
+					st.setLinetype(lineInfo.getType());
+				}
+				
+				startOrEndService.save(st);
 				lineInfoService.save(lineInfo);
 				// lineInfoService.findByQueryString("sdsdd");
 				message = "线路添加成功！";
@@ -289,7 +367,7 @@ public class LineInfoController extends BaseController {
 				message = "线路添加失败！";
 				j.setSuccess(false);
 				logger.error(ExceptionUtil.getExceptionMessage(e));
-				// e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		//线路挂接
@@ -312,27 +390,16 @@ public class LineInfoController extends BaseController {
 		 List<Line_busStopEntity> list = new ArrayList<Line_busStopEntity>();
 		 String startlocaid = request.getParameter("startLocation");
 		 String endlocaid = request.getParameter("endLocation");
-		 
-		 if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
-			 lin_busStop.setSiteId(startlocaid);
-			 lin_busStop1.setSiteId(startlocaid);
-		 }else if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
-			 lin_busStop.setSiteId(endlocaid);
-			 lin_busStop1.setSiteId(endlocaid);
-			 
-		 }
 			
 			StringBuffer str = new StringBuffer();
-			StringBuffer str1 = new StringBuffer();
-			StringBuffer str2 = new StringBuffer();
 			
 			if(StringUtil.isNotEmpty(startlocaid)){
-				str2.append("select b.name from busstopinfo b,line_busstop a where b.id='");
-				str2.append(startlocaid);
-				str2.append("' and a.busStopsId=b.id and a.lineId='");
-				str2.append(lineInfo.getId()+"'");
+				str.append("select b.name from busstopinfo b,line_busstop a where b.id='");
+				str.append(startlocaid);
+				str.append("' and a.busStopsId=b.id and a.lineId='");
+				str.append(lineInfo.getId()+"'");
 				
-				List<Object> bList =systemService.findListbySql(str2.toString());
+				List<Object> bList =systemService.findListbySql(str.toString());
 				if(bList.size()>0){
 					message="站点存在！";
 				}else{
@@ -340,15 +407,6 @@ public class LineInfoController extends BaseController {
 					lin_busStop.setBusStopsId(startlocaid);
 					lin_busStop.setSiteOrder(0);
 					list.add(lin_busStop);
-					if(StringUtil.isNotEmpty(lineInfo.getType())){
-						str.append("update busstopinfo set status=CONCAT(status,'");
-						str.append(lineInfo.getType());
-						str.append("') where ");
-						str.append("id = '"+startlocaid+"' and ");
-						str.append(" station_type = '0' ");
-						systemService.updateBySqlString(str.toString());
-					}
-					
 				}
 				
 			}
@@ -362,14 +420,8 @@ public class LineInfoController extends BaseController {
 				}else{
 					lin_busStop1.setLineId(lineInfo.getId());
 					lin_busStop1.setBusStopsId(endlocaid);
-					lin_busStop1.setSiteOrder(0);
+					lin_busStop1.setSiteOrder(99);
 					list.add(lin_busStop1);
-					str1.append("update busstopinfo set status=CONCAT(status,'");
-					str1.append(lineInfo.getType());
-					str1.append("') where ");
-					str1.append("id = '"+endlocaid+"' and ");
-					str1.append(" station_type = '0' ");
-					systemService.updateBySqlString(str1.toString());
 				}
 			}
 			try{
@@ -435,17 +487,10 @@ public class LineInfoController extends BaseController {
 	public void nullTobusStopInfoList(BusStopInfoEntity busStopInfo, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
 		String lineInfoId = request.getParameter("lineInfoId");
-		String siteid="";
 		if(StringUtil.isNotEmpty(lineInfoId)){
 			LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
-			List<Line_busStopEntity> Linelist =  this.systemService.findByProperty(Line_busStopEntity.class, "lineId", lineInfoId);
-			if(Linelist.size()>0){
-				 siteid = Linelist.get(Linelist.size()-1).getSiteId();
-				
-			}
 			
-			String lineType = request.getParameter("lineType");
-			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, lineInfoId, dataGrid, lineType, lineInfo,siteid);
+			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo,dataGrid, lineInfo);
 			responseDatagrid(response, jObject);
 		}
 		
@@ -462,6 +507,78 @@ public class LineInfoController extends BaseController {
 		request.setAttribute("arrivalTime", request.getParameter("arrivalTime"));
 		return new ModelAndView("yhy/lines/lineBusStopUpdate");
 	}
+	
+	/**
+	 * 上移
+	 */
+	@RequestMapping(params = "moveup")
+	@ResponseBody
+	public AjaxJson moveup(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String siteOrder = request.getParameter("siteOrder");
+		if (StringUtil.isNotEmpty(siteOrder)){
+			int site = Integer.parseInt(siteOrder);
+			if(site!=0 && site!=1 && site!=99){
+				int order=site-1;
+				List<Line_busStopEntity> list = this.systemService.findHql("from Line_busStopEntity where siteOrder=?", order);
+				Line_busStopEntity line= list.get(0);
+				String sql ="update line_busstop set siteOrder=" + order + "  where id='" + id + "'";
+				System.out.println(sql);
+				systemService.updateBySqlString("update line_busstop set siteOrder=" + order + "  where busStopsId='" + id + "'");
+				systemService.updateBySqlString("update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+			}else if(site==0){
+				message = "起点站不能上移";
+			}else if(site==1){
+				message = "起点站不可更改";
+			}else if(site==99){
+				message = "终点站不能上移";
+			}
+		}
+		message = "站点上移成功！";
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 下移
+	 */
+	@RequestMapping(params = "movedown")
+	@ResponseBody
+	public AjaxJson movedown(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String siteOrder = request.getParameter("siteOrder");
+		int siteOreder=0;
+		String sql= "select b.siteOrder from  line_busstop b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
+		List<Object> bList =systemService.findListbySql(sql.toString());
+		if(bList.size()>0){
+			 siteOreder = (int) bList.get(0);
+		}
+		
+		if (StringUtil.isNotEmpty(siteOrder)){
+			int site = Integer.parseInt(siteOrder);
+			if(site!=0 && site!=siteOreder && site!=99){
+				int order=site+1;
+				List<Line_busStopEntity> list = this.systemService.findHql("from Line_busStopEntity where siteOrder=?", order);
+				Line_busStopEntity line= list.get(0);
+				systemService.updateBySqlString("update line_busstop set siteOrder=" + order + "  where busStopsId='" + id + "'");
+				systemService.updateBySqlString("update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+			}else if(site==0){
+				message = "起点站不能下移";
+			}else if(site==1){
+				message = "终点站不可更改";
+			}else if(site==99){
+				message = "终点站不能下移";
+			}
+		}
+		message = "站点下移成功！";
+		j.setMsg(message);
+		return j;
+	}
+	
 
 	/**
 	 * 跳转到站点顺序编号页面
@@ -483,121 +600,8 @@ public class LineInfoController extends BaseController {
 		return j;
 	}
 	
-	
 	/**
-	 * 根据城市添加城市站点
-	 */
-	@RequestMapping(params = "getProvinceJson")
-	@ResponseBody
-	public JSONArray getLineJson(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
-        String city = request.getParameter("city");
-        String type = request.getParameter("type");
-        String starts = request.getParameter("starts");
-        String ends = request.getParameter("ends");
-        String ids = request.getParameter("ids");
-        
-        JSONObject jsonObj = new JSONObject(); 
-        JSONArray jsonArray = new JSONArray();
-        StringBuffer st = new StringBuffer();
-        
-        String sql = "select * from line_busstop a";
-        List<Object> sqlList =systemService.findListbySql(sql);
-        //判断是否有挂机数据
-        if(sqlList.size()>0){
-        	st.append("select DISTINCT b.id,b.name,b.station_type from busstopinfo b,line_busstop a where ");
-            
-            st.append(" b.cityId='");
-        	st.append(city+"'");
-        	
-        	if(type.equals("2") || type.equals("3")){
-    			st.append(" and b.station_type != 1");
-    		}
-    		if(type.equals("4") || type.equals("5")){
-    			st.append(" and b.station_type != 2");
-    		}
-    		if(type.equals("0")){
-    			st.append(" and b.station_type = '0'");
-    		}
-    		
-    		if(StringUtil.isNotEmpty(type)){
-    			st.append(" and (b.status not like'%");
-    			st.append(type);
-    			st.append("%'");
-    		}else{
-    			st.append(" and (b.status ='0'");
-    		}
-    		
-    		st.append("or (a.lineId= '");
-    		st.append(ids+"'");
-    		st.append(" and a.busStopsId=b.id))");
-        }else{
-        	st.append("select DISTINCT b.id,b.name,b.station_type from busstopinfo b where ");
-            
-            st.append(" b.cityId='");
-        	st.append(city+"'");
-        	
-        	if(type.equals("2") || type.equals("3")){
-    			st.append(" and b.station_type != 1");
-    		}
-    		if(type.equals("4") || type.equals("5")){
-    			st.append(" and b.station_type != 2");
-    		}
-    		if(type.equals("0")){
-    			st.append(" and b.station_type = '0'");
-    		}
-    		
-    		if(StringUtil.isNotEmpty(type)){
-    			st.append(" and b.status not like'%");
-    			st.append(type);
-    			st.append("%'");
-    		}else{
-    			st.append(" and b.status ='0'");
-    		}
-    		
-        }
-        
-        List<Object> bList =systemService.findListbySql(st.toString());
-        String startname = "";
-        String endname = "";
-        if(StringUtil.isNotEmpty(starts)){
-        	List<BusStopInfoEntity> sList = busStopInfoService.findByProperty(BusStopInfoEntity.class,"id",starts);
-        	if(sList.size()>0){
-        		for (int i = 0; i < sList.size(); i++) {
-    				 startname = sList.get(i).getName();
-    			}
-        	}
-        	
-        }
-        
-        if(StringUtil.isNotEmpty(ends)){
-        	List<BusStopInfoEntity> eList = busStopInfoService.findByProperty(BusStopInfoEntity.class,"id",ends);
-        	if(eList.size()>0){
-        		for (int i = 0; i < eList.size(); i++) {
-    				 endname = eList.get(i).getName();
-    			}
-        	}
-        }
-        
-        if(bList.size()>0){
-        	for (int i = 0; i < bList.size(); i++) {
-        		Object [] ob = (Object[]) bList.get(i);
-				String id = (String) ob[0];
-				String name = (String) ob[1];
-				String statype = (String) ob[2];
-				jsonObj.put("stopid", id);
-				jsonObj.put("name", name);
-				jsonObj.put("statype", statype);
-				jsonObj.put("startname", startname);
-				jsonObj.put("endname", endname);
-            	jsonArray.add(jsonObj);
-			}
-        }
-       
-		return jsonArray;
-	}
-	
-	/**
-	 * 根据城市添加城市站点
+	 * 根据起点站添加终点站
 	 */
 	@RequestMapping(params = "getEndlocation")
 	@ResponseBody
@@ -609,41 +613,23 @@ public class LineInfoController extends BaseController {
         JSONArray jsonArray = new JSONArray();
         
         StringBuffer st = new StringBuffer();
-        
+        st.append("select DISTINCT b.id,b.name from busstopinfo b  where 1=1 ");
+        if(StringUtil.isNotEmpty(city)){
+        	st.append(" and b.cityId='"+city+"'");
+        }
         if(StringUtil.isNotEmpty(type)){
         	if("2".equals(type) || "4".equals(type)){
-        		st.append("select DISTINCT b.id,b.name from busstopinfo b  where 1=1 ");
-        		
-        		if(StringUtil.isNotEmpty(city)){
-                	st.append(" and b.cityId='"+city+"'");
-                }
-        		st.append("and b.station_type = '0'");
-        		
-        		if(StringUtil.isNotEmpty(startLocation)){
-        			st.append(" and b.id not in (select g.id from line_busstop f LEFT JOIN busstopinfo g on g.id=f.busStopsId where f.siteId='");
-        			st.append(startLocation+"'");
-        		}
-        		st.append(" and g.status like '%"+type+"%')");
-        		
+        		st.append(" and b.station_type = '0'");
         	}
-        	
-        	if("3".equals(type) || "5".equals(type)){
-        		st.append("select DISTINCT b.id,b.name from busstopinfo b  where 1=1 ");
-                if(StringUtil.isNotEmpty(city)){
-                	st.append(" and b.cityId='"+city+"'");
-                }
-                if("3".equals(type)){
-                	st.append("and b.station_type = '2'");
-                }
-                if("5".equals(type)){
-                	st.append("and b.station_type = '1'");
-                }
-                
-                if(StringUtil.isNotEmpty(startLocation)){
-                	st.append(" and b.id not in (select l.endLocation from lineinfo l LEFT JOIN busstopinfo b on b.id=l.endLocation where b.station_type!='0' and l.startLocation='");
-                	st.append(startLocation+"')");
-        		}
+            if("3".equals(type)){
+                st.append(" and b.station_type = '2'");
+            }
+            if("5".equals(type)){
+                st.append(" and b.station_type = '1'");
         	}
+        	if(StringUtil.isNotEmpty(startLocation)){
+    			st.append(" and b.id not in(select se.endId from start_end se where 1=1 and se.startId='"+startLocation+"' and se.lineType like '%"+type+"%')");
+    		}
         }
         
         System.out.println(st.toString());
@@ -664,7 +650,7 @@ public class LineInfoController extends BaseController {
 	}
 	
 	/**
-	 * 根据城市添加城市站点
+	 * 根据城市和类型添加起点
 	 */
 	@RequestMapping(params = "getStartLocation")
 	@ResponseBody
@@ -675,31 +661,22 @@ public class LineInfoController extends BaseController {
         JSONArray jsonArray = new JSONArray();
         
         StringBuffer st = new StringBuffer();
+        st.append("select DISTINCT b.id,b.name from busstopinfo b where  1=1 ");
         
+        if(StringUtil.isNotEmpty(city)){
+        	st.append(" and b.cityId='"+city+"'");
+        }
         if(StringUtil.isNotEmpty(type)){
-        	if("2".equals(type) || "4".equals(type)){
-        		st.append("select DISTINCT b.id,b.name from busstopinfo b LEFT JOIN line_busstop a on b.id=a.busStopsId where  1=1 ");
-                if(StringUtil.isNotEmpty(city)){
-                	st.append(" and b.cityId='"+city+"'");
-                }
-                if("2".equals(type)){
-                	st.append("and b.station_type = '2'");
-                }
-                if("4".equals(type)){
-                	st.append("and b.station_type = '1'");
-                }
-        		
+            if("2".equals(type)){
+                st.append("and b.station_type = '2'");
+            }
+            if("4".equals(type)){
+                st.append("and b.station_type = '1'");
         	}
         	
         	if("3".equals(type) || "5".equals(type)){
-        		st.append("select DISTINCT b.id,b.name from busstopinfo b LEFT JOIN line_busstop a on b.id=a.busStopsId where 1=1");
-                if(StringUtil.isNotEmpty(city)){
-                	st.append(" and b.cityId='"+city+"'");
-                }
                 st.append("and b.station_type = '0'");
         	}
-        }else{
-        	st.append("select DISTINCT b.id,b.name from busstopinfo b LEFT JOIN line_busstop a on b.id=a.busStopsId where  1=1");
         }
         
         List<Object> bList =systemService.findListbySql(st.toString());
@@ -716,6 +693,10 @@ public class LineInfoController extends BaseController {
         }
         
         return jsonArray;
+	}
+	public static void main(String[] args) {
+		
+		String sq ="";
 	}
 
 }

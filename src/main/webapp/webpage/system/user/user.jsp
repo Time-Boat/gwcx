@@ -25,6 +25,39 @@
             $("#orgSelect").combobox("setValues", ${orgIdList});
             $("#orgSelect").combotree("setValues", ${orgIdList});
         }); --%>
+        
+		var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
+	  	
+	  	var b = true;
+	  	
+	  	//验证手机号是否已经被占用
+	  	function checkPhone(phone){
+			if(!pat.test(phone)){
+				
+				return;
+			}
+			$.ajax({
+	            type:"get",
+	            url:"conductorController.do?checkPhone&phone="+phone+"&id="+$("#id").val(),
+	            dataType:'json',
+	            success:function(d){
+	           		var obj = eval('('+d.jsonStr+')');
+	           		b = obj.success;
+	           		if(!b){
+	           			tip(obj.msg);
+	           			$('#check_phone').text(obj.msg).css({color:"red"});
+	           		}else{
+	           			$('#check_phone').text('通过信息验证！').css({color:"#71b83d"});
+	           		}
+	            }
+	        });
+		}
+	  	
+	  	//提交前验证手机号
+	  	function cp(){
+	  		return b;
+	  	}
+        
 
 		function openDepartmentSelect() {
 			$.dialog.setting.zIndex = getzIndex(); 
@@ -66,7 +99,7 @@
     </script>
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="setOrgIds">
+<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cp()">
 	<input id="id" name="id" type="hidden" value="${user.id }">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 		<tr>
@@ -142,8 +175,8 @@
 		<tr>
 			<td align="right" nowrap><label class="Validform_label">  <t:mutiLang langKey="common.phone"/>: </label></td>
 			<td class="value">
-                <input class="inputxt" name="mobilePhone" value="${user.mobilePhone}" datatype="m" errormsg="手机号码不正确" ignore="ignore">
-                <span class="Validform_checktip"></span>
+                <input class="inputxt" name="mobilePhone" value="${user.mobilePhone}" datatype="m" errormsg="手机号码不正确"  onchange="checkPhone(this.value);" >
+                <span class="Validform_checktip" id="check_phone"></span>
             </td>
 		</tr>
 		<tr>

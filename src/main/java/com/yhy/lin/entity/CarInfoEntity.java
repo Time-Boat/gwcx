@@ -50,6 +50,8 @@ public class CarInfoEntity implements java.io.Serializable {
 	private java.lang.String stopY;
 	/**纬度*/
 	private java.lang.String stopX;
+	//所属部门
+	private String departId;
 	
 	@Column(name ="BUSINESS_TYPE",nullable=true,length=1)
 	public java.lang.String getBusinessType() {
@@ -224,5 +226,13 @@ public class CarInfoEntity implements java.io.Serializable {
 	 */
 	public void setRemark(java.lang.String remark){
 		this.remark = remark;
+	}
+	
+	@Column(name = "departId")
+	public String getDepartId() {
+		return departId;
+	}
+	public void setDepartId(String departId) {
+		this.departId = departId;
 	}
 }

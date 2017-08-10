@@ -5,15 +5,15 @@
   <div region="center" style="padding:0px;border:0px">
   <t:datagrid name="carInfoList" title="车辆信息" autoLoadData="true" actionUrl="carInfoController.do?datagrid" idField="id" fitColumns="true" queryMode="group" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-   <t:dgCol title="车牌号" field="licencePlate" query="true" width="120"></t:dgCol>
-   <t:dgCol title="车辆类型" field="carType" dictionary="car_Type" query="true" width="120"></t:dgCol>
-   <t:dgCol title="座位数" field="seat" width="120"></t:dgCol>
-   <t:dgCol title="车辆位置" field="stopPosition" width="120"></t:dgCol>
-   <t:dgCol title="司机" field="name"   width="120"></t:dgCol>
-   <t:dgCol title="车辆状态" field="status" query="true" dictionary="carType" width="120"></t:dgCol>
-   <t:dgCol title="业务类型" field="businessType" query="true" dictionary="carBType" width="120"></t:dgCol>
-   <t:dgCol title="备注" field="remark"   width="120"></t:dgCol>
-   <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
+   <t:dgCol title="车牌号" field="licencePlate" query="true" align="center" width="80"></t:dgCol>
+   <t:dgCol title="车辆类型" field="carType" dictionary="car_Type" align="center" query="true" width="50"></t:dgCol>
+   <t:dgCol title="座位数" field="seat" align="center" width="50"></t:dgCol>
+   <t:dgCol title="车辆位置" field="stopPosition" width="180"></t:dgCol>
+   <t:dgCol title="司机" field="name" align="center"  width="50"></t:dgCol>
+   <t:dgCol title="车辆状态" field="status" align="center" query="true" dictionary="carType" width="50"></t:dgCol>
+   <t:dgCol title="业务类型" field="businessType" align="center" query="true" dictionary="carBType" width="80"></t:dgCol>
+   <t:dgCol title="备注" field="remark"  align="center" width="120"></t:dgCol>
+   <t:dgCol title="操作" field="opt" align="center" width="100"></t:dgCol>
    <t:dgDelOpt title="删除" url="carInfoController.do?del&id={id}" />
    <t:dgToolBar title="录入" icon="icon-add" url="carInfoController.do?addorupdate" funname="add" width="600" height="500"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="carInfoController.do?addorupdate" funname="update"></t:dgToolBar>

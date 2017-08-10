@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 
 @Service("driversInfoService")
@@ -20,7 +21,15 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid, String sex, String name, String phoneNumber,String status) {
+		
+		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
 		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag = 0 ");
+		
+		 
+		if(StringUtil.isNotEmpty(orgCode)){
+			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
+		}
 	    
 		if(StringUtil.isNotEmpty(sex)){
 			queryCondition.append(" and d.sex = '"+sex+"' ");
@@ -38,12 +47,12 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		}
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId" + queryCondition.toString();
+		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId " + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());

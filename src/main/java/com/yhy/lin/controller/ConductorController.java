@@ -16,9 +16,10 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.ExceptionUtil;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -109,13 +110,13 @@ public class ConductorController extends BaseController {
 	@RequestMapping(params = "datagrid")
 	public void datagrid(ConductorEntity conductors, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(ConductorEntity.class, dataGrid);
-		// 查询出来所有逻辑为删除的
-		cq.eq("deleteFlag", Globals.Delete_Normal);
-		// 查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, conductors, request.getParameterMap());
-		this.conductorService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		
+		String cr_bg = request.getParameter("createDate_begin");//创建时间
+		String cr_en = request.getParameter("createDate_end");
+		
+		JSONObject jObject = conductorService.getDatagrid(dataGrid,conductors,cr_bg,cr_en);
+		
+		responseDatagrid(response, jObject);
 	}
 
 	/**
@@ -164,9 +165,11 @@ public class ConductorController extends BaseController {
 	public AjaxJson save(ConductorEntity conductor, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		TSUser user = ResourceUtil.getSessionUserName();
+		conductor.setDepartId(user.getCurrentDepart().getId());
 		conductor.setDeleteFlag((short) 0);// 默认都是为做逻辑删除的数据
 		//验票员线路没有添加对应的线路id
-//		System.out.println(lineInfos);
+		//System.out.println(lineInfos);
 		if (StringUtil.isNotEmpty(conductor.getId())) {
 			message = "验票员: " + conductor.getName() + "被更新成功";
 			ConductorEntity t = conductorService.get(ConductorEntity.class, conductor.getId());

@@ -5,13 +5,13 @@
   <div region="center" style="padding:0px;border:0px">
   <t:datagrid name="openCityList" title="业务开通城市" actionUrl="openCityController.do?datagrid" idField="id" fit="true" >
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-   <t:dgCol title="省名称" field="provinceName" width="120"></t:dgCol>
-   <t:dgCol title="城市名称" field="cityName" width="120"></t:dgCol>
-   <t:dgCol title="城市开通业务id" field="cityBusiness" width="120"></t:dgCol>
-   <t:dgCol title="创建人" field="createPeople" width="120"></t:dgCol>
-   <t:dgCol title="城市开通状态" field="status" width="120" dictionary="openCity" ></t:dgCol>
-   <t:dgCol title="备注" field="remark"   width="120"></t:dgCol>
-   <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
+   <t:dgCol title="省名称" field="provinceName" align="center" width="50"></t:dgCol>
+   <t:dgCol title="城市名称" field="cityName" align="center" width="50"></t:dgCol>
+   <t:dgCol title="城市开通业务id" field="cityBusiness" align="center" width="150"></t:dgCol>
+   <t:dgCol title="创建人" field="createPeople" align="center" width="50"></t:dgCol>
+   <t:dgCol title="城市开通状态" field="status" align="center" width="80" dictionary="openCity" ></t:dgCol>
+   <t:dgCol title="备注" field="remark" align="center"  width="120"></t:dgCol>
+   <t:dgCol title="操作" field="opt" align="center" width="100"></t:dgCol>
    <t:dgDelOpt title="删除" url="openCityController.do?del&id={id}" />
    <t:dgToolBar title="录入" icon="icon-add" url="openCityController.do?addorupdate" funname="add"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="openCityController.do?addorupdate" funname="update"></t:dgToolBar>

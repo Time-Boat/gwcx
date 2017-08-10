@@ -33,6 +33,8 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	private Date createDate;
 	/**逻辑删除0是未删除 1 是已删除*/
 	private Short deleteFlag;// 状态: 0:不删除  1：删除
+	//所属部门
+	private String departId;
 	
 	private String lineIds;
 	
@@ -106,8 +108,12 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	
-	
+	@Column(name = "departId")
+	public String getDepartId() {
+		return departId;
+	}
+	public void setDepartId(String departId) {
+		this.departId = departId;
+	}
 	
 }
