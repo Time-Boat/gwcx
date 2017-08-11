@@ -13,11 +13,99 @@
 	<t:dgFunOpt title="删除关联站点" funname="delZd(id,line_busstopId)" />
 	<t:dgToolBar title="添加站点挂接"  operationCode="addSite" icon="icon-add" url="lineInfoController.do?busStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}" funname="add"></t:dgToolBar>
 	<t:dgToolBar title="站点时间、序号编辑" operationCode="editSite"  icon="icon-edit" url="lineInfoController.do?updateBusStopOrder" funname="update"></t:dgToolBar>
-
+	<t:dgToolBar title="上移"  icon="icon-putout" url="lineInfoController.do?moveup" funname="moveup"></t:dgToolBar>
+	<t:dgToolBar title="下移"  icon="icon-put" url="lineInfoController.do?movedown" funname="movedown"></t:dgToolBar>
 </t:datagrid>
 </div>
 </div>
 <script type="text/javascript">
+//上移
+function moveup(title,url,id,width,height,isRestful){
+	gridname=id;
+	var rowsData = $('#'+id).datagrid('getSelections');
+	if (!rowsData || rowsData.length==0) {
+		tip('请选择要上移的站点');
+		return;
+	}
+	if(isRestful!='undefined'&&isRestful){
+		url += '/'+rowsData[0].id;
+	}else{
+		if(rowsData[0].id==null){
+			rowsData[0].id = '';
+		}
+		if(rowsData[0].line_busstopId==null){
+			rowsData[0].line_busstopId = '';
+		}
+		if(rowsData[0].name==null){
+			rowsData[0].name = '';
+		}
+		if(rowsData[0].siteOrder==null){
+			rowsData[0].siteOrder = '';
+		}
+		if(rowsData[0].arrivalTime==null){
+			rowsData[0].arrivalTime = '';
+		}
+		url += '&id='+rowsData[0].id + '&line_busstopId=' + rowsData[0].line_busstopId + '&name=' + rowsData[0].name+'&siteOrder='+rowsData[0].siteOrder+'&arrivalTime='+rowsData[0].arrivalTime;
+	}
+	$.ajax({
+		url : url,
+		type : "get",
+		success : function(data) {
+			//console.log(data);
+			var d = $.parseJSON(data);
+			console.log(d);
+			var msg = d.msg;
+			//tip(d.description + '\n' + msg);
+			console.log(d.success);
+			tip(msg);
+			reloadTable();
+		}
+	});
+}
+
+//下移
+function movedown(title,url,id,width,height,isRestful){
+	gridname=id;
+	var rowsData = $('#'+id).datagrid('getSelections');
+	if (!rowsData || rowsData.length==0) {
+		tip('请选择要下移的站点');
+		return;
+	}
+	if(isRestful!='undefined'&&isRestful){
+		url += '/'+rowsData[0].id;
+	}else{
+		if(rowsData[0].id==null){
+			rowsData[0].id = '';
+		}
+		if(rowsData[0].line_busstopId==null){
+			rowsData[0].line_busstopId = '';
+		}
+		if(rowsData[0].name==null){
+			rowsData[0].name = '';
+		}
+		if(rowsData[0].siteOrder==null){
+			rowsData[0].siteOrder = '';
+		}
+		if(rowsData[0].arrivalTime==null){
+			rowsData[0].arrivalTime = '';
+		}
+		url += '&id='+rowsData[0].id + '&line_busstopId=' + rowsData[0].line_busstopId + '&name=' + rowsData[0].name+'&siteOrder='+rowsData[0].siteOrder+'&arrivalTime='+rowsData[0].arrivalTime;
+	}
+	$.ajax({
+		url : url,
+		type : "get",
+		success : function(data) {
+			//console.log(data);
+			var d = $.parseJSON(data);
+			console.log(d);
+			var msg = d.msg;
+			//tip(d.description + '\n' + msg);
+			console.log(d.success);
+			tip(msg);
+			reloadTable();
+		}
+	});
+}
 
 function update(title,url,id,width,height,isRestful) {
 	gridname=id;

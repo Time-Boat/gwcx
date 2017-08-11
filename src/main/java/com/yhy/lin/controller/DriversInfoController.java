@@ -69,7 +69,32 @@ public class DriversInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "list")
 	public ModelAndView list(HttpServletRequest request) {
+		request.setAttribute("cityList",getOpencity());
 		return new ModelAndView("yhy/drivers/driversInfoList");
+	}
+	
+	/**
+	 * 获得开通城市
+	 * @return
+	 */
+	public String getOpencity(){
+		String sql = "select op.city_id,op.city_name from open_city op where op.status='0' ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String cityName = ob[1]+"";
+					json.append("{");
+					json.append("'cityID':'" +id + "',");
+					json.append("'cityName':'"+ cityName + "'");
+					json.append("},");
+				}
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
 	}
 
 	/**
@@ -163,6 +188,7 @@ public class DriversInfoController extends BaseController {
 			}
 		} else {
 			message = "司机信息表添加成功";
+			driversInfo.setCityId(cityId);
 			driversInfo.setCreateDate(new Date(System.currentTimeMillis()));
 			driversInfo.setDeleteFlag(0);
 			driversInfo.setStatus("0");

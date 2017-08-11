@@ -11,7 +11,7 @@
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="司机姓名" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="性别" sortable="true" field="sex" dictionary="sex" query="true" align="center" width="60"></t:dgCol>
-	<t:dgCol title="所在城市" sortable="true" field="cityName" query="true" align="center" width="60"></t:dgCol>
+	<t:dgCol title="所在城市" sortable="true" field="cityName" align="center" width="60"></t:dgCol>
 	<t:dgCol title="年龄" sortable="true" editor="numberbox" field="age" align="center" width="80"></t:dgCol>
 	<t:dgCol title="电话" sortable="true" query="true" field="phoneNumber" align="center" width="80"></t:dgCol>
 	<t:dgCol title="身份证" field="idCard" align="center" width="80"></t:dgCol>
@@ -30,3 +30,20 @@
 
 </div>
 </div>
+<input type="hidden" value="${cityList}" id="citylie" />
+<script type="text/javascript">
+$(function() {
+	var json = $("#citylie").val();
+	var obj = eval('(' + json + ')');
+	var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
+	var a3 = '<select name="cityID" style="width: 150px">';
+	var c1 = '<option value="">所在城市</option>';
+	for (var i = 0; i < obj.data.length; i++) {
+		c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
+				+ '</option>';
+	}
+	var a4 = '</select></span>';
+	$("#driversInfoListForm").append(a1 + a2 + a3 + c1 + a4);
+});
+</script>

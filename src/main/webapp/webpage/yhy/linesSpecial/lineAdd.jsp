@@ -6,114 +6,7 @@
 <title>新增验票员</title>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <script type="text/javascript">
-    function getAddr(){
-    	
-		var city = $('#city option:selected').val();//获取选中城市
-    	var type = $('#type option:selected').val();//获取选中线路类型 
-    	var ids=  $("#id").val();
-    	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
-    	var endLocation = $('#endLocation option:selected').val();//获取选中起点 
-    	var starts =  $("#starts").val();//获取起点
-		var ends =  $("#ends").val();//获取终点 
-    	$("#startLocation").empty();//先置空 
-    	$("#endLocation").empty();//先置空 
-    	
-    		$.ajax({
-     		   url: 'lineInfoController.do?getProvinceJson&city='+city+'&type='+type+'&starts='+starts+'&ends='+ends+'&startLocation='+startLocation+'&endLocation='+endLocation+'&ids='+ids,
-     		   dataType: 'json',
-     		   complete: function(data,status) {
-     			   var message=data.responseText;
-     			   var info = eval(message);
-     			   var arr = new  Array();
-     			  var arr1 = new  Array();
-     			   for(var i=0;i<info.length;i++){
-     				  var sta = info[i].statype;
-     				  //接机  
-     				  if(type=="2"){
-     					 if(sta=="0"){
-         					 arr.push(info[i]); 
-         				  }
-         				 if(sta=="2"){
-         					 arr1.push(info[i]); 
-         				  }
-     				  }
-     				//送机  
-      				 if(type=="3"){
-      					if(sta=="0"){
-         					 arr1.push(info[i]); 
-         				  }
-         				 if(sta=="2"){
-         					 arr.push(info[i]); 
-         				  }
-      				 }
-     				  
-      				//接火车
-     				 if(type=="4"){
-     					 if(sta=="0"){
-         					 arr.push(info[i]); 
-         				  }
-         				 if(sta=="1"){
-         					 arr1.push(info[i]); 
-         				  }
-     				  }
-     				 
-     				 //送火车 
-     				if(type=="5"){
-    					 if(sta=="0"){
-        					 arr1.push(info[i]); 
-        				  }
-        				 if(sta=="1"){
-        					 arr.push(info[i]); 
-        				  }
-    				  }
-     				 }
-     			    if(ids!="" && ids!=null){
-     			    	
-     			    
-     			 //修改的时候给下拉框赋值 
-     			 if(type=="2" || type=="4"){
-     				  if(arr1.length>0){
-         				  for(var i=0;i<arr1.length;i++){
-             				  if(arr1[i].name==arr1[i].startname){
-             					 $("#startLocation").append($('<option value="'+arr1[i].stopid+'">'+arr1[i].startname+'</option>'));//后台数据加到下拉框
-             					 $("#endLocation").append($('<option value="'+arr1[i].stopid+'">'+arr1[i].endname+'</option>'));//后台数据加到下拉框
-             				  }
-             			  }
-         			   }
-     			   }
-     				//修改的时候给下拉框赋值 
-     			   if(type=="3" || type=="5"){
-     				  if(arr.length>0){
-         				  for(var i=0;i<arr.length;i++){
-             				  if(arr[i].name==arr[i].endname){
-             					 $("#startLocation").append($('<option value="'+arr[i].stopid+'">'+arr[i].startname+'</option>'));//后台数据加到下拉框
-             					 $("#endLocation").append($('<option value="'+arr[i].stopid+'">'+arr[i].endname+'</option>'));//后台数据加到下拉框
-             				  }
-             			  }
-         			   }
-     			   }
-     			    }else{
-     			    	if(startLocation=="" || startLocation==null){
-     			    		$("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
-     			    	}
-						if(endLocation=="" || endLocation==null){
-							$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
-						}
-     			    }
-     			   
-     			  $.each(arr1, function(i,n){
-     				  if(starts!=n.stopid){//去掉重复的数据
-     					 $("#startLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
-     				  }
-   				});
-      			 $.each(arr, function(i,n){
-      				 if(ends!=n.stopid){//去掉重复的数据
-      					$("#endLocation").append($('<option value="'+n['stopid']+'">'+n['name']+'</option>'));//后台数据加到下拉框
-      				 }
- 				});
-     			   }
-     		   });
-    }
+   
     //进入触发 
     $(function(){
     	var types= $("#types").val();
@@ -148,13 +41,6 @@
    		   complete: function(data,status) {
    			   var message=data.responseText;
    			   var info = eval(message);
-   				/* if(ids!=""){
-   					$("#startLocation").append($('<option value="'+startLocation+'">'+info[0].startname+'</option>'));
-   					$("#endLocation").append($('<option value="'+endLocation+'">'+info[0].endname+'</option>'));
-   				}else{
-   					$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
-   					$("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
-   				} */
    				
    			 	if(info.length>0){
    			 	 $("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));

@@ -41,7 +41,7 @@
 </t:datagrid> </div>
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
-<div region="east" style="width: 390px;" split="true">
+<div region="east" style="width: 490px;" split="true">
 <div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
 <div id="tt"></div>
