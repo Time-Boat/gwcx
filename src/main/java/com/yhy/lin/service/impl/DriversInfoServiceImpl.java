@@ -80,6 +80,11 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status) {
 		StringBuffer queryCondition = new StringBuffer(" where d.id not in (select ci.driver_id from car_info ci ) and d.deleteFlag = 0 ");
 	    
+		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
+		if(StringUtil.isNotEmpty(orgCode)){
+			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
+		}
 		if(StringUtil.isNotEmpty(sex)){
 			queryCondition.append(" and d.sex = '"+sex+"' ");
 		}
@@ -96,12 +101,12 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		}
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId" + queryCondition.toString();
+		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId " + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());

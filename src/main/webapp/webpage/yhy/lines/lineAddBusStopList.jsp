@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/context/mytags.jsp"%>
 <div class="easyui-layout" fit="true">
-<div region="center" style="padding:0px;border:0px">
-<t:datagrid name="roleUserList" title="已挂接的线路站点"
-            actionUrl="lineInfoController.do?busStopByLineDatagrid&lineInfoId=${lineInfoId}" fit="true" fitColumns="true" idField="id">
+<div region="center" style="padding:0px;border:0px"><!-- onLoadSuccess="selectRowFun" -->
+<t:datagrid name="roleUserListLB" title="已挂接的线路站点" 
+            actionUrl="lineInfoController.do?busStopByLineDatagrid&lineInfoId=${lineInfoId}" fit="true" fitColumns="true" idField="id" >
 	<t:dgCol title="站点ID" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="关联表ID" field="line_busstopId" hidden="true" ></t:dgCol>
 	<t:dgCol title="站点名称" field="name"   align="center"></t:dgCol>
@@ -19,10 +19,27 @@
 </div>
 </div>
 <script type="text/javascript">
+
+//选中的行
+var selectRowB;
+
+//移动状态
+var moveStatus; 
+
 //上移
 function moveup(title,url,id,width,height,isRestful){
+	
+	moveStatus = 0;
+	
 	gridname=id;
 	var rowsData = $('#'+id).datagrid('getSelections');
+	
+	$('#roleUserListLB').datagrid('selectRow', 1);
+	
+	//被选中的行
+	selectRowB = $('#'+id).datagrid('getRowIndex',rowsData[0].id);
+	//$('#'+id).datagrid('selectRow',2);
+	//return;
 	if (!rowsData || rowsData.length==0) {
 		tip('请选择要上移的站点');
 		return;
@@ -47,6 +64,7 @@ function moveup(title,url,id,width,height,isRestful){
 		}
 		url += '&id='+rowsData[0].id + '&line_busstopId=' + rowsData[0].line_busstopId + '&name=' + rowsData[0].name+'&siteOrder='+rowsData[0].siteOrder+'&arrivalTime='+rowsData[0].arrivalTime;
 	}
+	
 	$.ajax({
 		url : url,
 		type : "get",
@@ -58,13 +76,37 @@ function moveup(title,url,id,width,height,isRestful){
 			//tip(d.description + '\n' + msg);
 			console.log(d.success);
 			tip(msg);
+			
 			reloadTable();
+			
 		}
 	});
 }
 
+function selectRowFunLB(){
+	/* console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
+	if(moveStatus == 0){
+		$('roleUserListLB').datagrid('selectRow', selectRowB - 1);
+	}else{
+		$('roleUserListLB').datagrid('selectRow', selectRowB + 1);
+	} */
+	setTimeout("eeee()",1000);
+}
+
+/* function eeee(){
+	console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
+	if(moveStatus == 0){
+		$('#roleUserListLB').datagrid('selectRow', selectRowB - 1);
+	}else{
+		$('#roleUserListLB').datagrid('selectRow', selectRowB + 1);
+	}
+}
+ */
 //下移
 function movedown(title,url,id,width,height,isRestful){
+	
+	moveStatus = 1;
+	
 	gridname=id;
 	var rowsData = $('#'+id).datagrid('getSelections');
 	if (!rowsData || rowsData.length==0) {
@@ -155,7 +197,7 @@ function delZd(id,line_busstopId){
 					var obj = eval('(' + data + ')');
 					//alert(obj.msg);
 					tip(obj.msg);
-					$('#roleUserList').datagrid('reload');
+					$('#roleUserListLB').datagrid('reload');
 				}
 			);		
 	    }

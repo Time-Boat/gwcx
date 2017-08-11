@@ -517,17 +517,20 @@ public class LineInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
+		String busid =request.getParameter("line_busstopId");
 		String siteOrder = request.getParameter("siteOrder");
 		if (StringUtil.isNotEmpty(siteOrder)){
 			int site = Integer.parseInt(siteOrder);
 			if(site!=0 && site!=1 && site!=99){
 				int order=site-1;
-				List<Line_busStopEntity> list = this.systemService.findHql("from Line_busStopEntity where siteOrder=?", order);
+				Line_busStopEntity ln =this.systemService.getEntity(Line_busStopEntity.class, busid);
+				List<Line_busStopEntity> list = this.systemService.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order,ln.getLineId());
 				Line_busStopEntity line= list.get(0);
 				String sql ="update line_busstop set siteOrder=" + order + "  where id='" + id + "'";
 				System.out.println(sql);
 				systemService.updateBySqlString("update line_busstop set siteOrder=" + order + "  where busStopsId='" + id + "'");
 				systemService.updateBySqlString("update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+				message = "站点上移成功！";
 			}else if(site==0){
 				message = "起点站不能上移";
 			}else if(site==1){
@@ -536,7 +539,6 @@ public class LineInfoController extends BaseController {
 				message = "终点站不能上移";
 			}
 		}
-		message = "站点上移成功！";
 		j.setMsg(message);
 		return j;
 	}
@@ -550,6 +552,7 @@ public class LineInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
+		String busid =request.getParameter("line_busstopId");
 		String siteOrder = request.getParameter("siteOrder");
 		int siteOreder=0;
 		String sql= "select b.siteOrder from  line_busstop b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
@@ -562,23 +565,23 @@ public class LineInfoController extends BaseController {
 			int site = Integer.parseInt(siteOrder);
 			if(site!=0 && site!=siteOreder && site!=99){
 				int order=site+1;
-				List<Line_busStopEntity> list = this.systemService.findHql("from Line_busStopEntity where siteOrder=?", order);
+				Line_busStopEntity ln =this.systemService.getEntity(Line_busStopEntity.class, busid);
+				List<Line_busStopEntity> list = this.systemService.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order,ln.getLineId());
 				Line_busStopEntity line= list.get(0);
 				systemService.updateBySqlString("update line_busstop set siteOrder=" + order + "  where busStopsId='" + id + "'");
 				systemService.updateBySqlString("update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+				message = "站点下移成功！";
 			}else if(site==0){
 				message = "起点站不能下移";
-			}else if(site==1){
+			}else if(site==siteOreder){
 				message = "终点站不可更改";
 			}else if(site==99){
 				message = "终点站不能下移";
 			}
 		}
-		message = "站点下移成功！";
 		j.setMsg(message);
 		return j;
 	}
-	
 
 	/**
 	 * 跳转到站点顺序编号页面
@@ -693,10 +696,6 @@ public class LineInfoController extends BaseController {
         }
         
         return jsonArray;
-	}
-	public static void main(String[] args) {
-		
-		String sq ="";
 	}
 
 }

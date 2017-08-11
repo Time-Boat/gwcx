@@ -254,13 +254,20 @@ public class BusStopInfoController extends BaseController {
 	/**
 	 * 获取站点挂接站点序号
 	 */
-	private synchronized int getMaxSiteOrder(){
+	private synchronized int getMaxSiteOrder(String lineInfoId){
 		int siteOreder=0;
-		String sql= "select b.siteOrder from  line_busstop b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
-		List<Object> bList =systemService.findListbySql(sql.toString());
+		StringBuffer st = new StringBuffer();
+		st.append("select b.siteOrder from  line_busstop b where b.siteOrder!='99'");
+		if(StringUtil.isNotEmpty(lineInfoId)){
+			st.append(" and b.lineId='");
+			st.append(lineInfoId+"'");
+		}
+		st.append(" ORDER BY b.siteOrder DESC");
+		List<Object> bList =systemService.findListbySql(st.toString());
 		if(bList.size()>0){
 			 siteOreder = (int) bList.get(0);
 		}
+		
 		return siteOreder;
 	}
 	
@@ -289,7 +296,7 @@ public class BusStopInfoController extends BaseController {
 		        	Line_busStopEntity lin_busStop = new Line_busStopEntity();
 		        	lin_busStop.setLineId(lineInfoId);
 		        	lin_busStop.setBusStopsId(idsList.get(i));
-		        	int site = getMaxSiteOrder();
+		        	int site = getMaxSiteOrder(lineInfoId);
 		        	int pum = site+1+i;
 		        	lin_busStop.setSiteOrder(pum);
 		        	
