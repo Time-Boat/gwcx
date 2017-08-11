@@ -145,7 +145,7 @@
 		<attribute>
 			<name>onLoadSuccess</name>
 			<rtexprvalue>true</rtexprvalue>
-			<description>数据加载成调用方法</description>
+			<description>数据加载时调用方法</description>
 		</attribute>
 		<attribute>
 			<name>onDblClick</name>

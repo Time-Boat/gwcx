@@ -2,7 +2,7 @@
 <%@include file="/context/mytags.jsp"%>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px"><!-- onLoadSuccess="selectRowFun" -->
-<t:datagrid name="roleUserListLB" title="已挂接的线路站点" 
+<t:datagrid onLoadSuccess="selectRowFun" name="roleUserListLB" title="已挂接的线路站点" 
             actionUrl="lineInfoController.do?busStopByLineDatagrid&lineInfoId=${lineInfoId}" fit="true" fitColumns="true" idField="id" >
 	<t:dgCol title="站点ID" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="关联表ID" field="line_busstopId" hidden="true" ></t:dgCol>
@@ -34,7 +34,7 @@ function moveup(title,url,id,width,height,isRestful){
 	gridname=id;
 	var rowsData = $('#'+id).datagrid('getSelections');
 	
-	$('#roleUserListLB').datagrid('selectRow', 1);
+	//$('#roleUserListLB').datagrid('selectRow', 1);
 	
 	//被选中的行
 	selectRowB = $('#'+id).datagrid('getRowIndex',rowsData[0].id);
@@ -44,6 +44,15 @@ function moveup(title,url,id,width,height,isRestful){
 		tip('请选择要上移的站点');
 		return;
 	}
+	
+	var siteOrder = rowsData[0].siteOrder;
+	console.log("siteOrder=" + siteOrder);
+	
+	if(siteOrder == "0" || siteOrder == "99" || siteOrder == "1"){
+		tip("不能替换起点和终点");
+		return;
+	}
+	
 	if(isRestful!='undefined'&&isRestful){
 		url += '/'+rowsData[0].id;
 	}else{
@@ -71,11 +80,15 @@ function moveup(title,url,id,width,height,isRestful){
 		success : function(data) {
 			//console.log(data);
 			var d = $.parseJSON(data);
-			console.log(d);
+			//console.log(d);
 			var msg = d.msg;
 			//tip(d.description + '\n' + msg);
-			console.log(d.success);
-			tip(msg);
+			//console.log(d.success);
+			//tip(msg);
+			
+			if(!d.success){
+				tip(msg);
+			}
 			
 			reloadTable();
 			
@@ -83,36 +96,52 @@ function moveup(title,url,id,width,height,isRestful){
 	});
 }
 
-function selectRowFunLB(){
-	/* console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
+function selectRowFun(){
+	console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
+	//console.log(selectRowB);
+	
+	if(typeof(selectRowB) == "undefined") return;
+	
 	if(moveStatus == 0){
-		$('roleUserListLB').datagrid('selectRow', selectRowB - 1);
+		$("#roleUserListLB").datagrid('selectRow', selectRowB - 1);
 	}else{
-		$('roleUserListLB').datagrid('selectRow', selectRowB + 1);
-	} */
-	setTimeout("eeee()",1000);
+		$("#roleUserListLB").datagrid('selectRow', selectRowB + 1);
+	}
+	
+	selectRowB = undefined;
 }
 
-/* function eeee(){
-	console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
-	if(moveStatus == 0){
-		$('#roleUserListLB').datagrid('selectRow', selectRowB - 1);
-	}else{
-		$('#roleUserListLB').datagrid('selectRow', selectRowB + 1);
-	}
-}
- */
+
+
 //下移
 function movedown(title,url,id,width,height,isRestful){
 	
 	moveStatus = 1;
 	
+	//被选中的行
+	
 	gridname=id;
 	var rowsData = $('#'+id).datagrid('getSelections');
+	
+	selectRowB = $('#'+id).datagrid('getRowIndex',rowsData[0].id);
+	
+	//当前页的倒数第二行的下标
+	var countRow = $('#'+id).datagrid('getRows').length - 2;
+	console.log(countRow);
+	
 	if (!rowsData || rowsData.length==0) {
 		tip('请选择要下移的站点');
 		return;
 	}
+	
+	var siteOrder = rowsData[0].siteOrder;
+	console.log("siteOrder=" + siteOrder);
+	
+	if(siteOrder == "0" || siteOrder == "99" || siteOrder == countRow){
+		tip("不能替换起点和终点");
+		return;
+	}
+	
 	if(isRestful!='undefined'&&isRestful){
 		url += '/'+rowsData[0].id;
 	}else{
@@ -139,11 +168,11 @@ function movedown(title,url,id,width,height,isRestful){
 		success : function(data) {
 			//console.log(data);
 			var d = $.parseJSON(data);
-			console.log(d);
+			//console.log(d);
 			var msg = d.msg;
 			//tip(d.description + '\n' + msg);
-			console.log(d.success);
-			tip(msg);
+			//console.log(d.success);
+			//tip(msg);
 			reloadTable();
 		}
 	});
