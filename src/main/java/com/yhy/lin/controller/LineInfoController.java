@@ -274,11 +274,114 @@ public class LineInfoController extends BaseController {
 	}
 
 	/**
-	 * 线路保存
+	 * 接送机线路保存
 	 */
 	@RequestMapping(params = "save")
 	@ResponseBody
 	public AjaxJson save(LineInfoEntity lineInfo, HttpServletRequest request, HttpServletResponse respone) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		lineInfo.setDeleteFlag((short) 0);
+		TSUser user = ResourceUtil.getSessionUserName();
+		
+		lineInfo.setDepartId(user.getCurrentDepart().getId());
+		lineInfo.setCreatePeople(user.getUserName());
+		lineInfo.setCreateUserId(user.getId());
+		String settledCompanyId = request.getParameter("settledCompany");// 合作公司的id
+		String cityId = request.getParameter("city");
+		if(StringUtil.isNotEmpty(cityId)){
+			List<CitiesEntity> listCity = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
+			if (StringUtil.isNotEmpty(listCity)) {
+				
+				lineInfo.setCityId(cityId);
+				lineInfo.setCityName(listCity.get(0).getCity());
+			}
+		}
+		if (StringUtil.isNotEmpty(settledCompanyId)) {
+			TSDepart t = systemService.getEntity(TSDepart.class, settledCompanyId);
+			if (StringUtil.isNotEmpty(t)) {
+				lineInfo.setSettledCompanyId(settledCompanyId);
+				lineInfo.setSettledCompanyName(t.getDepartname());
+			}
+		}
+		if (StringUtil.isNotEmpty(lineInfo.getId())) {
+			try {
+				LineInfoEntity l = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
+				
+				/*//修改起点和终点数据
+				List<StartOrEndEntity> list= systemService.findHql("from StartOrEndEntity where startid=? and endid=? and linetype=? ", l.getStartLocation(),l.getEndLocation(),l.getType());
+				StartOrEndEntity addrs = list.get(0);
+				if (StringUtil.isNotEmpty(addrs)) {
+					addrs.setStartid(lineInfo.getStartLocation());
+					addrs.setEndid(lineInfo.getEndLocation());
+					addrs.setLinetype(lineInfo.getType());
+				}*/
+				
+				MyBeanUtils.copyBeanNotNull2Bean(lineInfo, l);
+				//startOrEndService.saveOrUpdate(addrs);
+				lineInfoService.saveOrUpdate(l);
+				message = "线路修改成功！";
+				// -----数据修改日志[类SVN]------------
+				Gson gson = new Gson();
+				systemService.addDataLog("lineInfo", l.getId(), gson.toJson(l));
+				// -----数据修改日志[类SVN]------------
+				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
+			} catch (Exception e) {
+				message = "线路修改失败！";
+				j.setSuccess(false);
+				logger.error(ExceptionUtil.getExceptionMessage(e));
+				// e.printStackTrace();
+			}
+		} else {
+			try {
+				
+				String code = getMaxLocalCode(cityId);
+				if(code!=null){
+					int pum = Integer.parseInt(code)+1;
+					String linecode = cityId+pum;
+					lineInfo.setLineNumber(linecode);//设置线路编号
+				}
+				
+				StartOrEndEntity st = new StartOrEndEntity();
+				if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {
+					st.setStartid(lineInfo.getStartLocation());
+				}
+				if (StringUtil.isNotEmpty(lineInfo.getEndLocation())) {
+					st.setEndid(lineInfo.getEndLocation());
+				}
+				if (StringUtil.isNotEmpty(lineInfo.getType())) {
+					st.setLinetype(lineInfo.getType());
+				}
+				
+				startOrEndService.save(st);
+				lineInfoService.save(lineInfo);
+				// lineInfoService.findByQueryString("sdsdd");
+				message = "线路添加成功！";
+				
+				// -----数据修改日志[类SVN]------------
+				Gson gson = new Gson();
+				systemService.addDataLog("lineInfo", lineInfo.getId(), gson.toJson(lineInfo));
+				// -----数据修改日志[类SVN]------------
+				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
+			} catch (Exception e) {
+				message = "线路添加失败！";
+				j.setSuccess(false);
+				logger.error(ExceptionUtil.getExceptionMessage(e));
+				e.printStackTrace();
+			}
+		}
+		//线路挂接
+		saveUserToOrg(request, lineInfo);
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 业务车(班车)线路保存
+	 */
+	@RequestMapping(params = "serviceLineSave")
+	@ResponseBody
+	public AjaxJson serviceLineSave(LineInfoEntity lineInfo, HttpServletRequest request, HttpServletResponse respone) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		lineInfo.setDeleteFlag((short) 0);
@@ -610,6 +713,7 @@ public class LineInfoController extends BaseController {
 	@ResponseBody
 	public JSONArray getEndlocation(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
 		String city = request.getParameter("city");
+		//线路类型 0：班车 1：包车 2：接机 3：送机 4：接火车 5：送火车  6：接送机  7：接送火车
         String type = request.getParameter("type");
         String startLocation = request.getParameter("startLocation");
         JSONObject jsonObj = new JSONObject(); 
@@ -620,7 +724,7 @@ public class LineInfoController extends BaseController {
         if(StringUtil.isNotEmpty(city)){
         	st.append(" and b.cityId='"+city+"'");
         }
-        if(StringUtil.isNotEmpty(type)){
+        if(StringUtil.isNotEmpty(type) || "0".equals(type)){
         	if("2".equals(type) || "4".equals(type)){
         		st.append(" and b.station_type = '0'");
         	}
@@ -659,6 +763,7 @@ public class LineInfoController extends BaseController {
 	@ResponseBody
 	public JSONArray getStartLocation(BusStopInfoEntity busStopInfo,HttpServletRequest request, HttpServletResponse response) {
         String city = request.getParameter("city");
+        //线路类型 0：班车 1：包车 2：接机 3：送机 4：接火车 5：送火车  6：接送机  7：接送火车
         String type = request.getParameter("type");
         JSONObject jsonObj = new JSONObject(); 
         JSONArray jsonArray = new JSONArray();
@@ -669,14 +774,13 @@ public class LineInfoController extends BaseController {
         if(StringUtil.isNotEmpty(city)){
         	st.append(" and b.cityId='"+city+"'");
         }
-        if(StringUtil.isNotEmpty(type)){
+        if(StringUtil.isNotEmpty(type) || "0".equals(type)){
             if("2".equals(type)){
                 st.append("and b.station_type = '2'");
             }
             if("4".equals(type)){
                 st.append("and b.station_type = '1'");
         	}
-        	
         	if("3".equals(type) || "5".equals(type)){
                 st.append("and b.station_type = '0'");
         	}

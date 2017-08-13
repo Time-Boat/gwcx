@@ -8,35 +8,37 @@
 <script type="text/javascript">
     function getAddrBC(){
     	
-		var city = $('#city option:selected').val();//获取选中城市
-    	var type = $('#type option:selected').val();//获取选中线路类型 
-    	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
-    	var endLocation = $('#endLocation option:selected').val();//获取选中起点 
+		//var city = $('#city option:selected').val();//获取选中城市
+    	//var type = $('#type option:selected').val();//获取选中线路类型 
+    	//var startLocation = $('#startLocation option:selected').val();//获取选中起点 
+    	//var endLocation = $('#endLocation option:selected').val();//获取选中起点 
     	
-    	var ids=  $("#id").val();
-    	var starts =  $("#starts").val();//获取起点
-		var ends =  $("#ends").val();//获取终点 
-    	$("#startLocation").empty();//先置空 
-    	$("#endLocation").empty();//先置空 
+    	//var ids=  $("#id").val();
+    	//var starts =  $("#starts").val();//获取起点
+		//var ends =  $("#ends").val();//获取终点 
+    	//$("#startLocation").empty();//先置空 
+    	//$("#endLocation").empty();//先置空 
     	
+    	getStartLocationBC();
+    	getEndlocationBC();
     }
     
   //给起点站点赋值
     function getStartLocationBC(){
     	
     	var city = $('#city option:selected').val();//获取选中城市
-    	var type = $('#type option:selected').val();//获取选中线路类型 
+    	//var type = $('#type option:selected').val();//获取选中线路类型 
     	var endLocation = $('#endLocation option:selected').val();//获取选中起点 
     	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
-    	var ids= $("#id").val();
+    	//var ids= $("#id").val();
     	var starts = $("#starts").val();//获取起点
 		var ends = $("#ends").val();//获取终点 
 		$("#startLocation").empty();//先置空 
-		$("#endLocation").empty();//先置空 
+		//$("#endLocation").empty();//先置空 
 		
 		
     	$.ajax({
-   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type='+type,
+   		   url: 'lineInfoController.do?getStartLocation&city='+city+'&type=0',   //0：班车类型
    		   dataType: 'json',
    		   complete: function(data,status) {
    			   var message=data.responseText;
@@ -50,28 +52,28 @@
    				} */
    				
    			 	if(info.length>0){
-   			 	 $("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
-   			 	$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
-				 for(var i=0;i<info.length;i++){
-					 if(starts!=info[i].stopid){
-						 $("#startLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
-					 }
+   			 		$("#startLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+   			 		//$("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
+					for(var i=0;i<info.length;i++){
+						if(starts!=info[i].stopid){
+							$("#startLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+						}
  			  		}
 			  	}
-   		   }
+			}
      	});
     }
     
   	//给终点站点赋值
     function getEndlocationBC(){
     	var city = $('#city option:selected').val();//获取选中城市
-    	var type = $('#type option:selected').val();//获取选中线路类型 
+    	//var type = $('#type option:selected').val();//获取选中线路类型 
     	var startLocation = $('#startLocation option:selected').val();//获取选中起点 
     	var starts =  $("#starts").val();//获取起点
     	var ends =  $("#ends").val();//获取终点 
     	$("#endLocation").empty();//先置空 
     	$.ajax({
-  		   url: 'lineInfoController.do?getEndlocation&city='+city+'&type='+type+'&startLocation='+startLocation,
+  		   url: 'lineInfoController.do?getEndlocation&city='+city+'&type=0&startLocation='+startLocation,
   		   dataType: 'json',
   		   complete: function(data,status) {
   			   var message=data.responseText;
@@ -79,7 +81,7 @@
   			 $("#endLocation").append($('<option value="">'+"--请选择--"+'</option>'));
   			 if(info.length>0){
 				 for(var i=0;i<info.length;i++){
-						 $("#endLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
+					 $("#endLocation").append($('<option value="'+info[i].stopid+'">'+info[i].name+'</option>'));//后台数据加到下拉框
   			  	 }
 			   }
   		   }
@@ -88,13 +90,13 @@
   	
     //进入触发 
     $(function(){
-    	getAddrBC();
+    	//getAddrBC();
     });
     
 </script>
 </head>
-<body style="" scroll="no">
-<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?save">
+<body scroll="no">
+<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?serviceLineSave">
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
 	<input id="ends" name="endLocations" type="hidden" value="${lineInfo.endLocation}">
 	<input id="starts" name="startLocations" type="hidden" value="${lineInfo.startLocation}">
@@ -153,7 +155,7 @@
 			<td class="value">
 				<!-- 这里面写死，因为这个线路添加中只有班车类型的添加 -->
 				
-				<t:dictSelect id="type" field="type" typeGroupCode="linetype" extendJson="{onchange:getAddrBC()}" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
+				<!-- extendJson="{onchange:getAddrBC()}" --><t:dictSelect id="type" field="type" typeGroupCode="linetype" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
 				
 				<span class="Validform_checktip"></span>
 			</td>
