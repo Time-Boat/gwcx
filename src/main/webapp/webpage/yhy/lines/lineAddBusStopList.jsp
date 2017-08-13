@@ -46,7 +46,7 @@ function moveup(title,url,id,width,height,isRestful){
 	}
 	
 	var siteOrder = rowsData[0].siteOrder;
-	console.log("siteOrder=" + siteOrder);
+	//console.log("siteOrder=" + siteOrder);
 	
 	if(siteOrder == "0" || siteOrder == "99" || siteOrder == "1"){
 		tip("不能替换起点和终点");
@@ -97,7 +97,7 @@ function moveup(title,url,id,width,height,isRestful){
 }
 
 function selectRowFun(){
-	console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
+	//console.log('selectRowB=' + selectRowB + 'moveStatus=' + moveStatus);
 	//console.log(selectRowB);
 	
 	if(typeof(selectRowB) == "undefined") return;
@@ -127,7 +127,7 @@ function movedown(title,url,id,width,height,isRestful){
 	
 	//当前页的倒数第二行的下标
 	var countRow = $('#'+id).datagrid('getRows').length - 2;
-	console.log(countRow);
+	//console.log(countRow);
 	
 	if (!rowsData || rowsData.length==0) {
 		tip('请选择要下移的站点');
@@ -135,7 +135,7 @@ function movedown(title,url,id,width,height,isRestful){
 	}
 	
 	var siteOrder = rowsData[0].siteOrder;
-	console.log("siteOrder=" + siteOrder);
+	//console.log("siteOrder=" + siteOrder);
 	
 	if(siteOrder == "0" || siteOrder == "99" || siteOrder == countRow){
 		tip("不能替换起点和终点");
@@ -173,6 +173,11 @@ function movedown(title,url,id,width,height,isRestful){
 			//tip(d.description + '\n' + msg);
 			//console.log(d.success);
 			//tip(msg);
+			
+			if(!d.success){
+				tip(msg);
+			}
+			
 			reloadTable();
 		}
 	});
