@@ -112,6 +112,7 @@
 		${lineInfo.status}
 		${lineInfo.deleteFlag}
 		</tr> --%>
+		<input type="button" onclick="javascript:window.open('www.baidu.com','_self');" value="测试" />
 		<tr>
 			<td align="right" width="15%" nowrap>
 				<label class="Validform_label"> 线路名称: </label>
