@@ -1,17 +1,24 @@
 package com.yhy.lin.controller;
 
 import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.h2.value.Transfer;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.p3.core.common.utils.DateUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -65,8 +72,6 @@ public class TransferOrderController extends BaseController {
 			
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
 	}
-	
-	
 
 	// 接送火车订单处理
 	@RequestMapping(params = "transferOrderList")
@@ -193,7 +198,7 @@ public class TransferOrderController extends BaseController {
 			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
 			 driverName = dr.getName();
 		}
-		String plate ="";
+		String plate = "";
 		String carId = request.getParameter("carId");
 		if (StringUtil.isNotEmpty(carId)) {
 			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
@@ -218,6 +223,7 @@ public class TransferOrderController extends BaseController {
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
 		String driverId = request.getParameter("driverId");
+		String lineOrderCode= request.getParameter("lineOrderCode");
 		String driverName ="";
 		if (StringUtil.isNotEmpty(driverId)) {
 			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
@@ -234,7 +240,7 @@ public class TransferOrderController extends BaseController {
 		String fc_end = request.getParameter("orderStartime_end");
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation, orderTerminusstation
+		JSONObject jObject = transferService.getDatagrid(transferorder, dataGrid,orderStartingstation,lineOrderCode, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
 		
 		responseDatagrid(response, jObject);
@@ -349,15 +355,12 @@ public class TransferOrderController extends BaseController {
 	 */
 	@RequestMapping(params = "editCarAndDriver")
 	public ModelAndView editCarAndDriver(HttpServletRequest request, HttpServletResponse response) {
-		String ids = request.getParameter("ids");
-
-		String slDate = request.getParameter("slDate");
-
-		// System.out.println(ids);
-		// 1、根据id查询到对应订单的所有线路，后台进行判断，如果是同一条线路，允许多条订单同时操作，否则给信息提示
-		if (StringUtil.isNotEmpty(ids)) {
-			request.setAttribute("ids", ids);
-			request.setAttribute("slDate", slDate);
+		String sdate = request.getParameter("sdate");
+		String lineOrderCode = request.getParameter("lineOrderCode");
+		
+		if (StringUtil.isNotEmpty(lineOrderCode)) {
+			request.setAttribute("lineOrderCode", lineOrderCode);
+			request.setAttribute("sdate", sdate + "");
 		}
 		return new ModelAndView("yhy/transferOrder/transferOrderAdd");
 	}

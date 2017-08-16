@@ -122,6 +122,7 @@
 						<value>app.do?getOrderList</value>
 						<value>app.do?getPTStation</value>
 						<value>app.do?getOrderDetail</value>
+						<value>app.do?getOrderStation</value>
 						
 						<value>app.do?cancelOrder</value>
 						<value>app.do?completeOrder</value>

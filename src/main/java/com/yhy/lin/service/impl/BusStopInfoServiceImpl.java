@@ -132,10 +132,15 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		StringBuffer sqlCnt = new StringBuffer();
 		sqlCnt.append("select count(*) from busstopinfo a where 1=1 ");
 		if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
-			sqlCnt.append("and a.id not in(select se.endId from start_end se where se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+			sqlCnt.append(" and a.id not in(select se.endId from start_end se where se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 		}
 		if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
-			sqlCnt.append("and a.id not in(select se.startId from start_end se where se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+			sqlCnt.append(" and a.id not in(select se.startId from start_end se where se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+		}
+		
+		//如果是班车线路
+		if("0".equals(lineInfo.getType())){
+			sqlCnt.append(" and station_type = '0' and a.id not in(select busstopsid from line_busstop where lineId='"+lineInfo.getId()+"') ");
 		}
 		
 		if (!sqlWhere.isEmpty()) {
@@ -146,13 +151,19 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-		sql.append("select a.id ,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from busstopinfo a  where 1=1 ");
+		sql.append("select a.id,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from busstopinfo a where 1=1 ");
 		if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
 			sql.append("and a.id not in(select se.endId from start_end se where se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 		}
 		if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
 			sql.append("and a.id not in(select se.startId from start_end se where se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 		}
+		
+		//如果是班车线路
+		if("0".equals(lineInfo.getType())){
+			sql.append(" and station_type = '0' and a.id not in(select busstopsid from line_busstop where lineId='"+lineInfo.getId()+"') ");
+		}
+				
 		//String sql = "select a.id ,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from  busstopinfo a LEFT JOIN (select lineId,busStopsId from line_busstop b where  b.lineId ='"+lineInfoId+"') as c on a.id = c.busStopsId  where c.lineId is NULL";
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);

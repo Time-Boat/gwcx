@@ -34,12 +34,12 @@
 	<t:dgCol title="操作" field="opt" width="100"></t:dgCol>
 	
 	<%-- <t:dgDelOpt title="下架" url="lineInfoController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" /> --%>
-	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
+	<t:dgFunOpt funname="addBusStop(id,name,type)" title="站点管理"></t:dgFunOpt>
 	<t:dgToolBar title="批量下架" icon="icon-remove" url="lineInfoController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar>
 	<t:dgToolBar operationCode="detail" title="线路查看" icon="icon-search" url="lineInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
 </t:datagrid> </div>
 </div>
-<div region="east" style="width: 390px;" split="true">
+<div region="east" style="width: 450px;" split="true">
 <div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
 <div id="tt"></div>
@@ -54,11 +54,11 @@ $(document).ready(function(){
 	$("input[name='lendTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 	$("input[name='lendTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 });
-function addBusStop(id,name) {
+function addBusStop(id,name,type) {
 	$("#function-panelAddBusStop").panel(
 			{
 				title :'线路名称：'+name,
-				href:"lineInfoController.do?addBusStop&lineInfoId="+id
+				href:"lineInfoController.do?addBusStop&lineInfoId=" + id + "&lineType=" + type
 			}
 		);
 }

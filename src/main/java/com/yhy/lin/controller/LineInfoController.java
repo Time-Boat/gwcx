@@ -397,7 +397,7 @@ public class LineInfoController extends BaseController {
 		if (StringUtil.isNotEmpty(cityId)) {
 			List<CitiesEntity> listCity = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
 			if (StringUtil.isNotEmpty(listCity)) {
-
+				
 				lineInfo.setCityId(cityId);
 				lineInfo.setCityName(listCity.get(0).getCity());
 			}
@@ -412,18 +412,6 @@ public class LineInfoController extends BaseController {
 		if (StringUtil.isNotEmpty(lineInfo.getId())) {
 			try {
 				LineInfoEntity l = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
-
-				/*
-				 * //修改起点和终点数据 List<StartOrEndEntity> list=
-				 * systemService.findHql(
-				 * "from StartOrEndEntity where startid=? and endid=? and linetype=? "
-				 * , l.getStartLocation(),l.getEndLocation(),l.getType());
-				 * StartOrEndEntity addrs = list.get(0); if
-				 * (StringUtil.isNotEmpty(addrs)) {
-				 * addrs.setStartid(lineInfo.getStartLocation());
-				 * addrs.setEndid(lineInfo.getEndLocation());
-				 * addrs.setLinetype(lineInfo.getType()); }
-				 */
 
 				MyBeanUtils.copyBeanNotNull2Bean(lineInfo, l);
 				// startOrEndService.saveOrUpdate(addrs);
@@ -597,6 +585,7 @@ public class LineInfoController extends BaseController {
 	public void nullTobusStopInfoList(BusStopInfoEntity busStopInfo, HttpServletRequest request,
 			HttpServletResponse response, DataGrid dataGrid) {
 		String lineInfoId = request.getParameter("lineInfoId");
+		String lineType = request.getParameter("lineType");
 		if (StringUtil.isNotEmpty(lineInfoId)) {
 			LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
 

@@ -18,7 +18,6 @@
 	<t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="100"></t:dgCol>
 	<t:dgCol title="状态" field="deleteFlag" dictionary="deleted" align="center" width="80"></t:dgCol>
 	<t:dgCol title="备注" field="remark" align="center" width="80"></t:dgCol>	
-	<t:dgCol title="图片" field="drivingLicenseImgUrl" image="true" imageSize="100,100" align="center"></t:dgCol>	
 	<t:dgToolBar operationCode="add" title="录入" icon="icon-add" url="driversInfoController.do?addorupdate&type=add" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="编辑" icon="icon-edit" url="driversInfoController.do?addorupdate" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="50"></t:dgCol>

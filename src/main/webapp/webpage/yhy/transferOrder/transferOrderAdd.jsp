@@ -11,8 +11,8 @@
     function noteSubmitCallback(data) {
 	  	var win = frameElement.api.opener;//获取父窗口
 		//刷新主表单父窗口
-		//win.reloadTable();
-	    win.reloadtransferOrderList();
+		win.reloadTable();
+	    //win.reloadtransferOrderList();
 		//关闭当前弹出框
 		frameElement.api.close();
     }//@ sourceURL=test.js
@@ -20,6 +20,12 @@
     function checkDepartTime(){
     	var date1 = $('#startDate').val();
     	var date2 = $('#slDate').val();     //选中的订单中最小的时间
+    	var slDate= date2.subString(7);
+    	var s = "";
+    	if(slDate=="A"){
+    		
+    		
+    	}
     	date1 = Date.parse(new Date(date1));  
     	
     	var date3 = date2 - date1/1000;  //时间差的毫秒数
@@ -57,8 +63,8 @@
 <t:formvalid  formid="transferOrderListInfo"  dialog="true" usePlugin="password" layout="table" beforeSubmit="checkDepartTime()" action="transferOrderController.do?saveCarAndDriver" callback="@Override noteSubmitCallback" >
 
 	<%--  <input id="ids" name="ids"  value="${ids}">  --%>
-	 <input id="id" name="id"  hidden="true"  value="${ids}">
-	 <input id="slDate" hidden="true" value="${slDate}">
+	 <input id="slDate" hidden="true" value="${sdate}">
+	 <input id="lineOrderCode" hidden="true" value="${lineOrderCode}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 			<tr>
 				<td align="center" colspan="2"> 
@@ -194,9 +200,5 @@
 		}
 	});
 	
-	
-	
 </script>
-
-
 </body>

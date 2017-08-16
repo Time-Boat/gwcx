@@ -50,9 +50,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
 
 	@Override
-	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
+	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,orderStartingstation,lineOrderCode,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 		StringBuffer sqlCnt = new StringBuffer();
@@ -114,7 +114,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Override
 	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -122,7 +122,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
 				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
-				+ "on l.createUserId=ur.ID where a.order_type in('2','3')");
+				+ "on l.createUserId=ur.ID where a.order_type in('2','3') ");
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
 		}
@@ -136,7 +136,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
-						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id where a.order_type in('2','3')");
+						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id "
+						+ " where a.order_type in('2','3') ");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -177,7 +178,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Override
 	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -292,7 +293,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			}
 		}
 	
-	public String getWhere(TransferorderEntity transferorder,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
+	public String getWhere(TransferorderEntity transferorder,String lineOrderCode, String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
 			String ddTime_end) {
 		StringBuffer sql = new StringBuffer();// 不需要显示退款状态的订单
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -358,9 +359,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if (StringUtil.isNotEmpty(transferorder.getOrderContactsname())) {
 			sql.append(" and  a.order_contactsname like '%" + transferorder.getOrderContactsname() + "%'");
 		}
-
+		// 订单编号
+		if (StringUtil.isNotEmpty(lineOrderCode)) {
+			sql.append(" and  a.lineOrderCode= '" + lineOrderCode+ "'");
+		}
 		// 不需要显示退款状态的订单
-		sql.append(" and order_status not in('3','4','5')");
+		sql.append(" and order_status in('1','2','7')");
 		
 		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),order_startime desc");
 
@@ -423,7 +427,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 
 		// 不需要显示退款状态的订单
-		sql.append(" and a.lineOrderCode is not null and a.order_status not in('3','4','5') ");
+		sql.append(" and a.lineOrderCode is not null and a.order_status in('1','2','7') ");
 
 		sql.append(" GROUP BY a.lineOrderCode ");
 

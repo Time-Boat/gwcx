@@ -739,7 +739,7 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 获取用户订单详情页 */
+	/** 订单详情 */
 	@RequestMapping(params = "getOrderDetail")
 	public void getOrderDetail(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -786,6 +786,56 @@ public class AppInterfaceController extends AppBaseController {
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", aod);
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	/** 订单所属线路的站点列表 */
+	@RequestMapping(params = "getOrderStation")
+	public void getOrderStation(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		JSONObject data = new JSONObject();
+		
+		String msg = "";
+		String statusCode = "";
+		String param = "";
+		try {
+
+			param = AppUtil.inputToStr(request);
+			System.out.println("getOrderStation     前端传递参数：" + param);
+
+			// 验证参数
+			JSONObject jsondata = checkParam(param);
+
+			String token = jsondata.getString("token");
+			// 验证token
+			checkToken(token);
+			
+			String orderId = jsondata.getString("orderId");
+			
+			List<Map<String,Object>> lm = systemService.findForJdbc(" select b.name,b.id,lb.siteOrder from transferorder t join lineinfo l on t.line_id = l.id join line_busstop lb on l.id = lb.lineId "
+					+ " join busstopinfo b on b.id = lb.busStopsId "
+					+ " where t.id = ? order by lb.siteOrder", orderId);
+			
+			data.put("stationInfo", lm);
+
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
 
 		responseOutWrite(response, returnJsonObj);
 	}

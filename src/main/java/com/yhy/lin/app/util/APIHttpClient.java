@@ -28,7 +28,9 @@ public class APIHttpClient {
 	//登录接口
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
 	//上传订单接口地址
-	private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+	//private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+	//订单所属线路的站点列表接口地址
+	private static String apiURL = "http://localhost:8080/gwcx/app.do?getOrderStation";  
     //线路站点信息地址
     //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
     //获取机场站点或者火车站站点信息
@@ -177,7 +179,7 @@ public class APIHttpClient {
         try {  
             // 建立一个NameValuePair数组，用于存储欲传送的参数  
 //            method.addHeader("Content-type","application/json; charset=utf-8");  
-            startTime = System.currentTimeMillis();  
+            startTime = System.currentTimeMillis();
             HttpGet request = new HttpGet(apiURL);
             HttpResponse response = httpClient.execute(request);  
               
@@ -235,7 +237,7 @@ public class APIHttpClient {
     	APIHttpClient ac = new APIHttpClient(apiURL);
         JsonArray arry = new JsonArray();
         JsonObject j = new JsonObject();
-        System.out.println(ac.get());
+//        System.out.println(ac.get());
         
         
         //登录接口
@@ -243,31 +245,31 @@ public class APIHttpClient {
         //j.addProperty("code", "1325");  
         
         //接送机订单测试
-        j.addProperty("orderType", "2");  
-        j.addProperty("orderStartingStationId", "4028b8815c380cd3015c3829c1530033");  
-        j.addProperty("orderTerminusStationId", "4028b8815c380cd3015c3823b3f00023");  
-        j.addProperty("orderStartime", "2017-08-28 16:12:00");  
-        j.addProperty("orderExpectedarrival", "2017-08-28 18:12:00");  
-        j.addProperty("orderUnitprice", "20");  
-        j.addProperty("orderNumbers", "2");  
-        j.addProperty("orderContactsname", "张三");  
-        j.addProperty("orderContactsmobile", "15527987654");  
-        j.addProperty("orderFlightnumber", "Z-15");
-        j.addProperty("orderStatus", "1");
-        j.addProperty("orderTrainnumber", "");  
-        j.addProperty("orderPaytype", "1"); 
-        j.addProperty("orderPaystatus", "0");  
-        j.addProperty("orderTerminusStationName", "龙里车站"); 
-        j.addProperty("orderStartingStationName", "一龙洞堡机场"); 
-        j.addProperty("userId", "4028820d5beb2c65015beb3fa78b0185"); 
-        j.addProperty("orderTotalPrice", "40"); 
-        j.addProperty("cityName", "贵阳市"); 
-        j.addProperty("cityId", "520100"); 
-        j.addProperty("token", "ca3fd93703461e577b11a30b8a50ecb6"); 
+//        j.addProperty("orderType", "2");  
+//        j.addProperty("orderStartingStationId", "4028b8815c380cd3015c3829c1530033");  
+//        j.addProperty("orderTerminusStationId", "4028b8815c380cd3015c3823b3f00023");  
+//        j.addProperty("orderStartime", "2017-08-28 16:12:00");  
+//        j.addProperty("orderExpectedarrival", "2017-08-28 18:12:00");  
+//        j.addProperty("orderUnitprice", "20");  
+//        j.addProperty("orderNumbers", "2");  
+//        j.addProperty("orderContactsname", "张三");  
+//        j.addProperty("orderContactsmobile", "15527987654");  
+//        j.addProperty("orderFlightnumber", "Z-15");
+//        j.addProperty("orderStatus", "1");
+//        j.addProperty("orderTrainnumber", "");  
+//        j.addProperty("orderPaytype", "1"); 
+//        j.addProperty("orderPaystatus", "0");  
+//        j.addProperty("orderTerminusStationName", "龙里车站"); 
+//        j.addProperty("orderStartingStationName", "一龙洞堡机场"); 
+//        j.addProperty("userId", "4028820d5beb2c65015beb3fa78b0185"); 
+//        j.addProperty("orderTotalPrice", "40"); 
+//        j.addProperty("cityName", "贵阳市"); 
+//        j.addProperty("cityId", "520100"); 
+//        j.addProperty("token", "ca3fd93703461e577b11a30b8a50ecb6"); 
       	
         //取消订单
-//		j.addProperty("orderId", "4028b8815c26b59b015c26c92ae80010"); 
-//		j.addProperty("token", ""); 
+		j.addProperty("orderId", "ff8080815dcfdd13015dd05448e20049"); 
+		j.addProperty("token", "12f9152b7f0649d6f73ada1efe0a83dd"); 
         
         //用户意见反馈
 //		j.addProperty("userId", "4028b8815c26b59b015c26c92ae80010"); 
