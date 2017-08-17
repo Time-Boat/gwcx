@@ -355,13 +355,30 @@ public class TransferOrderController extends BaseController {
 	 */
 	@RequestMapping(params = "editCarAndDriver")
 	public ModelAndView editCarAndDriver(HttpServletRequest request, HttpServletResponse response) {
-		String sdate = request.getParameter("sdate");
+		
+		String ids = request.getParameter("ids");
+		String slDate = request.getParameter("slDate");
 		String lineOrderCode = request.getParameter("lineOrderCode");
 		
+		if(StringUtil.isNotEmpty(lineOrderCode)){
+			List<Map<String,Object>> tList = systemService.findForJdbc(
+					"select order_startime from transferorder where lineOrderCode=? order by order_startime", new Object[]{lineOrderCode});
+			
+			String orderStartime = tList.get(0).get("order_startime") + "";
+			
+			slDate = (DateUtils.str2Date(orderStartime,DateUtils.datetimeFormat).getTime() / 1000) + "";
+		}
+		
+		// System.out.println(ids);
+		// 1、根据id查询到对应订单的所有线路，后台进行判断，如果是同一条线路，允许多条订单同时操作，否则给信息提示
 		if (StringUtil.isNotEmpty(lineOrderCode)) {
 			request.setAttribute("lineOrderCode", lineOrderCode);
-			request.setAttribute("sdate", sdate + "");
+		}else{
+			request.setAttribute("ids", ids);
 		}
+		
+		request.setAttribute("slDate", slDate + "");
+		
 		return new ModelAndView("yhy/transferOrder/transferOrderAdd");
 	}
 
@@ -374,27 +391,38 @@ public class TransferOrderController extends BaseController {
 		String message = null;
 		boolean success = false;
 		AjaxJson j = new AjaxJson();
-		String ids = request.getParameter("id");// 勾选的订单id
+		String ids = request.getParameter("ids");// 勾选的订单id
 		String startTime = request.getParameter("startDate");// 发车时间
 		String licencePlateId = request.getParameter("licencePlateId");// 车牌id
 		String driverId = request.getParameter("driverId");// 司机id
 		String licencePlateName = request.getParameter("licencePlateName");// 车牌号
 		
-		List<String> orderIds = extractIdListByComma(ids);
+		List<String> orderIds = new ArrayList<>();
+		
+		String lineOrderCode = request.getParameter("lineOrderCode");
+		
+		//通过订单批次的编码来查询所有的订单id
+		if(StringUtil.isNotEmpty(lineOrderCode)){
+			List<Map<String, Object>> list = systemService.findForJdbc("select id from transferorder where lineOrderCode=? and order_status in('2','3') ", lineOrderCode);
+			for(Map<String, Object> map : list){
+				orderIds.add(map.get("id") + "");
+			}
+		}else{
+			orderIds = extractIdListByComma(ids);
+		}
 		
 		List<String[]> contents = new ArrayList<>();
 		
-		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId, licencePlateName,
-				contents);
+		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId, licencePlateName, contents);
 		
-		if (b) {
+		if (true) {
 			//同一个人下的两条订单被安排了同一个车上，那么会连续发送两条短信，这个会出发流程控制，一分钟之内不允许发送两条消息
 			//可以将发送失败的短信存到数据库，使用quartz定时去循环发送
 			//如果有rides缓存服务器，可以存到缓存中，到时候再定时发送
 			String[] keys = new String[] { "name", "startStation", "terminusStation", "time" };
 			for (int i = 0; i < contents.size(); i++) {
 				String[] p = contents.get(i);
-				SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
+				//SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
 			}
 			success = true;
 			message = "订单处理成功";

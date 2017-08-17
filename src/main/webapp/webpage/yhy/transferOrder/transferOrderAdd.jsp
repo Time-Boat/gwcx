@@ -20,12 +20,6 @@
     function checkDepartTime(){
     	var date1 = $('#startDate').val();
     	var date2 = $('#slDate').val();     //选中的订单中最小的时间
-    	var slDate= date2.subString(7);
-    	var s = "";
-    	if(slDate=="A"){
-    		
-    		
-    	}
     	date1 = Date.parse(new Date(date1));  
     	
     	var date3 = date2 - date1/1000;  //时间差的毫秒数
@@ -57,14 +51,43 @@
     	return false;
     }
     
+    $(function(){
+    	var m = $('#slDate').val();     //选中的订单中最小的时间
+    	if(m == '' || m == null) return;
+    	var date = new Date(parseInt(m) * 1000).Format("yyyy-MM-dd hh:mm");
+    	console.log(date);
+    	$('#startDate').val(date);
+    });
+    
+    //格式化日期
+    Date.prototype.Format = function (fmt) {
+        var o = {
+            "M+": this.getMonth() + 1, //月份
+            "d+": this.getDate(), //日
+            "h+": this.getHours(), //小时
+            "m+": this.getMinutes(), //分
+            "s+": this.getSeconds(), //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds() //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o){
+            if (new RegExp("(" + k + ")").test(fmt)) {
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+
 	</script> 
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid  formid="transferOrderListInfo"  dialog="true" usePlugin="password" layout="table" beforeSubmit="checkDepartTime()" action="transferOrderController.do?saveCarAndDriver" callback="@Override noteSubmitCallback" >
+<t:formvalid  formid="transferOrderListInfo"  dialog="true" usePlugin="password" layout="table" beforeSubmit="checkDepartTime()" action="transferOrderController.do?saveCarAndDriver&lineOrderCode=${lineOrderCode}&ids=${ids}" callback="@Override noteSubmitCallback" >
 
-	<%--  <input id="ids" name="ids"  value="${ids}">  --%>
-	 <input id="slDate" hidden="true" value="${sdate}">
-	 <input id="lineOrderCode" hidden="true" value="${lineOrderCode}">
+	<input id="ids" name="ids" hidden="true" value="${ids}">
+	<input id="slDate" hidden="true" value="${slDate}">
+	<input id="lineOrderCode" hidden="true" value="${lineOrderCode}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 			<tr>
 				<td align="center" colspan="2"> 
