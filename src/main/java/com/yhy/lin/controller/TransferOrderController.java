@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.h2.value.Transfer;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.controller.AppInterfaceController;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
@@ -46,6 +48,8 @@ import net.sf.json.JSONObject;
 @RequestMapping("/transferOrderController")
 public class TransferOrderController extends BaseController {
 
+	private static final Logger logger = Logger.getLogger(TransferOrderController.class);
+	
 	@Autowired
 	private SystemService systemService;
 
@@ -360,6 +364,11 @@ public class TransferOrderController extends BaseController {
 		String slDate = request.getParameter("slDate");
 		String lineOrderCode = request.getParameter("lineOrderCode");
 		
+		/*logger.info("ids: " + ids);
+		logger.info("slDate: " + slDate);
+		logger.info("lineOrderCode: " + lineOrderCode);*/
+		
+		//接送机，接送火车，司机车辆安排三个模块都公用的这一个方法，高复用带来的高耦合，现在的解决办法就是通过参数判断
 		if(StringUtil.isNotEmpty(lineOrderCode)){
 			List<Map<String,Object>> tList = systemService.findForJdbc(
 					"select order_startime from transferorder where lineOrderCode=? order by order_startime", new Object[]{lineOrderCode});
@@ -401,10 +410,18 @@ public class TransferOrderController extends BaseController {
 		
 		String lineOrderCode = request.getParameter("lineOrderCode");
 		
+		
+		/*logger.info("ids: " + ids);
+		logger.info("slDate: " + startTime);
+		logger.info("lineOrderCode: " + lineOrderCode);
+		logger.info("driverId: " + driverId);
+		logger.info("lineOrderCode: " + lineOrderCode);*/
+		
 		//通过订单批次的编码来查询所有的订单id
 		if(StringUtil.isNotEmpty(lineOrderCode)){
-			List<Map<String, Object>> list = systemService.findForJdbc("select id from transferorder where lineOrderCode=? and order_status in('2','3') ", lineOrderCode);
+			List<Map<String, Object>> list = systemService.findForJdbc("select id from transferorder where lineOrderCode=? and order_status in('1','2') ", lineOrderCode);
 			for(Map<String, Object> map : list){
+				//logger.info("tids: " + map.get("id"));
 				orderIds.add(map.get("id") + "");
 			}
 		}else{

@@ -29,22 +29,24 @@ import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.entity.LineInfoEntity;
+import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 import sun.print.resources.serviceui;
 
 /**
-* Description : 
-* @author Administrator
-* @date 2017年6月1日 下午4:46:27
-*/
+ * Description :
+ * 
+ * @author Administrator
+ * @date 2017年6月1日 下午4:46:27
+ */
 @Service("AppInterfaceService")
 @Transactional
 public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInterfaceService {
-	
+
 	@Autowired
 	private SystemService systemService;
-	
+
 	/**
 	 * 1.添加事务注解 使用propagation 指定事务的传播行为，即当前的事务方法被另外一个事务方法调用时如何使用事务。
 	 * 默认取值为REQUIRED，即使用调用方法的事务 REQUIRES_NEW：使用自己的事务，调用的事务方法的事务被挂起。
@@ -59,48 +61,55 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	// readOnly=true//, timeout=30 //timeout 允许在执行第一条sql之后保持连接30秒
 	)
 	public String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId) {
-		
+
 		// 生成订单号
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
+
+		// 订单批次编号
+		String lineOrderCodel = "";
+
 		LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, t.getLineId());
 		String str = line.getLineNumber();
-		String orderstart=t.getOrderStartime();
+		String orderstart = t.getOrderStartime();
 		try {
-			if(StringUtil.isNotEmpty(orderstart)){
+			if (StringUtil.isNotEmpty(orderstart)) {
 				Date w = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(orderstart);
 				long nowLong = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmm").format(w));
-				String s = nowLong+"";
+				String s = nowLong + "";
 				String a = s.substring(10);
 				String b = s.substring(2, 10);
 				System.out.println(b);
-				if(Integer.parseInt(a)<30){
-					t.setLineOrderCode(str+b+"A");
-				}else{
-					t.setLineOrderCode(str+b+"B");
+				if (Integer.parseInt(a) < 30) {
+					lineOrderCodel = str + b + "A";
+				} else {
+					lineOrderCodel = str + b + "B";
 				}
 			}
-			
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
-		//t.setLineOrderCode(lineOrderCode);
-		// 做了一个视图，确保查出的线路的唯一性
-//		Map<String, Object> map = findOneForJdbc("select * from order_line_view where busStopsId=? ", commonAddrId);
-//		if (map.size() > 0) {
-//			t.setLineName(map.get("name") + "");
-//			t.setLineId(map.get("id") + "");
-//		}
+		t.setLineOrderCode(lineOrderCodel);
 		
+//		// 如果是一个批次只需要安排一辆车，然后由调度员去处理，那安排车辆有什么意义呢。。。
+//		List<Map<String, Object>> list = systemService.findForJdbc(
+//				"select o.driverId,o.licencePlateId from transferorder t join order_linecardiver o on t.id = o.id where lineOrderCodel = ? ",lineOrderCodel);
+//		// 只需要拿第一个数据就行了
+//		if (list != null && list.size() > 0) {
+//			Map<String, Object> map = list.get(0);
+//			String driverId = map.get("driverId") + "";
+//			String licencePlateId = map.get("licencePlateId") + "";
+//			Order_LineCarDiverEntity olc = new Order_LineCarDiverEntity();
+//		}
+
 		t.setApplicationTime(AppUtil.getDate());
 		// t.setOrderType(1);
-		
+
 		// 记录常用站点
 		CustomerCommonAddrEntity c = null;
 		List<CustomerCommonAddrEntity> addrs = findHql(
-				" from CustomerCommonAddrEntity where user_id=? and station_id=? ", t.getUserId(),
-				commonAddrId);
+				" from CustomerCommonAddrEntity where user_id=? and station_id=? ", t.getUserId(), commonAddrId);
 		if (addrs.size() > 0) {
 			c = addrs.get(0);
 			c.setCount(c.getCount() + 1);
@@ -111,18 +120,18 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			c.setUserId(t.getUserId());
 			c.setId(UUIDGenerator.generate());
 		}
-		
+
 		save(t);
 		save(c);
-		
+
 		return t.getId();
 	}
 
 	@Override
 	public List<AppStationInfoEntity> getPTStation(String serveType, String cityId) {
-		
+
 		List<AppStationInfoEntity> lList = new ArrayList<>();
-		
+
 		// 查找指定类型的线路
 		List<Map<String, Object>> lineList = findForJdbc(
 				" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y "
@@ -141,27 +150,27 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 			lList.add(asi);
 		}
-		
+
 		return lList;
-		
+
 	}
 
 	@Override
 	public void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
-		List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
-		List<AppStationInfoEntity> stationList) {
-		
+			List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
+			List<AppStationInfoEntity> stationList) {
+
 		// 根据起点id城市查找线路信息
 		List<Map<String, Object>> lineList = findForJdbc(
 				" select lf.id,lf.name,lf.price,lf.lineTimes,lf.dispath "
 						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
 						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ",
 				stationId, cityId, serveType);
-		
-		if(lineList.size() == 0){
+
+		if (lineList.size() == 0) {
 			return;
 		}
-		
+
 		StringBuffer sbf = new StringBuffer();
 		for (Map<String, Object> a : lineList) {
 
@@ -178,23 +187,22 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			sbf.append(asi.getId());
 			sbf.append("',");
 		}
-		 
+
 		if (sbf.length() > 0)
 			sbf.deleteCharAt(sbf.length() - 1);
 
-		
 		// 查询指定id线路中的所有普通站点
-		List<AppStationInfoEntity> stationList1 = findHql(
-				"from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? and name like '%" + likeStation + "%' ", 0);
+		List<AppStationInfoEntity> stationList1 = findHql("from AppStationInfoEntity where lineId in (" + sbf.toString()
+				+ ") and station_type=? and name like '%" + likeStation + "%' ", 0);
 		stationList.addAll(stationList1);
-		
+
 		// 常用站点列表
 		// List<CustomerCommonAddrEntity> c =
 		// systemService.findHql("from CustomerCommonAddrEntity where
 		// user_id=? ", userId);
-		
-		//userId如果为空的话就不进行查找
-		if(StringUtil.isNotEmpty(userId) && !StringUtil.isNotEmpty(likeStation)){
+
+		// userId如果为空的话就不进行查找
+		if (StringUtil.isNotEmpty(userId) && !StringUtil.isNotEmpty(likeStation)) {
 			List<Map<String, Object>> map = findForJdbc(
 					"select b.id,b.name,b.x,b.y,b.stopLocation,b.station_type,b.lineId from app_station_info_view b "
 							+ "inner join customer_common_addr c on c.station_id=b.id where c.user_id=? and b.lineId in ("
@@ -212,28 +220,27 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 				cList.add(addr);
 			}
 		}
-		
+
 	}
 
 	@Override
 	public List<AppUserOrderEntity> getUserOrders(String userId, String orderStatus, String pageNo,
 			String maxPageItem) {
-		
+
 		List<Map<String, Object>> list = null;
 		List<AppUserOrderEntity> auoList = new ArrayList<>();
-		
+
 		StringBuffer sql = new StringBuffer();
 		sql.append(
 				"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
 						+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? "
 						+ "and delete_flag='0' ORDER BY INSTR('2,1,3,4,6,5,0',order_status),a.order_startime asc ");
 
-//		if (StringUtil.isNotEmpty(orderStatus)) {
-//			sql.append(" and order_paystatus = '" + orderStatus + "'");
-//		}
+		// if (StringUtil.isNotEmpty(orderStatus)) {
+		// sql.append(" and order_paystatus = '" + orderStatus + "'");
+		// }
 
-		list = findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
-				Integer.parseInt(maxPageItem), userId);
+		list = findForJdbcParam(sql.toString(), Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
 
 		for (Map<String, Object> map : list) {
 			// Date date = (Date) map.get("startTime");
@@ -250,17 +257,17 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			auo.setOrderTotalPrice(map.get("order_totalPrice") + "");
 			auoList.add(auo);
 		}
-		
+
 		return auoList;
 	}
 
 	@Override
 	public AppUserOrderDetailEntity getOrderDetailById(String orderId) {
-		
+
 		List<Map<String, Object>> list = null;
 		AppUserOrderDetailEntity aod = new AppUserOrderDetailEntity();
-		
-		//为了通用这个详情页，把几个订单详情页的属性都拿出来了
+
+		// 为了通用这个详情页，把几个订单详情页的属性都拿出来了
 		list = findForJdbc(
 				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name,a.order_expectedarrival, "
 						+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
@@ -297,19 +304,20 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			// 发车时间
 			aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));
 
-//			// 线路时长
-//			String lineTime = map.get("lineTimes") + "";
-//			// 在发车时间的基础上加上线路所用时长
-//			if (StringUtil.isNotEmpty(lineTime)) {
-//				double lt = Double.parseDouble(lineTime);
-//
-//				long a = (long) (date.getTime() + (lt * 60 * 1000));
-//
-//				aod.setStationEndTime(DateUtils.date2Str(new Date(a), DateUtils.short_time_sdf));
-//			} else {
-//				aod.setStationEndTime("");
-//			}
-			
+			// // 线路时长
+			// String lineTime = map.get("lineTimes") + "";
+			// // 在发车时间的基础上加上线路所用时长
+			// if (StringUtil.isNotEmpty(lineTime)) {
+			// double lt = Double.parseDouble(lineTime);
+			//
+			// long a = (long) (date.getTime() + (lt * 60 * 1000));
+			//
+			// aod.setStationEndTime(DateUtils.date2Str(new Date(a),
+			// DateUtils.short_time_sdf));
+			// } else {
+			// aod.setStationEndTime("");
+			// }
+
 			String lineTime = map.get("order_expectedarrival") + "";
 			if (StringUtil.isNotEmpty(lineTime)) {
 				aod.setStationEndTime(lineTime.substring(lineTime.indexOf(" "), lineTime.lastIndexOf(":")));
@@ -317,16 +325,16 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 				aod.setStationEndTime("");
 			}
 		}
-		
+
 		return aod;
 	}
 
 	@Override
 	public List<AppCheckTicket> getTicketListById(String userId, String pageNo, String maxPageItem) {
-		
+
 		List<Map<String, Object>> list = null;
 		List<AppCheckTicket> actlist = new ArrayList<>();
-		
+
 		StringBuffer sql = new StringBuffer();
 		sql.append(
 				" select a.id,a.order_status,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
@@ -334,8 +342,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 						+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 						+ " left join driversinfo d on b.driverId =d.id where a.user_id=? and a.order_status='2' and order_paystatus='0' ");
 
-		list = findForJdbcParam(sql.toString(), Integer.parseInt(pageNo),
-				Integer.parseInt(maxPageItem), userId);
+		list = findForJdbcParam(sql.toString(), Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
 
 		for (Map<String, Object> map : list) {
 
@@ -360,13 +367,13 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 	@Override
 	public List<AppMessageListEntity> getMessageListById(String userId, String pageNo, String maxPageItem) {
-		
+
 		List<AppMessageListEntity> mList = new ArrayList<>();
 		List<Map<String, Object>> lm = null;
-		
+
 		lm = findForJdbcParam("select * from customer_message where user_id = ? order by create_time desc  ",
 				Integer.parseInt(pageNo), Integer.parseInt(maxPageItem), userId);
-		
+
 		for (Map<String, Object> m : lm) {
 			AppMessageListEntity am = new AppMessageListEntity();
 			am.setContent(m.get("content") + "");
@@ -379,14 +386,11 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			mList.add(am);
 		}
 
-		//进入消息中心后就将所有的消息改为已读       （改为点击消息的时候改为已读）
-//		String sql = "update customer_message set status=1 where user_id=? ";
-//		executeSql(sql, userId);
-		
+		// 进入消息中心后就将所有的消息改为已读 （改为点击消息的时候改为已读）
+		// String sql = "update customer_message set status=1 where user_id=? ";
+		// executeSql(sql, userId);
+
 		return mList;
 	}
 
-	
-	
-	
 }

@@ -21,7 +21,7 @@
 	<t:dgToolBar operationCode="add" title="录入" icon="icon-add" url="driversInfoController.do?addorupdate&type=add" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="编辑" icon="icon-edit" url="driversInfoController.do?addorupdate" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="50"></t:dgCol>
-	<t:dgDelOpt title="common.delete" url="driversInfoController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" />
+	<t:dgDelOpt title="common.delete" url="driversInfoController.do?del&id={id}" urlStyle="align:center" />
 	<%-- <t:dgToolBar title="批量删除" icon="icon-remove" url="driversInfoController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar> --%>
 	<t:dgToolBar operationCode="detail" title="查看" icon="icon-search" url="driversInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
 
@@ -31,18 +31,37 @@
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
 <script type="text/javascript">
-$(function() {
-	var json = $("#citylie").val();
-	var obj = eval('(' + json + ')');
-	var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
-	var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
-	var a3 = '<select name="cityID" style="width: 150px">';
-	var c1 = '<option value="">所在城市</option>';
-	for (var i = 0; i < obj.data.length; i++) {
-		c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
-				+ '</option>';
+	$(function() {
+		var json = $("#citylie").val();
+		var obj = eval('(' + json + ')');
+		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
+		var a3 = '<select name="cityID" style="width: 150px">';
+		var c1 = '<option value="">所在城市</option>';
+		for (var i = 0; i < obj.data.length; i++) {
+			c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
+					+ '</option>';
+		}
+		var a4 = '</select></span>';
+		$("#driversInfoListForm").append(a1 + a2 + a3 + c1 + a4);
+	});
+	
+	//删除调用函数
+	function delObj(url,name) {
+		
+		var id = url.substr(url.lastIndexOf("=") + 1);
+		$.get(
+			"driversInfoController.do?checkBinding&id="+id,
+			function(data){
+				var obj = eval("(" + data + ")");
+				if(!obj.success){
+					tip(obj.msg);
+				}else{
+					gridname=name;
+					createdialog('删除确认 ', '确定删除该记录吗 ?', url,name);
+				}
+			}
+		);
 	}
-	var a4 = '</select></span>';
-	$("#driversInfoListForm").append(a1 + a2 + a3 + c1 + a4);
-});
+	
 </script>

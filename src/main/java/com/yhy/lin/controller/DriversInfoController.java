@@ -1,14 +1,11 @@
 package com.yhy.lin.controller;
 
 import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,13 +15,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.common.UploadFile;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
@@ -59,8 +54,6 @@ public class DriversInfoController extends BaseController {
 	private DriversInfoServiceI driversInfoService;
 	@Autowired
 	private SystemService systemService;
-	@Autowired
-	private Validator validator;
 
 	/**
 	 * 司机信息表列表 页面跳转
@@ -144,21 +137,42 @@ public class DriversInfoController extends BaseController {
 	 * 
 	 * @return
 	 */
+	@RequestMapping(params = "checkBinding")
+	@ResponseBody
+	public AjaxJson checkBinding(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		j.setSuccess(true);
+		
+		String id = request.getParameter("id");
+		long l = systemService.getCountForJdbc("select count(*) from car_info where driver_id = '" + id + "'");
+		if(l > 0){
+			message = "司机已绑定车辆，请先解除绑定！";
+			j.setSuccess(false);
+		}
+		
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 删除司机信息表
+	 * 
+	 * @return
+	 */
 	@RequestMapping(params = "del")
 	@ResponseBody
 	public AjaxJson del(DriversInfoEntity driversInfo, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		driversInfo = systemService.getEntity(DriversInfoEntity.class, driversInfo.getId());
-		driversInfo.setDeleteFlag(1);
 		message = "司机信息表删除成功";
-//		driversInfoService.delete(driversInfo);
+		driversInfoService.delete(driversInfo);
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 		
 		j.setMsg(message);
 		return j;
 	}
-
 
 	/**
 	 * 添加司机信息表
