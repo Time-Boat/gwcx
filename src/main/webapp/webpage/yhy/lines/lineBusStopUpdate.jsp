@@ -25,7 +25,7 @@
 				<label class="Validform_label"> 站点序号: </label>
 			</td>
 			<td class="value" width="85%">
-			<input id="siteOrder" name="siteOrder" value="${siteOrder}" datatype="n" errormsg="请输入1-100的整数!" style="width: 60%" class="inputxt"  datatype="*"> 
+			<input id="siteOrder" name="siteOrder" value="${siteOrder}" <c:if test="${siteOrder == '99' or siteOrder == '0'}">disabled="disabled"</c:if> datatype="n" errormsg="请输入1-100的整数!" style="width: 60%" class="inputxt"  datatype="*"> 
 				<span class="Validform_checktip">用于线路站点的先后顺序排列</span> 
 			</td>
 		</tr>

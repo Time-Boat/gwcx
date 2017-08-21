@@ -104,9 +104,9 @@ public class DriversInfoController extends BaseController {
 		String sex = request.getParameter("sex");
 		String name = request.getParameter("name");
 		String phoneNumber = request.getParameter("phoneNumber");
-		String status =  request.getParameter("status");
+		String status = request.getParameter("status");
 		
-		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,sex ,name ,phoneNumber,status);
+		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,sex , name, phoneNumber, status);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -224,15 +224,15 @@ public class DriversInfoController extends BaseController {
 	public AjaxJson saveOrUpdate(DriversInfoEntity driversInfo,HttpServletRequest request) throws Exception {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		driversInfo = systemService.get(DriversInfoEntity.class, driversInfo.getId());
 		message = "司机信息表添加成功";
 		driversInfo.setCreateDate(new Date(System.currentTimeMillis()));
-		driversInfo.setDeleteFlag(0);
 		UploadFile uploadFile = new UploadFile(request, driversInfo);
 		//uploadFile.setCusPath("plug-in/accordion/images");
 		uploadFile.setDiskBasePath(AppGlobals.IMAGE_BASE_FILE_PATH);
 		uploadFile.setCusPath("image");  
 		uploadFile.setBasePath("driver");
-		uploadFile.setRealPath("drivingLicenseImgUrl");  
+		uploadFile.setRealPath("drivingLicenseImgUrl");
 		uploadFile.setObject(driversInfo);  
 		uploadFile.setRename(true);
 		systemService.uploadFile(uploadFile);	

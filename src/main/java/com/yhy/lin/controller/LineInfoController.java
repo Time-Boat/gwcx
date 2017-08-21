@@ -629,7 +629,7 @@ public class LineInfoController extends BaseController {
 				String sql = "update line_busstop set siteOrder=" + order + "  where id='" + id + "'";
 				System.out.println(sql);
 				systemService.updateBySqlString(
-						"update line_busstop set siteOrder=" + order + "  where busStopsId='" + id + "'");
+						"update line_busstop set siteOrder=" + order + "  where id='" + busid + "'");
 				systemService.updateBySqlString(
 						"update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
 				message = "站点上移成功！";
@@ -666,15 +666,15 @@ public class LineInfoController extends BaseController {
 		if (StringUtil.isNotEmpty(siteOrder)) {
 			int site = Integer.parseInt(siteOrder);
 			if (site != 0 && site != siteOreder && site != 99) {
+				//需要交换对象的排序值
 				int order = site + 1;
-				Line_busStopEntity ln = this.systemService.getEntity(Line_busStopEntity.class, busid);
-				List<Line_busStopEntity> list = this.systemService
-						.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order, ln.getLineId());
-				Line_busStopEntity line = list.get(0);
+				Line_busStopEntity ln = systemService.getEntity(Line_busStopEntity.class, busid);
+				List<Line_busStopEntity> list = systemService.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order, ln.getLineId());
+				Line_busStopEntity lb = list.get(0);
 				systemService.updateBySqlString(
-						"update line_busstop set siteOrder=" + order + "  where busStopsId='" + id + "'");
+						"update line_busstop set siteOrder='" + order + "' where id='" + busid + "'");
 				systemService.updateBySqlString(
-						"update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+						"update line_busstop set siteOrder='" + site + "' where id='" + lb.getId() + "'");
 				message = "站点下移成功！";
 			} else if (site == 0) {
 				message = "起点站不能下移";
@@ -700,8 +700,8 @@ public class LineInfoController extends BaseController {
 		String siteOrder = request.getParameter("siteOrder");
 		String arrivalTime = request.getParameter("arrivalTime");
 		if (StringUtil.isNotEmpty(id) && StringUtil.isNotEmpty(siteOrder)) {
-			systemService.updateBySqlString("update line_busstop set siteOrder='" + siteOrder + "', arrivalTime = '"
-					+ arrivalTime + "'  where id='" + id + "'");
+			String sql = "update line_busstop set siteOrder='" + siteOrder + "', arrivalTime = '" + arrivalTime + "'";
+			systemService.updateBySqlString(sql + " where id='" + id + "'");
 			message = "站点序号更新成功";
 		}
 		j.setMsg(message);

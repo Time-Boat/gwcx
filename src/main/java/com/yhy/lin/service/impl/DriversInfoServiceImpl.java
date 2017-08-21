@@ -24,7 +24,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
-		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag = 0 ");
+		StringBuffer queryCondition = new StringBuffer(" where 1=1 ");
 		
 		 
 		if(StringUtil.isNotEmpty(orgCode)){
@@ -52,7 +52,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -67,7 +67,6 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 							,new Db2Page("age", "age")
 							,new Db2Page("idCard", "idCard")
 							,new Db2Page("createDate", "createDate")
-							,new Db2Page("deleteFlag", "deleteFlag")
 							,new Db2Page("remark", "remark")
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("drivingLicenseImgUrl", "drivingLicenseImgUrl")
@@ -78,7 +77,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	
 	@Override
 	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status) {
-		StringBuffer queryCondition = new StringBuffer(" where d.id not in (select ci.driver_id from car_info ci ) and d.deleteFlag = 0 ");
+		StringBuffer queryCondition = new StringBuffer(" where d.id not in (select ci.driver_id from car_info ci ) ");
 	    
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
@@ -106,7 +105,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.deleteFlag,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -121,7 +120,6 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 							,new Db2Page("age", "age")
 							,new Db2Page("idCard", "idCard")
 							,new Db2Page("createDate", "createDate")
-							,new Db2Page("deleteFlag", "deleteFlag")
 							,new Db2Page("remark", "remark")
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("drivingLicenseImgUrl", "drivingLicenseImgUrl")

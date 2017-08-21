@@ -92,7 +92,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="name" name="name" ignore="ignore"
+						<input class="inputxt" id="name" name="name" datatype="*" <c:if test="${driversInfoPage.name != null}">disabled="disabled"</c:if>
 							   value="${driversInfoPage.name}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -116,8 +116,8 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="idCard" name="idCard" datatype="/^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/" errormsg="身份证号非法"
-							   value="${driversInfoPage.idCard}" onblur="getAge()">
+						<input class="inputxt" id="idCard" name="idCard" datatype="/^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/" 
+							   errormsg="身份证号非法" <c:if test="${driversInfoPage.idCard != null}">disabled="disabled"</c:if> value="${driversInfoPage.idCard}" onblur="getAge()">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

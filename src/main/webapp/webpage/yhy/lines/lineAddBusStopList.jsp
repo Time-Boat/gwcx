@@ -1,15 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/context/mytags.jsp"%>
 <div class="easyui-layout" fit="true">
-<div region="center" style="padding:0px;border:0px"><!-- onLoadSuccess="selectRowFun" -->
+<div region="center" style="padding:0px;border:0px">
 <t:datagrid onLoadSuccess="selectRowFun" name="roleUserListLB" title="已挂接的线路站点" 
             actionUrl="lineInfoController.do?busStopByLineDatagrid&lineInfoId=${lineInfoId}" fit="true" fitColumns="true" idField="id" >
 	<t:dgCol title="站点ID" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="关联表ID" field="line_busstopId" hidden="true" ></t:dgCol>
-	<t:dgCol title="站点名称" field="name"   align="center"></t:dgCol>
+	<t:dgCol title="站点名称" field="name" align="center"></t:dgCol>
 	<t:dgCol title="站点序号" field="siteOrder" align="center" ></t:dgCol>
 	<t:dgCol title="预计站点到站时间" field="arrivalTime" align="center" ></t:dgCol>
-	<t:dgCol title="common.operation" field="opt"></t:dgCol>
+	<t:dgCol title="操作" field="opt"></t:dgCol>
 	<t:dgFunOpt title="删除关联站点" funname="delZd(id,line_busstopId)" />
 	<t:dgToolBar title="添加站点挂接"  operationCode="addSite" icon="icon-add" url="lineInfoController.do?busStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}" funname="add"></t:dgToolBar>
 	<t:dgToolBar title="站点时间、序号编辑" operationCode="editSite"  icon="icon-edit" url="lineInfoController.do?updateBusStopOrder" funname="update"></t:dgToolBar>
@@ -24,7 +24,7 @@
 var selectRowB;
 
 //移动状态
-var moveStatus; 
+var moveStatus;
 
 //上移
 function moveup(title,url,id,width,height,isRestful){
@@ -111,8 +111,6 @@ function selectRowFun(){
 	selectRowB = undefined;
 }
 
-
-
 //下移
 function movedown(title,url,id,width,height,isRestful){
 	
@@ -190,7 +188,7 @@ function update(title,url,id,width,height,isRestful) {
 		tip('请选择编辑项目');
 		return;
 	}
-	if (rowsData.length>1) {
+	if (rowsData.lengt > 1) {
 		tip('请选择一条记录再编辑');
 		return;
 	}
