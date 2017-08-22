@@ -241,9 +241,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
+	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String cityid,String lineType,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere3(transferorder,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere3(transferorder,cityid,lineType,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -381,7 +381,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		return sql.toString();
 	}
 	
-	public String getWhere3(TransferorderEntity transferorder,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
+	public String getWhere3(TransferorderEntity transferorder,String cityid,String lineType,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
 			String ddTime_end) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -400,6 +400,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
 			sql.append(" and  a.order_id like '%" + transferorder.getOrderId() + "%'");
 		}
+		//所属城市
+		if (StringUtil.isNotEmpty(cityid)) {
+			sql.append(" and  a.city_id = '" + cityid + "'");
+		}
 		// 线路名称
 		if (StringUtil.isNotEmpty(lineId)) {
 			sql.append(" and  a.line_id = '" + lineId + "'");
@@ -409,6 +413,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and  d.name like '%" + driverId + "%'");
 		}
 				
+		//线路类型
+		if (StringUtil.isNotEmpty(lineType)) {
+			sql.append(" and  l.type = '" + lineType + "'");
+		}
+		
 		//车牌号
 		if (StringUtil.isNotEmpty(carId)) {
 			sql.append(" and  c.licence_plate = '" + carId + "'");

@@ -24,9 +24,17 @@
 			<td align="right" width="15%" nowrap>
 				<label class="Validform_label"> 站点序号: </label>
 			</td>
+			
 			<td class="value" width="85%">
-			<input id="siteOrder" name="siteOrder" value="${siteOrder}" <c:if test="${siteOrder == '99' or siteOrder == '0'}">disabled="disabled"</c:if> datatype="n" errormsg="请输入1-100的整数!" style="width: 60%" class="inputxt"  datatype="*"> 
-				<span class="Validform_checktip">用于线路站点的先后顺序排列</span> 
+				<select id="siteOrder" name="siteOrder" datatype="*" >
+						<option value="">--请选择序号--</option>
+						<c:forEach var="b" items="${bussiteOrder}">
+							<option value="${b.siteOrder}" <c:if test="${siteOrder == b.siteOrder}" >selected="selected"</c:if>>
+								${b.siteOrder}
+							</option>
+						</c:forEach>
+				</select> 
+				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
 		<tr>

@@ -4,6 +4,9 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.jeecgframework.core.common.service.CommonService;
 import org.jeecgframework.core.interceptors.DateConvertEditor;
+import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.web.system.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.ServletRequestDataBinder;
@@ -30,6 +33,9 @@ import java.util.List;
 @Controller
 @RequestMapping("/baseController")
 public class BaseController {
+	
+	@Autowired
+	private SystemService systemService;
 
 	/**
 	 * 将前台传递过来的日期格式的字符串，自动转化为Date类型
@@ -126,4 +132,117 @@ public class BaseController {
   		}
   	}	
   	
+  	/**
+	 * 获得开通城市
+	 * @return
+	 */
+	public String getOpencity(){
+		String sql = "select op.city_id,op.city_name from open_city op where op.status='0' ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String cityName = ob[1]+"";
+					json.append("{");
+					json.append("'cityID':'" +id + "',");
+					json.append("'cityName':'"+ cityName + "'");
+					json.append("},");
+				}
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
+	}
+	
+	/**
+	 * 获得车牌号
+	 * @return
+	 */
+	public String getCarPlate(){
+		String sql = "select c.id,c.licence_plate from car_info c ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String licencePlate = ob[1]+"";
+					json.append("{");
+					json.append("'carId':'" +id + "',");
+					json.append("'licencePlate':'"+ licencePlate + "'");
+					json.append("},");
+				}
+			}else{
+				json.append("{");
+				json.append("'carId':'',");
+				json.append("'licencePlate':''");
+				json.append("},");
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
+	}
+	
+	/**
+	 * 获取司机
+	 * @return
+	 */
+	public String getDriver(){
+		String sql = "select d.id,d.name from driversinfo d ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String name = ob[1]+"";
+					json.append("{");
+					json.append("'driverId':'" +id + "',");
+					json.append("'driverName':'"+ name + "'");
+					json.append("},");
+				}
+			}else{
+				json.append("{");
+				json.append("'driverId':'',");
+				json.append("'driverName':''");
+				json.append("},");
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		return json.toString();
+	}
+	
+	
+	/**
+	 * 获取线路(接送机)
+	 */
+	public String getLine(){
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		// 添加了权限
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type in('2','3');";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String name = ob[1]+"";
+					json.append("{");
+					json.append("'lineId':'" +id + "',");
+					json.append("'lineName':'"+ name + "'");
+					json.append("},");
+				}
+			}else{
+				json.append("{");
+				json.append("'lineId':'',");
+				json.append("'lineName':''");
+				json.append("},");
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		
+		return json.toString();
+	}
 }

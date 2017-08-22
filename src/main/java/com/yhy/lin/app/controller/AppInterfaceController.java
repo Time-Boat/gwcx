@@ -939,9 +939,33 @@ public class AppInterfaceController extends AppBaseController {
 				t = systemService.getEntity(TransferorderEntity.class, orderId);
 				if(StringUtil.isNotEmpty(t)){
 					String lineId = t.getLineId();
+					
+					// 订单批次编号
+					String lineOrderCodel = "";
+
 					LineInfoEntity lineinfo= systemService.getEntity(LineInfoEntity.class, lineId);
 					if(StringUtil.isNotEmpty(lineinfo)){
 						String lin = lineinfo.getLineTimes();
+						
+						String str = lineinfo.getLineNumber();
+						String orderstart = departTime;
+						
+						if (StringUtil.isNotEmpty(orderstart)) {
+							Date w = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(orderstart);
+							long nowLong = Long.parseLong(new SimpleDateFormat("yyyyMMddHHmm").format(w));
+							String s = nowLong + "";
+							String a = s.substring(10);
+							String c = s.substring(2, 10);
+							System.out.println(c);
+							if (Integer.parseInt(a) < 30) {
+								lineOrderCodel = str + c + "A";
+							} else {
+								lineOrderCodel = str + c + "B";
+							}
+						}
+						
+						
+						t.setLineOrderCode(lineOrderCodel);
 						
 						Calendar calendar = Calendar.getInstance();
 						SimpleDateFormat sdf =   new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );

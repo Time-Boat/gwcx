@@ -600,11 +600,38 @@ public class LineInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "updateBusStopOrder")
 	public ModelAndView updateBusStopOrder(Line_busStopEntity lineBusStop, HttpServletRequest request) {
-		request.setAttribute("id", request.getParameter("line_busstopId"));
+		String busstopid = request.getParameter("line_busstopId");
+		
+		request.setAttribute("id", busstopid);
 		request.setAttribute("name", request.getParameter("name"));
 		request.setAttribute("siteOrder", request.getParameter("siteOrder"));
+		request.setAttribute("bussiteOrder",getSiteOrder(busstopid) );
 		request.setAttribute("arrivalTime", request.getParameter("arrivalTime"));
+		
 		return new ModelAndView("yhy/lines/lineBusStopUpdate");
+	}
+	
+	/**
+	 * 获取序号
+	 * @return
+	 */
+	public List<Line_busStopEntity> getSiteOrder(String busstopid){
+		
+		List<Line_busStopEntity> lie = new ArrayList<Line_busStopEntity>();
+		Line_busStopEntity busstop = this.systemService.getEntity(Line_busStopEntity.class, busstopid);
+		String sql = "select b.siteOrder from line_busstop b where b.lineId='"+busstop.getLineId()+"' and b.siteOrder!=0 and b.siteOrder!=99 ORDER BY b.siteOrder";
+		List<Object> list = this.systemService.findListbySql(sql);
+				
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Line_busStopEntity linr = new Line_busStopEntity();
+				int siteOrder =  (int) list.get(i);
+				linr.setSiteOrder(siteOrder);
+				lie.add(linr);
+			}
+		}
+		return lie;
+			
 	}
 
 	/**
@@ -698,8 +725,20 @@ public class LineInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
 		String siteOrder = request.getParameter("siteOrder");
+		int site = Integer.parseInt(siteOrder);
 		String arrivalTime = request.getParameter("arrivalTime");
+		
 		if (StringUtil.isNotEmpty(id) && StringUtil.isNotEmpty(siteOrder)) {
+			
+			Line_busStopEntity line = this.systemService.getEntity(Line_busStopEntity.class, id);
+			if(site>line.getSiteOrder()){
+				String s = "update line_busstop b set siteOrder=siteOrder-1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>"+line.getSiteOrder()+" and b.siteOrder<="+site;
+				systemService.updateBySqlString(s);
+			}else{
+				String si = "update line_busstop b set siteOrder=siteOrder+1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>="+site+" and b.siteOrder<"+line.getSiteOrder();
+				systemService.updateBySqlString(si);
+			}
+			
 			String sql = "update line_busstop set siteOrder='" + siteOrder + "', arrivalTime = '" + arrivalTime + "'";
 			systemService.updateBySqlString(sql + " where id='" + id + "'");
 			message = "站点序号更新成功";

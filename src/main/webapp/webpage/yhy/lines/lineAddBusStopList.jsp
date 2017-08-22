@@ -3,7 +3,7 @@
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 <t:datagrid onLoadSuccess="selectRowFun" name="roleUserListLB" title="已挂接的线路站点" 
-            actionUrl="lineInfoController.do?busStopByLineDatagrid&lineInfoId=${lineInfoId}" fit="true" fitColumns="true" idField="id" >
+            actionUrl="lineInfoController.do?busStopByLineDatagrid&lineInfoId=${lineInfoId}" fit="true" fitColumns="true" idField="id" pageSize="100">
 	<t:dgCol title="站点ID" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="关联表ID" field="line_busstopId" hidden="true" ></t:dgCol>
 	<t:dgCol title="站点名称" field="name" align="center"></t:dgCol>

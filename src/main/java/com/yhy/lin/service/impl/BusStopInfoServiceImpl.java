@@ -98,7 +98,6 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 			sql += " where" + sqlWhere;
 		}
 		sql +=" order by b.siteOrder is NULL,b.siteOrder ";
-		
 		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
 
 		// 将结果集转换成页面上对应的数据集
