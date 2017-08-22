@@ -1,5 +1,7 @@
 package com.yhy.lin.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -177,4 +179,33 @@ public class DealerInfoController extends BaseController {
 		return new ModelAndView("yhy/dealer/dealerInfo");
 	}
 	
+	/**
+	 * 检查公司社会信用代码是否存在
+	 */
+	@RequestMapping(params = "checkCreditCode")
+	@ResponseBody
+	public AjaxJson checkCreditCode(HttpServletRequest request) {
+		String message = "";
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		try {
+			String creditCode = request.getParameter("creditCode");
+			List<DealerInfoEntity> list  = this.systemService.findByProperty(DealerInfoEntity.class, "creditCode", creditCode);
+			if(list.size() > 0){
+				message = "公司社会信用代码已经存在";
+				success = false;
+			}else{
+				message="添加社会信用代码成功！";
+				success = true;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
 }

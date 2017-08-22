@@ -51,6 +51,8 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String status;
 	/**备注（备用字段）*/
 	private String remark;
+	/**公司社会信用代码 */
+	private String creditCode;
 	
 	/**
 	 *方法: 取得java.lang.String
@@ -223,6 +225,19 @@ public class DealerInfoEntity implements java.io.Serializable {
 	 */
 	public void setRemark(java.lang.String remark){
 		this.remark = remark;
+	}
+
+	/**
+	 *方法: 取得java.lang.String
+	 *@return: java.lang.String  公司社会信用代码
+	 */
+	@Column(name ="credit_code",nullable=true,length=32)
+	public String getCreditCode() {
+		return creditCode;
+	}
+
+	public void setCreditCode(String creditCode) {
+		this.creditCode = creditCode;
 	}
 	
 }

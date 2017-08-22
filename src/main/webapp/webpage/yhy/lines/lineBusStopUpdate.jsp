@@ -26,7 +26,7 @@
 			</td>
 			
 			<td class="value" width="85%">
-				<select id="siteOrder" name="siteOrder" datatype="*" >
+				<select id="siteOrder" name="siteOrder" datatype="*" <c:if test="${siteOrder == '99' or siteOrder == '0'}">disabled="disabled"</c:if>>
 						<option value="">--请选择序号--</option>
 						<c:forEach var="b" items="${bussiteOrder}">
 							<option value="${b.siteOrder}" <c:if test="${siteOrder == b.siteOrder}" >selected="selected"</c:if>>
