@@ -19,7 +19,7 @@
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" replace="接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,待付款_6" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单状态" field="orderStatus" dictionary="orderStatus" query="true" align="center"></t:dgCol>
 		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
 		<t:dgCol title="单价(人/元)" field="orderUnitprice" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>

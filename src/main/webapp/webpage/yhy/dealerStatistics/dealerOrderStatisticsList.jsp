@@ -25,7 +25,7 @@
 			<t:dgCol title="乘车联系人" field="orderContactsname" align="center"></t:dgCol>
 			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
 			<t:dgCol title="订单状态" field="orderStatus"
-				replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,取消订单待退款_3" align="center"></t:dgCol>
+				dictionary="orderStatus" align="center"></t:dgCol>
 			<t:dgCol title="订单数量" field="orderNumbers" align="center"></t:dgCol>
 			<t:dgCol title="合计价格" field="orderTotalPrice" align="center"></t:dgCol>
 		</t:datagrid>

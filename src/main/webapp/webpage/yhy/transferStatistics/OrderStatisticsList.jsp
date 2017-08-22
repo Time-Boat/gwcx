@@ -24,7 +24,7 @@
 			<t:dgCol title="车牌号" field="licencePlate" align="center" width="80"></t:dgCol>
 			<t:dgCol title="订单来源渠道" field="account" align="center" width="80"></t:dgCol>
 			<t:dgCol title="订单状态" field="orderStatus" width="80"
-				replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,取消订单待退款_3" query="true"
+				dictionary="orderStatus" query="true"
 				align="center"></t:dgCol>
 			<t:dgCol title="订单数量" field="orderNumbers" align="center" width="80"></t:dgCol>
 			<t:dgCol title="合计价格" field="orderTotalPrice" align="center" width="80"></t:dgCol>

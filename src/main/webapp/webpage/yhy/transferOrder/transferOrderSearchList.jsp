@@ -21,7 +21,7 @@
 		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
 		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="火车车次" field="orderTrainnumber" align="center"></t:dgCol>
-		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,已付款待审核_1,审核通过待发车 _2,未支付_6" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单状态" field="orderStatus" dictionary="orderStatus" query="true" align="center"></t:dgCol>
 		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgToolBar> 	 
 	</t:datagrid>
 </div>
