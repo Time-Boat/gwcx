@@ -47,11 +47,17 @@
 		<t:dgCol title="申请退款时间" field="refundTime" formatter="yyyy-MM-dd hh:mm:ss" align="center" query="true" queryMode="group" ></t:dgCol>
 		<t:dgCol title="退款金额" field="refundPrice" align="center"></t:dgCol>
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
-		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
-		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
+		<t:dgCol title="初审时间" field="firstAuditDate" align="center"></t:dgCol>
+		<t:dgCol title="初审人" field="firstAuditUser" align="center"></t:dgCol>
+		<t:dgCol title="初审状态" field="firstAuditStatus" dictionary="first_audit_status" align="center"></t:dgCol>
+		<t:dgCol title="复审时间" field="lastAuditDate" align="center"></t:dgCol>
+		<t:dgCol title="复审人" field="lastAuditUser" align="center"></t:dgCol>
+		<t:dgCol title="复审状态" field="lastAuditStatus"  dictionary="last_audit_status" align="center"></t:dgCol>
+		<%-- <t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
+		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol> --%>
 		<t:dgCol title="订单状态" field="orderStatus" dictionary="orderStatus" query="true" align="center"></t:dgCol>
 		<%-- <t:dgCol title="操作" field="opt" align="center"></t:dgCol>
-		<t:dgFunOpt exp="orderStatus#eq#3" funname="agreeRefund(id)" title="同意" ></t:dgFunOpt>
+		<t:dgFunOpt exp="orderStatus#eq#3" funname="agreeRefund(id,orderTotalPrice)" title="同意" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="rejectRefund(id)" title="拒绝" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#5" funname="lookRejectReason(id)" title="查看原因" ></t:dgFunOpt> --%>
 		<t:dgToolBar title="批量同意" icon="icon-edit" url="orderRefundController.do?doAgreeALLSelect" funname="AgreeALLSelect"></t:dgToolBar>
@@ -59,62 +65,77 @@
 	</t:datagrid>
 </div>
 
-<!-- <div id="win"  class="easyui-window" title="退款原因" style="width:400px;height:300px"
+<div id="win" class="easyui-window" title="退款" style="width:400px;height:150px"
     data-options="modal:true" closed="true" >
-    <div class="easyui-layout" data-options="fit:true">
-		<div style="text-align: center; " data-options="region:'center'">
-			<input type="hidden" id="dialog_order_id" value="" />
-			<h5>请填写拒绝退款原因</h5>
-			<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols="7"></textarea>
-			<input id="terefuse" type="hidden" />
-			<div style="margin-top: 30px">
-				<input id="sub" type="button" class="button white" value="提交" style="margin-right: 50px;width:50px;height:30px" onclick="submitRefuse()" />
-				<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$('#win').window('close');"/>
-			</div>
-		</div>
-    </div>
-</div> -->
 
-<div id="win" class="easyui-window" title="确认退款" style="width:400px;height:150px;" data-options="modal:true" closed="true" ></div>
+<!-- <div id="win" class="easyui-window" title="确认退款" style="width:400px;height:150px;" data-options="modal:true" closed="true" ></div> -->
 
 </div>
 <script type="text/javascript">
 //进入触发 
-$(function() {
-	$('#win').append(refundWindow());
-	$('#orderRefundList').datagrid({   
-	    rowStyler:function(index,row){   
-	        if (row.orderStatus=="3"){   
-	            return 'color:#901622';   
-	        }
-	    }
+	$(function() {
+		$('#orderRefundList').datagrid({   
+		    rowStyler:function(index,row){
+		        if (row.orderStatus=="3"){
+		            return 'color:#901622';
+		        }
+		    }
+		});
 	});
-});
 
 	$(document).ready(function(){
 		$("input[name='orderStartime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderStartime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
 		$("input[name='refundTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='refundTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});	
-	
 	});
 
-	function refundWindow(){
+	function agreeWindow(){
 		var rwin = '';
 		rwin += '<div class="easyui-layout" data-options="fit:true">';
 		rwin += '<div style="text-align: center; position:relative;" data-options="region:\'center\'" >';
 		rwin += '<h5 id="reTitle" >确定要同意退款吗？</h5>';
-		rwin += '<input id="sub" type="button" class="button white" value="确定" style="margin-right: 50px;width:50px;height:30px" onclick="submitRefuse()" />';
+		rwin += '<input id="sub" type="button" class="button white" value="确定" style="margin-right: 50px;width:50px;height:30px" onclick="agreeRefund()" />';
 		rwin += '<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$(\'#win\').window(\'close\');"/>';
 		rwin += '<div id="refund_loading" style="display:none;position:absolute;cursor1:wait;left:50%;top:20px;transform: translateX(-50%);width:200px;height:32px;color:#000;">';
 		rwin += '</div></div></div>';
 		
 		return rwin;
-		
 	}
 	
-/* 	function agreeRefund(id){
-		$.dialog.confirm('确定同意退款吗？',function(r){
+	/* function refundWindow(){
+		var rwin = '';
+		rwin += '<div class="easyui-layout" data-options="fit:true">';
+		rwin += '<div style="text-align: center; " data-options="region:' + 'center' + '">';
+		rwin += '<input type="hidden" id="dialog_order_id" value="" />';
+		rwin += '<h5>请填写拒绝退款原因</h5>';
+		rwin += '<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols= "7"></textarea>';
+		rwin += '<input id="terefuse" type="hidden" />';
+		rwin += '<div style="margin-top: 30px">';
+		rwin += '<input id="sub" type="button" class="button white" value="提交" style="margin-right: 50px;width:50px;height:30px" onclick="refuseRefund()" />';
+		rwin += '<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$(\'#win\').window(\'close\');"/>';
+		rwin += '</div></div></div>';
+		
+		return rwin;
+	} */
+	
+	function agreeRefund(id, orderTotalPrice){
+		
+		refundBegin();
+	    
+		refundUrl = "orderRefundController.do?doAgreeALLSelect";
+		refundGname = "orderRefundList";
+		
+		var obj = new Object();
+		obj.id = id;
+		obj.orderTotalPrice = orderTotalPrice;
+		rows = [];
+		
+		rows.push(obj);
+		
+		$('#win').window('open');
+		
+		/* $.dialog.confirm('确定同意退款吗？',function(r){
 			if(!r){
 				return;
 			}else{
@@ -132,24 +153,26 @@ $(function() {
 		            }
 		        });
 			}
-		});
+		}); */
 	} 
 	
-	function rejectRefund(id){
+	/* function rejectRefund(id){
+		$('#win').empty().append(refundWindow());
+		$('#win').height("263px")
 		$('#win').window('open'); // open a window
 		$('#rejectReason').attr("readonly",false);
 		$('#rejectReason').val("");
 		$('#sub').show();
 		$('#dialog_order_id').val(id);
-	}
+	} 
 	
-	function submitRefund(){
+	function refuseRefund(){
 		var id = $('#dialog_order_id').val();
 		var rejectReason = $('#rejectReason').val();
 		if(rejectReason == ""){
 			tip("请填写拒绝原因");
 			return;
-		}
+		}	
 		$.ajax({
             type:"post",
             url:"orderRefundController.do?rejectRefund",
@@ -182,56 +205,11 @@ $(function() {
 	}
 	*/
 	
-	/**
-	 * 批量同意退款
-	 * @param title
-	 * @param url
-	 * @param gname
-	 * @return
-	 */
-	/* function AgreeALLSelect(title,url,gname) {
-		var ids = [];
-		var fees = [];
-	    var rows = $("#"+gname).datagrid('getSelections');
-	    if (rows.length > 0) {
-	    	$.dialog.setting.zIndex = getzIndex(true);
-	    	$.dialog.confirm('你确定同意退款吗?', function(r) {
-			   if (r) {
-					for ( var i = 0; i < rows.length; i++) {
-						ids.push(rows[i].id);
-						fees.push(rows[i].orderTotalPrice);
-					}
-					$.ajax({
-						url : url,
-						type : 'post',
-						data : {
-							ids : ids.join(','),
-							fees: fees.join(',')
-						},
-						async : false,
-						success : function(data) {
-							console.log(data);
-							var d = $.parseJSON(data);
-							console.log(d);
-							var msg = d.msg;
-							tip(d.description + '\n' + msg);
-							reloadTable();
-							$("#"+gname).datagrid('unselectAll');
-							ids='';
-						}
-					});
-					refunding();
-				}
-			});
-		} else {
-			tip("请选择需要批量同意退款的数据！");
-		}
-	} */
-	
 	var refundUrl;
 	var refundGname;
 	var rows;
 	
+	//批量退款
 	function AgreeALLSelect(title,url,gname) {
 		
 		rows = $("#"+gname).datagrid('getSelections');
@@ -246,11 +224,14 @@ $(function() {
 		refundUrl = url;
 		refundGname = gname;
 		
+		$('#win').empty().append(agreeWindow());
+		$('#win').height("150px")
 		$('#win').window('open');
 		
 	}
 	
-	function submitRefuse(){
+	//同意退款
+	function agreeRefund(){
 		console.log(rows);
 		$('#refund_loading').show();
 		$('#sub').hide();
@@ -292,6 +273,7 @@ $(function() {
 		});
 	}
 	
+	//弹出退款窗口前先让所有控件展示出来
 	function refundBegin(){
 		$('#refund_loading').html("");
 		$('#sub').show();
@@ -299,6 +281,7 @@ $(function() {
 		$('#reTitle').show();
 		$('#refund_loading').hide();
 	}
+	
 	
 	/**
 	 * 批量拒绝退款
@@ -330,6 +313,7 @@ $(function() {
 			tip("请选择需要批量拒绝退款的数据！");
 		}
 	}
+	
 	function submitRefuse(){
 		var ids = $('#terefuse').val();
 		var rejectReason = $('#rejectReason').val();

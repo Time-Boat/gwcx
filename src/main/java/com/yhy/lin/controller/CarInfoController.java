@@ -219,6 +219,7 @@ public class CarInfoController extends BaseController {
 	public ModelAndView addCar(HttpServletRequest req) {
 		String lpId = req.getParameter("lpId");
 		req.setAttribute("lpId", lpId);
+		req.setAttribute("cityList",getOpencity());
 		return new ModelAndView("/yhy/car/driverAndCity");
 	}
 }

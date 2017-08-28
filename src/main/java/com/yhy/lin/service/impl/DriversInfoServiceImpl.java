@@ -76,7 +76,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	}
 	
 	@Override
-	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status) {
+	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status,String cityID) {
 		StringBuffer queryCondition = new StringBuffer(" where d.id not in (select ci.driver_id from car_info ci ) ");
 	    
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -90,6 +90,9 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		if(StringUtil.isNotEmpty(name)){
 			queryCondition.append(" and d.name like '%"+name+"%' ");
+		}
+		if(StringUtil.isNotEmpty(cityID)){
+			queryCondition.append(" and d.cityId= '"+cityID+"' ");
 		}
 		
 		if(StringUtil.isNotEmpty(phoneNumber)){

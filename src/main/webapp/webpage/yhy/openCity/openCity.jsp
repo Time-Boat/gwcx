@@ -11,7 +11,7 @@
   		$('#provinceName').val($('#provinceId option:selected').text());
   		$('#cityName').val($('#cityId option:selected').text());
   	});
-  
+	
   	function changeProvince(){
   		var  cateOne = $("#provinceId").find("option:selected").val();
   	    if(cateOne == '') {

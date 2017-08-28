@@ -309,8 +309,10 @@ public class WeixinPayController extends AppBaseController{
 								
 								//通过订单号查找订单数据
 								TransferorderEntity t = systemService.findUniqueByProperty(TransferorderEntity.class, "orderPayNumber", out_trade_no);
-								//修改订单号为交易单号，测试交易单号批量退款的时候是不是更精准一些
+								//修改订单号为交易单号
 								t.setOrderPayNumber(transactionId);
+								t.setOrderStatus(1);
+								t.setOrderPaystatus("0");
 								
 								String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
 								// 如果购买成功，将消息添加到消息中心
@@ -369,7 +371,7 @@ public class WeixinPayController extends AppBaseController{
 	}
 
 	/**
-	 * 页面js返回支付成功后，查询微信后台是否支付成功，然后跳转结果页面    (不知道什么鬼，有时候会被调用两次，所以把这个业务逻辑放到notifyUrl中)
+	 * 页面js返回支付成功后，查询微信后台是否支付成功，然后跳转结果页面    (不知道什么鬼，有时候会被调用两次，所以把这个业务逻辑放到notifyUrl中,这个方法中只做跳转界面的操作)
 	 * 这个方法中只需要判断订单是否成功，然后跳转到相应的界面就行了
 	 * 
 	 * @param request
@@ -383,12 +385,12 @@ public class WeixinPayController extends AppBaseController{
 			throws IOException {
 		
 		logger.info("进入toWXPaySuccess回调");
-		String id = request.getParameter("orderId");
+//		String id = request.getParameter("orderId");
 		String status = request.getParameter("status");
 //		String orderPayNumber = request.getParameter("orderPayNumber");
 //		logger.info("toWXPaySuccess, orderId: " + id);
 //		logger.info("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
-		try {
+//		try {
 			//用商户单号查询订单状态
 //			Map resultMap = WeixinPayUtil.checkWxOrderPay(orderPayNumber);
 //			logger.info("resultMap:" + resultMap);
@@ -416,10 +418,10 @@ public class WeixinPayController extends AppBaseController{
 //				logger.info("toWXPaySuccess   status:" + status);
 //				logger.info("toWXPaySuccess   id:" + id);
 				
-				TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
-				if ("0".equals(status)) {
-					t.setOrderStatus(1);
-					t.setOrderPaystatus("0");
+//				TransferorderEntity t = systemService.getEntity(TransferorderEntity.class, id);
+//				if ("0".equals(status)) {
+//					t.setOrderStatus(1);
+//					t.setOrderPaystatus("0");
 //					t.setOrderPayNumber(orderPayNumber);
 //
 //					String content = "您已购买 " + t.getOrderStartingStationName() + "-" + t.getOrderTerminusStationName() + " 的车票，请等待管理员审核。";
@@ -432,20 +434,20 @@ public class WeixinPayController extends AppBaseController{
 //					//新增消息后，要把对应的用户状态改一下
 //					systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
 
-				} else {
-					t.setOrderStatus(6);
-					t.setOrderPaystatus("3");
-				}
-				systemService.save(t);
+//				} else {
+//					t.setOrderStatus(6);
+//					t.setOrderPaystatus("3");
+//				}
+//				systemService.save(t);
 
 //			} else {
 //				model.addAttribute("payResult", "0");
 //				model.addAttribute("err_code_des", "通信错误");
 //			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 
 		return new ModelAndView("yhy/wechat/payResult");
 	}

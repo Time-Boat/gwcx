@@ -1,6 +1,7 @@
 package com.yhy.lin.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,13 +12,18 @@ import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
+import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
+import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.OrderRefundServiceI;
@@ -39,7 +45,10 @@ public class OrderRefundController extends BaseController {
 
 	@Autowired
 	private OrderRefundServiceI orderRefundService;
-
+	
+	@Autowired
+	private UserService userService;
+	
 	//退款管理
 	@RequestMapping(params = "orderRefundList")
 	public ModelAndView orderRefundOrderList(HttpServletRequest request, HttpServletResponse response) {
@@ -54,8 +63,8 @@ public class OrderRefundController extends BaseController {
 		String rf_begin = request.getParameter("refundTime_begin");
 		String rf_end = request.getParameter("refundTime_end");
 		
-		String orderStartingstation =request.getParameter("orderStartingstation");
-		String orderTerminusstation =request.getParameter("orderTerminusstation");
+		String orderStartingstation = request.getParameter("orderStartingstation");
+		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end,rf_begin,rf_end,orderStartingstation,
 				orderTerminusstation);
 
@@ -136,6 +145,20 @@ public class OrderRefundController extends BaseController {
 	@ResponseBody
 	public JSONObject doAgreeALLSelect(TransferorderEntity trans, HttpServletRequest request, HttpServletResponse response) {
 		
+		//根据角色的不同来判断到底是初审还是复审，运营专员只能进行初审，平台审核员能进行复审，优先进行平台审核员的判断
+		TSUser user = ResourceUtil.getSessionUserName();
+		String roles = userService.getUserRole(user);
+		String a[] = roles.split(",");
+		
+		//是不是平台审核员
+		boolean isAdminpra = false;
+		
+		for(int i=0;i<a.length;i++){
+			if("adminpra".equals(a[i])){
+				isAdminpra = true;
+				break;
+			}
+		}
 		
 		String message = null;
 		Map<String,String> map = null;
@@ -148,7 +171,31 @@ public class OrderRefundController extends BaseController {
 			
 			RequestHandler refundRequest = new RequestHandler(request, response);
 			
-			map = orderRefundService.agreeAllRefund(ids, fees, refundRequest, path);
+			String[] arrId = ids.split(",");
+			
+			if(isAdminpra){
+				map = orderRefundService.firstAgreeAllRefund(arrId, fees, refundRequest, path);
+			}else{
+				map = new HashMap<>();
+				String userId = user.getId();
+				String date = AppUtil.getCurTime();
+				
+				int len = arrId.length;
+				
+				StringBuffer sbfIds = new StringBuffer();
+				
+				for(int i = 0;i < len;i++){
+					sbfIds.append("'" + arrId[i] + "',");
+				}
+				if(len > 0){
+					ids = sbfIds.deleteCharAt(sbfIds.length()-1).toString();
+				}
+				String sql = "update transferorder set first_audit_status='1',first_audit_user=?,first_audit_date=? where id in(" + ids + ")";
+				int l = orderRefundService.executeSql(sql, userId, date);
+				map.put("description", "共有" + l + "条数据被处理");
+				map.put("statusCode", AppGlobals.APP_SUCCESS);
+				map.put("success", "true");
+			}
 			
 //			String[] entitys = ids.split(",");
 //			if(entitys.length>0){
@@ -160,7 +207,6 @@ public class OrderRefundController extends BaseController {
 //				}
 //			}
 			
-			message = "批量同意成功！";
 			// 批量逻辑删除
 			//orderRefundService.updateAllEntitie(list);
 		} catch (Exception e) {
@@ -210,4 +256,6 @@ public class OrderRefundController extends BaseController {
 		}
 		return j;
 	}
+	
+	
 }

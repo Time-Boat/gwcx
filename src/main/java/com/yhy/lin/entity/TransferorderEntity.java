@@ -65,6 +65,72 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String lineOrderCode;//线路订单码
 	
+	private String firstAuditStatus;//初审审核状态   0：初审待审核     1：初审通过    2：初审未通过
+	
+	private String lastAuditStatus;//复审审核状态   0：复审待审核     1：复审通过    2：复审未通过
+	
+	private String firstAuditUser;//初审人id
+	
+	private String lastAuditUser;//复审人id
+	
+	private Date firstAuditDate;//初审时间
+	
+	private Date lastAuditDate;//复审时间
+	
+	@Column(name = "first_audit_status")
+	public String getFirstAuditStatus() {
+		return firstAuditStatus;
+	}
+
+	public void setFirstAuditStatus(String firstAuditStatus) {
+		this.firstAuditStatus = firstAuditStatus;
+	}
+
+	@Column(name = "last_audit_status")
+	public String getLastAuditStatus() {
+		return lastAuditStatus;
+	}
+
+	public void setLastAuditStatus(String lastAuditStatus) {
+		this.lastAuditStatus = lastAuditStatus;
+	}
+
+	@Column(name = "first_audit_user")
+	public String getFirstAuditUser() {
+		return firstAuditUser;
+	}
+
+	public void setFirstAuditUser(String firstAuditUser) {
+		this.firstAuditUser = firstAuditUser;
+	}
+	
+	@Column(name = "last_audit_user")
+	public String getLastAuditUser() {
+		return lastAuditUser;
+	}
+
+	public void setLastAuditUser(String lastAuditUser) {
+		this.lastAuditUser = lastAuditUser;
+	}
+	
+	@Column(name = "first_audit_date")
+	public Date getFirstAuditDate() {
+		return firstAuditDate;
+	}
+
+	public void setFirstAuditDate(Date firstAuditDate) {
+		this.firstAuditDate = firstAuditDate;
+	}
+
+	@Column(name = "last_audit_date")
+	public Date getLastAuditDate() {
+		return lastAuditDate;
+	}
+
+	public void setLastAuditDate(Date lastAuditDate) {
+		this.lastAuditDate = lastAuditDate;
+	}
+
 	@Column(name = "refund_completed_time")
 	public Date getRefundCompletedTime() {
 		return refundCompletedTime;

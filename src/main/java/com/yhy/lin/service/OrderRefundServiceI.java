@@ -18,6 +18,6 @@ public interface OrderRefundServiceI extends CommonService{
 
 	public boolean rejectRefund(String id, String rejectReason);
 
-	public Map<String,String> agreeAllRefund(String ids, String fees, RequestHandler refundRequest, String path);
-	
+	public Map<String,String> firstAgreeAllRefund(String[] arrId, String fees, RequestHandler refundRequest, String path);
+
 }

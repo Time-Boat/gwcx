@@ -186,8 +186,7 @@ public class BusStopInfoController extends BaseController {
 			busStopInfo = busStopInfoService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
 			req.setAttribute("busStopInfo", busStopInfo);
 		}
-//		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
-		List<OpenCityEntity> cities = systemService.getList(OpenCityEntity.class);
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/busStop/busStopInfoAdd");
 	}

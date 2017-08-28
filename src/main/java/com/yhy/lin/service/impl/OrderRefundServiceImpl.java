@@ -58,11 +58,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		}
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append("select a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name,");
-		sql.append("a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.refund_time,a.refund_price,");
-		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime");
-		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ");
+		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status, ");
+		sql.append(" a.last_audit_date,a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name, ");
+		sql.append(" a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.refund_time,a.refund_price, ");
+		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime ");
+		sql.append(" from transferorder a left join order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId = c.id "
+				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId "
+				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user");
 		
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -73,7 +75,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = { new Db2Page("id"),
 				new Db2Page("orderId", "order_id", null),
-				new Db2Page("orderStatus", "order_status", null), 
+				new Db2Page("orderStatus", "order_status", null),
 				new Db2Page("orderType", "order_type", null),
 				new Db2Page("orderStartime", "order_startime", null),
 				new Db2Page("orderNumbers", "order_numbers", null),
@@ -89,7 +91,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				new Db2Page("orderTerminusstation", "order_terminus_station_name", null),
 				new Db2Page("refundTime", "refund_time", null),
 				new Db2Page("cityName", "city_name", null),
-				new Db2Page("refundPrice", "refund_price", null)
+				new Db2Page("refundPrice", "refund_price", null),
+				new Db2Page("firstAuditUser", "f_audit_user", null),
+				new Db2Page("firstAuditStatus", "first_audit_status", null),
+				new Db2Page("firstAuditDate", "first_audit_date", null),
+				new Db2Page("lastAuditUser", "l_audit_user", null),
+				new Db2Page("lastAuditStatus", "last_audit_status", null),
+				new Db2Page("lastAuditDate", "last_audit_date", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -190,7 +198,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	//@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
 	//不要加事物，批量退款的时候，如果前两个人的款项已经退还，数据库就要做相应的修改
 	@Override
-	public Map<String,String> agreeAllRefund(String ids, String fees, RequestHandler refundRequest, String path) {
+	public Map<String,String> firstAgreeAllRefund(String[] arrId, String fees, RequestHandler refundRequest, String path) {
 		
 		Map<String,String> map = new HashMap<>();
 		
@@ -202,14 +210,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		int sCount = 0;   //退款成功订单数
 		int fCount = 0;   //退款失败订单数
 		
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");// 可以方便地修改日期格式
-		
 		RefundReqData refundReqData = new RefundReqData();
-		String[] arrId = ids.split(",");
 		String[] arrFee = fees.split(",");
 		try {
 			for(int i=0;i<arrId.length;i++){
-				Date now = new Date();
 				//确保在同一时间内的outRefundNo不一样，不然会出现退款失败的问题
 				String outRefundNo = "NO" + System.currentTimeMillis() + StringUtil.numRandom(6);
 				// 获得退款的传入参数
@@ -266,6 +270,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 					trans.setOrderStatus(4);
 					trans.setOrderPaystatus("2");
 					trans.setRefundCompletedTime(AppUtil.getDate());
+					//记录审核数据
+					trans.setLastAuditDate(AppUtil.getDate());
+					trans.setLastAuditStatus("1");
+					trans.setLastAuditUser(ResourceUtil.getSessionUserName().getId());
 					logger.info("RefundCompletedTime：" + trans.getRefundCompletedTime());
 					//退款金额
 					double fee = (double)refundFee/100;
