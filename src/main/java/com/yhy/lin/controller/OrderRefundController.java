@@ -65,9 +65,13 @@ public class OrderRefundController extends BaseController {
 		
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
+		
+		//有没有平台退款的权限
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_REFUND_AUDIT);
+		
 		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end,rf_begin,rf_end,orderStartingstation,
-				orderTerminusstation);
-
+				orderTerminusstation, hasPermission);
+		
 		responseDatagrid(response, jObject);
 	}
 
@@ -146,19 +150,10 @@ public class OrderRefundController extends BaseController {
 	public JSONObject doAgreeALLSelect(TransferorderEntity trans, HttpServletRequest request, HttpServletResponse response) {
 		
 		//根据角色的不同来判断到底是初审还是复审，运营专员只能进行初审，平台审核员能进行复审，优先进行平台审核员的判断
-		TSUser user = ResourceUtil.getSessionUserName();
-		String roles = userService.getUserRole(user);
-		String a[] = roles.split(",");
+		String userId = ResourceUtil.getSessionUserName().getId();
 		
 		//是不是平台审核员
-		boolean isAdminpra = false;
-		
-		for(int i=0;i<a.length;i++){
-			if("adminpra".equals(a[i])){
-				isAdminpra = true;
-				break;
-			}
-		}
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_REFUND_AUDIT);
 		
 		String message = null;
 		Map<String,String> map = null;
@@ -173,11 +168,10 @@ public class OrderRefundController extends BaseController {
 			
 			String[] arrId = ids.split(",");
 			
-			if(isAdminpra){
+			if(hasPermission){
 				map = orderRefundService.firstAgreeAllRefund(arrId, fees, refundRequest, path);
 			}else{
 				map = new HashMap<>();
-				String userId = user.getId();
 				String date = AppUtil.getCurTime();
 				
 				int len = arrId.length;

@@ -44,8 +44,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
-			String rf_begin,String rf_end,String orderStartingstation,String orderTerminusstation) {
-		String sqlWhere = getWhere(transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation);
+			String rf_begin, String rf_end, String orderStartingstation, String orderTerminusstation, boolean hasPermission) {
+		String sqlWhere = getWhere(transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation, hasPermission);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -55,7 +55,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
-		}
+		} 
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status, ");
@@ -104,15 +104,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	}
 
 	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end,String orderStartingstation,
-			String orderTerminusstation) {
+			String orderTerminusstation, boolean hasPermission) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-		// 添加了权限
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
-
-		if(StringUtil.isNotEmpty(orgCode)){
-			sql.append(" and t.org_code like '" + orgCode + "%' ");
-		}
+		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
@@ -148,8 +146,20 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			sql.append(" and  a.order_contactsname like '%" + transferorder.getOrderContactsname() + "%'");
 		}
 
-		sql.append(" and order_status in('3','4','5') ");
+		//看是否是平台审核员
+		if(hasPermission){
+			//平台审核员只能看到初审通过的订单
+			sql.append(" and a.first_audit_status = '1' ");
+		}else{
+			//客服专员只能看到自己的订单
+			sql.append(" and l.createUserId = '" + userId + "' ");
+			// 添加了权限。限制了组织机构，平台审核员不需要
+			if(StringUtil.isNotEmpty(orgCode)){
+				sql.append(" and t.org_code like '" + orgCode + "%' ");
+			}
+		}
 
+		sql.append(" and order_status in('3','4','5') ");
 		sql.append(" order by a.order_status,a.refund_time desc");
 
 		return sql.toString();

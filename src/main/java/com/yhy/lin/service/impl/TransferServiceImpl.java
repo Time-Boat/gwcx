@@ -122,7 +122,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
 				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
-				+ "on l.createUserId=ur.ID where a.order_type in('2', '3') ");
+				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3') ");
 		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
@@ -138,8 +138,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
-						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id "
-						+ " where a.order_type in('2', '3') ");
+						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on "
+						+ "a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3')");
 		
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -189,7 +189,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
 				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
-				+ "on l.createUserId=ur.ID where a.order_type in('4','5')");
+				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('4','5')");
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
 		}
@@ -202,7 +202,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
-						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id where a.order_type in('4','5')");
+						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer "
+						+ " cu on a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('4','5')");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}

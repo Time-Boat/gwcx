@@ -5,6 +5,7 @@ import org.hibernate.criterion.Projections;
 import org.jeecgframework.core.common.service.CommonService;
 import org.jeecgframework.core.interceptors.DateConvertEditor;
 import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.web.system.service.UserService;
@@ -138,10 +139,10 @@ public class BaseController {
   	}	
   	
   	//检查角色是否有审核权限
-  	public boolean checkRole(){
+  	public boolean checkRole(String role){
   		
   		//是不是平台审核员
-  		boolean isAdminpra = false;
+  		boolean hasPermission = false;
   		
   		//根据角色的不同来判断到底是初审还是复审，运营专员只能进行初审，平台审核员能进行复审，优先进行平台审核员的判断
 		TSUser user = ResourceUtil.getSessionUserName();
@@ -149,12 +150,12 @@ public class BaseController {
 		String a[] = roles.split(",");
 		
 		for(int i=0;i<a.length;i++){
-			if("adminpra".equals(a[i])){
-				isAdminpra = true;
+			if(a[i].equals(role)){
+				hasPermission = true;
 				break;
 			}
 		}
-		return isAdminpra;
+		return hasPermission;
   	}
   	
   	
