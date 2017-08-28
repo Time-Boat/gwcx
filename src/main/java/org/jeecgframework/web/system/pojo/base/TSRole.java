@@ -38,7 +38,7 @@ public class TSRole extends IdEntity implements java.io.Serializable {
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
 	}
-	@Column(name = "rolecode", length = 10)
+	@Column(name = "rolecode", length = 20)
 	public String getRoleCode() {
 		return this.roleCode;
 	}

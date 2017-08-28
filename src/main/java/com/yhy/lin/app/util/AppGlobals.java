@@ -124,7 +124,7 @@ public interface AppGlobals {
 	/** 运营专员 */
 	public static final String OPERATION_SPECIALIST = "operationS";
 
-	/** 运营经理 */
+	/** 运营经理 */	
 	public static final String OPERATION_MANAGER = "operationM";
 
 	/** 商务专员 */
@@ -144,5 +144,5 @@ public interface AppGlobals {
 
 	/** 平台退款审核员 */
 	public static final String PLATFORM_REFUND_AUDIT = "refundAudit";
-
+	
 }
