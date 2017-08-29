@@ -96,13 +96,6 @@ public class BusStopInfoController extends BaseController {
 	
 	@RequestMapping(params="datagrid")
 	public void datagrid(BusStopInfoEntity busStopInfo,HttpServletRequest request,HttpServletResponse response,DataGrid dataGrid){
-		/*CriteriaQuery cq = new CriteriaQuery(BusStopInfoEntity.class, dataGrid);
-	    //查询出来所有逻辑为删除的 
-		//cq.eq("deleteFlag", Globals.Delete_Normal);
-		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, busStopInfo,request.getParameterMap());
-		this.busStopInfoService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);*/
 		String cityID = request.getParameter("cityID");
 		JSONObject jObject = busStopInfoService.getDatagrid(busStopInfo, dataGrid,cityID);
 		responseDatagrid(response, jObject);

@@ -62,6 +62,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.util.AppGlobals;
+
 
 /**
  * @ClassName: UserController
@@ -638,7 +640,7 @@ public class UserController extends BaseController {
 		if(list.size()>0){
 			for (int i = 0; i < list.size(); i++) {
 				String rolecode = list.get(i).getRoleCode();
-				if("adminjx".equals(rolecode) || "adminkf".equals(rolecode)){
+				if(AppGlobals.OPERATION_MANAGER.equals(rolecode) || AppGlobals.OPERATION_MANAGER.equals(rolecode)){
 					dglist.add(list.get(i));
 				}
 			}

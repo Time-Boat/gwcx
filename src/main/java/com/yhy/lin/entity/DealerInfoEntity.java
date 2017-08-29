@@ -53,7 +53,29 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String remark;
 	/**公司社会信用代码 */
 	private String creditCode;
+	/**创建用户 */
+	private String createUserId;
+	/**组织机构id */
+	private String departId;
 	
+	@Column(name ="DEPARTID",nullable=true,length=32)
+	public String getDepartId() {
+		return departId;
+	}
+
+	public void setDepartId(String departId) {
+		this.departId = departId;
+	}
+
+	@Column(name ="CREATE_USER_ID",nullable=true,length=32)
+	public String getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  id

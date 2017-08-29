@@ -46,14 +46,16 @@
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
-   <t:dgCol title="渠道商账号" field="account"   width="120"></t:dgCol>
+   <t:dgCol title="渠道商账号" field="account" align="center" width="120"></t:dgCol>
+   <t:dgCol title="合作状态" field="status" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
-   <t:dgCol title="推广用户数" field="scanCount"   width="120"></t:dgCol>
-   <t:dgCol title="联系电话" field="phone"   width="120"></t:dgCol>
-   <t:dgCol title="负责人" field="manager"   width="120"></t:dgCol>
-   <t:dgCol title="地址" field="position"   width="120"></t:dgCol>
-   <t:dgCol title="银行账户" field="bankAccount"   width="120"></t:dgCol>
-   <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
+   <t:dgCol title="创建人" field="username" align="center" width="80"></t:dgCol>
+   <t:dgCol title="推广用户数" field="scanCount" align="center" width="60"></t:dgCol>
+   <t:dgCol title="联系电话" field="phone" align="center" width="120"></t:dgCol>
+   <t:dgCol title="负责人" field="manager" align="center" width="70"></t:dgCol>
+   <t:dgCol title="地址" field="position" align="center" width="120"></t:dgCol>
+   <t:dgCol title="银行账户" field="bankAccount" align="center" width="120"></t:dgCol>
+   <t:dgCol title="操作" field="opt" ></t:dgCol>
    <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="qrCodeUrl#empty#false"/>
    <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update"></t:dgToolBar>
@@ -61,6 +63,14 @@
    <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览" exp="qrCodeUrl#empty#false"></t:dgFunOpt>
    <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载" exp="qrCodeUrl#empty#false"></t:dgFunOpt> 
+   
+   <!-- 权限按钮 -->
+   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" ></t:dgFunOpt> 
+   <t:dgFunOpt funname="rejectReason(id)" title="拒绝原因" operationCode="rejectReason" ></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgree" ></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerReject" ></t:dgFunOpt> 
+   <t:dgFunOpt funname="allotAttache(qrCodeUrl)" title="分配" operationCode="allotAttache" ></t:dgFunOpt> 
+   
   </t:datagrid>
   </div>
  </div>

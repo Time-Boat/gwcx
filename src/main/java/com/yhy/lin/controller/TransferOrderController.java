@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.controller.AppInterfaceController;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
@@ -62,16 +63,16 @@ public class TransferOrderController extends BaseController {
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
 	}
 	
-	// 接送车司机安排
+	//订单详细
 	@RequestMapping(params = "getOrderdetail")
 	public ModelAndView getOrderdetail(HttpServletRequest request, HttpServletResponse response) {
 		String orderType = request.getParameter("lineType");
 		String lineOrderCode = request.getParameter("lineOrderCode");
 		if("2".equals(orderType) || "3".equals(orderType)){
-			return transferOrderAirList(request, response,lineOrderCode);
+			return transferOrderAirList(request, response,lineOrderCode,orderType);
 		}
 		if("4".equals(orderType) || "5".equals(orderType)){
-			return transferOrderList(request, response,lineOrderCode);
+			return transferOrderList(request, response,lineOrderCode,orderType);
 		}
 			
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
@@ -79,8 +80,9 @@ public class TransferOrderController extends BaseController {
 
 	// 接送火车订单处理
 	@RequestMapping(params = "transferOrderList")
-	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode) {
+	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType) {
 		
+		request.setAttribute("orderType",orderType);
 		request.setAttribute("lineOrderCode",lineOrderCode);	
 		request.setAttribute("carplateList",getCarPlate());	
 		request.setAttribute("driverList",getDriver());	
@@ -90,8 +92,9 @@ public class TransferOrderController extends BaseController {
 	
 	// 接送机订单处理
 	@RequestMapping(params = "transferOrderAirList")
-	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode) {
+	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType) {
 			
+		request.setAttribute("orderType",orderType);
 		request.setAttribute("lineOrderCode",lineOrderCode);
 		request.setAttribute("carplateList",getCarPlate());	
 		request.setAttribute("driverList",getDriver());	
@@ -454,11 +457,11 @@ public class TransferOrderController extends BaseController {
 		String sql = "select * from (select COUNT(l.createUserId),ts.mobilePhone,a.order_type from transferorder a left join order_linecardiver b on a.id = b .id left join "
 				+ "car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = "
 				+ "l.departId LEFT JOIN t_s_base_user u on u.ID=l.createUserId LEFT JOIN t_s_user ts on ts.id=u.ID LEFT JOIN t_s_role_user ru on ru.userid=ts.id LEFT JOIN "
-				+ "t_s_role tr on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='adminkf' and a.order_type in('2','3') and l.createUserId ='"+userid+"' GROUP BY l.createUserId UNION select "
+				+ "t_s_role tr on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='" + AppGlobals.OPERATION_MANAGER + "' and a.order_type in('2','3') and l.createUserId ='"+userid+"' GROUP BY l.createUserId UNION select "
 				+ "COUNT(l.createUserId),ts.mobilePhone,a.order_type from transferorder a left join order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId "
 				+ "=c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN "
 				+ "t_s_base_user u on u.ID=l.createUserId LEFT JOIN t_s_user ts on ts.id=u.ID LEFT JOIN t_s_role_user ru on ru.userid=ts.id LEFT JOIN t_s_role tr "
-				+ "on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='adminkf' and a.order_type in('4','5') and l.createUserId ='"+userid+"' GROUP BY l.createUserId) gh ORDER BY gh.mobilePhone";
+				+ "on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='" + AppGlobals.OPERATION_MANAGER + "' and a.order_type in('4','5') and l.createUserId ='"+userid+"' GROUP BY l.createUserId) gh ORDER BY gh.mobilePhone";
 		
 		List<Object> list = this.systemService.findListbySql(sql);
 		

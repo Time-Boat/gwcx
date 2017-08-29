@@ -19,7 +19,7 @@
 		
 		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
-		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
+		<%--<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>--%> 
 	</t:datagrid>
 </div>
 </div>
@@ -120,9 +120,11 @@
 	
 	function transferOrderList(rowIndex,rowData) {
 		///addTab("接送机订单处理","transferOrderController.do?getOrderdetail&lineOrderCode="+rowData.lineOrderCode+"&lineType="+rowData.lineType);
-		
-		addOneTab("接送机订单处理", "transferOrderController.do?getOrderdetail&lineOrderCode="+rowData.lineOrderCode+"&lineType="+rowData.lineType); 
-		//detail('接送机订单处理','transferOrderController.do?detail','outsideCarRecordList');
+		if(rowData.lineType=="2" || rowData.lineType=="3"){
+			addOneTab("接送机订单处理", "transferOrderController.do?getOrderdetail&lineOrderCode="+rowData.lineOrderCode+"&lineType="+rowData.lineType);
+		}else if(rowData.lineType=="4" || rowData.lineType=="5"){
+			addOneTab("接送火车订单处理", "transferOrderController.do?getOrderdetail&lineOrderCode="+rowData.lineOrderCode+"&lineType="+rowData.lineType); 
+		}
 	}
 	
 </script>

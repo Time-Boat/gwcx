@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.entity.AppMessageListEntity;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.DriversInfoEntity;
@@ -308,7 +309,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 添加了权限
 		for (int i = 0; i < a.length; i++) {
 			String role = a[i];
-			if("adminkf".equals(role)){
+			if(AppGlobals.OPERATION_MANAGER.equals(role)){
 				if (StringUtil.isNotEmpty(user.getId())) {
 					sql.append(" and l.createUserId='"+user.getId()+"'");
 				}
@@ -375,9 +376,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and order_status in('1', '2', '7')");
 		}else{
 			sql.append(" and order_status in('1', '2', '6', '7')");
-		}	
-				
-		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),order_startime desc");
+		}
+		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
+			sql.append(" and lb.lineId=l.id");	
+		}
+		
+		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),lb.siteOrder,order_startime desc");
 
 		return sql.toString();
 	}

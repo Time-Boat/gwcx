@@ -21,6 +21,7 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
@@ -29,6 +30,8 @@ import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
+
+import net.sf.json.JSONObject;
 
 /**   
  * @Title: Controller
@@ -52,8 +55,6 @@ public class DealerInfoController extends BaseController {
 	private SystemService systemService;
 	@Autowired
 	private Validator validator;
-	
-
 
 	/**
 	 * 渠道商信息列表 页面跳转
@@ -76,11 +77,13 @@ public class DealerInfoController extends BaseController {
 
 	@RequestMapping(params = "datagrid")
 	public void datagrid(DealerInfoEntity dealerInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(DealerInfoEntity.class, dataGrid);
-		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, dealerInfo, request.getParameterMap());
-		this.dealerInfoService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		
+		//有没有商务经理的角色
+		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
+		
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, hasPermission);
+		
+		responseDatagrid(response, jObject);
 	}
 
 	/**
@@ -113,6 +116,11 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson save(DealerInfoEntity dealerInfo, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		
+		String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		dealerInfo.setCreateUserId(userId);
+		dealerInfo.setDepartId(departId);
 		if (StringUtil.isNotEmpty(dealerInfo.getId())) {
 			message = "渠道商信息更新成功";
 			DealerInfoEntity t = dealerInfoService.get(DealerInfoEntity.class, dealerInfo.getId());

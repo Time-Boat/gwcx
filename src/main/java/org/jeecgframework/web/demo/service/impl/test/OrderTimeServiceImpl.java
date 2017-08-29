@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.SendMessageUtil;
 
 import net.sf.json.JSONArray;
@@ -32,11 +34,11 @@ public class OrderTimeServiceImpl extends CommonServiceImpl implements OrderTime
 		String sql = "select * from (select COUNT(l.createUserId),ts.mobilePhone,a.order_type from transferorder a left join order_linecardiver b on a.id = b .id left join "
 				+ "car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = "
 				+ "l.departId LEFT JOIN t_s_base_user u on u.ID=l.createUserId LEFT JOIN t_s_user ts on ts.id=u.ID LEFT JOIN t_s_role_user ru on ru.userid=ts.id LEFT JOIN "
-				+ "t_s_role tr on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='adminkf' and a.order_type in('2','3') GROUP BY l.createUserId UNION select "
+				+ "t_s_role tr on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='" + AppGlobals.OPERATION_MANAGER + "' and a.order_type in('2','3') GROUP BY l.createUserId UNION select "
 				+ "COUNT(l.createUserId),ts.mobilePhone,a.order_type from transferorder a left join order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId "
 				+ "=c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN "
 				+ "t_s_base_user u on u.ID=l.createUserId LEFT JOIN t_s_user ts on ts.id=u.ID LEFT JOIN t_s_role_user ru on ru.userid=ts.id LEFT JOIN t_s_role tr "
-				+ "on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='adminkf' and a.order_type in('4','5') GROUP BY l.createUserId) gh ORDER BY gh.mobilePhone";
+				+ "on tr.ID=ru.roleid where a.order_status='1' and tr.rolecode='" + AppGlobals.OPERATION_MANAGER + "' and a.order_type in('4','5') GROUP BY l.createUserId) gh ORDER BY gh.mobilePhone";
 		
 		List<Object> list = this.systemService.findListbySql(sql);
 		
