@@ -118,9 +118,9 @@ public interface AppGlobals {
 	/**
 	 * web平台角色权限
 	 */
-	/** 管理员 */
-	public static final String ADMIN = "admin";
-
+	/** 项目管理员（开发） */
+	public static final String XM_ADMIN = "xmAdmin";
+	
 	/** 运营专员 */
 	public static final String OPERATION_SPECIALIST = "operationS";
 

@@ -250,12 +250,14 @@ public class DealerInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		
 		String id = req.getParameter("id");
+		String rejectReason = req.getParameter("rejectReason");
 		
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
 			dealerInfo.setAuditDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("2");
 			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			dealerInfo.setRejectReason(rejectReason);
 			
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {

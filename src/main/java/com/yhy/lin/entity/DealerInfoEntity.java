@@ -68,7 +68,18 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private Date commitApplyDate;
 	/**申请类型 */
 	private String applyType;
+	/**拒绝原因 */
+	private String rejectReason;
 	
+	@Column(name ="REJECT_REASON",nullable=true,length=500)
+	public String getRejectReason() {
+		return rejectReason;
+	}
+
+	public void setRejectReason(String rejectReason) {
+		this.rejectReason = rejectReason;
+	}
+
 	@Column(name ="APPLY_TYPE",nullable=true,length=1)
 	public String getApplyType() {
 		return applyType;

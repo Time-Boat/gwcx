@@ -259,9 +259,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		List list = this.systemService.findListbySql(sqlCnt);
 		Long iCount = (long) list.size();
-		sql.append("select a.lineOrderCode,l.name as lineName,l.type,d.name as driverName,d.phoneNumber,c.licence_plate,a.city_name,"
+		sql.append("select a.lineOrderCode,l.name as lineName,l.type,SUM(case when a.order_status='2' then a.order_numbers else 0 end) as alreadyarranged,SUM(case when a.order_status='1' then a.order_numbers else 0 end) as notarranged,a.city_name,"
 				+ "a.city_id,SUM(a.order_numbers) as orderNumber from transferorder a left join order_linecardiver b on a.id = "
-				+ "b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join "
+				+ "b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join "
 				+ "lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -273,9 +273,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("lineOrderCode", "lineOrderCode", null),
 				new Db2Page("lineName", "lineName", null), 
 				new Db2Page("lineType", "type", null), 
-				new Db2Page("driverName", "driverName", null),
-				new Db2Page("phoneNumber", "phoneNumber", null),
-				new Db2Page("licencePlate", "licence_plate", null),
+				new Db2Page("alreadyarranged", "alreadyarranged", null),
+				new Db2Page("notarranged", "notarranged", null),
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("cityId", "city_id", null),
 				new Db2Page("orderNumber", "orderNumber", new MyDataExchangerOrderNumber() )
@@ -373,9 +372,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		//如果是从接送司机安排页面跳转过来的则不显示未付款订单
 		if(StringUtil.isNotEmpty(lineOrderCode)){
-			sql.append(" and order_status in('1', '2', '7')");
+			sql.append(" and order_status in('1', '2')");
 		}else{
-			sql.append(" and order_status in('1', '2', '6', '7')");
+			sql.append(" and order_status in('1', '2', '6', '0')");
 		}
 		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
 			sql.append(" and lb.lineId=l.id");	

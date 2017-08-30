@@ -138,7 +138,10 @@ public class BaseController {
   		}
   	}	
   	
-  	//检查角色是否有审核权限
+  	/**
+	 * 检查角色是否有传入的参数权限权限
+	 * @param role 角色权限
+	 */
   	public boolean checkRole(String role){
   		
   		//是不是平台审核员

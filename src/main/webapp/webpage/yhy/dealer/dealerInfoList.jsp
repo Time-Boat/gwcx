@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@include file="/context/mytags.jsp"%>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
+<link href="plug-in/tools/css/rejectReason.css" type="text/css" rel="stylesheet"/>
 <div class="easyui-layout" fit="true">
   <div region="center" style="padding:0px;border:0px">
    <script type="text/javascript">
@@ -63,10 +64,6 @@
 			});
 		}
 		
-		function rejectReason(id){
-			window.open(qrCodeUrl);	
-		}
-		
 		function dealerAgree(id){
 			$.dialog.confirm("确定要同意审核吗?", function(r) {
 				if(r){
@@ -89,25 +86,71 @@
 		}
 		
 		function dealerReject(id){
-			$.dialog.confirm("确定要同意审核吗?", function(r) {
-				if(r){
-					$.ajax({
-						url : "dealerInfoController.do?dealerReject&id="+id,
-						type : "get",
-						success : function(data) {
-							//console.log(data);
-							var d = $.parseJSON(data);
-							console.log(d);
-							var msg = d.msg;
-							//tip(d.description + '\n' + msg);
-							console.log(d.success);
-							tip(msg);
-							reloadTable();
-						}
-					});
+			$('#dealerWin').empty().append(rejectWindow());
+			$('#dealerWin').window('open'); // open a window
+			$('#rejectReason').attr("readonly",false);
+			$('#rejectReason').val("");
+			$('#sub').show();
+			$('#dialog_order_id').val(id);
+		}
+		
+		//填写拒绝原因窗口
+		function rejectWindow(){
+			var rwin = '';
+			rwin += '<div class="easyui-layout" data-options="fit:true">';
+			rwin += '<div style="text-align: center; " data-options="region:' + 'center' + '">';
+			rwin += '<input type="hidden" id="dialog_order_id" value="" />';
+			rwin += '<h5>请填写拒绝原因</h5>';
+			rwin += '<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols= "7"></textarea>';
+			rwin += '<input id="terefuse" type="hidden" />';
+			rwin += '<div style="margin-top: 30px">';
+			rwin += '<input id="sub" type="button" class="button white" value="提交" style="margin-right: 50px;width:50px;height:30px" onclick="commitReason()" />';
+			rwin += '<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$(\'#dealerWin\').window(\'close\');"/>';
+			rwin += '</div></div></div>';
+			
+			return rwin;
+		}
+		
+		function commitReason(){
+			var id = $('#dialog_order_id').val();
+			var rejectReason = $('#rejectReason').val();
+			if(rejectReason == ""){
+				tip("请填写拒绝原因");
+				return;
+			}	
+			$.ajax({
+				url : "dealerInfoController.do?dealerReject&id="+id+"&rejectReason="+rejectReason,
+				type : "get",
+				success : function(data) {
+					//console.log(data);
+					var d = $.parseJSON(data);
+					console.log(d);
+					var msg = d.msg;
+					//tip(d.description + '\n' + msg);
+					console.log(d.success);
+					$('#dealerWin').window('close');
+					tip(msg);
+					reloadTable();
 				}
 			});
 		}
+		
+		function lookRejectReason(id){
+			$('#dealerWin').window('open');
+			$('#rejectReason').attr("readonly",true);
+			$('#sub').hide();
+			$.ajax({
+	            type:"get",
+	            url:"dealerInfoController.do?getReason&id="+id,
+	            dataType:'json',
+	            success:function(d){
+	           		var obj = eval('('+d.jsonStr+')');
+	           		$('#rejectReason').val(obj.msg);
+	            }
+	        });
+			
+		}
+		
 	</script>
 	<a hidden="true" id="downloadCode" download ></a>
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true">
@@ -135,10 +178,13 @@
    
    <!-- 权限按钮 -->
    <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" ></t:dgFunOpt> 
-   <t:dgFunOpt funname="rejectReason(id)" title="拒绝原因" operationCode="rejectReason" ></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerReject(id)" title="拒绝原因" operationCode="rejectReason" ></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgree" ></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerReject" ></t:dgFunOpt> 
    
   </t:datagrid>
+  </div>
+  <div id="dealerWin" class="easyui-window" title="退款" style="width:400px;height:300px"
+    data-options="modal:true" closed="true" >
   </div>
  </div>

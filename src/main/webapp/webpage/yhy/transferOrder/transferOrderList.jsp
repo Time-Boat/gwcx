@@ -9,14 +9,15 @@
 			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
+		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
-		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
+		
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
 		<t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
 		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
 		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
-		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
+		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" replace="接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
 		<t:dgCol title="订单状态" field="orderStatus" dictionary="orderStatus" query="true" align="center"></t:dgCol>

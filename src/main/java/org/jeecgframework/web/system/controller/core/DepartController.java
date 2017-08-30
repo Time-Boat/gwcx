@@ -2,6 +2,8 @@ package org.jeecgframework.web.system.controller.core;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import com.yhy.lin.app.util.AppGlobals;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.criterion.DetachedCriteria;
@@ -254,6 +256,7 @@ public class DepartController extends BaseController {
 	@ResponseBody
 	public Object departgrid(TSDepart tSDepart,HttpServletRequest request, HttpServletResponse response, TreeGrid treegrid) {
 		CriteriaQuery cq = new CriteriaQuery(TSDepart.class);
+		
 		if("yes".equals(request.getParameter("isSearch"))){
 			treegrid.setId(null);
 			tSDepart.setId(null);
@@ -261,12 +264,23 @@ public class DepartController extends BaseController {
 		if(null != tSDepart.getDepartname()){
 			org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, tSDepart);
 		}
+		
 		if (treegrid.getId() != null) {
 			cq.eq("TSPDepart.id", treegrid.getId());
 		}
+		//通过当前用户所属组织机构id来进行查询
 		if (treegrid.getId() == null) {
-			cq.isNull("TSPDepart");
+			String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
+			boolean hasPermission = checkRole(AppGlobals.XM_ADMIN);
+			//如果是项目管理员，可以看到所有的组织机构
+			if(hasPermission){
+				cq.isNull("TSPDepart.id");
+			}else{
+				cq.eq("TSPDepart.id", departId);
+			}
+			
 		}
+		
 		cq.add();
 		List<TreeGrid> departList =null;
 		departList=systemService.getListByCriteriaQuery(cq, false);
@@ -459,7 +473,8 @@ public class DepartController extends BaseController {
     @RequestMapping(params = "departSelect")
     public String departSelect(HttpServletRequest req) {
     	
-    	req.setAttribute("orgIds", req.getParameter("orgIds"));
+    	String orgIds = req.getParameter("orgIds");
+    	req.setAttribute("orgIds", orgIds);
     	
         return "system/depart/departSelect";
     }
@@ -612,6 +627,16 @@ public class DepartController extends BaseController {
 		
 		String parentid = request.getParameter("parentid");
 		
+		if(!StringUtil.isNotEmpty(parentid)){
+			//通过当前用户所属组织机构id来进行查询
+			parentid = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
+			boolean hasPermission = checkRole(AppGlobals.XM_ADMIN);
+			//如果是项目管理员，可以看到所有的组织机构
+			if(hasPermission){
+				parentid = "";
+			}
+		}
+				
 		List<TSDepart> tSDeparts = new ArrayList<TSDepart>();
 		
 		StringBuffer hql = new StringBuffer(" from TSDepart t where 1=1 ");

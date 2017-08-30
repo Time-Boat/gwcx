@@ -46,7 +46,6 @@
 </div>
 
 <script type="text/javascript">
-<!--
     $(function() {
         var li_east = 0;
     });
@@ -104,5 +103,4 @@
     function ExportXlsByT() {
         JeecgExcelExport("departController.do?exportXlsByT","departList");
     }
-//-->
 </script>
