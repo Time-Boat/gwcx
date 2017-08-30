@@ -99,7 +99,7 @@ public class CgAutoListController extends BaseController{
         paras.put("this_olstylecode",template);
 		CgformTemplateEntity entity=cgformTemplateService.findByCode(template);
 		String html = viewEngine.parseTemplate(TemplateUtil.getTempletPath(entity,0, TemplateUtil.TemplateType.LIST), paras);
-
+		System.out.println(html);
 		PrintWriter writer = null;
 		try {
 			response.setContentType("text/html");

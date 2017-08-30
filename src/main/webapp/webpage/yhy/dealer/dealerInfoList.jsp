@@ -5,7 +5,7 @@
   <div region="center" style="padding:0px;border:0px">
    <script type="text/javascript">
 		function generateQRCode(id){
-			$.dialog.confirm("你确定要生成二维码吗?", function(r) {
+			$.dialog.confirm("确定要生成二维码吗?", function(r) {
 				if(r){
 					$.ajax({
 						url : "dealerInfoController.do?generateQRCode&id="+id,
@@ -41,6 +41,73 @@
 		function lookQRCode(qrCodeUrl){
 			window.open(qrCodeUrl);	
 		}
+		
+		function dealerDisable(id){
+			$.dialog.confirm("确定要申请停用吗?", function(r) {
+				if(r){
+					$.ajax({
+						url : "dealerInfoController.do?dealerDisable&id="+id,
+						type : "get",
+						success : function(data) {
+							//console.log(data);
+							var d = $.parseJSON(data);
+							console.log(d);
+							var msg = d.msg;
+							//tip(d.description + '\n' + msg);
+							console.log(d.success);
+							tip(msg);
+							reloadTable();
+						}
+					});
+				}
+			});
+		}
+		
+		function rejectReason(id){
+			window.open(qrCodeUrl);	
+		}
+		
+		function dealerAgree(id){
+			$.dialog.confirm("确定要同意审核吗?", function(r) {
+				if(r){
+					$.ajax({
+						url : "dealerInfoController.do?dealerAgree&id="+id,
+						type : "get",
+						success : function(data) {
+							//console.log(data);
+							var d = $.parseJSON(data);
+							console.log(d);
+							var msg = d.msg;
+							//tip(d.description + '\n' + msg);
+							console.log(d.success);
+							tip(msg);
+							reloadTable();
+						}
+					});
+				}
+			});
+		}
+		
+		function dealerReject(id){
+			$.dialog.confirm("确定要同意审核吗?", function(r) {
+				if(r){
+					$.ajax({
+						url : "dealerInfoController.do?dealerReject&id="+id,
+						type : "get",
+						success : function(data) {
+							//console.log(data);
+							var d = $.parseJSON(data);
+							console.log(d);
+							var msg = d.msg;
+							//tip(d.description + '\n' + msg);
+							console.log(d.success);
+							tip(msg);
+							reloadTable();
+						}
+					});
+				}
+			});
+		}
 	</script>
 	<a hidden="true" id="downloadCode" download ></a>
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true">
@@ -60,6 +127,8 @@
    <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update"></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
+   <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerInfoController.do?addorupdate" funname="detail" operationCode="allotAttache" ></t:dgToolBar> 
+   
    <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览" exp="qrCodeUrl#empty#false"></t:dgFunOpt>
    <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载" exp="qrCodeUrl#empty#false"></t:dgFunOpt> 
@@ -69,7 +138,6 @@
    <t:dgFunOpt funname="rejectReason(id)" title="拒绝原因" operationCode="rejectReason" ></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgree" ></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerReject" ></t:dgFunOpt> 
-   <t:dgFunOpt funname="allotAttache(qrCodeUrl)" title="分配" operationCode="allotAttache" ></t:dgFunOpt> 
    
   </t:datagrid>
   </div>

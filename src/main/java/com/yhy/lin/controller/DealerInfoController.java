@@ -117,6 +117,10 @@ public class DealerInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		
+		dealerInfo.setCommitApplyDate(AppUtil.getDate());
+		dealerInfo.setAuditStatus("0");
+		dealerInfo.setApplyType("0");
+		
 		String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
 		String userId = ResourceUtil.getSessionUserName().getId();
 		dealerInfo.setCreateUserId(userId);
@@ -165,10 +169,100 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setQrCodeUrl(path);
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
-			message = "二维码生成失败";
+			message = "服务器异常";
 			e.printStackTrace();
 		}
 		message = "二维码生成成功";
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请停用
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "dealerDisable")
+	@ResponseBody
+	public AjaxJson dealerDisable(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		
+		String id = req.getParameter("id");
+		
+		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+		try {
+//			dealerInfo.setAuditDate(AppUtil.getDate());
+//			dealerInfo.setAuditStatus("0");
+//			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			dealerInfo.setCommitApplyDate(AppUtil.getDate());
+			dealerInfo.setAuditStatus("0");
+			dealerInfo.setApplyType("1");
+			
+			dealerInfoService.saveOrUpdate(dealerInfo);
+		} catch (Exception e) {
+			message = "服务器失败";
+			e.printStackTrace();
+		}
+		message = "申请成功";
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 同意审核
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "dealerAgree")
+	@ResponseBody
+	public AjaxJson dealerAgree(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		
+		String id = req.getParameter("id");
+		
+		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+		try {
+			dealerInfo.setAuditDate(AppUtil.getDate());
+			dealerInfo.setAuditStatus("1");
+			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			
+			dealerInfoService.saveOrUpdate(dealerInfo);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "审核成功";
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 拒绝审核
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "dealerReject")
+	@ResponseBody
+	public AjaxJson dealerReject(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		
+		String id = req.getParameter("id");
+		
+		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+		try {
+			dealerInfo.setAuditDate(AppUtil.getDate());
+			dealerInfo.setAuditStatus("2");
+			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			
+			dealerInfoService.saveOrUpdate(dealerInfo);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "审核成功";
 		j.setMsg(message);
 		return j;
 	}

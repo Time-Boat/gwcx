@@ -58,15 +58,71 @@ public class DealerInfoEntity implements java.io.Serializable {
 	/**组织机构id */
 	private String departId;
 	
+	/**审核人 */
+	private String auditUser;
+	/**审核时间 */
+	private Date auditDate;
+	/**审核状态 */
+	private String auditStatus;
+	/**提交申请时间 */
+	private Date commitApplyDate;
+	/**申请类型 */
+	private String applyType;
+	
+	@Column(name ="APPLY_TYPE",nullable=true,length=1)
+	public String getApplyType() {
+		return applyType;
+	}
+
+	public void setApplyType(String applyType) {
+		this.applyType = applyType;
+	}
+
+	@Column(name ="COMMIT_APPLY_DATE",nullable=true)
+	public Date getCommitApplyDate() {
+		return commitApplyDate;
+	}
+
+	public void setCommitApplyDate(Date commitApplyDate) {
+		this.commitApplyDate = commitApplyDate;
+	}
+
+	@Column(name ="AUDIT_USER",nullable=true,length=32)
+	public String getAuditUser() {
+		return auditUser;
+	}
+
+	public void setAuditUser(String auditUser) {
+		this.auditUser = auditUser;
+	}
+
+	@Column(name ="AUDIT_DATE",nullable=true)
+	public Date getAuditDate() {
+		return auditDate;
+	}
+
+	public void setAuditDate(Date auditDate) {
+		this.auditDate = auditDate;
+	}
+	
+	@Column(name ="AUDIT_STATUS",nullable=true,length=32)
+	public String getAuditStatus() {
+		return auditStatus;
+	}
+	
+	public void setAuditStatus(String auditStatus) {
+		this.auditStatus = auditStatus;
+	}
+	
 	@Column(name ="DEPARTID",nullable=true,length=32)
 	public String getDepartId() {
 		return departId;
 	}
-
+	
 	public void setDepartId(String departId) {
 		this.departId = departId;
 	}
-
+	
 	@Column(name ="CREATE_USER_ID",nullable=true,length=32)
 	public String getCreateUserId() {
 		return createUserId;

@@ -3,30 +3,7 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <script src="plug-in/tools/popup/userSelect.js"></script>
 <script src="plug-in/tools/popup/departSelect.js"></script>
-<style>
-	/* white */ 
-	.white { 
-		color: #606060; 
-		border: solid 1px #b7b7b7; 
-		background: #fff; 
-		background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ededed)); 
-		background: -moz-linear-gradient(top, #fff, #ededed); 
-		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#ededed'); 
-	} 
-	.white:hover { 
-		background: #ededed; 
-		background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#dcdcdc)); 
-		background: -moz-linear-gradient(top, #fff, #dcdcdc); 
-		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#dcdcdc'); 
-	}
-	.white:active { 
-		color: #999; 
-		background: -webkit-gradient(linear, left top, left bottom, from(#ededed), to(#fff)); 
-		background: -moz-linear-gradient(top, #ededed, #fff); 
-		filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#ffffff'); 
-	} 
-
-</style>
+<link href="plug-in/tools/css/rejectReason.css" type="text/css" rel="stylesheet"/>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 	<t:datagrid name="orderRefundList" title="接送机退款管理" autoLoadData="true" actionUrl="orderRefundController.do?datagrid" fitColumns="true"
