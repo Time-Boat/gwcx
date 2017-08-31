@@ -29,6 +29,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
+import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -78,10 +79,7 @@ public class DealerInfoController extends BaseController {
 	@RequestMapping(params = "datagrid")
 	public void datagrid(DealerInfoEntity dealerInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		
-		//有没有商务经理的角色
-		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
-		
-		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, hasPermission);
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -117,10 +115,6 @@ public class DealerInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		
-		dealerInfo.setCommitApplyDate(AppUtil.getDate());
-		dealerInfo.setAuditStatus("0");
-		dealerInfo.setApplyType("0");
-		
 		String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
 		String userId = ResourceUtil.getSessionUserName().getId();
 		dealerInfo.setCreateUserId(userId);
@@ -140,6 +134,7 @@ public class DealerInfoController extends BaseController {
 			message = "渠道商信息添加成功";
 			dealerInfo.setCreateDate(AppUtil.getDate());
 			dealerInfo.setScanCount(0);
+			dealerInfo.setStatus("1");
 			
 			dealerInfoService.save(dealerInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
@@ -192,9 +187,6 @@ public class DealerInfoController extends BaseController {
 		
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
-//			dealerInfo.setAuditDate(AppUtil.getDate());
-//			dealerInfo.setAuditStatus("0");
-//			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 			dealerInfo.setCommitApplyDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("0");
 			dealerInfo.setApplyType("1");
@@ -208,6 +200,50 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
+	
+	
+	/**
+	 * 提交申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "dealerApply")
+	@ResponseBody
+	public AjaxJson dealerApply(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		
+		String id = req.getParameter("id");
+		
+		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+		try {
+			dealerInfo.setCommitApplyDate(AppUtil.getDate());
+			dealerInfo.setAuditStatus("0");
+			dealerInfo.setApplyType("0");
+			
+			//清空审核状态
+			dealerInfo.setAuditDate(null);
+			dealerInfo.setAuditUser("");
+			
+			dealerInfoService.saveOrUpdate(dealerInfo);
+		} catch (Exception e) {
+			message = "服务器失败";
+			e.printStackTrace();
+		}
+		message = "申请成功";
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 分配专员
+	 * @return
+	 */
+	@RequestMapping(params = "getAttacheList")
+    public ModelAndView getAttacheList(HttpServletRequest req) {
+        req.setAttribute("id", req.getParameter("id"));
+        return new ModelAndView("yhy/dealer/dealerAttacheList");
+    }
 	
 	/**
 	 * 同意审核
@@ -224,6 +260,12 @@ public class DealerInfoController extends BaseController {
 		
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
+			String apply = dealerInfo.getApplyType();
+			if("0".equals(apply)){
+				dealerInfo.setStatus("0");
+			}else{
+				dealerInfo.setStatus("2");
+			}
 			dealerInfo.setAuditDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("1");
 			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
@@ -269,6 +311,23 @@ public class DealerInfoController extends BaseController {
 		return j;
 	}
 	
+	// 获取拒绝退款原因
+	@RequestMapping(params = "getReason")
+	@ResponseBody
+	public AjaxJson getReason(HttpServletRequest request) {
+
+		AjaxJson j = new AjaxJson();
+
+		String id = request.getParameter("id");// id
+
+		DealerInfoEntity t = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+		String reasont = t.getRejectReason();
+		
+		j.setSuccess(true);
+		j.setMsg(reasont);
+		return j;
+	}
+
 	/**
 	 * 渠道商信息列表页面跳转
 	 * 

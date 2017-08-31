@@ -64,6 +64,21 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	//线路创建人id
 	private String createUserId;
 	
+	//申请状态
+	private String applicationStatus;
+	
+	//初审被拒绝的原因
+	private String trialReason;
+	
+	//复审被拒绝的原因
+	private String reviewReason;
+	
+	//申请人
+	private String applicationUserid;
+	
+	//申请时间
+	private Date applicationTime;
+	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
 		return price;
@@ -220,6 +235,46 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	}
 	public void setLineNumber(String lineNumber) {
 		this.lineNumber = lineNumber;
+	}
+	
+	@Column(name = "application_status")
+	public String getApplicationStatus() {
+		return applicationStatus;
+	}
+	public void setApplicationStatus(String applicationStatus) {
+		this.applicationStatus = applicationStatus;
+	}
+	
+	@Column(name = "trial_reason")
+	public String getTrialReason() {
+		return trialReason;
+	}
+	public void setTrialReason(String trialReason) {
+		this.trialReason = trialReason;
+	}
+	
+	@Column(name = "review_reason")
+	public String getReviewReason() {
+		return reviewReason;
+	}
+	public void setReviewReason(String reviewReason) {
+		this.reviewReason = reviewReason;
+	}
+	
+	@Column(name = "application_user_id")
+	public String getApplicationUserid() {
+		return applicationUserid;
+	}
+	public void setApplicationUserid(String applicationUserid) {
+		this.applicationUserid = applicationUserid;
+	}
+	
+	@Column(name = "application_time")
+	public Date getApplicationTime() {
+		return applicationTime;
+	}
+	public void setApplicationTime(Date applicationTime) {
+		this.applicationTime = applicationTime;
 	}
 	
 }

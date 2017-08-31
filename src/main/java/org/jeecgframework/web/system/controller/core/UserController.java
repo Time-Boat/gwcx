@@ -375,8 +375,25 @@ public class UserController extends BaseController {
         CriteriaQuery cq = new CriteriaQuery(TSUser.class, dataGrid);
         //查询条件组装器
         org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
-
+        
+        
+        List<TSUser> tsList = new ArrayList<TSUser>();
+        
+        List<String> tempList = null;
+        
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+        //是不是子公司管理员
+  		boolean hasPermission = checkRole(AppGlobals.SUBSIDIARY_ADMIN);
+  		//子公司管理员只能看到自己公司的用户
+  		if(hasPermission){
+  			//查出所有在orgCode范围的用户id
+  			tempList = systemService.findListbySql(
+  					"select su.id from t_s_user su join t_s_base_user u on su.id = u.id join t_s_user_org o on u.id = o.user_id join t_s_depart d on o.org_id = d.id "
+  					+ "where d.org_code like '%" + orgCode + "%' and u.status!=0 and u.delete_flag=0 ");
+  		}
+  		
         Short[] userstate = new Short[]{Globals.User_Normal, Globals.User_ADMIN, Globals.User_Forbidden};
+        
         cq.in("status", userstate);
 
         cq.eq("deleteFlag", Globals.Delete_Normal);
@@ -396,11 +413,17 @@ public class UserController extends BaseController {
 
         cq.add();
         this.systemService.getDataGridReturn(cq, true);
-
+        
         List<TSUser> cfeList = new ArrayList<TSUser>();
         for (Object o : dataGrid.getResults()) {
             if (o instanceof TSUser) {
                 TSUser cfe = (TSUser) o;
+                
+                //如果包含这个id，就将他添加到list中
+                if(tempList != null && tempList.size() > 0 && tempList.contains(cfe.getId())){
+                	tsList.add(cfe);
+                }
+                
                 if (cfe.getId() != null && !"".equals(cfe.getId())) {
                     List<TSRoleUser> roleUser = systemService.findByProperty(TSRoleUser.class, "TSUser.id", cfe.getId());
                     if (roleUser.size() > 0) {
@@ -415,7 +438,12 @@ public class UserController extends BaseController {
                 cfeList.add(cfe);
             }
         }
-
+        
+	    //修改要显示的数据为之前过滤的数据
+        if(hasPermission){
+        	dataGrid.setResults(tsList);
+        }
+        
         TagUtil.datagrid(response, dataGrid);
     }
 

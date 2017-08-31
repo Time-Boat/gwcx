@@ -7,6 +7,6 @@ import net.sf.json.JSONObject;
 
 public interface DealerInfoServiceI extends CommonService{
 
-	JSONObject getDatagrid(DataGrid dataGrid, boolean hasPermission);
+	JSONObject getDatagrid(DataGrid dataGrid);
 
 }

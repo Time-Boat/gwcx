@@ -398,6 +398,7 @@ public class DepartController extends BaseController {
         req.setAttribute("orgId", req.getParameter("orgId"));
         return new ModelAndView("system/depart/noCurDepartUserList");
     }
+    
     /**
      * 获取 除当前 组织之外的用户信息列表
      * @param request request
@@ -405,23 +406,47 @@ public class DepartController extends BaseController {
      */
     @RequestMapping(params = "addUserToOrgList")
     public void addUserToOrgList(TSUser user, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-        String orgId = request.getParameter("orgId");
 
+        String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+        //是不是子公司管理员
+  		boolean hasPermission = checkRole(AppGlobals.SUBSIDIARY_ADMIN);
+  		//子公司管理员只能看到自己公司的用户
+  		
+  		List<TSUser> userList = new ArrayList<>();
+        //查出所有在orgCode范围的用户id
+  		if(hasPermission){
+  			//查出所有在orgCode范围的用户id
+  			List<Object[]> orgArrList = systemService.findHql(
+  	  				"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb where d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id "
+  	  				+ "and d.orgCode like '%" + orgCode + "%' and tb.status!=0 and tb.deleteFlag=0 ");
+  	        for (Object[] departs : orgArrList) {
+  	        	userList.add((TSUser) departs[3]);
+  	        }
+  		}
+  		
+		String orgId = request.getParameter("orgId");
         CriteriaQuery cq = new CriteriaQuery(TSUser.class, dataGrid);
         org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
-
+        
         // 获取 当前组织机构的用户信息
         CriteriaQuery subCq = new CriteriaQuery(TSUserOrg.class);
         subCq.setProjection(Property.forName("tsUser.id"));
         subCq.eq("tsDepart.id", orgId);
         subCq.add();
-
+        
         cq.add(Property.forName("id").notIn(subCq.getDetachedCriteria()));
         cq.add();
-
+        
         this.systemService.getDataGridReturn(cq, true);
+        
+        //修改要显示的数据为之前过滤的数据
+        if(hasPermission){
+        	dataGrid.setResults(userList);
+        }
+        
         TagUtil.datagrid(response, dataGrid);
     }
+    
     /**
      * 添加 用户到组织机构
      * @param req request

@@ -115,6 +115,7 @@ public interface AppGlobals {
 	 */
 	public static final String SP_NAME = "龙游出行app支付";
 
+	
 	/**
 	 * web平台角色权限
 	 */
@@ -144,5 +145,22 @@ public interface AppGlobals {
 
 	/** 平台退款审核员 */
 	public static final String PLATFORM_REFUND_AUDIT = "refundAudit";
+	
+	/** 子公司管理员 */
+	public static final String SUBSIDIARY_ADMIN = "companyAdmin";
+	
+	/**
+	 * web平台组织机构类型
+	 */
+	/** 公司 */
+	public static final String ORG_COMPANY_TYPE = "1";
+	/** 子公司 */
+	public static final String ORG_SUBSIDIARY_TYPE = "2";
+	/** 部门 */
+	public static final String ORG_DEPARTMENT_TYPE = "3";
+	/** 岗位 */
+	public static final String ORG_JOB_TYPE = "4";
+	/** 入驻公司 */
+	public static final String ORG_ENTER_COMPANY_TYPE = "5";
 	
 }

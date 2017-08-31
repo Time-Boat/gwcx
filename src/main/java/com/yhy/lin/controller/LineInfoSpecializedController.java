@@ -8,16 +8,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jeecgframework.core.common.controller.BaseController;
+import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.JsonObject;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
@@ -236,4 +240,131 @@ public class LineInfoSpecializedController extends BaseController{
 		return new ModelAndView("yhy/linesSpecial/lineMap");
 	}
 	
+	/**
+	 * 申请上架、申请下架
+	 */
+	@RequestMapping(params = "applyShelves")
+	@ResponseBody
+	public AjaxJson applyShelves(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
+		if(StringUtil.isNotEmpty(line)){
+			line.setApplicationStatus("1");//待审核
+			line.setApplicationTime(AppUtil.getDate());
+			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+		}
+		try {
+			message="申请成功！";
+			this.systemService.saveOrUpdate(line);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message="服务器异常！";
+		}
+		
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 获取拒绝原因
+	 */
+	@RequestMapping(params = "getReason")
+	@ResponseBody
+	public AjaxJson getReason(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
+		
+		if(StringUtil.isNotEmpty(line)){
+			if(StringUtil.isNotEmpty(line.getReviewReason())){
+				message=line.getReviewReason();//复审拒绝原因
+			}else{
+				message=line.getTrialReason();//初审拒绝原因
+			}
+		}
+		
+		
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请同意
+	 */
+	@RequestMapping(params = "agree")
+	@ResponseBody
+	public AjaxJson agree(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
+		
+		if(StringUtil.isNotEmpty(line)){
+			if("1".equals(line.getApplicationStatus())){
+				line.setApplicationStatus("2");//初审
+			}else if("2".equals(line.getApplicationStatus())){
+				if("0".equals(line.getStatus())){
+					line.setApplicationStatus("3");//复审
+					line.setStatus("1");//已上架
+				}else if("1".equals(line.getStatus())){
+					line.setApplicationStatus("4");//复审
+					line.setStatus("0");//已下架
+				}
+			}
+			line.setApplicationTime(AppUtil.getDate());
+			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+			
+		}
+		try {
+			message="申请成功！";
+			this.systemService.saveOrUpdate(line);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message="服务器异常！";
+		}
+		
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请拒绝
+	 */
+	@RequestMapping(params = "refuse")
+	@ResponseBody
+	public AjaxJson refuse(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String rejectReason = request.getParameter("rejectReason");
+		LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, id);
+		
+		if(StringUtil.isNotEmpty(line)){
+			
+			if("1".equals(line.getApplicationStatus())){
+				line.setTrialReason(rejectReason);
+			}
+			if("2".equals(line.getApplicationStatus())){
+				line.setReviewReason(rejectReason);
+			}
+			line.setApplicationStatus("5");//拒绝
+			line.setApplicationTime(AppUtil.getDate());
+			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+		}
+		
+		try {
+			message="拒绝成功！";
+			this.systemService.saveOrUpdate(line);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message="服务器异常！";
+		}
+		
+		j.setMsg(message);
+		j.setMsg(message);
+		return j;
+	}
 }

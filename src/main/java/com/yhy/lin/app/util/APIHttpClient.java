@@ -165,7 +165,7 @@ public class APIHttpClient {
     }  
   
     /** 
-     * 调用 API 
+     * 调用 API (微信获取二维码请求，不要修改) 
      *  
      * @param parameters 
      * @return 

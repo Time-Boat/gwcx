@@ -2,43 +2,60 @@
 <%@include file="/context/mytags.jsp"%>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <script src="plug-in/tools/popup/userSelect.js"></script>
+<link href="plug-in/tools/css/rejectReason.css" type="text/css" rel="stylesheet"/>
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 <t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" >
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="150"></t:dgCol>
-	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="120"></t:dgCol>
-	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="120"></t:dgCol>
+	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
+	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
+	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
 	
-	<t:dgCol title="线路类型" field="type" replace="公务班车_0,接送包车_1,接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="60"></t:dgCol>
+	<t:dgCol title="线路类型" field="type" replace="公务班车_0,接送包车_1,接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="50"></t:dgCol>
 	<t:dgCol title="出车时间段" field="dispath" dictionary="dispathtime" align="center" width="90"></t:dgCol>
 	<%--
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
-	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="150"></t:dgCol>
+	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
 	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="线路状态" field="status" dictionary="lineStatus"  align="center" width="60"></t:dgCol>
+	<t:dgCol title="线路状态" field="status" dictionary="lineStatus"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status"  align="center" width="50"></t:dgCol>
 	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
 	<t:dgCol title="预计到达时间" field="lendTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group"  align="center" width="120"></t:dgCol>
 	 --%>
-	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="80"></t:dgCol>
+	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="50"></t:dgCol>
 	 
-	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="80"></t:dgCol>
-	<t:dgCol title="所在城市" field="city"  align="center"></t:dgCol>
-	 <t:dgCol title="线路备注" field="remark"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="操作" field="opt" width="100"></t:dgCol>
+	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="所在城市" field="city"  align="center" width="60"></t:dgCol>
+	 <t:dgCol title="线路备注" field="remark"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="操作" field="opt" width="200"></t:dgCol>
 
 	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
+	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="allot" height="500" ></t:dgToolBar>
 	<%-- <t:dgToolBar operationCode="edit" title="站点挂接" icon="icon-edit" url="lineInfoController.do?addBusStop" funname="update"></t:dgToolBar>
 	 --%>
 	<%-- <t:dgDelOpt title="下架" url="lineInfoController.do?del&id={id}&deleteFlag=1" /> --%>
 	
 	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#0&&applicationStatus#eq#4"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#1&&applicationStatus#eq#3"></t:dgFunOpt>
+	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="firstagree" exp="applicationStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agrees" exp="applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="firstrefuse" exp="applicationStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuses" exp="applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt> 
 	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
 </t:datagrid> </div>
+<div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
+    data-options="modal:true" closed="true" >
+  </div>
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
 <div region="east" style="width: 490px;" split="true">
@@ -83,4 +100,155 @@
 	function lookLine(id, name) {
 		createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id=" + id,"1200px","800px");
 	}
+	
+	//申请上、下架
+	function applyShelves(id) {
+		
+		$.dialog.confirm('确定要申请？',function(r){
+		    if (r){
+		    	$.post(
+		    		"lineInfoSpecializedController.do?applyShelves",	
+					{'id':id},
+					function(data){
+						var obj = eval('(' + data + ')');
+						tip(obj.msg);
+						$('#lineList2').datagrid('reload');
+					}
+				);		
+		    }
+		});
+	}
+	
+	//申请下架 
+	function applicationShelf(id) {
+		
+		$.ajax({
+            type:"post",
+            url:"lineInfoSpecializedController.do?agree&id="+id,
+            dataType:'json',
+            success:function(data){
+            	 var t = eval('('+data.jsonStr+')');
+					tip(t.msg);
+           		$('#win').window('close');
+	           	//刷新当前窗体
+	           	$('#lineList2').datagrid('reload');
+            }
+        });
+	}
+	
+	//同意
+	function agree(id) {
+		
+		$.dialog.confirm('确定通过？',function(r){
+		    if (r){
+		    	$.post(
+		    		"lineInfoSpecializedController.do?agree",	
+					{'id':id},
+					function(data){
+						var obj = eval('(' + data + ')');
+						tip(obj.msg);
+						$('#lineList2').datagrid('reload');
+					}
+				);		
+		    }
+		});
+		
+		
+		/* $.ajax({
+            type:"post",
+            url:"lineInfoSpecializedController.do?agree&id="+id,
+            dataType:'json',
+            success:function(data){
+            	 var t = eval('('+data.jsonStr+')');
+					tip(t.msg);
+           		$('#win').window('close');
+	           	//刷新当前窗体
+	           	$('#lineList2').datagrid('reload');
+            }
+        }); */
+	}
+	
+	function commitReason(){
+		var id = $('#dialog_order_id').val();
+		var rejectReason = $('#rejectReason').val();
+		if(rejectReason == ""){
+			tip("请填写拒绝原因");
+			return;
+		}	
+		$.ajax({
+			url : "lineInfoSpecializedController.do?refuse&id="+id+"&rejectReason="+rejectReason,
+			type : "get",
+			success : function(data) {
+				//console.log(data);
+				var d = $.parseJSON(data);
+				console.log(d);
+				var msg = d.msg;
+				//tip(d.description + '\n' + msg);
+				console.log(d.success);
+				$('#dealerWin').window('close');
+				tip(msg);
+				reloadTable();
+			}
+		});
+	}
+	
+	//填写拒绝原因窗口
+	function rejectWindow(){
+		var rwin = '';
+		rwin += '<div class="easyui-layout" data-options="fit:true">';
+		rwin += '<div style="text-align: center; " data-options="region:' + 'center' + '">';
+		rwin += '<input type="hidden" id="dialog_order_id" value="" />';
+		rwin += '<h5>请填写拒绝原因</h5>';
+		rwin += '<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols= "7"></textarea>';
+		rwin += '<input id="terefuse" type="hidden" />';
+		rwin += '<div style="margin-top: 30px">';
+		rwin += '<input id="sub" type="button" class="button white" value="提交" style="margin-right: 50px;width:50px;height:30px" onclick="commitReason()" />';
+		rwin += '<input id="cal" type="button" class="button white" value="取消" style="width:50px;height:30px" onclick="javascript:$(\'#dealerWin\').window(\'close\');"/>';
+		rwin += '</div></div></div>';
+		
+		return rwin;
+	}
+	
+	//拒绝
+	function refuse(id) {
+		$('#dealerWin').empty().append(rejectWindow());
+		$('#dealerWin').window('open'); // open a window
+		$('#rejectReason').attr("readonly",false);
+		$('#rejectReason').val("");
+		$('#sub').show();
+		$('#dialog_order_id').val(id);
+	}
+	
+	function lookRejectReason(id){
+		$('#dealerWin').window('open');
+		$('#sub').hide();
+		$.ajax({
+            type:"get",
+            url:"lineInfoSpecializedController.do?getReason&id="+id,
+            dataType:'json',
+            success:function(d){
+           		//var obj = eval('('+d.msg+')');
+           		$('#dealerWin').empty().append(lookRejectReasonWindow());
+           		$('#rejectReason').val(d.msg);
+           		$('#rejectReason').attr("readonly",true);
+            }
+        });
+	}
+	
+	//填写拒绝原因窗口
+	function lookRejectReasonWindow(){
+		var rwin = '';
+		rwin += '<div class="easyui-layout" data-options="fit:true">';
+		rwin += '<div style="text-align: center; " data-options="region:' + 'center' + '">';
+		rwin += '<input type="hidden" id="dialog_order_id" value="" />';
+		rwin += '<h5>请填写拒绝原因</h5>';
+		rwin += '<textarea id="rejectReason" type="text" style="width:70%;height:40%;resize:none;" rows="5" cols= "7"></textarea>';
+		rwin += '<input id="terefuse" type="hidden" />';
+		rwin += '<div style="margin-top: 30px">';
+		rwin += '<input id="cal" type="button" class="button white" value="关闭" style="width:50px;height:30px" onclick="javascript:$(\'#dealerWin\').window(\'close\');"/>';
+		rwin += '</div></div></div>';
+		
+		return rwin;
+	}
+	
 </script>

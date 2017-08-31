@@ -47,7 +47,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="account" name="account" ignore="ignore"
+						<input class="inputxt" id="account"  name="account" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
 							   value="${dealerInfoPage.account}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -71,7 +71,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="manager" name="manager" ignore="ignore"
+						<input class="inputxt" id="manager" name="manager" 
 							   value="${dealerInfoPage.manager}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -83,7 +83,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="position" name="position" ignore="ignore"
+						<input class="inputxt" id="position" name="position" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
 							   value="${dealerInfoPage.position}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -95,7 +95,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="bankAccount" name="bankAccount" ignore="ignore"
+						<input class="inputxt" id="bankAccount" name="bankAccount" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
 							   value="${dealerInfoPage.bankAccount}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -107,7 +107,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="creditCode" name="creditCode" onchange="checkCreditCode(this.value);"
+						<input class="inputxt" id="creditCode" name="creditCode" onchange="checkCreditCode(this.value);" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
 							   value="${dealerInfoPage.creditCode}">
 						<span id="checkCreditCode" class="Validform_checktip"></span>
 					</td>

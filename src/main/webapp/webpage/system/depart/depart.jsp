@@ -35,10 +35,11 @@
         var optionNum = orgTypeSelect.get(0).options.length;
         if(optionNum == 1) {
             $("#orgType option:first").remove();
-            var bumen = '<option value="2" <c:if test="${orgType=='2'}">selected="selected"</c:if>><t:mutiLang langKey="common.department"/></option>';
-            var gangwei = '<option value="3" <c:if test="${orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="common.position"/></option>';
+            var zigongsi = '<option value="2" <c:if test="${orgType=='2'}">selected="selected"</c:if>><t:mutiLang langKey="子公司"/></option>';
+            var bumen = '<option value="3" <c:if test="${orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="部门"/></option>';
+            var gangwei = '<option value="3" <c:if test="${orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="岗位"/></option>';
             var ruzhu = '<option value="4" <c:if test="${orgType=='4'}">selected="selected"</c:if>><t:mutiLang langKey="入驻公司"/></option>';
-            orgTypeSelect.append(bumen).append(gangwei).append(ruzhu);
+            orgTypeSelect.append(zigongsi).append(bumen).append(gangwei).append(ruzhu);
         }
     }
 </script>
@@ -65,9 +66,10 @@
             <label class="Validform_label"> <t:mutiLang langKey="common.org.type"/>: </label>
             <select name="orgType" id="orgType">
                 <option value="1" <c:if test="${depart.orgType=='1'}">selected="selected"</c:if>><t:mutiLang langKey="common.company"/></option>
-                <option value="2" <c:if test="${depart.orgType=='2'}">selected="selected"</c:if>><t:mutiLang langKey="common.department"/></option>
-                <option value="3" <c:if test="${depart.orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="common.position"/></option>
-                <option value="4" <c:if test="${depart.orgType=='4'}">selected="selected"</c:if>><t:mutiLang langKey="入驻公司"/></option>
+                <option value="2" <c:if test="${depart.orgType=='2'}">selected="selected"</c:if>><t:mutiLang langKey="子公司"/></option>
+                <option value="3" <c:if test="${depart.orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="部门"/></option>
+                <option value="4" <c:if test="${depart.orgType=='4'}">selected="selected"</c:if>><t:mutiLang langKey="岗位"/></option>
+                <option value="5" <c:if test="${depart.orgType=='5'}">selected="selected"</c:if>><t:mutiLang langKey="入驻公司"/></option>
             </select>
         </div>
         <div class="form">
