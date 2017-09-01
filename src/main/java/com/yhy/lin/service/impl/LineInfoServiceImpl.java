@@ -88,6 +88,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if(StringUtil.isNotEmpty(lineInfo.getName())){
 			sqlWhere.append(" and  a.name like '%"+lineInfo.getName()+"%'");
 		}
+		if(StringUtil.isNotEmpty(lineInfo.getCreatePeople())){
+			sqlWhere.append(" and a.createPeople like '%"+lineInfo.getCreatePeople()+"%'");
+		}
+		
 		if(StringUtil.isNotEmpty(lineInfo.getStartLocation())){
 			sqlWhere.append(" and  a.name like '%"+lineInfo.getStartLocation()+"%'");
 		}
@@ -218,6 +222,36 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			new Db2Page("id")
 			,new Db2Page("name", "name", null)
 		};
+		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+		return jObject;
+	}
+
+	@Override
+	public JSONObject getDatagrid4(LineInfoEntity lineInfo, DataGrid dataGrid) {
+		
+		StringBuffer sql = new StringBuffer();
+		StringBuffer sqlCnt = new StringBuffer();
+		sqlCnt.append("select count(*) from t_s_role r LEFT JOIN t_s_role_user ru on ru.roleid="
+				+ "r.ID LEFT JOIN t_s_base_user u on ru.userid=u.ID LEFT JOIN t_s_user_org g on g.user_id=u.ID LEFT JOIN t_s_depart d "
+				+ "on g.org_id=d.ID where r.rolecode='operationS'");
+		Long iCount = getCountForJdbcParam(sqlCnt.toString(), null);
+		
+		sql.append("select u.id,u.username,u.realname,d.departname,r.rolename from t_s_role r LEFT JOIN t_s_role_user ru on ru.roleid="
+				+ "r.ID LEFT JOIN t_s_base_user u on ru.userid=u.ID LEFT JOIN t_s_user_org g on g.user_id=u.ID LEFT JOIN t_s_depart d "
+				+ "on g.org_id=d.ID where r.rolecode='operationS' and u.delete_flag='0' and u.status='1'");
+		
+		List<Map<String, Object>> mapList = findForJdbc(sql.toString() , dataGrid.getPage(), dataGrid.getRows());
+		
+		// 将结果集转换成页面上对应的数据集
+		Db2Page[] db2Pages = {
+				new Db2Page("id")
+				,new Db2Page("username", "username", null)
+				,new Db2Page("realname", "realname", null)
+				,new Db2Page("departname", "departname", null)
+				,new Db2Page("rolename", "rolename", null)
+						
+		};
+				
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
 	}

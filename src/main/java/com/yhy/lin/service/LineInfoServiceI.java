@@ -12,4 +12,6 @@ public interface LineInfoServiceI extends CommonService{
 	public JSONObject getDatagrid2(LineInfoEntity lineInfo,DataGrid dataGrid, String ywlx);
 	
 	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType);
+	
+	public JSONObject getDatagrid4(LineInfoEntity lineInfo,DataGrid dataGrid);
 }

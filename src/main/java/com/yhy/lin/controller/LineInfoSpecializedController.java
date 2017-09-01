@@ -71,6 +71,15 @@ public class LineInfoSpecializedController extends BaseController{
 	}
 	
 	/**
+	 * 显示所有激活的用户
+	 */
+	@RequestMapping(params="userdatagrid")
+	public void userdatagrid(LineInfoEntity lineInfos,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid){
+		JSONObject jObject  = lineInfoService.getDatagrid4(lineInfos,dataGrid);
+        responseDatagrid(response, jObject);
+	}
+	
+	/**
 	 * 去线路添加页面
 	 * 
 	 * @return
@@ -97,6 +106,51 @@ public class LineInfoSpecializedController extends BaseController{
 			
 		return new ModelAndView("yhy/linesSpecial/lineAdd");
 	}
+	
+	
+	/**
+	 * 分配用户
+	 * @return
+	 */
+	@RequestMapping(params = "lineAllot")
+	public ModelAndView lineAllot(LineInfoEntity lineInfo, HttpServletRequest request) {
+		String ids = request.getParameter("ids");
+		request.setAttribute("ids", ids);
+		return new ModelAndView("yhy/linesSpecial/lineAllot");
+	}
+	
+	/**
+	 * 申请上架、申请下架
+	 */
+	@RequestMapping(params = "allot")
+	@ResponseBody
+	public AjaxJson allot(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String lineid = request.getParameter("lineid");
+		String id = request.getParameter("ids");
+		String username = request.getParameter("username");
+		if(StringUtil.isNotEmpty(lineid)){
+			String lin[] = lineid.split(",");
+			for (int i = 0; i < lin.length; i++) {
+				String linId = lin[i];
+				LineInfoEntity lineinfo = this.systemService.getEntity(LineInfoEntity.class, linId);
+				lineinfo.setCreateUserId(id);
+				lineinfo.setCreatePeople(username);
+				try {
+					message="分配成功！";
+					this.systemService.saveOrUpdate(lineinfo);
+				} catch (Exception e) {
+					message="系统异常！";
+					// TODO: handle exception
+				}
+			}
+		}
+		
+		j.setMsg(message);
+		return j;
+	}
+	
 	
 	/**
 	 * 获取起点站点
@@ -285,8 +339,6 @@ public class LineInfoSpecializedController extends BaseController{
 				message=line.getTrialReason();//初审拒绝原因
 			}
 		}
-		
-		
 		j.setMsg(message);
 		return j;
 	}
@@ -308,10 +360,10 @@ public class LineInfoSpecializedController extends BaseController{
 			}else if("2".equals(line.getApplicationStatus())){
 				if("0".equals(line.getStatus())){
 					line.setApplicationStatus("3");//复审
-					line.setStatus("1");//已上架
+					line.setStatus("0");//已上架
 				}else if("1".equals(line.getStatus())){
 					line.setApplicationStatus("4");//复审
-					line.setStatus("0");//已下架
+					line.setStatus("1");//已下架
 				}
 			}
 			line.setApplicationTime(AppUtil.getDate());

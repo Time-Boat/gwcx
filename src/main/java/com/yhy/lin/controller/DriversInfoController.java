@@ -81,8 +81,9 @@ public class DriversInfoController extends BaseController {
 		String name = request.getParameter("name");
 		String phoneNumber = request.getParameter("phoneNumber");
 		String status = request.getParameter("status");
+		String cityID= request.getParameter("cityID");
 		
-		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,sex , name, phoneNumber, status);
+		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,driversInfo,cityID);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -165,6 +166,7 @@ public class DriversInfoController extends BaseController {
 		String cityId = request.getParameter("city");
 		TSUser user = ResourceUtil.getSessionUserName();
 		driversInfo.setDepartId(user.getCurrentDepart().getId());
+		driversInfo.setCreateUserId(user.getId());
 		if (StringUtil.isNotEmpty(driversInfo.getId())) {
 			driversInfo.setCityId(cityId);
 			message = "司机信息表更新成功";

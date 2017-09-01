@@ -6,12 +6,15 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.DealerStatisticsServiceI;
 import com.yhy.lin.service.TransferStatisticsServiceI;
@@ -69,14 +72,16 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		String sqlWhere = getWhere(account,fc_begin, fc_end);
 
 		StringBuffer sql = new StringBuffer();
-		String sqlCnt = "select count(*) from car_customer s, dealer_customer d,dealer_info f where s.open_id = d.open_id and f.id=d.dealer_id";
+		String sqlCnt = "select count(*) from car_customer s, dealer_customer d,dealer_info f, t_s_depart td "
+				+ "where s.open_id = d.open_id and f.id=d.dealer_id and td.id=f.departId ";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append(
-				"select f.account,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.login_count from car_customer s, dealer_customer d,dealer_info f where s.open_id = d.open_id and f.id=d.dealer_id  ");
+				"select f.account,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.login_count "
+				+ "from car_customer s, dealer_customer d,dealer_info f, t_s_depart td where s.open_id = d.open_id and f.id=d.dealer_id and td.id=f.departId ");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -107,7 +112,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id LEFT JOIN car_customer w on w.id="
-				+ "t.user_id,dealer_customer d,dealer_info f where w.open_id = d.open_id and f.id=d.dealer_id and t.order_status='0'";
+				+ "t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id and f.id=d.dealer_id and t.order_status='0' and td.id=f.departId ";
 
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -116,8 +121,8 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 
 		sql.append("select f.account,t.order_completed_time,t.order_id,l.name as line_name,l.type as line_type,t.order_startime,w.real_name,t.order_contactsname,"
 				+ "t.order_contactsmobile,t.order_status,t.order_numbers,t.order_totalPrice from transferorder t LEFT JOIN lineinfo l on "
-				+ "t.line_id = l.id LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f where w.open_id = d.open_id"
-				+ " and f.id=d.dealer_id and t.order_status='0'");
+				+ "t.line_id = l.id LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id"
+				+ " and f.id=d.dealer_id and t.order_status='0' and td.id=f.departId ");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -175,6 +180,19 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and s.create_time between '" + fc_begin + "' and '" + fc_end + "'");
 		}
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and f.create_user_id = '" + userId + "' ");
+		}
+		
+		sql.append(" and td.org_code like '" + orgCode + "%' ");
+		
 		sql.append(" ORDER BY s.create_time desc");
 		return sql.toString();
 	}
@@ -199,6 +217,18 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		if (StringUtil.isNotEmpty(lineName)) {
 			sql.append(" and  l.name like '%" + lineName + "%'");
 		}
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and f.create_user_id = '" + userId + "' ");
+		}
+		sql.append(" and td.org_code like '" + orgCode + "%' ");
+		
 		sql.append(" order by t.order_completed_time desc");
 
 		return sql.toString();

@@ -7,7 +7,7 @@
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 <t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
-	idField="id" fit="true" queryMode="group" >
+	idField="id" fit="true" queryMode="group" checkbox="true">
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
@@ -19,7 +19,7 @@
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
-	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
+	<t:dgCol title="创建人" field="createPeople"  query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" dictionary="lineStatus"  align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status"  align="center" width="50"></t:dgCol>
 	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
@@ -34,18 +34,15 @@
 
 	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
-	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="allot" height="500" ></t:dgToolBar>
-	<%-- <t:dgToolBar operationCode="edit" title="站点挂接" icon="icon-edit" url="lineInfoController.do?addBusStop" funname="update"></t:dgToolBar>
-	 --%>
-	<%-- <t:dgDelOpt title="下架" url="lineInfoController.do?del&id={id}&deleteFlag=1" /> --%>
+	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
 	
 	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#0&&applicationStatus#eq#4"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#1&&applicationStatus#eq#3"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="firstagree" exp="applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agrees" exp="applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="firstrefuse" exp="applicationStatus#eq#1"></t:dgFunOpt>
@@ -63,6 +60,7 @@
 </div>
 <div id="tt"></div>
 </div>
+
 <script type="text/javascript">
 	$(document).ready(function(){
 		$("input[name='createTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
@@ -152,20 +150,6 @@
 				);		
 		    }
 		});
-		
-		
-		/* $.ajax({
-            type:"post",
-            url:"lineInfoSpecializedController.do?agree&id="+id,
-            dataType:'json',
-            success:function(data){
-            	 var t = eval('('+data.jsonStr+')');
-					tip(t.msg);
-           		$('#win').window('close');
-	           	//刷新当前窗体
-	           	$('#lineList2').datagrid('reload');
-            }
-        }); */
 	}
 	
 	function commitReason(){
@@ -249,6 +233,23 @@
 		rwin += '</div></div></div>';
 		
 		return rwin;
+	}
+	
+	function lineAllot(title,url,id,width,height){
+		
+		var ids = '';
+		var rows = $("#lineList2").datagrid("getSelections");
+		for(var i=0;i<rows.length;i++){
+			ids+=rows[i].id;
+			ids+=',';
+		}
+		ids = ids.substring(0,ids.length-1);
+		if(ids.length==0){
+			tip('请选择要分配的线路');
+			return;
+		}
+		url += '&ids='+ids;
+		createwindow(title,url,width,height);
 	}
 	
 </script>

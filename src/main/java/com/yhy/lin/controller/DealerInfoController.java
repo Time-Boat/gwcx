@@ -1,5 +1,6 @@
 package com.yhy.lin.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,12 +35,12 @@ import com.yhy.lin.service.DealerInfoServiceI;
 
 import net.sf.json.JSONObject;
 
-/**   
+/**
  * @Title: Controller
  * @Description: 渠道商信息
  * @author zhangdaihao
  * @date 2017-06-29 17:51:18
- * @version V1.0   
+ * @version V1.0
  *
  */
 @Controller
@@ -77,10 +78,11 @@ public class DealerInfoController extends BaseController {
 	 */
 
 	@RequestMapping(params = "datagrid")
-	public void datagrid(DealerInfoEntity dealerInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		
+	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
+			DataGrid dataGrid) {
+
 		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid);
-		
+
 		responseDatagrid(response, jObject);
 	}
 
@@ -98,7 +100,7 @@ public class DealerInfoController extends BaseController {
 		message = "渠道商信息删除成功";
 		dealerInfoService.delete(dealerInfo);
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-		
+
 		j.setMsg(message);
 		return j;
 	}
@@ -114,7 +116,7 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson save(DealerInfoEntity dealerInfo, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
 		String userId = ResourceUtil.getSessionUserName().getId();
 		dealerInfo.setCreateUserId(userId);
@@ -135,6 +137,7 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setCreateDate(AppUtil.getDate());
 			dealerInfo.setScanCount(0);
 			dealerInfo.setStatus("1");
+			dealerInfo.setAuditStatus("-1");
 			
 			dealerInfoService.save(dealerInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
@@ -153,10 +156,10 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson generateQRCode(DealerInfoEntity dealerInfo, HttpServletRequest req) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, dealerInfo.getId());
 		try {
-			//文件存储路径
+			// 文件存储路径
 			String path = AppGlobals.QR_CODE_FILE_PATH + req.getParameter("id") + ".jpg";
 			logger.info("linux全路径：" + AppGlobals.IMAGE_BASE_FILE_PATH + path);
 			logger.info("数据库存储路径：" + path);
@@ -171,7 +174,7 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
 	 * 申请停用
 	 * 
@@ -182,15 +185,15 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson dealerDisable(HttpServletRequest req) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		String id = req.getParameter("id");
-		
+
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
 			dealerInfo.setCommitApplyDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("0");
 			dealerInfo.setApplyType("1");
-			
+
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器失败";
@@ -200,8 +203,7 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
-	
+
 	/**
 	 * 提交申请
 	 * 
@@ -212,19 +214,19 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson dealerApply(HttpServletRequest req) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		String id = req.getParameter("id");
-		
+
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
 			dealerInfo.setCommitApplyDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("0");
 			dealerInfo.setApplyType("0");
-			
-			//清空审核状态
+
+			// 清空审核状态
 			dealerInfo.setAuditDate(null);
 			dealerInfo.setAuditUser("");
-			
+
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器失败";
@@ -234,17 +236,53 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
-	 * 分配专员
+	 * 专员列表
+	 * 
 	 * @return
 	 */
 	@RequestMapping(params = "getAttacheList")
-    public ModelAndView getAttacheList(HttpServletRequest req) {
-        req.setAttribute("id", req.getParameter("id"));
-        return new ModelAndView("yhy/dealer/dealerAttacheList");
-    }
-	
+	public ModelAndView getAttacheList(HttpServletRequest req) {
+		String ids = req.getParameter("ids");
+		req.setAttribute("ids", ids);
+		return new ModelAndView("yhy/dealer/dealerAttacheList");
+	}
+
+	/**
+	 * 分配专员
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "allotAttache")
+	@ResponseBody
+	public AjaxJson allotAttache(HttpServletRequest req) {
+		AjaxJson j = new AjaxJson();
+		String message = null;
+
+		String userId = req.getParameter("userId");
+		String ids = req.getParameter("ids");
+
+		List<DealerInfoEntity> list = new ArrayList<>();
+
+		try {
+			String[] idArr = ids.split(",");
+			for (int i = 0; i < idArr.length; i++) {
+			
+				DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, idArr[i]);
+				dealerInfo.setCreateUserId(userId);
+				list.add(dealerInfo);
+			}	
+			dealerInfoService.saveAllEntitie(list);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "审核成功";
+		j.setMsg(message);
+		return j;
+	}
+
 	/**
 	 * 同意审核
 	 * 
@@ -255,21 +293,21 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson dealerAgree(HttpServletRequest req) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		String id = req.getParameter("id");
-		
+
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
 			String apply = dealerInfo.getApplyType();
-			if("0".equals(apply)){
+			if ("0".equals(apply)) {
 				dealerInfo.setStatus("0");
-			}else{
+			} else {
 				dealerInfo.setStatus("2");
 			}
 			dealerInfo.setAuditDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("1");
 			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
-			
+
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器异常";
@@ -279,7 +317,7 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
 	 * 拒绝审核
 	 * 
@@ -290,17 +328,17 @@ public class DealerInfoController extends BaseController {
 	public AjaxJson dealerReject(HttpServletRequest req) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		String id = req.getParameter("id");
 		String rejectReason = req.getParameter("rejectReason");
-		
+
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
 			dealerInfo.setAuditDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("2");
 			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 			dealerInfo.setRejectReason(rejectReason);
-			
+
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器异常";
@@ -310,7 +348,7 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	// 获取拒绝退款原因
 	@RequestMapping(params = "getReason")
 	@ResponseBody
@@ -322,7 +360,7 @@ public class DealerInfoController extends BaseController {
 
 		DealerInfoEntity t = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		String reasont = t.getRejectReason();
-		
+
 		j.setSuccess(true);
 		j.setMsg(reasont);
 		return j;
@@ -341,7 +379,7 @@ public class DealerInfoController extends BaseController {
 		}
 		return new ModelAndView("yhy/dealer/dealerInfo");
 	}
-	
+
 	/**
 	 * 检查公司社会信用代码是否存在
 	 */
@@ -353,20 +391,21 @@ public class DealerInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		try {
 			String creditCode = request.getParameter("creditCode");
-			List<DealerInfoEntity> list  = this.systemService.findByProperty(DealerInfoEntity.class, "creditCode", creditCode);
-			if(list.size() > 0){
+			List<DealerInfoEntity> list = this.systemService.findByProperty(DealerInfoEntity.class, "creditCode",
+					creditCode);
+			if (list.size() > 0) {
 				message = "公司社会信用代码已经存在";
 				success = false;
-			}else{
-				message="添加社会信用代码成功！";
+			} else {
+				message = "添加社会信用代码成功！";
 				success = true;
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-		
+
 		j.setSuccess(success);
 		j.setMsg(message);
 		return j;

@@ -116,7 +116,7 @@ public class DealerInfoEntity implements java.io.Serializable {
 		this.auditDate = auditDate;
 	}
 	
-	@Column(name ="AUDIT_STATUS",nullable=true,length=32)
+	@Column(name ="AUDIT_STATUS",nullable=true,length=2)
 	public String getAuditStatus() {
 		return auditStatus;
 	}

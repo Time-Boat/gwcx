@@ -186,9 +186,30 @@
 			createwindow(title,url,width,height);
 		}
 		
+		function dealerAllot(title,url,id,width,height){
+			
+			var ids = '';
+			var rows = $("#dealerInfoList").datagrid("getSelections");
+			for(var i=0;i<rows.length;i++){
+				if(rows[i].status != '0' || rows[i].auditStatus == '0'){
+					tip('只有合作中的渠道商，并且不是待审核状态才能被分配！');
+					return;
+				}
+				ids+=rows[i].id;
+				ids+=',';
+			}
+			ids = ids.substring(0,ids.length-1);
+			if(ids.length==0){
+				tip('请选择要分配的渠道商');
+				return;
+			}
+			url += '&ids='+ids;
+			createwindow(title,url,width,height);
+		}
+		
 	</script>
 	<a hidden="true" id="downloadCode" download ></a>
-  <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true">
+  <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" >
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
    <t:dgCol title="渠道商账号" field="account" align="center" width="120"></t:dgCol>
@@ -208,11 +229,11 @@
    <t:dgCol title="审核状态" field="auditStatus" dictionary="audit_status" align="center" width="120"></t:dgCol>
    
    <t:dgCol title="操作" field="opt" ></t:dgCol>
-   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#empty#true"/>
+   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#eq#-1"/>
    <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update"></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
-   <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerInfoController.do?getAttacheList" funname="add" operationCode="allotAttache" ></t:dgToolBar> 
+   <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerInfoController.do?getAttacheList" funname="dealerAllot" operationCode="allotAttache" ></t:dgToolBar> 
    
    <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt>
@@ -220,7 +241,7 @@
    
    <!-- 权限按钮 -->
    <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2"></t:dgFunOpt> 
-   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#empty#true"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&auditStatus#eq#1"></t:dgFunOpt> 
    <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2"></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgree" exp="auditStatus#eq#0"></t:dgFunOpt> 

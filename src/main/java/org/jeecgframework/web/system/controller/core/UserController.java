@@ -389,7 +389,7 @@ public class UserController extends BaseController {
   			//查出所有在orgCode范围的用户id
   			tempList = systemService.findListbySql(
   					"select su.id from t_s_user su join t_s_base_user u on su.id = u.id join t_s_user_org o on u.id = o.user_id join t_s_depart d on o.org_id = d.id "
-  					+ "where d.org_code like '%" + orgCode + "%' and u.status!=0 and u.delete_flag=0 ");
+  					+ "where d.org_code like '" + orgCode + "%' and u.status!=0 and u.delete_flag=0 ");
   		}
   		
         Short[] userstate = new Short[]{Globals.User_Normal, Globals.User_ADMIN, Globals.User_Forbidden};

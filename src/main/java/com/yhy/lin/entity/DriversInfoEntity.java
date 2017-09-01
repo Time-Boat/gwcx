@@ -54,6 +54,8 @@ public class DriversInfoEntity implements java.io.Serializable {
 	private String drivingLicenseImgUrl;
 	//所属部门
 	private String departId;
+	//创建人
+	private String createUserId;
 	/**
 	 * 所在城市
 	 * @return
@@ -170,4 +172,13 @@ public class DriversInfoEntity implements java.io.Serializable {
 	public void setDepartId(String departId) {
 		this.departId = departId;
 	}
+	
+	@Column(name = "create_user_id")
+	public String getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
+	}
+	
 }

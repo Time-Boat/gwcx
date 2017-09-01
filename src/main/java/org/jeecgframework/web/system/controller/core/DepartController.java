@@ -409,7 +409,7 @@ public class DepartController extends BaseController {
 
         String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
         //是不是子公司管理员
-  		boolean hasPermission = checkRole(AppGlobals.SUBSIDIARY_ADMIN);
+  		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
   		//子公司管理员只能看到自己公司的用户
   		
   		List<TSUser> userList = new ArrayList<>();
@@ -418,7 +418,7 @@ public class DepartController extends BaseController {
   			//查出所有在orgCode范围的用户id
   			List<Object[]> orgArrList = systemService.findHql(
   	  				"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb where d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id "
-  	  				+ "and d.orgCode like '%" + orgCode + "%' and tb.status!=0 and tb.deleteFlag=0 ");
+  	  				+ "and d.orgCode like '" + orgCode + "%' and tb.status!=0 and tb.deleteFlag=0 and tb.id !='"+ResourceUtil.getSessionUserName().getId()+"' ");
   	        for (Object[] departs : orgArrList) {
   	        	userList.add((TSUser) departs[3]);
   	        }
@@ -429,12 +429,14 @@ public class DepartController extends BaseController {
         org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
         
         // 获取 当前组织机构的用户信息
-        CriteriaQuery subCq = new CriteriaQuery(TSUserOrg.class);
-        subCq.setProjection(Property.forName("tsUser.id"));
-        subCq.eq("tsDepart.id", orgId);
-        subCq.add();
-        
-        cq.add(Property.forName("id").notIn(subCq.getDetachedCriteria()));
+        if(StringUtil.isNotEmpty(orgId)){
+	        CriteriaQuery subCq = new CriteriaQuery(TSUserOrg.class);
+	        subCq.setProjection(Property.forName("tsUser.id"));
+	        subCq.eq("tsDepart.id", orgId);
+	        subCq.add();
+	        
+	        cq.add(Property.forName("id").notIn(subCq.getDetachedCriteria()));
+        }
         cq.add();
         
         this.systemService.getDataGridReturn(cq, true);

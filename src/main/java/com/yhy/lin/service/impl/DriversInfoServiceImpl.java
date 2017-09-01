@@ -3,6 +3,7 @@ package com.yhy.lin.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.DriversInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -20,7 +21,7 @@ import org.jeecgframework.core.util.StringUtil;
 public class DriversInfoServiceImpl extends CommonServiceImpl implements DriversInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, String sex, String name, String phoneNumber,String status) {
+	public JSONObject getDatagrid(DataGrid dataGrid,DriversInfoEntity driversInfo,String cityID) {
 		
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
@@ -31,19 +32,20 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
 		}
 	    
-		if(StringUtil.isNotEmpty(sex)){
-			queryCondition.append(" and d.sex = '"+sex+"' ");
+		if(StringUtil.isNotEmpty(driversInfo.getSex())){
+			queryCondition.append(" and d.sex = '"+driversInfo.getSex()+"' ");
 		}
 		
-		if(StringUtil.isNotEmpty(name)){
-			queryCondition.append(" and d.name like '%"+name+"%' ");
+		if(StringUtil.isNotEmpty(driversInfo.getName())){
+			queryCondition.append(" and d.name like '%"+driversInfo.getName()+"%' ");
 		}
 		
-		if(StringUtil.isNotEmpty(phoneNumber)){
-			queryCondition.append(" and d.phoneNumber like '" + phoneNumber +"%' ");
+		if(StringUtil.isNotEmpty(driversInfo.getPhoneNumber())){
+			queryCondition.append(" and d.phoneNumber like '" + driversInfo.getPhoneNumber() +"%' ");
 		}
-		if(StringUtil.isNotEmpty(status)){
-			queryCondition.append(" and d.status ='" + status +"' ");
+		
+		if(StringUtil.isNotEmpty(cityID)){
+			queryCondition.append(" and d.cityId = '" +cityID +"'");
 		}
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
@@ -52,7 +54,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city,d.create_user_id,u.username from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID LEFT JOIN t_s_base_user u on u.ID=d.create_user_id" + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -67,6 +69,8 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 							,new Db2Page("age", "age")
 							,new Db2Page("idCard", "idCard")
 							,new Db2Page("createDate", "createDate")
+							,new Db2Page("createUserId", "create_user_id")
+							,new Db2Page("username", "username")
 							,new Db2Page("remark", "remark")
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("drivingLicenseImgUrl", "drivingLicenseImgUrl")

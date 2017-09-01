@@ -138,8 +138,8 @@ public class DealerStatisticsController extends BaseController {
 		StringBuffer orsql = new StringBuffer();
 		orsql.append(
 				"select SUM(t.order_numbers),SUM(t.order_totalPrice ) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id "
-				+ "LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f where w.open_id = d.open_id and f.id="
-				+ "d.dealer_id and t.order_status='0'");
+				+ "LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id and f.id="
+				+ "d.dealer_id and t.order_status='0' and td.id=f.departId ");
 		if (!dsService.getWhere4(lineName, orderType, account, fc_begin, fc_end)
 				.isEmpty()) {
 			orsql.append(dsService.getWhere4(lineName, orderType, account, fc_begin,
@@ -187,7 +187,8 @@ public class DealerStatisticsController extends BaseController {
 		String fc_end = request.getParameter("createTime_end");
 		
 		StringBuffer orsql = new StringBuffer();
-		orsql.append("select count(*) from car_customer s, dealer_customer d,dealer_info f where s.open_id = d.open_id and f.id=d.dealer_id ");
+		orsql.append(
+				"select count(*) from car_customer s, dealer_customer d,dealer_info f,t_s_depart td  where s.open_id = d.open_id and f.id=d.dealer_id and td.id=f.departId ");
 		
 		if (!dsService.getWhere(account,fc_begin, fc_end).isEmpty()) {
 			orsql.append(dsService.getWhere(account,fc_begin,fc_end));
