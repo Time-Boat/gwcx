@@ -376,9 +376,7 @@ public class UserController extends BaseController {
         //查询条件组装器
         org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
         
-        
         List<TSUser> tsList = new ArrayList<TSUser>();
-        
         List<String> tempList = null;
         
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -419,10 +417,24 @@ public class UserController extends BaseController {
             if (o instanceof TSUser) {
                 TSUser cfe = (TSUser) o;
                 
+//                System.out.println("cfe11111: " + cfe.getId());
+//                System.out.println("tempList: " + tempList.contains(cfe.getId()));
                 //如果包含这个id，就将他添加到list中
                 if(tempList != null && tempList.size() > 0 && tempList.contains(cfe.getId())){
                 	tsList.add(cfe);
                 }
+//                if(tempList != null && tempList.size() > 0) {
+//	                for(String userid : tempList){
+//	                	System.out.println(cfe.getId() + "   --------------   " + userid);
+//	                	if(userid.equals(cfe.getId())){
+//	                		System.out.println(userid.equals(cfe.getId()));
+//	                		tsList.add(cfe);
+//	                		break;
+//	                	}
+//	                }
+//	                
+//	                System.out.println();
+//                }
                 
                 if (cfe.getId() != null && !"".equals(cfe.getId())) {
                     List<TSRoleUser> roleUser = systemService.findByProperty(TSRoleUser.class, "TSUser.id", cfe.getId());
@@ -441,6 +453,7 @@ public class UserController extends BaseController {
         
 	    //修改要显示的数据为之前过滤的数据
         if(hasPermission){
+//        	dataGrid.setTotal(tsList.size());
         	dataGrid.setResults(tsList);
         }
         

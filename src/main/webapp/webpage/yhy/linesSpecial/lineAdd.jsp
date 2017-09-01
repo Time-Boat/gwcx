@@ -186,72 +186,6 @@
 			</td>
 		</tr>
 		
-		<%--
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 终点位置地址: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="endLocation" value="${lineInfo.endLocation}" style="width: 60%" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>--%>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 线路状态: </label>
-			</td>
-			<td class="value">
-				
-					<t:dictSelect field="status" typeGroupCode="lineStatus" hasLabel="false" defaultVal="${lineInfo.status}" datatype="*"></t:dictSelect>	
-				
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		
-		
-		<%-- <tr>
-			<td align="right">
-				<label class="Validform_label"> 选择入驻公司: </label>
-			</td>
-			<td class="value">
-				<select name="settledCompany">
-						<c:choose>
-							<c:when test="${lineInfo.settledCompanyId !=null }">
-								<option value="${lineInfo.settledCompanyId}">${lineInfo.settledCompanyName}</option>
-							</c:when>
-							<c:otherwise>
-								<option value="">--请选择入驻公司--</option>
-							</c:otherwise>
-						</c:choose>
-						<c:forEach var="settledCompany" items="${list}">
-							<option value="${settledCompany.id}">
-								${settledCompany.departname}
-							</option>
-						</c:forEach>
-				</select> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr> --%>
-		
-		<%-- <tr>
-			<td align="right">
-				<label class="Validform_label"> 发车时间: </label>
-			</td>
-			<td class="value">
-				<input name="lstartTime" class="Wdate" onClick="WdatePicker({dateFmt:'HH:mm:ss'})" style="width: 150px" value="<fmt:formatDate value='${lineInfo.lstartTime }' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>" errormsg="日期格式不正确!"  datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 预计到达时间: </label>
-			</td>
-			<td class="value">
-				<input name="lendTime" class="Wdate" onClick="WdatePicker({dateFmt:'HH:mm:ss'})" style="width: 150px" value="<fmt:formatDate value='${lineInfo.lendTime }' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>" errormsg="日期格式不正确!"  datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr> --%>
-		
 		<tr>
 			<td align="right">
 				<label class="Validform_label"> 线路定价(元/人): </label>
@@ -272,28 +206,6 @@
 			</td>
 		</tr>
 		
-		
-		
-		<%-- 
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 线路图片: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="endLocation" value="${lineInfo.endLocation}" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 线路类型: </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="endLocation" value="${lineInfo.endLocation}" datatype="*"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		 --%>
 	</table>
 </t:formvalid>
 <t:authFilter name="formtableId"></t:authFilter>

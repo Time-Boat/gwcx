@@ -37,8 +37,8 @@
             $("#orgType option:first").remove();
             var zigongsi = '<option value="2" <c:if test="${orgType=='2'}">selected="selected"</c:if>><t:mutiLang langKey="子公司"/></option>';
             var bumen = '<option value="3" <c:if test="${orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="部门"/></option>';
-            var gangwei = '<option value="3" <c:if test="${orgType=='3'}">selected="selected"</c:if>><t:mutiLang langKey="岗位"/></option>';
-            var ruzhu = '<option value="4" <c:if test="${orgType=='4'}">selected="selected"</c:if>><t:mutiLang langKey="入驻公司"/></option>';
+            var gangwei = '<option value="4" <c:if test="${orgType=='4'}">selected="selected"</c:if>><t:mutiLang langKey="岗位"/></option>';
+            var ruzhu = '<option value="5" <c:if test="${orgType=='5'}">selected="selected"</c:if>><t:mutiLang langKey="入驻公司"/></option>';
             orgTypeSelect.append(zigongsi).append(bumen).append(gangwei).append(ruzhu);
         }
     }

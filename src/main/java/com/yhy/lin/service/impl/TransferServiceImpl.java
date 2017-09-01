@@ -10,7 +10,6 @@ import java.util.Map;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
@@ -243,9 +242,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String cityid,String lineType,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
-			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere3(transferorder,cityid,lineType,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String cityid,String lineId,String lineOrderCode,String lineType) {
+		String sqlWhere = getWhere3(transferorder,cityid,lineId,lineOrderCode,lineType);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -267,14 +265,15 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(sqlWhere);
 		}
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
+		
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = { 
 				new Db2Page("id"), 
 				new Db2Page("lineOrderCode", "lineOrderCode", null),
 				new Db2Page("lineName", "lineName", null), 
 				new Db2Page("lineType", "type", null), 
-				new Db2Page("alreadyarranged", "alreadyarranged", null),
-				new Db2Page("notarranged", "notarranged", null),
+				new Db2Page("alreadyarranged", "alreadyarranged", new MyDataExchangerOrderNumber()),
+				new Db2Page("notarranged", "notarranged", new MyDataExchangerOrderNumber()),
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("cityId", "city_id", null),
 				new Db2Page("orderNumber", "orderNumber", new MyDataExchangerOrderNumber() )
@@ -385,72 +384,29 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		return sql.toString();
 	}
 	
-	public String getWhere3(TransferorderEntity transferorder,String cityid,String lineType,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
-			String ddTime_end) {
+	public String getWhere3(TransferorderEntity transferorder,String cityid,String lineId,String lineOrderCode,String lineType) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
 		StringBuffer sql = new StringBuffer(" where t.org_code like '" + orgCode + "%' ");
-
-		// 发车时间
-		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
-			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
-		}
-		// 预计到达时间
-		if (StringUtil.isNotEmpty(ddTime_begin) && StringUtil.isNotEmpty(ddTime_end)) {
-			sql.append(" and a.order_expectedarrival between '" + ddTime_begin + "' and '" + ddTime_end + "'");
-		}
-		// 订单编号
-		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
-			sql.append(" and  a.order_id like '%" + transferorder.getOrderId() + "%'");
-		}
 		//所属城市
 		if (StringUtil.isNotEmpty(cityid)) {
 			sql.append(" and  a.city_id = '" + cityid + "'");
 		}
-		// 线路名称
+		//所属线路
 		if (StringUtil.isNotEmpty(lineId)) {
 			sql.append(" and  a.line_id = '" + lineId + "'");
 		}
-		//司机
-		if (StringUtil.isNotEmpty(driverId)) {
-			sql.append(" and  d.name like '%" + driverId + "%'");
-		}
-				
 		//线路类型
 		if (StringUtil.isNotEmpty(lineType)) {
 			sql.append(" and  l.type = '" + lineType + "'");
 		}
-		
-		//车牌号
-		if (StringUtil.isNotEmpty(carId)) {
-			sql.append(" and  c.licence_plate = '" + carId + "'");
+		//线路订单码
+		if (StringUtil.isNotEmpty(lineOrderCode)) {
+			sql.append(" and  a.lineOrderCode = '" + lineOrderCode + "'");
 		}
-		
-		// 订单类型
-		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
-			sql.append(" and  a.order_type ='" + transferorder.getOrderType() + "'");
-		}
-		// 订单状态
-		if (StringUtil.isNotEmpty(transferorder.getOrderStatus())) {
-			sql.append(" and  a.order_status ='" + transferorder.getOrderStatus() + "'");
-		}
-		// 起点站id
-		if (StringUtil.isNotEmpty(orderStartingstation)) {
-			sql.append(" and  a.order_starting_station_name = '" +orderStartingstation+ "'");
-		}
-		// 终点站id
-		if (StringUtil.isNotEmpty(orderTerminusstation)) {
-			sql.append(" and  a.order_terminus_station_name = '" + orderTerminusstation + "'");
-		}
-
-		// 申请人
-		if (StringUtil.isNotEmpty(transferorder.getOrderContactsname())) {
-			sql.append(" and  a.order_contactsname like '%" + transferorder.getOrderContactsname() + "%'");
-		}
-
 		// 不需要显示退款状态的订单
-		sql.append(" and a.lineOrderCode is not null and a.order_status in('1','2','7') ");
+		sql.append(" and a.lineOrderCode is not null and a.order_status in('1','2') ");
 
 		sql.append(" GROUP BY a.lineOrderCode ");
 

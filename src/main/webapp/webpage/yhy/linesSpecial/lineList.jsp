@@ -19,9 +19,10 @@
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
-	<t:dgCol title="创建人" field="createPeople"  query="true" align="center" width="60"></t:dgCol>
+	<t:dgCol title="创建人" field="username"  query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" dictionary="lineStatus"  align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="50"></t:dgCol>
 	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
 	<t:dgCol title="预计到达时间" field="lendTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group"  align="center" width="120"></t:dgCol>
 	 --%>
@@ -37,12 +38,12 @@
 	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
 	
 	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="firstagree" exp="applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agrees" exp="applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="firstrefuse" exp="applicationStatus#eq#1"></t:dgFunOpt>
@@ -100,13 +101,13 @@
 	}
 	
 	//申请上、下架
-	function applyShelves(id) {
+	function applyShelves(id,lineStatus) {
 		
 		$.dialog.confirm('确定要申请？',function(r){
 		    if (r){
 		    	$.post(
 		    		"lineInfoSpecializedController.do?applyShelves",	
-					{'id':id},
+					{'id':id,'lineStatus':lineStatus},
 					function(data){
 						var obj = eval('(' + data + ')');
 						tip(obj.msg);

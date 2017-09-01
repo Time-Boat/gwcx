@@ -294,6 +294,7 @@ public class LineInfoController extends BaseController {
 		lineInfo.setDepartId(user.getCurrentDepart().getId());
 		lineInfo.setCreatePeople(user.getUserName());
 		lineInfo.setCreateUserId(user.getId());
+		
 		String cityId = request.getParameter("city");
 		if (StringUtil.isNotEmpty(cityId)) {
 			List<CitiesEntity> listCity = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
@@ -343,6 +344,8 @@ public class LineInfoController extends BaseController {
 					String linecode = cityId + pum;
 					lineInfo.setLineNumber(linecode);// 设置线路编号
 				}
+				lineInfo.setStatus("1");
+				lineInfo.setApplicationStatus("0");
 
 				StartOrEndEntity st = new StartOrEndEntity();
 				if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {

@@ -25,6 +25,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
@@ -137,6 +138,8 @@ public class CarInfoController extends BaseController {
 		String beforeDriverId = "";
 		TSUser user = ResourceUtil.getSessionUserName();
 		carInfo.setDepartId(user.getCurrentDepart().getId());
+		carInfo.setCreateUserId(user.getId());
+		carInfo.setCreateTime(AppUtil.getDate());
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			message = "车辆信息更新成功";
 			CarInfoEntity t = carInfoService.get(CarInfoEntity.class, carInfo.getId());

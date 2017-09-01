@@ -8,10 +8,12 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.service.LineInfoServiceI;
 
@@ -34,10 +36,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,"
-		 		+ "a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,"
+		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username,"
+		 		+ "a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content,"
 		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status");
-		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id=a.endLocation where 1=1 ");
+		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id=a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID where 1=1 ");
 		 
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -56,7 +58,9 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("deleteFlag", "deleteFlag", null)
 				,new Db2Page("createTime", "createTime", null)
 				,new Db2Page("createPeople", "createPeople", null)
+				,new Db2Page("username", "username", null)
 				,new Db2Page("price", "price", null)
+				,new Db2Page("applyContent", "apply_content", null)
 				,new Db2Page("lstartTime", "lstartTime", null)
 				,new Db2Page("lendTime", "lendTime", null)
 				,new Db2Page("lineTimes", "lineTimes", null)
@@ -76,8 +80,18 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType){
-		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
 		StringBuffer sqlWhere = new StringBuffer();
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sqlWhere.append(" and a.createUserId = '" + userId + "' ");
+		}
+		
 		if(StringUtil.isNotEmpty(orgCode)){
 			sqlWhere.append(" and org_code like '"+orgCode+"%'");
 		}
@@ -229,16 +243,17 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	@Override
 	public JSONObject getDatagrid4(LineInfoEntity lineInfo, DataGrid dataGrid) {
 		
+		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		StringBuffer sql = new StringBuffer();
 		StringBuffer sqlCnt = new StringBuffer();
 		sqlCnt.append("select count(*) from t_s_role r LEFT JOIN t_s_role_user ru on ru.roleid="
 				+ "r.ID LEFT JOIN t_s_base_user u on ru.userid=u.ID LEFT JOIN t_s_user_org g on g.user_id=u.ID LEFT JOIN t_s_depart d "
-				+ "on g.org_id=d.ID where r.rolecode='operationS'");
+				+ "on g.org_id=d.ID where r.rolecode='operationS' and u.delete_flag='0' and u.status='1' and d.org_code like '"+orgCode+"%'");
 		Long iCount = getCountForJdbcParam(sqlCnt.toString(), null);
 		
 		sql.append("select u.id,u.username,u.realname,d.departname,r.rolename from t_s_role r LEFT JOIN t_s_role_user ru on ru.roleid="
 				+ "r.ID LEFT JOIN t_s_base_user u on ru.userid=u.ID LEFT JOIN t_s_user_org g on g.user_id=u.ID LEFT JOIN t_s_depart d "
-				+ "on g.org_id=d.ID where r.rolecode='operationS' and u.delete_flag='0' and u.status='1'");
+				+ "on g.org_id=d.ID where r.rolecode='operationS' and u.delete_flag='0' and u.status='1' and d.org_code like '"+orgCode+"%'");
 		
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString() , dataGrid.getPage(), dataGrid.getRows());
 		

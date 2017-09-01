@@ -99,11 +99,6 @@ public class LineInfoSpecializedController extends BaseController{
 		}
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
-//		List<TSDepart> list = systemService.findByProperty(TSDepart.class, "orgType", "4");
-//		if(list.size()>0){
-//			req.setAttribute("list", list);
-//		}
-			
 		return new ModelAndView("yhy/linesSpecial/lineAdd");
 	}
 	
@@ -303,9 +298,16 @@ public class LineInfoSpecializedController extends BaseController{
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
+		String lineStatus= request.getParameter("id");
+		
 		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
 		if(StringUtil.isNotEmpty(line)){
 			line.setApplicationStatus("1");//待审核
+			if(StringUtil.isNotEmpty(lineStatus) || "0".equals(lineStatus)){
+				line.setApplyContent("1");//申请内容
+			}else{
+				line.setApplyContent("0");//申请内容
+			}
 			line.setApplicationTime(AppUtil.getDate());
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 		}

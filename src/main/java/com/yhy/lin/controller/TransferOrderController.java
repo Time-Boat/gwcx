@@ -59,7 +59,8 @@ public class TransferOrderController extends BaseController {
 	// 接送车司机安排
 	@RequestMapping(params = "transferDriverList")
 	public ModelAndView transferDriverList(HttpServletRequest request, HttpServletResponse response) {
-		request.setAttribute("cityList",getOpencity());	
+		request.setAttribute("cityList",getOpencity());
+		request.setAttribute("lineNameList",getLine2());
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
 	}
 	
@@ -74,7 +75,7 @@ public class TransferOrderController extends BaseController {
 		if("4".equals(orderType) || "5".equals(orderType)){
 			return transferOrderList(request, response,lineOrderCode,orderType);
 		}
-			
+		
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
 	}
 
@@ -106,30 +107,12 @@ public class TransferOrderController extends BaseController {
 	public void driverdatagrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		
-		String orderStartingstation = request.getParameter("orderStartingstation");
-		String orderTerminusstation = request.getParameter("orderTerminusstation");
+		String lineOrderCode = request.getParameter("lineOrderCode");
 		String lineId = request.getParameter("lineId");
-		String driverId = request.getParameter("driverId");
-		String cityid = request.getParameter("cityID");
 		String lineType = request.getParameter("lineType");
-		String driverName ="";
-		if (StringUtil.isNotEmpty(driverId)) {
-			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
-			 driverName = dr.getName();
-		}
-		String plate = "";
-		String carId = request.getParameter("carId");
-		if (StringUtil.isNotEmpty(carId)) {
-			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
-			 plate = dr.getLicencePlate();
-		}
+		String cityid = request.getParameter("cityID");
 		
-		String fc_begin = request.getParameter("orderStartime_begin");
-		String fc_end = request.getParameter("orderStartime_end");
-		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
-		String ddTime_end = request.getParameter("orderExpectedarrival_end");
-		JSONObject jObject = transferService.getDatagrid3(transferorder, dataGrid,cityid,lineType,orderStartingstation, orderTerminusstation
-				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
+		JSONObject jObject = transferService.getDatagrid3(transferorder, dataGrid,cityid,lineId,lineOrderCode,lineType);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -172,6 +155,37 @@ public class TransferOrderController extends BaseController {
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
 		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type  in('4','5');";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String name = ob[1]+"";
+					json.append("{");
+					json.append("'lineId':'" +id + "',");
+					json.append("'lineName':'"+ name + "'");
+					json.append("},");
+				}
+			}else{
+				json.append("{");
+				json.append("'lineId':'',");
+				json.append("'lineName':''");
+				json.append("},");
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		
+		return json.toString();
+	}
+	
+	/**
+	 * 获取线路
+	 */
+	public String getLine2(){
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		// 添加了权限
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type  in('2','3','4','5');";
 		List<Object> list = this.systemService.findListbySql(sql);
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){

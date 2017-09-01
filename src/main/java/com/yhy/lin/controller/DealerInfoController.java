@@ -81,7 +81,10 @@ public class DealerInfoController extends BaseController {
 	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 
-		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid);
+		String status = request.getParameter("status");
+		String auditStatus = request.getParameter("auditStatus");
+		
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, status, auditStatus);
 
 		responseDatagrid(response, jObject);
 	}

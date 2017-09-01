@@ -5,7 +5,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 
 <div class="easyui-layout" fit="true">
-<div region="center"  style="padding:0px;border:0px">
+<div region="center" style="padding:0px;border:0px">
  <t:datagrid name="driversInfoList" title="司机信息管理" autoLoadData="true" actionUrl="driversInfoController.do?datagrid"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" >
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>

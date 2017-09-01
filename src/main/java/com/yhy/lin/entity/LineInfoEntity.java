@@ -78,6 +78,8 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	
 	//申请时间
 	private Date applicationTime;
+	//申请内容
+	private String applyContent;
 	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
@@ -268,13 +270,19 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	public void setApplicationUserid(String applicationUserid) {
 		this.applicationUserid = applicationUserid;
 	}
-	
 	@Column(name = "application_time")
 	public Date getApplicationTime() {
 		return applicationTime;
 	}
 	public void setApplicationTime(Date applicationTime) {
 		this.applicationTime = applicationTime;
+	}
+	@Column(name = "apply_content")
+	public String getApplyContent() {
+		return applyContent;
+	}
+	public void setApplyContent(String applyContent) {
+		this.applyContent = applyContent;
 	}
 	
 }

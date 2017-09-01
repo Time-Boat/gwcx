@@ -38,6 +38,9 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	
 	private String lineIds;
 	
+	//创建人
+	private String createUserId;
+	
 	@Column(name = "line_ids")
 	public String getLineIds() {
 		return lineIds;
@@ -114,6 +117,13 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	}
 	public void setDepartId(String departId) {
 		this.departId = departId;
+	}
+	@Column(name = "create_user_id")
+	public String getCreateUserId() {
+		return createUserId;
+	}
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
 	}
 	
 }

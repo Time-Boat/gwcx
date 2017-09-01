@@ -208,12 +208,11 @@
 		}
 		
 	</script>
-	<a hidden="true" id="downloadCode" download ></a>
-  <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" >
-   <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
+  <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" queryMode="group">
+   <t:dgCol title="编号" field="id" hidden="true" ></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
    <t:dgCol title="渠道商账号" field="account" align="center" width="120"></t:dgCol>
-   <t:dgCol title="合作状态" field="status" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
+   <t:dgCol title="合作状态" field="status" query="true" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建人" field="username" align="center" width="80"></t:dgCol>
    <t:dgCol title="推广人数" field="scanCount" align="center" width="60"></t:dgCol>
@@ -226,7 +225,7 @@
    
    <t:dgCol title="审核用户" field="auditUser" align="center" width="120"></t:dgCol>
    <t:dgCol title="审核时间" field="auditDate" align="center" width="120" formatter="yyyy-MM-dd hh:mm:ss" ></t:dgCol>
-   <t:dgCol title="审核状态" field="auditStatus" dictionary="audit_status" align="center" width="120"></t:dgCol>
+   <t:dgCol title="审核状态" field="auditStatus" dictionary="audit_status" query="true" align="center" width="120"></t:dgCol>
    
    <t:dgCol title="操作" field="opt" ></t:dgCol>
    <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#eq#-1"/>

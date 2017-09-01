@@ -3,6 +3,7 @@ package com.yhy.lin.service.impl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
@@ -22,6 +23,7 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 
 @Service("carInfoService")
 @Transactional
@@ -31,17 +33,26 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType) {
 		
 		StringBuffer queryCondition = new StringBuffer(" where delete_flag = '0' ");
-		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			queryCondition.append(" and c.create_user_id = '" + userId + "' ");
+		}
+		
+		queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
+		
 		
 		if(StringUtil.isNotEmpty(userCar)){
 			queryCondition.append(" and c.status = '" + userCar + "' ");
 			if(StringUtil.isNotEmpty(lpId)){
 				queryCondition.append(" or c.id = '" + lpId + "' ");
 			}
-		}
-		
-		if(StringUtil.isNotEmpty(orgCode)){
-			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
 		}
 		
 		if(StringUtil.isNotEmpty(businessType)){
@@ -79,6 +90,8 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 							,new Db2Page("status", "status")
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("driverId", "driverId")
+							,new Db2Page("createUserId", "create_user_id")
+							,new Db2Page("createTime", "create_time")
 							,new Db2Page("businessType", "business_type")
 							,new Db2Page("remark", "remark")
 					};

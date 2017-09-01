@@ -1,6 +1,8 @@
 package com.yhy.lin.entity;
 
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -52,6 +54,10 @@ public class CarInfoEntity implements java.io.Serializable {
 	private java.lang.String stopX;
 	//所属部门
 	private String departId;
+	//创建人
+	private String createUserId;
+	//创建时间
+	private Date createTime;
 	
 	@Column(name ="BUSINESS_TYPE",nullable=true,length=1)
 	public java.lang.String getBusinessType() {
@@ -235,4 +241,23 @@ public class CarInfoEntity implements java.io.Serializable {
 	public void setDepartId(String departId) {
 		this.departId = departId;
 	}
+
+	@Column(name = "create_user_id")
+	public String getCreateUserId() {
+		return createUserId;
+	}
+
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
+	}
+
+	@Column(name = "create_time")
+	public Date getCreateTime() {
+		return createTime;
+	}
+
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
+	}
+	
 }

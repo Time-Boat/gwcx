@@ -14,6 +14,7 @@ import java.util.Map;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 
 @Service("dealerInfoService")
@@ -21,8 +22,8 @@ import org.jeecgframework.web.system.pojo.base.TSDepart;
 public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid) {
-		String sqlWhere = getWhere();
+	public JSONObject getDatagrid(DataGrid dataGrid, String status, String auditStatus) {
+		String sqlWhere = getWhere(status, auditStatus);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_info d join t_s_base_user u on d.create_user_id = u.id join t_s_depart t on t.id = d.departId ";
 		if (!sqlWhere.isEmpty()) {
@@ -66,15 +67,22 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		return jObject;
 	}
 	
-	public String getWhere() {
-
+	public String getWhere(String status, String auditStatus) {
+		
+		StringBuffer sql = new StringBuffer(" where 1=1 ");
+		
+		if(StringUtil.isNotEmpty(status)){
+			sql.append(" and d.status = '" + status + "' ");
+		}
+		
+		if(StringUtil.isNotEmpty(auditStatus)){
+			sql.append(" and d.audit_status = '" + auditStatus + "' ");
+		}
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
 		String orgType = depart.getOrgType();
 		String userId = ResourceUtil.getSessionUserName().getId();
-		
-		StringBuffer sql = new StringBuffer(" where 1=1 ");
 		
 		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
 		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
