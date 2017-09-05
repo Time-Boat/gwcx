@@ -5,7 +5,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
-	<t:datagrid name="transferOrderList" title="接送机订单处理" autoLoadData="true" actionUrl="transferOrderController.do?airdatagrid&lineOrderCode=${lineOrderCode}&orderType=${orderType}" fitColumns="true"
+	<t:datagrid name="transferOrderList" title="接送机订单处理" autoLoadData="true" actionUrl="transferOrderController.do?airdatagrid&lineOrderCode=${lineOrderCode}&orderTypes=${orderType}" fitColumns="true"
 			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>

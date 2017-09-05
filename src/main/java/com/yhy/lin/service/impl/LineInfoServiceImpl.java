@@ -230,7 +230,12 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	public JSONObject getDatagrid2(LineInfoEntity lineInfos, DataGrid dataGrid, String ywlx){
 		
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-		String code = orgCode.substring(0,6);
+		String code="";
+		if(orgCode.length()>6){
+			code = orgCode.substring(0,6);
+		}else{
+			code=orgCode;
+		}
 		
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）

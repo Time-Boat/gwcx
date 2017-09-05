@@ -39,7 +39,6 @@
 	 		}
 	 		$("#jurisdiction").val(names);
 	 		$("#lineIds").val(ids);
-	 		alert(ids);
 		}
 	 	
 	  	var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;

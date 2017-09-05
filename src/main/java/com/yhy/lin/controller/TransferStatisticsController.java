@@ -97,7 +97,7 @@ public class TransferStatisticsController extends BaseController {
 		String lineName = request.getParameter("lineName");
 
 		JSONObject jObject = transferStatisticsServiceI.getrefundDatagrid(transferorder, dataGrid, orderId,orderStartingstation,
-				orderTerminusstation, orderType, lineName);
+				orderTerminusstation, lineName,orderType);
 		responseDatagrid(response, jObject);
 
 	}

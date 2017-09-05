@@ -32,7 +32,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType) {
 		
-		StringBuffer queryCondition = new StringBuffer(" where delete_flag = '0' ");
+		StringBuffer queryCondition = new StringBuffer(" where c.delete_flag = '0' ");
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
@@ -71,12 +71,14 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 			queryCondition.append(" and c.status = '"+status+"' ");
 		}
 		
-		String sqlCnt = "select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID" + queryCondition.toString();
+		String sqlCnt = "select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
+				+ "LEFT JOIN t_s_base_user u on d.create_user_id = u.id " + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select c.*,d.name,d.driving_license,d.id as driverId from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID" + queryCondition.toString());
+	    sql.append("select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id "
+	    		+ "LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on d.create_user_id = u.id " + queryCondition.toString());
 		
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
@@ -90,7 +92,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 							,new Db2Page("status", "status")
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("driverId", "driverId")
-							,new Db2Page("createUserId", "create_user_id")
+							,new Db2Page("username", "username")
 							,new Db2Page("createTime", "create_time")
 							,new Db2Page("businessType", "business_type")
 							,new Db2Page("remark", "remark")

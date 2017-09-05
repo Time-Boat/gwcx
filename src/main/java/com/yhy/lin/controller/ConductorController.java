@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jeecgframework.core.annotation.config.AutoMenuOperation;
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
@@ -188,6 +187,7 @@ public class ConductorController extends BaseController {
 			message = "验票员: " + conductor.getName() + "被添加成功";
 			conductor.setStatus("0");
 			try {
+				conductor.setCreateUserId(user.getId());
 				conductorService.save(conductor);
 				// -----数据修改日志[类SVN]------------
 				Gson gson = new Gson();

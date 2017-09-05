@@ -112,7 +112,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
+	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
 		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
@@ -123,6 +123,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
 				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
 				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3') ");
+		if (StringUtil.isNotEmpty(orderTypes)) {
+			sqlCnt.append(" and  a.order_type= '" + orderTypes + "'");
+		}
 		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
@@ -140,6 +143,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
 						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on "
 						+ "a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3')");
+		
+		if (StringUtil.isNotEmpty(orderTypes)) {
+			sql.append(" and  a.order_type= '" + orderTypes + "'");
+		}
 		
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -179,7 +186,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
+	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
 		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
@@ -351,11 +358,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		// 起点站id
 		if (StringUtil.isNotEmpty(orderStartingstation)) {
-			sql.append(" and  a.order_starting_station_name = '" +orderStartingstation+ "'");
+			sql.append(" and  a.order_starting_station_name like '%" +orderStartingstation+ "%'");
 		}
 		// 终点站id
 		if (StringUtil.isNotEmpty(orderTerminusstation)) {
-			sql.append(" and  a.order_terminus_station_name = '" + orderTerminusstation + "'");
+			sql.append(" and  a.order_terminus_station_name like '%" + orderTerminusstation + "%'");
 		}
 
 		// 申请人
