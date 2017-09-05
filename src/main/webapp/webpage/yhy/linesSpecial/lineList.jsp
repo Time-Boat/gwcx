@@ -20,8 +20,8 @@
 	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
 	<t:dgCol title="创建人" field="username"  query="true" align="center" width="60"></t:dgCol>
-	<t:dgCol title="线路状态" field="status" dictionary="lineStatus"  align="center" width="50"></t:dgCol>
-	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="50"></t:dgCol>
+	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status" query="true" align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="50"></t:dgCol>
 	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
 	<t:dgCol title="预计到达时间" field="lendTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group"  align="center" width="120"></t:dgCol>
@@ -37,7 +37,7 @@
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
 	
-	<t:dgFunOpt funname="addBusStop(id,name)" title="站点管理"></t:dgFunOpt>
+	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
@@ -72,7 +72,21 @@
 		$("input[name='lendTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='lendTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 	});
-	function addBusStop(id,name) {
+	function addBusStop(id,name,status,applicationStatus) {
+		
+		if(applicationStatus==1){
+			tip('初审不能进行站点管理');
+			return;
+		}
+		if(applicationStatus==2){
+			tip('复审不能进行站点管理');
+			return;
+		}
+		if(status==0){
+			tip('已上架线路不能进行站点管理');
+			return;
+		}
+		
 		$("#function-panelAddBusStop").panel(
 			{
 				title :'线路名称：'+name,
@@ -252,5 +266,32 @@
 		url += '&ids='+ids;
 		createwindow(title,url,width,height);
 	}
+	
+	function update(title,url,id,width,height){
+		var rows = $("#lineList2").datagrid("getSelections");
+		if(rows.length==0){
+			tip('请选择一条要修改的线路');
+			return;
+		}
+		if(rows[0].applicationStatus==1){
+			tip('初审不能修改线路');
+			return;
+		}
+		if(rows[0].applicationStatus==2){
+			tip('复审不能修改线路');
+			return;
+		}
+		if(rows[0].status==0){
+			tip('已上架线路不能修改');
+			return;
+		}
+		if(rows.length>1){
+			tip('只能修改一条线路');
+			return;
+		}
+		createwindow(title,url,width,height);
+		
+	}
+	
 	
 </script>

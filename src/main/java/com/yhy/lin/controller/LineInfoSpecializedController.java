@@ -56,6 +56,7 @@ public class LineInfoSpecializedController extends BaseController{
 	
 	@RequestMapping(params="datagrid")
 	public void datagrid(LineInfoEntity lineInfos,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid){
+		String username = request.getParameter("username");
 		String cityid = request.getParameter("cityID");
 		String linetype = request.getParameter("linetype");//线路类型
 		String beginTime = request.getParameter("createTime_begin");//线路创建开始查询时间
@@ -66,7 +67,7 @@ public class LineInfoSpecializedController extends BaseController{
 		String lendTime_end = request.getParameter("lendTime_end");
 		//因为调用的方法一样，所以在外层来处理...   忘记是啥意思了。。。
 		linetype = " >='"+linetype+"' ";
-		JSONObject jObject  = lineInfoService.getDatagrid3(lineInfos,cityid,beginTime,endTime,dataGrid,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,linetype);
+		JSONObject jObject  = lineInfoService.getDatagrid3(lineInfos,cityid,beginTime,endTime,dataGrid,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,linetype,username);
         responseDatagrid(response, jObject);
 	}
 	
@@ -75,6 +76,7 @@ public class LineInfoSpecializedController extends BaseController{
 	 */
 	@RequestMapping(params="userdatagrid")
 	public void userdatagrid(LineInfoEntity lineInfos,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid){
+		
 		JSONObject jObject  = lineInfoService.getDatagrid4(lineInfos,dataGrid);
         responseDatagrid(response, jObject);
 	}
@@ -298,16 +300,18 @@ public class LineInfoSpecializedController extends BaseController{
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
-		String lineStatus= request.getParameter("id");
+		//String lineStatus= request.getParameter("id");
 		
 		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
 		if(StringUtil.isNotEmpty(line)){
 			line.setApplicationStatus("1");//待审核
-			if(StringUtil.isNotEmpty(lineStatus) || "0".equals(lineStatus)){
+			
+			if("0".equals(line.getStatus())){
 				line.setApplyContent("1");//申请内容
 			}else{
 				line.setApplyContent("0");//申请内容
 			}
+			
 			line.setApplicationTime(AppUtil.getDate());
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 		}
@@ -361,11 +365,11 @@ public class LineInfoSpecializedController extends BaseController{
 				line.setApplicationStatus("2");//初审
 			}else if("2".equals(line.getApplicationStatus())){
 				if("0".equals(line.getStatus())){
-					line.setApplicationStatus("3");//复审
-					line.setStatus("0");//已上架
-				}else if("1".equals(line.getStatus())){
 					line.setApplicationStatus("4");//复审
-					line.setStatus("1");//已下架
+					line.setStatus("1");//已上架
+				}else if("1".equals(line.getStatus())){
+					line.setApplicationStatus("3");//复审
+					line.setStatus("0");//已下架
 				}
 			}
 			line.setApplicationTime(AppUtil.getDate());

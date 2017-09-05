@@ -26,11 +26,11 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	private JdbcDao JdbcDao;
 	
 	@Override
-	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType){
-		String sqlWhere = getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType);
+	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username){
+		String sqlWhere = getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID ";
+		String sqlCnt = "select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID LEFT JOIN t_s_base_user u on a.createUserId=u.ID";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += " where 1=1 " + sqlWhere;
 		}
@@ -58,6 +58,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("deleteFlag", "deleteFlag", null)
 				,new Db2Page("createTime", "createTime", null)
 				,new Db2Page("createPeople", "createPeople", null)
+				,new Db2Page("createUserId", "createUserId", null)
 				,new Db2Page("username", "username", null)
 				,new Db2Page("price", "price", null)
 				,new Db2Page("applyContent", "apply_content", null)
@@ -79,7 +80,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
-			String lendTime_begin,String lendTime_end,String lineType){
+			String lendTime_begin,String lendTime_end,String lineType,String username){
 
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
@@ -92,6 +93,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			sqlWhere.append(" and a.createUserId = '" + userId + "' ");
 		}
 		
+		if(StringUtil.isNotEmpty(lineInfo.getCreateUserId())){
+			sqlWhere.append(" and a.createUserId = '"+lineInfo.getCreateUserId()+"'");
+		}
+		
 		if(StringUtil.isNotEmpty(orgCode)){
 			sqlWhere.append(" and org_code like '"+orgCode+"%'");
 		}
@@ -102,8 +107,16 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if(StringUtil.isNotEmpty(lineInfo.getName())){
 			sqlWhere.append(" and  a.name like '%"+lineInfo.getName()+"%'");
 		}
-		if(StringUtil.isNotEmpty(lineInfo.getCreatePeople())){
-			sqlWhere.append(" and a.createPeople like '%"+lineInfo.getCreatePeople()+"%'");
+		if(StringUtil.isNotEmpty(username)){
+			sqlWhere.append(" and u.username like '%"+username+"%'");
+		}
+		
+		if(StringUtil.isNotEmpty(lineInfo.getStatus())){
+			sqlWhere.append(" and a.status = '"+lineInfo.getStatus()+"'");
+		}
+		
+		if(StringUtil.isNotEmpty(lineInfo.getApplicationStatus())){
+			sqlWhere.append(" and a.application_status = '"+lineInfo.getApplicationStatus()+"'");
 		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getStartLocation())){
@@ -216,9 +229,12 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	@Override
 	public JSONObject getDatagrid2(LineInfoEntity lineInfos, DataGrid dataGrid, String ywlx){
 		
+		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		String code = orgCode.substring(0,6);
+		
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from lineinfo a where a.deleteFlag='0' and type " + ywlx + " ";
+		String sqlCnt = "select count(*) from lineinfo a LEFT JOIN t_s_depart t on a.departId = t.ID where a.deleteFlag='0' and t.org_code like '"+code+"%' and type " + ywlx + " ";
 		if(StringUtil.isNotEmpty(lineInfos.getName())){
 			sqlCnt +=" and a.name like '%"+lineInfos.getName()+"%'";
 		}
@@ -226,7 +242,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
 		sql.append("select a.id,a.name ");
-		sql.append(" from lineinfo a  where type " + ywlx + " and a.deleteFlag='0' ");
+		sql.append(" from lineinfo a LEFT JOIN t_s_depart t on a.departId = t.ID where type " + ywlx + " and a.deleteFlag='0' and t.org_code like '"+code+"%'");
 		if(StringUtil.isNotEmpty(lineInfos.getName())){
 			sql.append(" and a.name like '%"+lineInfos.getName()+"%'");
 		}

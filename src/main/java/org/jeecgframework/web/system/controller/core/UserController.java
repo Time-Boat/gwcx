@@ -372,14 +372,10 @@ public class UserController extends BaseController {
 	 */
 	@RequestMapping(params = "datagrid")
 	public void datagrid(TSUser user,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-        CriteriaQuery cq = new CriteriaQuery(TSUser.class, dataGrid);
-        //查询条件组装器
-        org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
-        
-        List<TSUser> tsList = new ArrayList<TSUser>();
+		
         List<String> tempList = null;
         
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+        String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
         //是不是子公司管理员
   		boolean hasPermission = checkRole(AppGlobals.SUBSIDIARY_ADMIN);
   		//子公司管理员只能看到自己公司的用户
@@ -390,6 +386,10 @@ public class UserController extends BaseController {
   					+ "where d.org_code like '" + orgCode + "%' and u.status!=0 and u.delete_flag=0 ");
   		}
   		
+		CriteriaQuery cq = new CriteriaQuery(TSUser.class, dataGrid);
+        //查询条件组装器
+        org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
+        
         Short[] userstate = new Short[]{Globals.User_Normal, Globals.User_ADMIN, Globals.User_Forbidden};
         
         cq.in("status", userstate);
@@ -408,7 +408,12 @@ public class UserController extends BaseController {
             cq.add(Property.forName("id").in(subCq.getDetachedCriteria()));
         }
 
-
+        
+        //添加额外的过滤条件
+        if(hasPermission){
+        	cq.in("id", tempList.toArray());
+        }
+        
         cq.add();
         this.systemService.getDataGridReturn(cq, true);
         
@@ -416,25 +421,6 @@ public class UserController extends BaseController {
         for (Object o : dataGrid.getResults()) {
             if (o instanceof TSUser) {
                 TSUser cfe = (TSUser) o;
-                
-//                System.out.println("cfe11111: " + cfe.getId());
-//                System.out.println("tempList: " + tempList.contains(cfe.getId()));
-                //如果包含这个id，就将他添加到list中
-                if(tempList != null && tempList.size() > 0 && tempList.contains(cfe.getId())){
-                	tsList.add(cfe);
-                }
-//                if(tempList != null && tempList.size() > 0) {
-//	                for(String userid : tempList){
-//	                	System.out.println(cfe.getId() + "   --------------   " + userid);
-//	                	if(userid.equals(cfe.getId())){
-//	                		System.out.println(userid.equals(cfe.getId()));
-//	                		tsList.add(cfe);
-//	                		break;
-//	                	}
-//	                }
-//	                
-//	                System.out.println();
-//                }
                 
                 if (cfe.getId() != null && !"".equals(cfe.getId())) {
                     List<TSRoleUser> roleUser = systemService.findByProperty(TSRoleUser.class, "TSUser.id", cfe.getId());
@@ -449,12 +435,6 @@ public class UserController extends BaseController {
                 }
                 cfeList.add(cfe);
             }
-        }
-        
-	    //修改要显示的数据为之前过滤的数据
-        if(hasPermission){
-//        	dataGrid.setTotal(tsList.size());
-        	dataGrid.setResults(tsList);
         }
         
         TagUtil.datagrid(response, dataGrid);
