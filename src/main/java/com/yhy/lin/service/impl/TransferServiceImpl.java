@@ -376,10 +376,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and order_status in('1', '2', '6', '0')");
 		}
 		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
-			sql.append(" and lb.lineId=l.id");	
+			sql.append(" and lb.lineId=l.id");
+			sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),lb.siteOrder,order_startime desc");
+		}else{
+			sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),order_startime desc");
 		}
-		
-		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),lb.siteOrder,order_startime desc");
 
 		return sql.toString();
 	}
