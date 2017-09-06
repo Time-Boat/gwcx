@@ -169,9 +169,11 @@ public class TransferStatisticsController extends BaseController {
 			} else {
 				sumorder = 0;
 			}
-
 			BigDecimal bsum = (BigDecimal) ob[1];
-			sumPrice=sumPrice.add(bsum);
+			if(bsum != null){
+				sumPrice = sumPrice.add(bsum);
+			}
+			
 		} else {
 			sumorder = 0;
 		}

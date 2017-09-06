@@ -111,11 +111,7 @@
 			<td align="right"><label class="Validform_label"> 年龄: </label></td>
 			<td class="value"><input class="inputxt" name="age" value="${conductor.age}" datatype="n" errormsg="年龄格式不正确!"> <span class="Validform_checktip"></span></td>
 		</tr>
-		<tr>
-			<td align="right"><label class="Validform_label"> 创建日期: </label></td>
-			<td class="value"><input name="createDate" class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px"
-				value="<fmt:formatDate value='${conductor.createDate }' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>" errormsg="日期格式不正确!"  datatype="*"> <span class="Validform_checktip"></span></td>
-		</tr>
+		
 		<tr>
 			<td align="right"><label class="Validform_label"> 性别: </label></td>
 			<td class="value"><t:dictSelect field="sex" typeGroupCode="sex" hasLabel="false" defaultVal="${conductor.sex}" datatype="*"></t:dictSelect> <span class="Validform_checktip"></span></td>

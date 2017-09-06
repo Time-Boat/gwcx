@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.ConductorEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.service.ConductorServiceI;
@@ -166,7 +167,9 @@ public class ConductorController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		TSUser user = ResourceUtil.getSessionUserName();
 		conductor.setDepartId(user.getCurrentDepart().getId());
-		conductor.setDeleteFlag((short) 0);// 默认都是为做逻辑删除的数据
+		conductor.setDeleteFlag((short) 0);// 默认都是为做逻辑删除的数据、
+		conductor.setCreateUserId(user.getId());
+		conductor.setCreateDate(AppUtil.getDate());
 		//验票员线路没有添加对应的线路id
 		//System.out.println(lineInfos);
 		if (StringUtil.isNotEmpty(conductor.getId())) {
@@ -187,7 +190,7 @@ public class ConductorController extends BaseController {
 			message = "验票员: " + conductor.getName() + "被添加成功";
 			conductor.setStatus("0");
 			try {
-				conductor.setCreateUserId(user.getId());
+				
 				conductorService.save(conductor);
 				// -----数据修改日志[类SVN]------------
 				Gson gson = new Gson();

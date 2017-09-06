@@ -81,21 +81,20 @@ public interface AppGlobals {
 	public static final String CHECK_PHONE = "^1[34578]\\d{9}$";
 
 	/** 微信第三方支付 */
-
 	/** 退款url */
 	public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 
 	/** 获取access_token url */
 	public static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=%1&appid=%2&secret=%3";
-
-	/** appId */
+	
+	/** 微信appId */
 	public static final String WECHAT_ID = "wx1775577d8050cf73";
+
+	/** 微信第三方唯一凭证密码 */
+	public static final String WECHAT_APP_SECRET = "807e12ebcb667f66820d4b4eb9118467";
 
 	/** 收款商家商户号 */
 	public static final String MCH_ID = "1481189932";
-
-	/** 第三方唯一凭证密码 */
-	public static final String WECHAT_APP_SECRET = "807e12ebcb667f66820d4b4eb9118467";
 
 	/** 收款商户后台进行配置，登录微信商户平台–账户设置–安全设置–api安全，设置32位key值 */
 	public static final String WECHAT_KEY = "GZLYXNYYYYXGS20170601jiesongyewu";

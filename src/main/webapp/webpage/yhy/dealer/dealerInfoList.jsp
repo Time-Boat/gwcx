@@ -234,7 +234,7 @@
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
    <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerInfoController.do?getAttacheList" funname="dealerAllot" operationCode="allotAttache" ></t:dgToolBar> 
    
-   <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true"></t:dgFunOpt>
+   <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true&&status#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt> 
    

@@ -637,47 +637,46 @@ public class AppInterfaceController extends AppBaseController {
 		boolean success = false;
 		String msg = "";
 		String statusCode = "";
-			try {
-				String param = AppUtil.inputToStr(request); 
-				//验证参数
-				JSONObject jsondata = checkParam(param);
-				
-				String orderId = jsondata.getString("orderId");
-				TransferorderEntity t = this.systemService.getEntity(TransferorderEntity.class, orderId);
-				if (t!=null) {
-					//订单已经完成、取消订单完成退款、拒绝退款的订单更改delete_flag
-					if(t.getOrderStatus()==0 || t.getOrderStatus()==4 || t.getOrderStatus()==5){
-						String sql = "update transferorder set delete_flag='1' where id in ('"+orderId+"')";
-						systemService.updateBySqlString(sql.toString());
-						statusCode = AppGlobals.APP_SUCCESS;
-						returnJsonObj.put("success", true);
-						msg = AppGlobals.APP_SUCCESS_MSG;
-					}else if(t.getOrderStatus()==6){
-						systemService.delete(t);
-						returnJsonObj.put("success", true);
-						statusCode = AppGlobals.APP_SUCCESS;
-						msg = AppGlobals.APP_SUCCESS_MSG;
-					}else{
-						statusCode = "666";
-						msg = "订单不能被删除";
-						returnJsonObj.put("success", success);
-					}
+		try {
+			String param = AppUtil.inputToStr(request); 
+			//验证参数
+			JSONObject jsondata = checkParam(param);
+			
+			String orderId = jsondata.getString("orderId");
+			TransferorderEntity t = this.systemService.getEntity(TransferorderEntity.class, orderId);
+			if (t!=null) {
+				//订单已经完成、取消订单完成退款、拒绝退款的订单更改delete_flag
+				if(t.getOrderStatus()==0 || t.getOrderStatus()==4 || t.getOrderStatus()==5){
+					String sql = "update transferorder set delete_flag='1' where id in ('"+orderId+"')";
+					systemService.updateBySqlString(sql.toString());
+					statusCode = AppGlobals.APP_SUCCESS;
+					returnJsonObj.put("success", true);
+					msg = AppGlobals.APP_SUCCESS_MSG;
+				}else if(t.getOrderStatus()==6){
+					systemService.delete(t);
+					returnJsonObj.put("success", true);
+					statusCode = AppGlobals.APP_SUCCESS;
+					msg = AppGlobals.APP_SUCCESS_MSG;
 				}else{
-					statusCode = AppGlobals.SYSTEM_ERROR;
-					msg = AppGlobals.SYSTEM_ERROR_MSG;
+					statusCode = "666";
+					msg = "订单不能被删除";
+					returnJsonObj.put("success", success);
 				}
-				
-				
-			} catch (Exception e) {
+			}else{
 				statusCode = AppGlobals.SYSTEM_ERROR;
 				msg = AppGlobals.SYSTEM_ERROR_MSG;
-				e.printStackTrace();
 			}
-
-			returnJsonObj.put("msg", msg);
-			returnJsonObj.put("code", statusCode);
-			responseOutWrite(response, returnJsonObj);
 			
+			
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		responseOutWrite(response, returnJsonObj);
 	}
 
 	/** 获取用户订单列表 get */

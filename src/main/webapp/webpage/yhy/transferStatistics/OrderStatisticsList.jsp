@@ -23,7 +23,7 @@
 			<t:dgCol title="司机名称" field="driverName" align="center" query="true" width="80"></t:dgCol>
 			<t:dgCol title="车牌号" field="licencePlate" align="center" width="80"></t:dgCol>
 			<t:dgCol title="订单来源渠道" field="account" align="center" width="80"></t:dgCol>
-			<t:dgCol title="订单状态" field="orderStatus" width="80"
+			<t:dgCol title="订单状态" field="orderStatus" width="80" replace="订单已完成_0,待派车_1,带出行_2,取消订单待退款_3"
 				dictionary="orderStatus" query="true"
 				align="center"></t:dgCol>
 			<t:dgCol title="订单数量" field="orderNumbers" align="center" width="80"></t:dgCol>

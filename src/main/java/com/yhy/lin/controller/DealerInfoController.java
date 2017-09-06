@@ -141,6 +141,7 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setScanCount(0);
 			dealerInfo.setStatus("1");
 			dealerInfo.setAuditStatus("-1");
+			dealerInfo.setQrCodeUrl("");
 			
 			dealerInfoService.save(dealerInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);

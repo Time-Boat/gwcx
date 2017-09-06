@@ -114,16 +114,14 @@ public class PasswordUtil {
 		PBEParameterSpec parameterSpec = new PBEParameterSpec(getStaticSalt(), ITERATIONCOUNT);
 		try {
 			Cipher cipher = Cipher.getInstance(ALGORITHM);
-
+			
 			cipher.init(Cipher.DECRYPT_MODE, key, parameterSpec);
-
+			
 			passDec = cipher.doFinal(hexStringToBytes(ciphertext));
-		}
-
-		catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
-		if(passDec == null){
+		if(passDec != null){
 			return new String(passDec);
 		}else{
 			return "";
@@ -183,17 +181,15 @@ public class PasswordUtil {
 	public static void main(String[] args) {
 		int i=10;
 		for (int j = 0; j < i; j++) {
-			if((j)%3==0)
-			{
+			if((j)%3==0){
 				System.out.print("<br>");
-			}
-			else {
+			}else {
 				System.out.print(j);
 			}
 		}
 		System.out.print(-1%2==0);
-		String str = "root";
-		String password = "root";
+		String str = "bc000f9da35481f290f25d832bac0168";
+		String password = "c6088e76c13ab964b3832d3d7161ecc4";
 
 		org.jeecgframework.core.util.LogUtil.info("明文:" + str);
 		org.jeecgframework.core.util.LogUtil.info("密码:" + password);
@@ -205,7 +201,7 @@ public class PasswordUtil {
 			String plaintext = PasswordUtil.decrypt(ciphertext, password, salt);
 			org.jeecgframework.core.util.LogUtil.info("明文:" + plaintext);
 			
-			String result = PasswordUtil.decrypt("ea3d519525358e00", "root", salt);
+			String result = PasswordUtil.decrypt("bc000f9da35481f290f25d832bac0168", "c6088e76c13ab964b3832d3d7161ecc4", salt);
 			org.jeecgframework.core.util.LogUtil.info("明文:" + result);
 		} catch (Exception e) {
 			e.printStackTrace();
