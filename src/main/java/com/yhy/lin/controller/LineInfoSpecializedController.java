@@ -56,6 +56,7 @@ public class LineInfoSpecializedController extends BaseController{
 	
 	@RequestMapping(params="datagrid")
 	public void datagrid(LineInfoEntity lineInfos,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid){
+		String departname = request.getParameter("departname");
 		String username = request.getParameter("username");
 		String cityid = request.getParameter("cityID");
 		String linetype = request.getParameter("linetype");//线路类型
@@ -67,7 +68,7 @@ public class LineInfoSpecializedController extends BaseController{
 		String lendTime_end = request.getParameter("lendTime_end");
 		//因为调用的方法一样，所以在外层来处理...   忘记是啥意思了。。。
 		linetype = " >='"+linetype+"' ";
-		JSONObject jObject  = lineInfoService.getDatagrid3(lineInfos,cityid,beginTime,endTime,dataGrid,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,linetype,username);
+		JSONObject jObject  = lineInfoService.getDatagrid3(lineInfos,cityid,beginTime,endTime,dataGrid,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,linetype,username,departname);
         responseDatagrid(response, jObject);
 	}
 	

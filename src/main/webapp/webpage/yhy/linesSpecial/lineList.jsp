@@ -20,6 +20,7 @@
 	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
 	<t:dgCol title="创建人" field="username"  query="true" align="center" width="60"></t:dgCol>
+	<t:dgCol title="所属公司" field="departname"  query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status" query="true" align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="50"></t:dgCol>

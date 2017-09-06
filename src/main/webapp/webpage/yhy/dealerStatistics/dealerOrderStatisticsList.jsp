@@ -20,7 +20,7 @@
 			<t:dgCol title="线路名称" field="lineName" query="true" align="center"></t:dgCol>
 			<t:dgCol title="线路类型" field="ordertype"
 				replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
-			<t:dgCol title="发车时间" field="orderStartime" align="center"></t:dgCol>
+			<t:dgCol title="发车时间" field="orderStartime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
 			<t:dgCol title="下单联系人" field="realName" align="center"></t:dgCol>
 			<t:dgCol title="乘车联系人" field="orderContactsname" align="center"></t:dgCol>
 			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>

@@ -26,20 +26,22 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	private JdbcDao JdbcDao;
 	
 	@Override
-	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username){
-		String sqlWhere = getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username);
+	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username,String departname){
+		String sqlWhere = getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username,departname);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID LEFT JOIN t_s_base_user u on a.createUserId=u.ID";
+		String sqlCnt = "select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p";
 		if (!sqlWhere.isEmpty()) {
-			sqlCnt += " where 1=1 " + sqlWhere;
+			sqlCnt += " where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code" + sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
 		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username,"
 		 		+ "a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content,"
-		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status");
-		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id=a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID where 1=1 ");
+		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status,p.departname ");
+		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id="
+		 		+ "a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when "
+		 		+ " LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code");
 		 
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -60,6 +62,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("createPeople", "createPeople", null)
 				,new Db2Page("createUserId", "createUserId", null)
 				,new Db2Page("username", "username", null)
+				,new Db2Page("departname", "departname", null)
 				,new Db2Page("price", "price", null)
 				,new Db2Page("applyContent", "apply_content", null)
 				,new Db2Page("lstartTime", "lstartTime", null)
@@ -80,7 +83,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
-			String lendTime_begin,String lendTime_end,String lineType,String username){
+			String lendTime_begin,String lendTime_end,String lineType,String username,String departname){
 
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
@@ -98,7 +101,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		}
 		
 		if(StringUtil.isNotEmpty(orgCode)){
-			sqlWhere.append(" and org_code like '"+orgCode+"%'");
+			sqlWhere.append(" and b.org_code like '"+orgCode+"%'");
 		}
 		if(StringUtil.isNotEmpty(cityid)){
 			sqlWhere.append(" and a.cityId = '"+cityid+"'");
@@ -117,6 +120,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		
 		if(StringUtil.isNotEmpty(lineInfo.getApplicationStatus())){
 			sqlWhere.append(" and a.application_status = '"+lineInfo.getApplicationStatus()+"'");
+		}
+		
+		if(StringUtil.isNotEmpty(departname)){
+			sqlWhere.append(" and  p.departname like '%"+departname+"%'");
 		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getStartLocation())){
