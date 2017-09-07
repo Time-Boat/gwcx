@@ -6,8 +6,10 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.jeecgframework.web.system.service.SystemService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,20 +23,27 @@ import net.sf.json.JSONObject;
 @Transactional
 public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements TransferStatisticsServiceI {
 
+	@Autowired
+	private SystemService systemService;
+	
 	@Override
 	public JSONObject getUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String fc_begin,
 			String fc_end) {
 		String sqlWhere = getWhere(fc_begin, fc_end);
 
 		StringBuffer sql = new StringBuffer();
-		String sqlCnt = "select COUNT(*) from car_customer s  ";
+		String sqlCnt = "select DISTINCT s.id from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id LEFT JOIN t_s_depart t on l.departId=t.ID  ";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
 		}
-		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		List list = this.systemService.findListbySql(sqlCnt);
+		
+		Long iCount = (long) list.size();
 
-		sql.append("select s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,f.account from "
-				+ "car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on f.id=d.dealer_id");
+		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,f.account,"
+				+ "t.org_code from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on"
+				+ " f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id  "
+				+ "LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -82,7 +91,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on "
-				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id ";
+				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN t_s_depart t on l.departId=t.ID";
 
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -94,7 +103,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 						+ "a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_status,a.order_numbers,a.order_totalPrice,fi.account from "
 						+ "transferorder a LEFT JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
 						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id "
-						+ "LEFT JOIN dealer_customer dc on w.open_id = dc.open_id LEFT JOIN dealer_info fi on fi.id=dc.dealer_id");
+						+ "LEFT JOIN dealer_customer dc on w.open_id = dc.open_id LEFT JOIN dealer_info fi on fi.id=dc.dealer_id LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -152,7 +161,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on "
-				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id ";
+				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN t_s_depart t on l.departId=t.ID";
 
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -163,7 +172,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				"select a.refund_completed_time,a.id,a.order_id,l.name as line_name,l.type,a.refund_time,w.real_name,"
 						+ " a.order_contactsname,a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_numbers,a.refund_price "
 						+ " from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on b.licencePlateId "
-						+ " =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id");
+						+ " =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -209,7 +218,15 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	public String getWhere2(String OrderId,String OrderStatus,String lineName, String orderType, String driverName, String fc_begin,
 			String fc_end) {
+		
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
 		StringBuffer sql = new StringBuffer(" where a.order_status not in('4','6') ");
+		
+		if(orgCode.length()>=6){
+			String code = orgCode.substring(0,6);
+			sql.append(" and t.org_code like '"+code+"%'");
+		}
 		
 		//订单编号
 		if (StringUtil.isNotEmpty(OrderId)) {
@@ -244,7 +261,15 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 	public String getWhere(String fc_begin, String fc_end) {
 		StringBuffer sql = new StringBuffer();
 
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
 		sql.append(" where 1=1 ");
+		
+		if(orgCode.length()>=6){
+			String code = orgCode.substring(0,6);
+			sql.append(" and t.org_code like '"+code+"%'");
+		}
+		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and s.create_time between '" + fc_begin + "' and '" + fc_end + "'");
@@ -255,7 +280,15 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	public String getWhere1(String orderId,String orderStartingstation, String orderTerminusstation, String lineName,
 			String orderType) {
+		
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
 		StringBuffer sql = new StringBuffer(" where a.order_status='4' ");
+		
+		if(orgCode.length()>=6){
+			String code = orgCode.substring(0,6);
+			sql.append(" and t.org_code like '"+code+"%'");
+		}
 
 		// 发车时间
 		if (StringUtil.isNotEmpty(orderStartingstation) && StringUtil.isNotEmpty(orderTerminusstation)) {

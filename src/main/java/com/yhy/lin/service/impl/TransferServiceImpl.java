@@ -13,6 +13,7 @@ import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.web.system.service.UserService;
@@ -60,7 +61,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
 				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
-				+ "on l.createUserId=ur.ID where 1=1");
+				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where 1=1");
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
 		}
@@ -73,7 +74,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
-						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id where 1=1");
+						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where 1=1");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -114,6 +115,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Override
 	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
+		
+		//订单类型
+		if (StringUtil.isNotEmpty(orderTypes)) {
+			transferorder.setOrderType(Integer.parseInt(orderTypes));
+		}
 		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
@@ -123,9 +129,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
 				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
 				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3') ");
-		if (StringUtil.isNotEmpty(orderTypes)) {
+		/*if (StringUtil.isNotEmpty(orderTypes)) {
 			sqlCnt.append(" and  a.order_type= '" + orderTypes + "'");
-		}
+		}*/
 		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
@@ -143,10 +149,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
 						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on "
 						+ "a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3')");
-		
-		if (StringUtil.isNotEmpty(orderTypes)) {
-			sql.append(" and  a.order_type= '" + orderTypes + "'");
-		}
 		
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -188,6 +190,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Override
 	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
+		
+		//订单类型
+		if (StringUtil.isNotEmpty(orderTypes)) {
+			transferorder.setOrderType(Integer.parseInt(orderTypes));
+		}
+		
 		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
@@ -299,25 +307,23 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			}
 		}
 	
-	public String getWhere(TransferorderEntity transferorder,String lineOrderCode, String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
+	public String getWhere(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
 			String ddTime_end) {
 		StringBuffer sql = new StringBuffer();// 不需要显示退款状态的订单
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-				
-		TSUser user =ResourceUtil.getSessionUserName();
-		String roles =userService.getUserRole(user);
-		String a[] = roles.split(",");
-		// 添加了权限
-		for (int i = 0; i < a.length; i++) {
-			String role = a[i];
-			if(AppGlobals.OPERATION_MANAGER.equals(role)){
-				if (StringUtil.isNotEmpty(user.getId())) {
-					sql.append(" and l.createUserId='"+user.getId()+"'");
-				}
-			}else{
-				sql.append(" and t.org_code like '" + orgCode + "%' ");
-			}
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and l.createUserId = '" + userId + "' ");
+			sql.append(" and a.order_history = '0' ");
 		}
+		
+		sql.append(" and t.org_code like '" + orgCode + "%' ");
+		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
@@ -378,21 +384,32 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}else{
 			sql.append(" and order_status in('1', '2', '6', '0')");
 		}
-		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
-			sql.append(" and lb.lineId=l.id");
-			sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),lb.siteOrder,order_startime desc");
-		}else{
-			sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),order_startime desc");
-		}
-
+		
+		sql.append(" and lb.lineId=l.id ");
+		
+		sql.append(" ORDER BY FIELD(order_status,1,2,3,4,5,6,7,0),lb.siteOrder,order_startime desc");
+		
 		return sql.toString();
 	}
 	
 	public String getWhere3(TransferorderEntity transferorder,String cityid,String lineId,String lineOrderCode,String lineType) {
 
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
+		
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
 		StringBuffer sql = new StringBuffer(" where t.org_code like '" + orgCode + "%' ");
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and l.createUserId = '" + userId + "' ");
+			sql.append(" and a.order_history = '0' ");
+		}
+		
 		//所属城市
 		if (StringUtil.isNotEmpty(cityid)) {
 			sql.append(" and  a.city_id = '" + cityid + "'");

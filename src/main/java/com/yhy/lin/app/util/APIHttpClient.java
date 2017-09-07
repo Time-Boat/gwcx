@@ -211,8 +211,12 @@ public class APIHttpClient {
         	status = 3;
         } finally {
         	try {
-				is.close();
-				fileOutputStream.close();
+        		if(is != null){
+        			is.close();
+        		}
+        		if(fileOutputStream != null){
+        			fileOutputStream.close();
+        		}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

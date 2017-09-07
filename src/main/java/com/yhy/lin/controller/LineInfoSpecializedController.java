@@ -92,10 +92,11 @@ public class LineInfoSpecializedController extends BaseController{
 		//获取部门信息
 		List<TSDepart> departList = systemService.getList(TSDepart.class);
 		req.setAttribute("departList", departList);	
+		String id = req.getParameter("id");
 		
 		//修改线路
-		if (StringUtil.isNotEmpty(lineInfo.getId())) {
-			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, lineInfo.getId());
+		if (StringUtil.isNotEmpty(id)) {
+			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, id);
 			req.setAttribute("lineInfo", lineInfo);
 			req.setAttribute("startList",getStartLocation(lineInfo.getCityId(),lineInfo.getType()));
 			req.setAttribute("endList",getEndLocation(lineInfo.getCityId(),lineInfo.getType(),lineInfo.getStartLocation()));

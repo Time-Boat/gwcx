@@ -139,16 +139,24 @@ public class BaseController {
   	}	
   	
   	/**
-	 * 检查角色是否有传入的参数权限权限
+	 * 检查用户是否有传入的参数权限权限
 	 * @param role 角色权限
 	 */
   	public boolean checkRole(String role){
+		TSUser user = ResourceUtil.getSessionUserName();
+		return checkRole(user, role);
+  	}
+  	
+  	/**
+	 * 检查用户是否有传入的参数权限权限
+	 * @param role 角色权限
+	 */
+  	public boolean checkRole(TSUser user, String role){
   		
   		//是不是平台审核员
   		boolean hasPermission = false;
   		
   		//根据角色的不同来判断到底是初审还是复审，运营专员只能进行初审，平台审核员能进行复审，优先进行平台审核员的判断
-		TSUser user = ResourceUtil.getSessionUserName();
 		String roles = userService.getUserRole(user);
 		String a[] = roles.split(",");
 		

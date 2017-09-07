@@ -208,6 +208,7 @@
 		}
 		
 	</script>
+	<a hidden="true" id="downloadCode" download ></a>
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" queryMode="group">
    <t:dgCol title="编号" field="id" hidden="true" ></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>

@@ -113,7 +113,9 @@ public class TransferStatisticsController extends BaseController {
 		String fc_begin = request.getParameter("createTime_begin");
 		String fc_end = request.getParameter("createTime_end");
 		StringBuffer orsql = new StringBuffer();
-		orsql.append("select COUNT(*) from car_customer s ");
+		orsql.append("select DISTINCT s.id from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f "
+				+ "on f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id LEFT "
+				+ "JOIN t_s_base_user u on l.createUserId =u.ID LEFT JOIN t_s_user_org o on u.ID=o.user_id LEFT JOIN t_s_depart t on o.org_id=t.ID ");
 		
 		if (!transferStatisticsServiceI.getWhere(fc_begin, fc_end).isEmpty()) {
 			orsql.append(transferStatisticsServiceI.getWhere(fc_begin,fc_end));
@@ -121,8 +123,7 @@ public class TransferStatisticsController extends BaseController {
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 		int sumUser = 0;
 		if (mlist.size() > 0) {
-			BigInteger ob = (BigInteger) mlist.get(0);
-			sumUser = ob.intValue();
+			 sumUser = mlist.size();
 		} else {
 			sumUser = 0;
 		}
@@ -151,7 +152,7 @@ public class TransferStatisticsController extends BaseController {
 		orsql.append(
 				"select SUM(a.order_numbers) as sum_order,SUM(a.order_totalPrice) as sum_price from transferorder a LEFT"
 						+ " JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
-						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id ");
+						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!transferStatisticsServiceI.getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin, fc_end)
 				.isEmpty()) {
 			orsql.append(transferStatisticsServiceI.getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin,
@@ -200,7 +201,7 @@ public class TransferStatisticsController extends BaseController {
 		resql.append(
 				"select  SUM(a.order_numbers),SUM(a.refund_price ) from transferorder a LEFT JOIN order_linecardiver b "
 						+ "on a.id=b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left "
-						+ "join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id");
+						+ "join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName, orderType)
 				.isEmpty()) {
 			resql.append(transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName,

@@ -36,17 +36,16 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
-		String orgType = depart.getOrgType();
+		/*String orgType = depart.getOrgType();
 		String userId = ResourceUtil.getSessionUserName().getId();
 		
 		
 		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
 		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
 			queryCondition.append(" and c.create_user_id = '" + userId + "' ");
-		}
+		}*/
 		
 		queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
-		
 		
 		if(StringUtil.isNotEmpty(userCar)){
 			queryCondition.append(" and c.status = '" + userCar + "' ");

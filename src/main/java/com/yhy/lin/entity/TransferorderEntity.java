@@ -77,6 +77,17 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private Date lastAuditDate;//复审时间
 	
+	private String orderHistory;//历史订单（就是该订单绑定的运营专员已经被注销了）   0：否    1：是
+	
+	@Column(name = "order_history")
+	public String getOrderHistory() {
+		return orderHistory;
+	}
+
+	public void setOrderHistory(String orderHistory) {
+		this.orderHistory = orderHistory;
+	}
+
 	@Column(name = "first_audit_status")
 	public String getFirstAuditStatus() {
 		return firstAuditStatus;

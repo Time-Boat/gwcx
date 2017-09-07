@@ -328,9 +328,9 @@ public class LineInfoController extends BaseController {
 				message = "线路修改成功！";
 				// -----数据修改日志[类SVN]------------
 				Gson gson = new Gson();
-				systemService.addDataLog("lineInfo", l.getId(), gson.toJson(l));
-				// -----数据修改日志[类SVN]------------
-				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
+				//systemService.addDataLog("lineInfo", l.getId(), gson.toJson(l));
+				// -----数据修改日志[类SVN]------------    报错，不知道什么鬼，注释掉
+				//systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 			} catch (Exception e) {
 				message = "线路修改失败！";
 				j.setSuccess(false);

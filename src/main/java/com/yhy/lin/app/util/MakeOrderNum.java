@@ -24,13 +24,13 @@ public class MakeOrderNum {
 	private static int maxPerMSECSize = 1000;
 	
 	/**订单号生成前缀*/
-	// 接机
+	/** 接机*/
 	public static final String AIRPORT_TO_DESTINATION_ORDER = "JA";
-	// 送机
+	/** 送机*/
 	public static final String DESTINATION_TO_AIRPORT_ORDER = "SA";
-	// 接火车
+	/** 接火车*/
 	public static final String TRAIN_TO_DESTINATION_ORDER = "JR";
-	// 送火车
+	/** 送火车*/
 	public static final String DESTINATION_TO_TRAIN_ORDER = "SR";
 
 	// 班车
@@ -39,8 +39,7 @@ public class MakeOrderNum {
 	/**
 	 * 生成非重复订单号，理论上限1毫秒1000个，可扩展
 	 * 
-	 * @param tname
-	 *            测试用
+	 * @param type
 	 */
 	public static String makeOrderNum(String type) {
 		// 最终生成的订单号

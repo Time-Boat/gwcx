@@ -289,12 +289,21 @@ public class UserController extends BaseController {
 			j.setMsg(message);
 			return j;
 		}
-		String lockValue=req.getParameter("lockvalue");
+		String lockValue = req.getParameter("lockvalue");
 
 		user.setStatus(new Short(lockValue));
 		try{
-		userService.updateEntitie(user);
+			userService.updateEntitie(user);
 		if("0".equals(lockValue)){
+			
+			//有没有运营专员这个角色
+			boolean hasPermission = checkRole(user, AppGlobals.OPERATION_SPECIALIST);
+			if(hasPermission){
+				//将所有关联这个用户的订单状态(order_history)改为1  (历史订单)
+				int c = userService.executeSql("update Transferorder set order_history='1' where line_id in (select id from lineinfo where createUserId=?)", id);
+				logger.info("锁定用户成功，将" + c + "条订单状态改变为历史订单数据");
+			}
+			
 			message = "用户：" + user.getUserName() + "锁定成功!";
 		}else if("1".equals(lockValue)){
 			message = "用户：" + user.getUserName() + "激活成功!";

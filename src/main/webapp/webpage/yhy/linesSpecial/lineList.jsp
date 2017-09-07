@@ -110,7 +110,6 @@
 		$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);
 	});
 	
-	
 	function lookLine(id, name) {
 		createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id=" + id,"1200px","800px");
 	}
@@ -290,6 +289,9 @@
 			tip('只能修改一条线路');
 			return;
 		}
+		
+		url=url+"&id="+rows[0].id;
+		
 		createwindow(title,url,width,height);
 		
 	}

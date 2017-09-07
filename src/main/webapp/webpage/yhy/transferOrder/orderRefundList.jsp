@@ -37,6 +37,7 @@
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="agreeRefund(id,orderTotalPrice)" title="同意" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="rejectRefund(id)" title="拒绝" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#5" funname="lookRejectReason(id)" title="查看原因" ></t:dgFunOpt> --%>
+		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgToolBar>
 		<t:dgToolBar title="批量同意" icon="icon-edit" url="orderRefundController.do?doAgreeALLSelect" funname="AgreeALLSelect"></t:dgToolBar>
 		<%-- <t:dgToolBar title="批量拒绝" icon="icon-edit" url="" funname="RefuseALLSelect"></t:dgToolBar> --%>
 	</t:datagrid>
@@ -195,6 +196,13 @@
 			tip("请选择需要批量同意退款的数据！");
 			return;
 		}
+	    
+	    for(var i=0;i<rows.length;i++){
+	    	if (rows[i].orderStatus == 4) {
+				tip("已退款的订单不能再进行退款操作！");
+				return;
+			}
+	    }
 	    
 	    refundBegin();
 	    
