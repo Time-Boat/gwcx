@@ -14,11 +14,11 @@
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
 	
 	<t:dgCol title="线路类型" field="type" replace="公务班车_0,接送包车_1,接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="50"></t:dgCol>
-	<t:dgCol title="出车时间段" field="dispath" dictionary="dispathtime" align="center" width="90"></t:dgCol>
+	<%--<t:dgCol title="出车时间段" field="dispath" dictionary="dispathtime" align="center" width="90"></t:dgCol> --%>
 	<%--
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
-	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> --%>
-	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>
+	<t:dgCol title="线路状态" field="status" replace="启用_0,未启用_1"  align="center" width="60"></t:dgCol> 
+	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>--%>
 	<t:dgCol title="创建人" field="username"  query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="所属公司" field="departname"  query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="50"></t:dgCol>
@@ -31,12 +31,13 @@
 	 
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="50"></t:dgCol>
 	<t:dgCol title="所在城市" field="city"  align="center" width="60"></t:dgCol>
-	 <t:dgCol title="线路备注" field="remark"  align="center" width="50"></t:dgCol>
+	 <%--<t:dgCol title="线路备注" field="remark"  align="center" width="50"></t:dgCol>--%>
 	<t:dgCol title="操作" field="opt" width="200"></t:dgCol>
 
 	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
+	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail" height="500"></t:dgToolBar>
 	
 	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
@@ -295,6 +296,29 @@
 		createwindow(title,url,width,height);
 		
 	}
+	/* 
+	function detail(title,url,id,width,height){
+		/* var rows = $("#lineList2").datagrid("getSelections");
+		url=url+"&id="+rows[0].id;
+		createwindow(title,url,'800px','600px'); 
+		detail(title,url,'lineList2',null,600)
+	} 
+	*/
+	function detail(title,url, id,width,height) {
+		var rowsData = $('#'+id).datagrid('getSelections');
+		
+		if (!rowsData || rowsData.length == 0) {
+			tip('请选择查看项目');
+			return;
+		}
+		if (rowsData.length > 1) {
+			tip('请选择一条记录再查看');
+			return;
+		}
+	    url += '&load=detail&id='+rowsData[0].id;
+		createdetailwindow(title,url,width,600);
+	}
+	
 	
 	
 </script>

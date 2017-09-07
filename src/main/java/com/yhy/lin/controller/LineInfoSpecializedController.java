@@ -20,11 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.gson.JsonObject;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
-import com.yhy.lin.entity.Line_busStopEntity;
+import com.yhy.lin.entity.LineInfoView;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.LineInfoServiceI;
 
@@ -104,6 +103,24 @@ public class LineInfoSpecializedController extends BaseController{
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/linesSpecial/lineAdd");
+	}
+	
+	/**
+	 * 查看线路详情
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "linedetail")
+	public ModelAndView linedetail(HttpServletRequest request) {
+		String id = request.getParameter("id");
+		if (StringUtil.isNotEmpty(id)) {
+			LineInfoView view = lineInfoService.getDetail(id);
+			if (view != null) {
+				request.setAttribute("View", view);
+			}
+		}
+		
+		return new ModelAndView("yhy/linesSpecial/lineDetial");
 	}
 	
 	
@@ -270,7 +287,6 @@ public class LineInfoSpecializedController extends BaseController{
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unused")
 	@RequestMapping(params = "lineMap")
 	public ModelAndView lineMap(LineInfoEntity lineInfo, HttpServletRequest req) {
 		//获取部门信息

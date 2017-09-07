@@ -44,7 +44,7 @@
         #panel {
             position: fixed;
             background-color: white;
-            max-height: 90%;
+            max-height: 100%;
             overflow-y: auto;
             top: 36px;
             left: 58px;
@@ -52,6 +52,35 @@
             z-index: 9999;
         }
         
+        .amap-lib-driving .planTitle {
+		    position: relative;
+		    padding: 2px 8px;
+		    border-top: 1px solid #e6e6e6;
+		    border-bottom: 1px solid #e6e6e6;
+		    background: #fafafa;
+		    font-size: 14px;
+		    cursor: pointer;
+		    border: 1px solid silver;
+		}
+		
+	.tabtop13 td{
+		background-color:#ffffff;
+		height:25px;
+		line-height:150%;
+	}
+	.font-center{ text-align:center}
+	.btbg{background:#e9faff !important;}
+	.btbg2{background:#f3f3f3 !important;}
+	.titfont {
+		
+		font-family: 微软雅黑;
+		font-size: 16px;
+		font-weight: bold;
+		color: #255e95;
+		background: url(../images/ico3.gif) no-repeat 15px center;
+		background-color:#e9faff;
+	}
+
 	  </style>
 	  <title>站点信息</title>
 	</head>
@@ -59,7 +88,10 @@
    	<input type="hidden" id="stations" name="stations" value="${stations}" />
     	
     <div id="container" tabindex="0" style="height:100%;" >
-    	<div id="panel"></div>
+    	<div id="panel">
+   				<table id="stationTable" width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#cccccc" class="tabtop13" align="center">
+				</table>
+    	</div>
     </div>
 	
     <!-- script必须放在body中。。 -->
@@ -68,6 +100,16 @@
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
+    
+	    function loadTable(stations){
+			var td = '<tr><td class="btbg font-center titfont" ></td><td class="btbg font-center titfont" >站点</td></tr>';
+				td += '<tr><td class="btbg2 font-center">起点</td><td class="font-center">' + stations[0].name + '</td></tr>';
+			for(var i=1;i<stations.length-1;i++){
+				td += '<tr><td class="btbg2 font-center">途经点</td><td class="font-center">' + stations[i].name + '</td></tr>';
+        	}
+				td += '<tr><td class="btbg2 font-center">终点</td><td class="font-center">' + stations[stations.length-1].name + '</td></tr>';
+			$('#stationTable').append(td);
+		}
     
     	//地图对象
     	var map;
@@ -99,8 +141,8 @@
        	     	hideMarkers: true,   //设置隐藏路径规划的起始点图标
         		showTraffic: false,  //设置是否显示实时路况信息
         		autoFitView: true,   //是否自动调整地图视野
-       	        map: map,
-       	    	panel: 'panel'   	 //结果列表的HTML容器id或容器元素
+       	        map: map
+       	    	//,panel: 'panel'   	 //结果列表的HTML容器id或容器元素
        	    };
         	//起点坐标
         	var origin = new AMap.LngLat(obj[0].x, obj[0].y);
@@ -132,6 +174,8 @@
         		createMarker(new AMap.LngLat(obj[i].x, obj[i].y), obj[i].name, passContent);
         	}
         	
+        	loadTable(obj);
+        	
         	console.log(opts);
         	
         	createMarker(new AMap.LngLat(obj[0].x, obj[0].y), obj[0].name, qcontent);
@@ -151,6 +195,8 @@
 			//afterLoad();
        	}
         
+    	
+    	
        	//打开窗体
        	function openInfoWin(content, position) {
        		infoWindow.setContent('<p class="my-desc">' + content + '</p>');//点击以后窗口展示的内容

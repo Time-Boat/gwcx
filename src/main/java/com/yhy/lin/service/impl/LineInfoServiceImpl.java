@@ -1,20 +1,21 @@
 package com.yhy.lin.service.impl;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.LineInfoEntity;
+import com.yhy.lin.entity.LineInfoView;
 import com.yhy.lin.service.LineInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -22,8 +23,6 @@ import net.sf.json.JSONObject;
 @Service("LineInfoServiceI")
 @Transactional//声明所有方法都需要事务管理
 public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoServiceI {
-	@Autowired
-	private JdbcDao JdbcDao;
 	
 	@Override
 	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username,String departname){
@@ -297,6 +296,80 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
+	}
+
+	@Override
+	public LineInfoView getDetail(String id) {
+		
+		StringBuffer sql = new StringBuffer();
+		/*
+		 * sql.append(
+		 * "select a.id,a.order_id as orderId,a.order_type as orderType,a.order_status as orderStatus,a.order_flightnumber as orderFlightnumber,a.order_starting_station_id,a.order_terminus_station_id,"
+		 * ); sql.append(
+		 * "a.order_startime as orderStartime,a.order_expectedarrival as orderExpectedarrival,a.order_unitprice as orderUnitprice,a.order_numbers as orderNumbers,a.order_paytype as orderPaytype,a.order_contactsname as orderContactsname,"
+		 * ); sql.append(
+		 * "a.order_contactsmobile as orderContactsmobile,a.order_paystatus as orderPaystatus,a.order_trainnumber as orderTrainnumber,a.order_totalPrice as orderTotalPrice,d.name as driverName,d.phoneNumber as driverMobile,c.licence_plate as licencePlate,c.status as CarStatus,a.applicationTime "
+		 * ); sql.append(
+		 * " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id "
+		 * );
+		 */
+		sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username,a.imageurl,a.type,"
+				+ "a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content,a.lineNumber,a.departId,"
+				+ "a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as "
+				+ "endname,a.application_status,p.departname from lineinfo a inner join t_s_depart b on a.departId =b.ID left join "
+				+ "cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id="
+				+ "a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN "
+				+ "t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else "
+				+ "substring(t.org_code,1,6) END)=p.org_code and a.id='"+id+"'");
+		
+		List<Object[]> list = findListbySql(sql.toString());
+		LineInfoView lineInfoView = new LineInfoView();
+		if (list.size() > 0) {
+			Object[] obj = list.get(0);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				lineInfoView.setCityId(String.valueOf(obj[0]));
+				lineInfoView.setCityName(String.valueOf(obj[1]));
+				lineInfoView.setId(String.valueOf(obj[2]));
+				lineInfoView.setName(String.valueOf(obj[3]));
+				lineInfoView.setStartLocation(String.valueOf(obj[4]));
+				lineInfoView.setEndLocation(String.valueOf(obj[5]));
+				lineInfoView.setCreateUserId(String.valueOf(obj[6]));
+				lineInfoView.setCreatePeople(String.valueOf(obj[7]));
+				lineInfoView.setImageurl(String.valueOf(obj[8]));
+				lineInfoView.setType(String.valueOf(obj[9]));
+				lineInfoView.setStatus(String.valueOf(obj[10]));
+				lineInfoView.setRemark(String.valueOf(obj[11]));
+				lineInfoView.setDeleteFlag((short)Integer.parseInt(obj[12].toString()));
+				if (obj[13] != null) {
+					lineInfoView.setCreateTime(sdf.parse(obj[13].toString()));
+				}
+				lineInfoView.setCreatePeople(String.valueOf(obj[14]));
+				lineInfoView.setPrice(new BigDecimal(obj[15].toString()));
+				lineInfoView.setApplyContent(String.valueOf(obj[16]));
+				lineInfoView.setLineNumber(String.valueOf(obj[17]));
+				lineInfoView.setDepartId(String.valueOf(obj[18]));
+				if (obj[19] != null) {
+					lineInfoView.setLstartTime(sdf.parse(obj[19].toString()));
+				}
+				if (obj[20] != null) {
+					lineInfoView.setLendTime(sdf.parse(obj[20].toString()));
+				}
+				lineInfoView.setLineTimes(String.valueOf(obj[21]));
+				lineInfoView.setSettledCompanyId(String.valueOf(obj[22]));
+				lineInfoView.setSettledCompanyName(String.valueOf(obj[23]));
+				lineInfoView.setDispath(String.valueOf(obj[24]));
+				lineInfoView.setStartName(String.valueOf(obj[25]));
+				lineInfoView.setEndName(String.valueOf(obj[26]));
+				lineInfoView.setApplicationStatus(String.valueOf(obj[27]));
+				lineInfoView.setCompanyName(String.valueOf(obj[28]));
+				
+			} catch (Exception e) {
+			}
+			}
+		
+		// TODO Auto-generated method stub
+		return lineInfoView;
 	}
 	
 }
