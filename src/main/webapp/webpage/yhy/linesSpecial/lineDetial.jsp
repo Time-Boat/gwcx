@@ -101,18 +101,7 @@
 					<t:dictSelect field="applyContent" typeGroupCode="apply_type" hasLabel="false" defaultVal="${View.applyContent}"></t:dictSelect>				  
 				</td>
 			</tr>
-			<tr>	
-				
-				<td align="right">
-					<label class="Validform_label">申请时间：</label>
-				</td>
-				
-				<td class="value">
-					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="applicationTime" name="applicationTime" 
-					value="<fmt:formatDate value='${View.applicationTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
-				</td>
-				
-			<tr>
+			
 			<tr>
 				
 				<td align="right">
@@ -170,20 +159,33 @@
 				</td>
 				
 			</tr>
+			
+			<tr>	
+				
+				<td align="right">
+					<label class="Validform_label">申请时间：</label>
+				</td>
+				
+				<td class="value" colspan="3">
+					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="applicationTime" name="applicationTime" 
+					value="<fmt:formatDate value='${View.applicationTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
+				</td>
+				
+			<tr>
 			<tr>
 				<td align="right">
 					<label class="Validform_label">初审被拒绝的原因：</label>
 				</td>
-				<td class="value">
-					<textarea id="trialReason" name="trialReason" cols="50" rows="3">${View.trialReason}</textarea>						  
+				<td colspan="3">
+					<textarea id="trialReason" name="trialReason" cols="82" rows="3">${View.trialReason}</textarea>						  
 				</td>
 			</tr>
 			<tr>
 				<td align="right">
 					<label class="Validform_label">复审被拒绝的原因：</label>
 				</td>
-				<td class="value">
-					<textarea id="reviewReason" name="reviewReason" cols="50" rows="3">${View.reviewReason}</textarea>							  
+				<td class="value" colspan="3">
+					<textarea id="reviewReason" name="reviewReason" cols="82" rows="3">${View.reviewReason}</textarea>							  
 				</td>
 				
 			</tr>
@@ -191,8 +193,8 @@
 				<td align="right">
 					<label class="Validform_label">备注：</label>
 				</td>
-				<td class="value">
-					<textarea id="remark" name="remark" cols="50" rows="3">${View.remark}</textarea>					  
+				<td class="value" colspan="3">
+					<textarea id="remark" name="remark" cols="82" rows="3">${View.remark}</textarea>					  
 				</td>
 				
 			</tr>

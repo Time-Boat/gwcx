@@ -25,6 +25,7 @@
 		<t:dgCol title="单价(人/元)" field="orderUnitprice" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
+		
 		<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
 		

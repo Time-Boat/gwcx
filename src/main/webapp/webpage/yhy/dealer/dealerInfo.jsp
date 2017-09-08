@@ -8,7 +8,7 @@
   <script type="text/javascript">
   
 	var b = true;
-	//验证手机号是否已经被占用
+	//验证信用代码是否已经被占用
 	function checkCreditCode(creditCode){
 		
 		$.ajax({

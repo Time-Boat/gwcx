@@ -416,7 +416,6 @@ public class UserController extends BaseController {
 
             cq.add(Property.forName("id").in(subCq.getDetachedCriteria()));
         }
-
         
         //添加额外的过滤条件
         if(hasPermission){

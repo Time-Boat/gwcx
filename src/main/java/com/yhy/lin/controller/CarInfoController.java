@@ -87,12 +87,13 @@ public class CarInfoController extends BaseController {
 		String carType = request.getParameter("carType");
 		String status = request.getParameter("status");
 		String businessType = request.getParameter("businessType");
+		String carAndDriver = request.getParameter("carAndDriver");
 		
 		if(StringUtil.isNotEmpty(operation)){
 			businessType = operation;
 		}
 		
-		JSONObject jObject = carInfoService.getDatagrid(dataGrid, userCar, lpId, licencePlate, carType, status, businessType);
+		JSONObject jObject = carInfoService.getDatagrid(dataGrid, userCar, lpId, licencePlate, carType, status, businessType,carAndDriver);
 		
 		responseDatagrid(response, jObject);
 		

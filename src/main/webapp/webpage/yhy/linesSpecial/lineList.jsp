@@ -65,6 +65,23 @@
 </div>
 
 <script type="text/javascript">
+
+	$(function() {
+		$('#lineList2').datagrid({   
+	    	rowStyler:function(index,row){
+	    		if (row.applicationStatus=="0"){   
+	            	return 'color:red';   
+	        	}
+	        	if (row.applicationStatus=="1"){   
+	            	return 'color:#29B6F6';   
+	        	}
+	        	if (row.applicationStatus=="2"){   
+	            	return 'color:#5400FF';   
+	        	}
+	    	}   
+		});
+	});
+
 	$(document).ready(function(){
 		$("input[name='createTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='createTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});

@@ -30,7 +30,7 @@ import org.jeecgframework.web.system.pojo.base.TSDepart;
 public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType) {
+	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType,String carAndDriver) {
 		
 		StringBuffer queryCondition = new StringBuffer(" where c.delete_flag = '0' ");
 		
@@ -44,8 +44,16 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
 			queryCondition.append(" and c.create_user_id = '" + userId + "' ");
 		}*/
-		
-		queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
+		if(orgCode.length()>6){
+			String code = orgCode.substring(0, 6);
+			if("1".equals(carAndDriver)){
+				queryCondition.append(" and t.org_code like '" + code + "%' ");
+			}else{
+				queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
+			}
+		}else{
+			queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
+		}
 		
 		if(StringUtil.isNotEmpty(userCar)){
 			queryCondition.append(" and c.status = '" + userCar + "' ");
@@ -151,7 +159,5 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		}
 		return dList;
 	}
-	
-	
-	
+
 }

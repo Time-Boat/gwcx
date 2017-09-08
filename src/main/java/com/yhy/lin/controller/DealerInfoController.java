@@ -395,8 +395,7 @@ public class DealerInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		try {
 			String creditCode = request.getParameter("creditCode");
-			List<DealerInfoEntity> list = this.systemService.findByProperty(DealerInfoEntity.class, "creditCode",
-					creditCode);
+			List<DealerInfoEntity> list = this.systemService.findHql("from DealerInfoEntity where creditCode=? and status !=2 ", creditCode);
 			if (list.size() > 0) {
 				message = "公司社会信用代码已经存在";
 				success = false;

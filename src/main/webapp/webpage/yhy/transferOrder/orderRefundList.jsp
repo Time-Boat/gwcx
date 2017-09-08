@@ -13,14 +13,14 @@
 		<t:dgCol title="订单类型" field="orderType" dictionary="transferTy" query="true" align="center"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
-		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
+		<%--<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol> --%>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="车票数量" field="orderNumbers" align="center" ></t:dgCol>
-		<t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol>
+		<%-- <t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol> --%>
 		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
 		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
-		<t:dgCol title="支付状态" field="orderPaystatus" replace="已付款_0,退款中_1,已退款_2,已拒绝_4" align="center"></t:dgCol>
+		<%--<t:dgCol title="支付状态" field="orderPaystatus" replace="已付款_0,退款中_1,已退款_2,已拒绝_4" align="center"></t:dgCol> --%>
 		<t:dgCol title="申请退款时间" field="refundTime" formatter="yyyy-MM-dd hh:mm:ss" align="center" query="true" queryMode="group" ></t:dgCol>
 		<t:dgCol title="退款金额" field="refundPrice" align="center"></t:dgCol>
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
