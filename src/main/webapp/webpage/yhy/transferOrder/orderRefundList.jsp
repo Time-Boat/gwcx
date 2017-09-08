@@ -11,6 +11,9 @@
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" dictionary="transferTy" query="true" align="center"></t:dgCol>
+		<c:if test="true">
+			<t:dgCol title="所属公司" field="departname" query="true" align="center" ></t:dgCol>
+		</c:if>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
 		<%--<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol> --%>

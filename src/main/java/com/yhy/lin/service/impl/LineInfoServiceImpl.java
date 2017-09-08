@@ -10,6 +10,9 @@ import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
+import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.jeecgframework.web.system.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +26,9 @@ import net.sf.json.JSONObject;
 @Service("LineInfoServiceI")
 @Transactional//声明所有方法都需要事务管理
 public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoServiceI {
+	
+	@Autowired
+	private UserService userService;
 	
 	@Override
 	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username,String departname){
@@ -86,11 +92,26 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType,String username,String departname){
 
-		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		TSUser user = ResourceUtil.getSessionUserName();
+		String roles = userService.getUserRole(user);
+		TSDepart depart = user.getCurrentDepart();
+		
 		String orgCode = depart.getOrgCode();
 		String orgType = depart.getOrgType();
-		String userId = ResourceUtil.getSessionUserName().getId();
+		String userId = user.getId();
+		
 		StringBuffer sqlWhere = new StringBuffer();
+		
+		String a[] = roles.split(",");
+		for (int i = 0; i < a.length; i++) {
+			String role = a[i];
+			if(AppGlobals.PLATFORM_LINE_AUDIT.equals(role)){
+				sqlWhere.append(" and a.application_status in('2','3','4','6') ");
+			}
+			if(AppGlobals.OPERATION_MANAGER.equals(role)){
+				sqlWhere.append(" and a.application_status in('1','2','3','4','5','6') ");
+			}
+		}
 		
 		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
 		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){

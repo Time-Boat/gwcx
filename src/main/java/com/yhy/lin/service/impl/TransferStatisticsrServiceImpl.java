@@ -40,8 +40,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		
 		Long iCount = (long) list.size();
 
-		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,f.account,"
-				+ "t.org_code from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on"
+		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,f.account"
+				+ " from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on"
 				+ " f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id  "
 				+ "LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!sqlWhere.isEmpty()) {

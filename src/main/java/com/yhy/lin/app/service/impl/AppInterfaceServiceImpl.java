@@ -271,9 +271,9 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		list = findForJdbc(
 				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name,a.order_expectedarrival, "
 						+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
-						+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes "
+						+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes,u.mobilePhone "
 						+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-						+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id where a.id=? ",
+						+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id LEFT JOIN t_s_user u on l.createUserId=u.ID where a.id=? ",
 				orderId);
 
 		for (Map<String, Object> map : list) {
@@ -299,7 +299,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
 
 			aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
-			aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
+			aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
 
 			// 发车时间
 			aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));

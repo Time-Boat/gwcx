@@ -53,7 +53,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 
 		String sqlCnt = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ " left join driversinfo d on b.driverId =d.id "
-				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId ";
+				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId,t_s_depart p ";
 		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -63,10 +63,11 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status, ");
 		sql.append(" a.last_audit_date,a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name, ");
 		sql.append(" a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.refund_time,a.refund_price, ");
-		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime ");
+		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime, p.departname ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId = c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId "
-				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user");
+				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user"
+				+ " ,t_s_depart p  ");
 		
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -99,7 +100,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				new Db2Page("firstAuditDate", "first_audit_date", null),
 				new Db2Page("lastAuditUser", "l_audit_user", null),
 				new Db2Page("lastAuditStatus", "last_audit_status", null),
-				new Db2Page("lastAuditDate", "last_audit_date", null)
+				new Db2Page("lastAuditDate", "last_audit_date", null),
+				new Db2Page("departname", "departname", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -109,6 +111,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			String orderTerminusstation, boolean hasPermission) {
 
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
+		
+		sql.append(" and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
 		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {

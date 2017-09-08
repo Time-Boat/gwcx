@@ -277,7 +277,7 @@ public class BusStopInfoController extends BaseController {
 	        try{
 		        String lineInfoId = request.getParameter("lineInfoId");
 		        //公务车线路为1    接送机线路为2
-		       // String lineType = request.getParameter("lineType");
+		        //String lineType = request.getParameter("lineType");
 		        LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, lineInfoId);
 		        
 		        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID

@@ -85,7 +85,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
 	    sql.append("select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id "
-	    		+ "LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on d.create_user_id = u.id " + queryCondition.toString());
+	    		+ "LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id " + queryCondition.toString());
 		
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集

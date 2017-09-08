@@ -163,7 +163,7 @@ public class LineInfoController extends BaseController {
 					LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
 					if (StringUtil.isNotEmpty(lines)) {
 						List<Line_busStopEntity> list = this.systemService.findByQueryString(
-								"from Line_busStopEntity where siteOrder!='99' and siteOrder>" + lines.getSiteOrder());
+								"from Line_busStopEntity where siteOrder!='99' and lineId='" + id + "' and siteOrder>" + lines.getSiteOrder());
 						if (list.size() > 0) {
 							for (int i = 0; i < list.size(); i++) {
 								Line_busStopEntity buss = list.get(i);
@@ -172,7 +172,6 @@ public class LineInfoController extends BaseController {
 									buss.setSiteOrder(order - 1);
 								}
 							}
-
 						}
 					}
 
