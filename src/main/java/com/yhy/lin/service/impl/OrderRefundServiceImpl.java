@@ -46,8 +46,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
-			String rf_begin, String rf_end, String orderStartingstation, String orderTerminusstation, boolean hasPermission) {
-		String sqlWhere = getWhere(transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation, hasPermission);
+			String rf_begin, String rf_end, String orderStartingstation, String orderTerminusstation, boolean hasPermission, String departname) {
+		String sqlWhere = getWhere(transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation, hasPermission, departname);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -108,12 +108,16 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	}
 
 	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end,String orderStartingstation,
-			String orderTerminusstation, boolean hasPermission) {
+			String orderTerminusstation, boolean hasPermission, String departname) {
 
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 		
 		sql.append(" and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
 		
+		// 公司名称
+		if (StringUtil.isNotEmpty(departname)) {
+			sql.append(" and p.departname like '%" + departname + "%'");
+		}
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and a.order_startime between '" + fc_begin + "' and '" + fc_end + "'");
@@ -122,7 +126,6 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		if (StringUtil.isNotEmpty(rf_begin) && StringUtil.isNotEmpty(rf_end)) {
 			sql.append(" and a.refund_time between '" + rf_begin + "' and '" + rf_end + "'");
 		}
-		
 		// 订单编号
 		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
 			sql.append(" and  a.order_id like '%" + transferorder.getOrderId() + "%'");

@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.DealerStatisticsServiceI;
 import com.yhy.lin.service.TransferStatisticsServiceI;
@@ -52,8 +55,22 @@ public class DealerStatisticsController extends BaseController {
 	 * 获取渠道商用户信息
 	 */
 	public String getAccount(){
-		String sql ="select d.id,d.account from dealer_info d";
-		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("select d.id,d.account from dealer_info d, t_s_depart td where status='0' ");
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and d.create_user_id = '" + userId + "' ");
+		}
+		sql.append(" and td.org_code like '" + orgCode + "%' and td.id=d.departId");
+				
+		List<Object> list = this.systemService.findListbySql(sql.toString());
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){
 			for (int i = 0; i < list.size(); i++) {
