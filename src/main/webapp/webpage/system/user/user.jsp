@@ -32,6 +32,7 @@
 	  	
 	  	//验证手机号是否已经被占用
 	  	function checkPhone(phone){
+	  		
 			if(!pat.test(phone)){
 				
 				return;
@@ -55,13 +56,18 @@
 	  	
 	  	//提交前验证手机号
 	  	function cp(){
+	  		var lineOrgCodes = "";
+	  		$("input:checkbox[name='lineOrgCode']:checked").each(function() { // 遍历name=lineOrgCode的多选框
+	  			lineOrgCodes += $(this).val() + ",";  // 每一个被选中项的值
+	  		});
+	  		//修改要提交的action
+	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes);
 	  		return b;
 	  	}
         
 
 		function openDepartmentSelect() {
 			$.dialog.setting.zIndex = getzIndex(); 
-			
 			var orgIds = $("#orgIds").val();
 			
 			$.dialog({content: 'url:departController.do?departSelect&orgIds='+orgIds, zIndex: 2100, title: '组织机构列表', lock: true, width: '400px', height: '350px', opacity: 0.4, button: [
@@ -81,6 +87,7 @@
 			     ids += node.id+',';
 			    names += node.name+',';
 			 }
+			  
 			 $('#departname').val(names);
 			 $('#departname').blur();		
 			 $('#orgIds').val(ids);		
@@ -89,17 +96,85 @@
 		
 		function callbackClean(){
 			$('#departname').val('');
-			 $('#orgIds').val('');	
+			$('#orgIds').val('');	
 		}
 		
 		function setOrgIds() {}
 		$(function(){
 			$("#departname").prev().hide();
 		});
+		
+		//开关
+		var oc = false;
+		
+		//是否已经加载过数据,不重复加载
+		var isLoad = false;
+		
+		//弹出框确定之后的回调函数
+		function roleSuccess(){
+			
+			if(!isLoad){
+				$.get(
+					"userController.do?getCompany",
+					function(data){
+						//console.log(data);
+						if(data.success){
+							console.log(data);
+							var obj = data.obj;
+							console.log(obj);
+							obj = eval('(' + obj + ')');
+							console.log(obj);
+							var td = "";
+							for(var i=0;i<obj.length;i++){
+								td += '<label class="demo--label">';
+								//td += '<input class="demo--radio" name="cityBusiness" type="checkbox" checked="checked" value="0" />';
+								td += '<input class="demo--radio" name="lineOrgCode" type="checkbox" value="' + obj[i].org_code + '" />';
+								td += '<span class="demo--checkbox demo--radioInput"></span> ' + obj[i].departname;
+								td += '</label> ';
+							}
+							console.log(td);
+							$("#company_td").append(td);
+							//<span class="Validform_checktip"></span>
+						}
+						isLoad = true;
+					},
+					"json"
+				);
+			}
+			
+			var names = $('#roleName').val();
+			if(typeof(names) != 'undefined' && names != null && names != ''){
+				var arr = names.split(",");
+				console.log(arr);
+				console.log(oc);
+				for(var i=0;i<arr.length;i++){
+					if(arr[i] == '平台线路审核员'){
+						oc = true;
+						break;
+					}else{
+						oc = false;
+					}
+				}
+				console.log(oc);
+				if(oc){
+					$('#company_tr').show();
+				}else{
+					$('#company_tr').hide();
+				}
+			}
+		}
     </script>
+      <!-- 多选框样式 -->
+  <style type="text/css">
+  	.demo--label{margin:5px 30px 5px 0;display:inline-block}
+	.demo--radio{display:none}
+	.demo--radioInput{background-color:#fff;border:1px solid rgba(0,0,0,0.15);border-radius:100%;display:inline-block;height:16px;margin-right:10px;margin-top:-1px;vertical-align:middle;width:16px;line-height:1}
+	.demo--radio:checked + .demo--radioInput:after{background-color:#57ad68;border-radius:100%;content:"";display:inline-block;height:12px;margin:2px;width:12px}
+	.demo--checkbox.demo--radioInput,.demo--radio:checked + .demo--checkbox.demo--radioInput:after{border-radius:0}
+  </style>
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cp()">
+<t:formvalid formid="userController" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cp()">
 	<input id="id" name="id" type="hidden" value="${user.id }">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 		<tr>
@@ -168,9 +243,18 @@
                 <input name="roleid" name="roleid" type="hidden" value="${id}" id="roleid">
                 <input name="roleName" class="inputxt" value="${roleName }" id="roleName" readonly="readonly" datatype="*" />
                 <t:choose hiddenName="roleid" hiddenid="id" url="userController.do?roles" name="roleList"
-                          icon="icon-search" title="common.role.list" textname="roleName" isclear="true" isInit="true"></t:choose>
+                          icon="icon-search" title="common.role.list" textname="roleName" isclear="true" isInit="true" fun="roleSuccess" ></t:choose>
                 <span class="Validform_checktip"><t:mutiLang langKey="role.muti.select"/></span>
             </td>
+		</tr>
+		<tr id="company_tr" hidden="true">
+			<td align="right">
+				<label class="Validform_label">
+					选择责任公司:
+				</label>
+			</td>
+			<td class="value" id="company_td">
+			</td>
 		</tr>
 		<tr>
 			<td align="right" nowrap><label class="Validform_label">  <t:mutiLang langKey="common.phone"/>: </label></td>
@@ -180,7 +264,7 @@
             </td>
 		</tr>
 		<tr>
-			<td align="right"><label class="Validform_label"> <t:mutiLang langKey="common.tel"/>: </label></td>
+			<td align="right"><label class="Validform_label">  <t:mutiLang langKey="common.tel"/>: </label></td>
 			<td class="value">
                 <input class="inputxt" name="officePhone" value="${user.officePhone}" datatype="n" errormsg="办公室电话不正确" ignore="ignore">
                 <span class="Validform_checktip"></span>

@@ -64,6 +64,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.AppGlobals;
 
+import net.sf.json.JSONArray;
+import net.sf.json.JSONObject;
+
 
 /**
  * @ClassName: UserController
@@ -346,6 +349,26 @@ public class UserController extends BaseController {
 	}
 
 	/**
+	 * 得到组织机构公司列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getCompany")
+	@ResponseBody
+	public AjaxJson getCompany(HttpServletResponse response, HttpServletRequest request, ComboBox comboBox) {
+		AjaxJson j = new AjaxJson();
+		j.setSuccess(false);
+		
+		List<Map<String, Object>> list = systemService.findForJdbc("select departname,org_code from t_s_depart where LENGTH(org_code) = 6 ");
+		String json = JSONArray.fromObject(list).toString();
+		if(StringUtil.isNotEmpty(json)){
+			j.setObj(json);
+			j.setSuccess(true);
+		}
+		return j;
+	}
+	
+	/**
 	 * 得到部门列表
 	 * 
 	 * @return
@@ -542,6 +565,10 @@ public class UserController extends BaseController {
 		// 得到用户的角色
 		String roleid = oConvertUtils.getString(req.getParameter("roleid"));
 		String password = oConvertUtils.getString(req.getParameter("password"));
+		
+		//平台线路管理员管理公司
+		String orgCodes = req.getParameter("lineOrgCode");
+		
 		if (StringUtil.isNotEmpty(user.getId())) {
 			TSUser users = systemService.getEntity(TSUser.class, user.getId());
 			users.setEmail(user.getEmail());

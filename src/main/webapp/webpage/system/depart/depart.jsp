@@ -6,6 +6,41 @@
 <title>部门信息</title>
 <t:base type="jquery,easyui,tools"></t:base>
 <script type="text/javascript">
+
+var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
+	
+	var b = true;
+	
+	//验证手机号是否已经被占用
+	function checkPhone(phone){
+	if(!pat.test(phone)){
+		
+		return;
+	}
+	$.ajax({
+        type:"get",
+        url:"conductorController.do?checkPhone&phone="+phone+"&id="+$("#id").val(),
+        dataType:'json',
+        success:function(d){
+       		var obj = eval('('+d.jsonStr+')');
+       		b = obj.success;
+       		if(!b){
+       			tip(obj.msg);
+       			$('#check_phone').text(obj.msg).css({color:"red"});
+       		}else{
+       			$('#check_phone').text('通过信息验证！').css({color:"#71b83d"});
+       		}
+        }
+    });
+}
+	
+	//提交前验证手机号
+	function cp(){
+		return b;
+	}
+
+
+
 	$(function() {
 		$('#cc').combotree({
 			url : 'departController.do?setPFunction&selfId=${depart.id}',
@@ -45,7 +80,7 @@
 </script>
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="formobj" layout="div" dialog="true" action="systemController.do?saveDepart">
+<t:formvalid formid="formobj" layout="div" dialog="true" action="systemController.do?saveDepart" beforeSubmit="cp()">
 	<input id="id" name="id" type="hidden" value="${depart.id }">
 	<fieldset class="step">
         <div class="form">
@@ -74,7 +109,8 @@
         </div>
         <div class="form">
             <label class="Validform_label"> <t:mutiLang langKey="common.mobile"/>: </label>
-            <input name="mobile" class="inputxt" value="${depart.mobile }">
+            <input name="mobile" class="inputxt" value="${depart.mobile }" datatype="m" errormsg="手机号码不正确"  onchange="checkPhone(this.value);" />
+            <span class="Validform_checktip" id="check_phone"></span>
         </div>
         <div class="form">
             <label class="Validform_label"> <t:mutiLang langKey="common.fax"/>: </label>
