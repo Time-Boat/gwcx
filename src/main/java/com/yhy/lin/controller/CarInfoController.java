@@ -61,7 +61,7 @@ public class CarInfoController extends BaseController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(params = "list")
+	@RequestMapping(params = "carInfoList")
 	public ModelAndView list(HttpServletRequest request) {
 		return new ModelAndView("yhy/car/carInfoList");
 	}

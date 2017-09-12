@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -22,8 +23,8 @@ import org.jeecgframework.web.system.pojo.base.TSDepart;
 public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, String status, String auditStatus) {
-		String sqlWhere = getWhere(status, auditStatus);
+	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo,String username) {
+		String sqlWhere = getWhere(dealerInfo,username);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_info d join t_s_base_user u on d.create_user_id = u.id join t_s_depart t on t.id = d.departId ";
 		if (!sqlWhere.isEmpty()) {
@@ -67,16 +68,23 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		return jObject;
 	}
 	
-	public String getWhere(String status, String auditStatus) {
+	public String getWhere(DealerInfoEntity dealerInfo,String username) {
 		
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 		
-		if(StringUtil.isNotEmpty(status)){
-			sql.append(" and d.status = '" + status + "' ");
+		if(StringUtil.isNotEmpty(dealerInfo.getAccount())){
+			sql.append(" and d.account like '%" + dealerInfo.getAccount() + "%' ");
+		}
+		if(StringUtil.isNotEmpty(username)){
+			sql.append(" and u.username like '%" + username + "%' ");
 		}
 		
-		if(StringUtil.isNotEmpty(auditStatus)){
-			sql.append(" and d.audit_status = '" + auditStatus + "' ");
+		if(StringUtil.isNotEmpty(dealerInfo.getStatus())){
+			sql.append(" and d.status = '" + dealerInfo.getStatus() + "' ");
+		}
+		
+		if(StringUtil.isNotEmpty(dealerInfo.getAuditStatus())){
+			sql.append(" and d.audit_status = '" + dealerInfo.getAuditStatus() + "' ");
 		}
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();

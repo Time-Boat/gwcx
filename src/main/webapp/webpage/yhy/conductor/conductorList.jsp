@@ -15,7 +15,7 @@
 	<t:dgCol title="电话号码" sortable="false" field="phoneNumber" query="true" align="center"  width="120"></t:dgCol>
 	<t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center" width="200"></t:dgCol>
 	<t:dgCol title="创建人" field="username"  align="center" width="120" query="true"></t:dgCol>
-	<t:dgCol title="验票线路" field="jurisdiction"  align="center" width="120" query="true"></t:dgCol>
+	<t:dgCol title="验票线路" field="jurisdiction"  align="center" width="120" ></t:dgCol>
 	<t:dgCol title="业务类型" field="status" dictionary="carBType" query="true" align="center" width="120"></t:dgCol>
 	<t:dgToolBar operationCode="add" title="录入" icon="icon-add" url="conductorController.do?addorupdate" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="编辑" icon="icon-edit" url="conductorController.do?addorupdate" funname="update"></t:dgToolBar>
@@ -30,7 +30,28 @@
 
 </t:datagrid></div>
 </div>
+<input type="hidden" value="${lineNameList}" id="lineNames" />
  <script type="text/javascript">
+ 
+//进入触发 
+	$(function() {
+		var json = $("#lineNames").val();
+		var obj = eval('(' + json + ')');
+		
+		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
+		var a3 = '<select name="lineId" style="width: 150px">';
+		var c1 = '<option value="">选择所属线路</option>';
+		for (var i = 0; i < obj.data.length; i++) {
+			c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName
+					+ '</option>';
+		}
+		var a4 = '</select></span>';
+		$("#conductorListForm").append(a1 + a2 + a3 + c1 + a4);
+	});
+ 
+ 
+ 
 	function testReloadPage(){
 		document.location = "http://www.baidu.com"; 
 	}

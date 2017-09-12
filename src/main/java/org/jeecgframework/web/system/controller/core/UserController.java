@@ -359,7 +359,24 @@ public class UserController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		j.setSuccess(false);
 		
-		List<Map<String, Object>> list = systemService.findForJdbc("select departname,org_code from t_s_depart where LENGTH(org_code) = 6 ");
+		String id = request.getParameter("id");
+		
+		List<String> orgList = systemService.findListbySql(
+				"select org_company from t_s_user where org_company is not null and id != '" + id + "'");
+		
+		StringBuffer orgs = new StringBuffer();
+		for(String org : orgList){
+			orgs.append(org + ",");
+		}
+		
+		String[] orgArr = orgs.toString().split(",");
+		StringBuffer orgs1 = new StringBuffer();
+		for (int i = 0; i < orgArr.length; i++) {
+			orgs1.append("'" + orgArr[i] + "',");
+		}
+		
+		List<Map<String, Object>> list = systemService.findForJdbc(
+				"select departname,org_code from t_s_depart where LENGTH(org_code) = 6 and org_code not in(" + orgs1.toString().substring(0, orgs1.length() - 1) + ")");
 		String json = JSONArray.fromObject(list).toString();
 		if(StringUtil.isNotEmpty(json)){
 			j.setObj(json);
@@ -566,7 +583,7 @@ public class UserController extends BaseController {
 		String roleid = oConvertUtils.getString(req.getParameter("roleid"));
 		String password = oConvertUtils.getString(req.getParameter("password"));
 		
-		//平台线路管理员管理公司
+		//平台线路管理员管理公司    (找个字段存进去)
 		String orgCodes = req.getParameter("lineOrgCode");
 		
 		if (StringUtil.isNotEmpty(user.getId())) {
@@ -574,7 +591,11 @@ public class UserController extends BaseController {
 			users.setEmail(user.getEmail());
 			users.setOfficePhone(user.getOfficePhone());
 			users.setMobilePhone(user.getMobilePhone());
-
+			
+			if(StringUtil.isNotEmpty(orgCodes)){
+				users.setOrgCompany(orgCodes);
+			}
+			
             systemService.executeSql("delete from t_s_user_org where user_id=?", user.getId());
             saveUserOrgList(req, user);
 //            users.setTSDepart(user.getTSDepart());
@@ -601,6 +622,9 @@ public class UserController extends BaseController {
 //				}
 				user.setStatus(Globals.User_Normal);
 				user.setDeleteFlag(Globals.Delete_Normal);
+				if(StringUtil.isNotEmpty(orgCodes)){
+					user.setOrgCompany(orgCodes);
+				}
 				systemService.save(user);
                 // todo zhanggm 保存多个组织机构
                 saveUserOrgList(req, user);

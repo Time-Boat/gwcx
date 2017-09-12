@@ -60,11 +60,16 @@
 	  		$("input:checkbox[name='lineOrgCode']:checked").each(function() { // 遍历name=lineOrgCode的多选框
 	  			lineOrgCodes += $(this).val() + ",";  // 每一个被选中项的值
 	  		});
+	  		
+	  		if(lineOrgCodes == ""){
+	  			tip("至少选择一个责任公司");
+	  			return false;
+	  		}
+	  		
 	  		//修改要提交的action
-	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes);
+	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1));
 	  		return b;
 	  	}
-        
 
 		function openDepartmentSelect() {
 			$.dialog.setting.zIndex = getzIndex(); 
@@ -113,26 +118,45 @@
 		//弹出框确定之后的回调函数
 		function roleSuccess(){
 			
-			if(!isLoad){
+			var names = $('#roleName').val();
+			if(typeof(names) != 'undefined' && names != null && names != ''){
+				var arr = names.split(",");
+				for(var i=0;i<arr.length;i++){
+					if(arr[i] == '平台线路审核员'){
+						oc = true;
+						break;
+					}else{
+						oc = false;
+					}
+				}
+				if(oc){
+					$('#company_tr').show();
+				}else{
+					$('#company_tr').hide();
+				}
+			}
+			
+			if(!isLoad && oc){
 				$.get(
-					"userController.do?getCompany",
+					"userController.do?getCompany&id="+$('#id').val(),
 					function(data){
-						//console.log(data);
+						console.log(data);
 						if(data.success){
-							console.log(data);
 							var obj = data.obj;
-							console.log(obj);
 							obj = eval('(' + obj + ')');
-							console.log(obj);
 							var td = "";
+							var ocs = $('#orgCompanys').val();
 							for(var i=0;i<obj.length;i++){
 								td += '<label class="demo--label">';
-								//td += '<input class="demo--radio" name="cityBusiness" type="checkbox" checked="checked" value="0" />';
-								td += '<input class="demo--radio" name="lineOrgCode" type="checkbox" value="' + obj[i].org_code + '" />';
+								if(ocs.indexOf(obj[i].org_code) >= 0){
+									td += '<input class="demo--radio" name="lineOrgCode" type="checkbox" checked="checked" value="' + obj[i].org_code + '" />';
+								}else{
+									td += '<input class="demo--radio" name="lineOrgCode" type="checkbox" value="' + obj[i].org_code + '" />';
+								}
+									
 								td += '<span class="demo--checkbox demo--radioInput"></span> ' + obj[i].departname;
 								td += '</label> ';
 							}
-							console.log(td);
 							$("#company_td").append(td);
 							//<span class="Validform_checktip"></span>
 						}
@@ -142,27 +166,11 @@
 				);
 			}
 			
-			var names = $('#roleName').val();
-			if(typeof(names) != 'undefined' && names != null && names != ''){
-				var arr = names.split(",");
-				console.log(arr);
-				console.log(oc);
-				for(var i=0;i<arr.length;i++){
-					if(arr[i] == '平台线路审核员'){
-						oc = true;
-						break;
-					}else{
-						oc = false;
-					}
-				}
-				console.log(oc);
-				if(oc){
-					$('#company_tr').show();
-				}else{
-					$('#company_tr').hide();
-				}
-			}
 		}
+		
+		$(function(){
+			roleSuccess();
+		});
     </script>
       <!-- 多选框样式 -->
   <style type="text/css">
@@ -176,6 +184,7 @@
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="userController" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cp()">
 	<input id="id" name="id" type="hidden" value="${user.id }">
+	<input id="orgCompanys" name="orgCompanys" type="hidden" value="${user.orgCompany }">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 		<tr>
 			<td align="right" width="25%" nowrap>

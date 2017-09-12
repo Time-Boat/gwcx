@@ -63,7 +63,7 @@ public class DealerInfoController extends BaseController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(params = "list")
+	@RequestMapping(params = "dealerInfoList")
 	public ModelAndView list(HttpServletRequest request) {
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
@@ -81,10 +81,10 @@ public class DealerInfoController extends BaseController {
 	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 
-		String status = request.getParameter("status");
-		String auditStatus = request.getParameter("auditStatus");
-		
-		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, status, auditStatus);
+		/*String status = request.getParameter("status");
+		String auditStatus = request.getParameter("auditStatus");*/
+		String username = request.getParameter("username");
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo,username);
 
 		responseDatagrid(response, jObject);
 	}

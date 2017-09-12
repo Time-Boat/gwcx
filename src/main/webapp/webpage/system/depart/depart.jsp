@@ -6,8 +6,52 @@
 <title>部门信息</title>
 <t:base type="jquery,easyui,tools"></t:base>
 <script type="text/javascript">
+	$(function(){
+		$('#provinceName').val($('#provinceId option:selected').text());
+		$('#cityName').val($('#cityId option:selected').text());
+	});
 
-var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
+	function changeProvince(){
+		var  cateOne = $("#provinceId").find("option:selected").val();
+	    if(cateOne == '') {
+	        $("#cityId").empty().append("<option value=''>---请选择城市----</option>");
+	        return false;
+	    }
+	    
+	    console.log('provinceId:'+$('#provinceId option:selected').text());
+	    $('#provinceName').val($('#provinceId option:selected').text());
+	    
+	    $.ajax({
+	        url:'openCityController.do?getCitys&provinceId='+cateOne,
+	        type:"get",
+	        dataType:"json",
+	      	success: function (data) {
+	      		//console.log(data);
+	      		data = eval("("+data+")");
+	      		//console.log(data);
+	            $("#cityId").empty().append("<option value=''>---请选择城市----</option>");
+	          	var city = $("#cityId").val();
+	          	console.log('cityId:'+data[0].cityId);
+	            console.log('city:'+city); 	
+	            for(var i=0,len=data.length;i<len;i++){
+	            	if(city == data[i].cityId){
+	            		$("#cityId").append($("<option value='"+data[i].cityId+"' selected='selected' >"+data[i].city+"</option>")); 
+	            	}else{
+	            		$("#cityId").append($("<option value='"+data[i].cityId+"'>"+data[i].city+"</option>")); 
+	            	}
+	            }
+	            //console.log($('#cityId option:selected').text());
+	      }
+	     }); 
+	}
+
+	function changeCity(){
+		$('#cityName').val($('#cityId option:selected').text());
+		console.log($('#cityId option:selected').text());
+	}
+
+
+	var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
 	
 	var b = true;
 	
@@ -38,8 +82,6 @@ var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{
 	function cp(){
 		return b;
 	}
-
-
 
 	$(function() {
 		$('#cc').combotree({
@@ -82,6 +124,9 @@ var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" layout="div" dialog="true" action="systemController.do?saveDepart" beforeSubmit="cp()">
 	<input id="id" name="id" type="hidden" value="${depart.id }">
+	<input id="provinceName" name="provinceName" type="hidden" value="${openCityPage.provinceName }">
+	<input id="cityName" name="cityName" type="hidden" value="${openCityPage.cityName }">
+	
 	<fieldset class="step">
         <div class="form">
             <label class="Validform_label"> <t:mutiLang langKey="common.department.name"/>: </label>
@@ -117,7 +162,48 @@ var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{
             <input name="fax" class="inputxt" value="${depart.fax }">
         </div>
         <div class="form">
-            <label class="Validform_label"> <t:mutiLang langKey="common.address"/>: </label>
+            	地址:
+            <!--  <input name="orgAddress" class="inputxt" value="${depart.orgAddress }" datatype="s1-50">-->
+            <table>
+            	<tr>
+					<td align="right">
+						<label class="Validform_label">
+							省份:
+						</label>
+					</td>
+					<td class="value">
+						<select id="provinceId" name="provinceId" onchange="changeProvince();" datatype="*" >
+							<option value="">---请选择省份----</option>
+							<c:forEach items="${pList}" var="p" >
+								<option value="${p.provinceId}" <c:if test="${p.provinceId == province.provinceId}" >selected="selected"</c:if> >${p.province}</option>
+							</c:forEach>
+						</select>
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							城市:
+						</label>
+					</td>
+					<td class="value">
+						<%-- <input class="inputxt" id="cityId" name="cityId" ignore="ignore"
+							   value="${openCityPage.cityName}"> --%>
+					    <select id="cityId" name="cityId" datatype="*" onchange="changeCity();">
+							<option value="">---请选择城市----</option>
+							<c:forEach items="${cList}" var="c" >
+								<option value="${c.cityId}" <c:if test="${c.cityId == city.cityId}" >selected="selected"</c:if> >${c.city}</option>
+							</c:forEach>
+						</select>
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+            </table>
+            
+        </div>
+        <div class="form">
+            <label class="Validform_label"> <t:mutiLang langKey="详细地址"/>: </label>
             <input name="address" class="inputxt" value="${depart.address }" datatype="s1-50">
             <span class="Validform_checktip"><t:mutiLang langKey="departmentaddress.rang1to50"/></span>
         </div>

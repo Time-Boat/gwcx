@@ -610,6 +610,10 @@ public class SystemController extends BaseController {
 		String message = null;
 		// 设置上级部门
 		String pid = request.getParameter("TSPDepart.id");
+		String provinceId=request.getParameter("provinceId");
+		String cityId = request.getParameter("cityId");
+		
+		depart.setOrgAddress(provinceId+cityId);
 		if (pid.equals("")) {
 			depart.setTSPDepart(null);
 		}

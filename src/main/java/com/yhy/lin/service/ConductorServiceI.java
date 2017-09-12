@@ -9,6 +9,6 @@ import net.sf.json.JSONObject;
 
 public interface ConductorServiceI extends CommonService{
 	
-	JSONObject getDatagrid(DataGrid dataGrid,ConductorEntity conductors,String cr_bg,String cr_en);
+	JSONObject getDatagrid(DataGrid dataGrid,ConductorEntity conductors,String cr_bg,String cr_en,String lineId);
 
 }

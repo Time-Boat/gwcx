@@ -35,6 +35,18 @@ public class TSUser extends TSBaseUser implements java.io.Serializable {
 	private java.lang.String updateBy;
 	/**修改人名称*/
 	private java.lang.String updateName;
+	/**管理公司(只有角色中包含平台线路审核员，此字段才有值)*/
+	private java.lang.String orgCompany;
+	
+	@Column(name = "org_company", length = 255)
+	public java.lang.String getOrgCompany() {
+		return orgCompany;
+	}
+
+	public void setOrgCompany(java.lang.String orgCompany) {
+		this.orgCompany = orgCompany;
+	}
+
 	@Column(name = "signatureFile", length = 100)
 	public String getSignatureFile() {
 		return this.signatureFile;

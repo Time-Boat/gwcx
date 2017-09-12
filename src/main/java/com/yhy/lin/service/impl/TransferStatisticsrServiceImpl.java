@@ -91,7 +91,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on "
-				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN t_s_depart t on l.departId=t.ID";
+				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN t_s_depart t on l.departId=t.ID,t_s_depart p where (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code";
 
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -99,11 +99,12 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append(
-				"select a.id,a.applicationTime,a.order_id,l.name as line_name,l.type,a.order_startime,w.real_name,a.order_contactsname,"
+				"select a.id,a.applicationTime,a.order_id,l.name as line_name,l.type,a.order_startime,w.real_name,a.order_contactsname,p.departname,"
 						+ "a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_status,a.order_numbers,a.order_totalPrice,fi.account from "
 						+ "transferorder a LEFT JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
 						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id "
-						+ "LEFT JOIN dealer_customer dc on w.open_id = dc.open_id LEFT JOIN dealer_info fi on fi.id=dc.dealer_id LEFT JOIN t_s_depart t on l.departId=t.ID");
+						+ "LEFT JOIN dealer_customer dc on w.open_id = dc.open_id LEFT JOIN dealer_info fi on fi.id=dc.dealer_id LEFT JOIN t_s_depart t"
+						+ " on l.departId=t.ID,t_s_depart p where (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -141,6 +142,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				new Db2Page("realName", "real_name", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
+				new Db2Page("departname", "departname", null), 
 				new Db2Page("driverName", "driver_name", null), 
 				new Db2Page("licencePlate", "licence_plate", null),
 				new Db2Page("orderStatus", "order_status", null),
@@ -161,7 +163,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on "
-				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN t_s_depart t on l.departId=t.ID";
+				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN"
+				+ " t_s_depart t on l.departId=t.ID,t_s_depart p where (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code";
 
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -169,10 +172,12 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append(
-				"select a.refund_completed_time,a.id,a.order_id,l.name as line_name,l.type,a.refund_time,w.real_name,"
+				"select a.refund_completed_time,a.id,a.order_id,l.name as line_name,l.type,a.refund_time,w.real_name,p.departname,"
 						+ " a.order_contactsname,a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_numbers,a.refund_price "
 						+ " from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on b.licencePlateId "
-						+ " =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
+						+ " =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w"
+						+ " on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID,t_s_depart p where (case when LENGTH(t.org_code)<6 then"
+						+ " t.org_code else substring(t.org_code,1,6) END)=p.org_code");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -207,7 +212,9 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				new Db2Page("realName", "real_name", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
-				new Db2Page("driverName", "driver_name", null), new Db2Page("licencePlate", "licence_plate", null),
+				new Db2Page("driverName", "driver_name", null),
+				new Db2Page("departname", "departname", null),
+				new Db2Page("licencePlate", "licence_plate", null),
 				new Db2Page("orderNumbers", "order_numbers", null),
 				new Db2Page("refundPrice", "refund_price", null)
 
@@ -221,7 +228,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
-		StringBuffer sql = new StringBuffer(" where a.order_status not in('4','6') ");
+		StringBuffer sql = new StringBuffer(" and a.order_status not in('4','6') ");
 		
 		if(orgCode.length()>=6){
 			String code = orgCode.substring(0,6);
@@ -283,7 +290,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
-		StringBuffer sql = new StringBuffer(" where a.order_status='4' ");
+		StringBuffer sql = new StringBuffer(" and a.order_status='4' ");
 		
 		if(orgCode.length()>=6){
 			String code = orgCode.substring(0,6);

@@ -55,7 +55,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 						,new Db2Page("createTime", "createTime", null)
 						,new Db2Page("createPeople", "createPeople", null)
 						,new Db2Page("stopLocation", "stopLocation", null)
-						,new Db2Page("stationType", "stationType", null)
+						,new Db2Page("stationType", "station_type", null)
 						,new Db2Page("cityId", "cityId", null)
 						,new Db2Page("cityName", "cityName", null)
 				};
@@ -73,6 +73,11 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		if (StringUtil.isNotEmpty(cityID)) {
 			
 			sqlWhere.append(" and  a.cityId= '"+cityID+"'");
+		}
+		
+		if (StringUtil.isNotEmpty(busStopInfo.getStationType())) {
+			
+			sqlWhere.append(" and  a.station_type= '"+busStopInfo.getStationType()+"'");
 		}
 		if (StringUtil.isNotEmpty(busStopInfo.getCityName())) {
 			sqlWhere.append(" and  a.cityName like '%" + busStopInfo.getCityName() + "%' ");

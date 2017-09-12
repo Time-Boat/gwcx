@@ -32,8 +32,6 @@
   	      		//console.log(data);
   	            $("#cityId").empty().append("<option value=''>---请选择城市----</option>");
   	          	var city = $("#cityId").val();
-  	          	console.log('cityId:'+data[0].cityId);
-  	            console.log('city:'+city); 	
   	            for(var i=0,len=data.length;i<len;i++){
   	            	if(city == data[i].cityId){
   	            		$("#cityId").append($("<option value='"+data[i].cityId+"' selected='selected' >"+data[i].city+"</option>")); 

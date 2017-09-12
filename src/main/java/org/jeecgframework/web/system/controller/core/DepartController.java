@@ -3,6 +3,9 @@ package org.jeecgframework.web.system.controller.core;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.entity.CitiesEntity;
+import com.yhy.lin.entity.OpenCityEntity;
+import com.yhy.lin.entity.ProvincesEntity;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -171,6 +174,9 @@ public class DepartController extends BaseController {
 			depart.setTSPDepart(null);
 		}
 		AjaxJson j = new AjaxJson();
+		String province=request.getParameter("provinceId");
+		String city = request.getParameter("cityId");
+		depart.setOrgAddress(province+city);
 		if (StringUtil.isNotEmpty(depart.getId())) {
             message = MutiLangUtil.paramUpdSuccess("common.department");
 			userService.saveOrUpdate(depart);
@@ -185,7 +191,7 @@ public class DepartController extends BaseController {
 		return j;
 	}
 	@RequestMapping(params = "add")
-	public ModelAndView add(TSDepart depart, HttpServletRequest req) {
+	public ModelAndView add(TSDepart depart,OpenCityEntity openCity, HttpServletRequest req) {
 		List<TSDepart> departList = systemService.getList(TSDepart.class);
 		req.setAttribute("departList", departList);
 //        这个if代码段没有用吧，注释之
@@ -199,6 +205,17 @@ public class DepartController extends BaseController {
 //			req.setAttribute("depart", tsDepart);
 //		}
         req.setAttribute("pid", depart.getId());
+        List<ProvincesEntity> pList = systemService.getList(ProvincesEntity.class);
+        req.setAttribute("pList", pList);
+		if (StringUtil.isNotEmpty(openCity.getId())) {
+			openCity = systemService.getEntity(OpenCityEntity.class, openCity.getId());
+			req.setAttribute("openCityPage", openCity);
+			if (StringUtil.isNotEmpty(openCity)) {
+				String provinceId = openCity.getProvinceId();
+				List<CitiesEntity> cities = systemService.findByProperty(CitiesEntity.class, "provinceId", provinceId);
+				req.setAttribute("cities", cities);
+			}
+		}
 		return new ModelAndView("system/depart/depart");
 	}
 	/**
@@ -214,6 +231,30 @@ public class DepartController extends BaseController {
 			depart = systemService.getEntity(TSDepart.class, depart.getId());
 			req.setAttribute("depart", depart);
 		}
+		String orgAddress=depart.getOrgAddress();
+		
+		List<ProvincesEntity> pList = systemService.getList(ProvincesEntity.class);
+		req.setAttribute("pList", pList);
+		
+		
+		if (StringUtil.isNotEmpty(orgAddress)) {
+			String provinceId=orgAddress.substring(0, 6);
+			String cityId = orgAddress.substring(6,12);
+			List<ProvincesEntity> op = systemService.findByProperty(ProvincesEntity.class, "provinceId", provinceId);
+			if(op.size()>0){
+				ProvincesEntity province = op.get(0);
+				req.setAttribute("province", province);
+			}
+			List<CitiesEntity> cList = systemService.findByProperty(CitiesEntity.class, "provinceId", provinceId);
+			req.setAttribute("cList", cList);
+			
+			List<CitiesEntity> ci = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
+			if(ci.size()>0){
+				CitiesEntity city = ci.get(0);
+				req.setAttribute("city", city);
+			}
+		}
+		
 		return new ModelAndView("system/depart/depart");
 	}
 	

@@ -112,7 +112,9 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id LEFT JOIN car_customer w on w.id="
-				+ "t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id and f.id=d.dealer_id and t.order_status='0' and td.id=f.departId ";
+				+ "t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where w.open_id = d.open_id and f.id=d.dealer_id "
+				+ "and t.order_status='0' and td.id=f.departId and (case when LENGTH(td.org_code)<6 then td.org_code else "
+				+ "substring(td.org_code,1,6) END)=p.org_code";
 
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -120,9 +122,9 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append("select f.account,t.order_completed_time,t.order_id,l.name as line_name,l.type as line_type,t.order_startime,w.real_name,t.order_contactsname,"
-				+ "t.order_contactsmobile,t.order_status,t.order_numbers,t.order_totalPrice from transferorder t LEFT JOIN lineinfo l on "
-				+ "t.line_id = l.id LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id"
-				+ " and f.id=d.dealer_id and t.order_status='0' and td.id=f.departId ");
+				+ "t.order_contactsmobile,t.order_status,t.order_numbers,t.order_totalPrice,p.departname from transferorder t LEFT JOIN lineinfo l on "
+				+ "t.line_id = l.id LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where w.open_id = d.open_id"
+				+ " and f.id=d.dealer_id and t.order_status='0' and td.id=f.departId and (case when LENGTH(td.org_code)<6 then td.org_code else substring(td.org_code,1,6) END)=p.org_code");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
@@ -159,6 +161,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 				new Db2Page("ordertype", "line_type", null), 
 				new Db2Page("orderStartime", "order_startime", null),
 				new Db2Page("realName", "real_name", null),
+				new Db2Page("departname", "departname", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
 				new Db2Page("orderStatus", "order_status", null),

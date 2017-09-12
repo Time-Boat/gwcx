@@ -6,7 +6,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 	<div region="center" style="padding: 0px; border: 0px">
-		<t:datagrid name="OrderStatList" title="订单收入统计" autoLoadData="true" checkbox="true" fit="true"
+		<t:datagrid name="OrderStatList" title="订单收入统计" autoLoadData="true" fit="true"
 			actionUrl="transferStatisticsController.do?orderdatagrid" idField="id" queryMode="group">
 			<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 			<t:dgCol title="下单时间" field="applicationTime" editor="datebox"
@@ -16,10 +16,11 @@
 			<t:dgCol title="线路名称" field="lineName" query="true" align="center" width="80"></t:dgCol>
 			<t:dgCol title="线路类型" field="ordertype" width="60"
 				replace="接机_2,送机_3,接火车 _4,送火车_5" query="true" align="center"></t:dgCol>
-			<t:dgCol title="发车时间" field="orderStartime" align="center" width="120"></t:dgCol>
+			<t:dgCol title="发车时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center" width="120"></t:dgCol>
 			<t:dgCol title="下单联系人" field="realName" align="center" width="80"></t:dgCol>
 			<t:dgCol title="乘车联系人" field="orderContactsname" align="center" width="80"></t:dgCol>
 			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center" width="80"></t:dgCol>
+			<t:dgCol title="所属公司" field="departname" align="center" query="true" width="80"></t:dgCol>
 			<t:dgCol title="司机名称" field="driverName" align="center" query="true" width="80"></t:dgCol>
 			<t:dgCol title="车牌号" field="licencePlate" align="center" width="80"></t:dgCol>
 			<t:dgCol title="订单来源渠道" field="account" align="center" width="80"></t:dgCol>

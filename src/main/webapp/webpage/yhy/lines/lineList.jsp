@@ -56,10 +56,10 @@ $(document).ready(function(){
 });
 function addBusStop(id,name,type) {
 	$("#function-panelAddBusStop").panel(
-			{
-				title :'线路名称：'+name,
-				href:"lineInfoController.do?addBusStop&lineInfoId=" + id + "&lineType=" + type
-			}
-		);
+		{
+			title :'线路名称：'+name,
+			href:"lineInfoController.do?addBusStop&lineInfoId=" + id + "&lineType=" + type
+		}
+	);
 }
 </script>

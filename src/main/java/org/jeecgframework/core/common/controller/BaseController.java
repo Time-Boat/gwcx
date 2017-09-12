@@ -153,7 +153,7 @@ public class BaseController {
 	 */
   	public boolean checkRole(TSUser user, String role){
   		
-  		//是不是平台审核员
+  		//是否拥有role这个角色权限
   		boolean hasPermission = false;
   		
   		//根据角色的不同来判断到底是初审还是复审，运营专员只能进行初审，平台审核员能进行复审，优先进行平台审核员的判断
@@ -255,12 +255,12 @@ public class BaseController {
 	
 	
 	/**
-	 * 获取线路(接送机)
+	 * 获取线路
 	 */
 	public String getLine(){
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type in('2','3');";
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'";
 		List<Object> list = this.systemService.findListbySql(sql);
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){

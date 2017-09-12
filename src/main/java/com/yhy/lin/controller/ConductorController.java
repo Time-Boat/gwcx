@@ -67,6 +67,7 @@ public class ConductorController extends BaseController {
 	 */
 	@RequestMapping(params = "conductorList")
 	public ModelAndView conductorList(HttpServletRequest request) {
+		request.setAttribute("lineNameList",getJurisdiction());
 		return new ModelAndView("yhy/conductor/conductorList");
 	}
 
@@ -113,8 +114,8 @@ public class ConductorController extends BaseController {
 		
 		String cr_bg = request.getParameter("createDate_begin");//创建时间
 		String cr_en = request.getParameter("createDate_end");
-		
-		JSONObject jObject = conductorService.getDatagrid(dataGrid,conductors,cr_bg,cr_en);
+		String lineId = request.getParameter("lineId");
+		JSONObject jObject = conductorService.getDatagrid(dataGrid,conductors,cr_bg,cr_en,lineId);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -297,6 +298,44 @@ public class ConductorController extends BaseController {
 		j.setSuccess(success);
 		j.setMsg(message);
 		return j;
+	}
+	
+	/**
+	 * 获取线路
+	 */
+	public String getJurisdiction(){
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		String code="";
+		if(orgCode.length()>6){
+			 code = orgCode.substring(0,6);
+		}else{
+			code=orgCode;
+		}
+		
+		// 添加了权限
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + code + "%' ";
+		List<Object> list = this.systemService.findListbySql(sql);
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String name = ob[1]+"";
+					json.append("{");
+					json.append("'lineId':'" +id + "',");
+					json.append("'lineName':'"+ name + "'");
+					json.append("},");
+				}
+			}else{
+				json.append("{");
+				json.append("'lineId':'',");
+				json.append("'lineName':''");
+				json.append("},");
+			}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
+		
+		return json.toString();
 	}
 
 }

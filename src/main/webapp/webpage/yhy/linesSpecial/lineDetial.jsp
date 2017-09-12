@@ -9,7 +9,7 @@
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="">
 	<input id="id" name="id" type="hidden" value="${View.id }">
-		<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id="formtableId">
+		<table style="width: 700px;" cellpadding="0" cellspacing="1" class="formtable" id="formtableId">
 			<%-- <tr>${tView.id} 
 			${tView.orderId}
 			</tr> --%>
@@ -159,6 +159,26 @@
 				</td>
 				
 			</tr>
+			<tr>
+				<td align="right">
+					<label class="Validform_label">初审时间：</label>
+				</td>
+				
+				<td class="value">
+					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="firstAuditDate" name="firstAuditDate" 
+					value="<fmt:formatDate value='${View.firstAuditDate}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> <span class="Validform_checktip"></span>
+				</td>
+				
+				<td align="right">
+					<label class="Validform_label">复审时间：</label>
+				</td>
+				
+				<td class="value">
+					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="lastAuditDate" name="lastAuditDate" 
+					value="<fmt:formatDate value='${View.lastAuditDate}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> <span class="Validform_checktip"></span>
+				</td>
+				
+			</tr>
 			
 			<tr>	
 				
@@ -176,7 +196,7 @@
 				<td align="right">
 					<label class="Validform_label">初审被拒绝的原因：</label>
 				</td>
-				<td colspan="3">
+				<td class="value" colspan="3">
 					<textarea id="trialReason" name="trialReason" cols="82" rows="3">${View.trialReason}</textarea>						  
 				</td>
 			</tr>

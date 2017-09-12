@@ -32,25 +32,28 @@
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="50"></t:dgCol>
 	<t:dgCol title="所在城市" field="city"  align="center" width="60"></t:dgCol>
 	 <%--<t:dgCol title="线路备注" field="remark"  align="center" width="50"></t:dgCol>--%>
-	<t:dgCol title="操作" field="opt" width="200"></t:dgCol>
+	<t:dgCol title="操作" field="opt" width="230"></t:dgCol>
 
 	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
-	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail" height="500"></t:dgToolBar>
+	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
 	
 	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#6"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#6"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="firstagree" exp="applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agrees" exp="applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="firstrefuse" exp="applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuses" exp="applicationStatus#eq#2"></t:dgFunOpt>
-	<t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt> 
+	<t:dgFunOpt funname="lookRejectReason(id)" title="初审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="lookRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#6"></t:dgFunOpt> 
 	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
 </t:datagrid> </div>
 <div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
@@ -58,6 +61,7 @@
   </div>
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
+<input type="hidden" value="${companyList}" id="companyList" />
 <div region="east" style="width: 490px;" split="true">
 <div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
@@ -114,6 +118,7 @@
 		);
 	}
 	$(function() {
+		//添加城市条件
 		var json = $("#citylie").val();
 		var obj = eval('(' + json + ')');
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
@@ -125,7 +130,23 @@
 					+ '</option>';
 		}
 		var a4 = '</select></span>';
-		$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);
+		$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);//....
+		
+		//添加所属公司条件
+		var json = $("#companyList").val();
+		console.log(json);
+		var obj1 = eval('(' + json + ')');
+		var ss = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		ss += 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属公司">选择公司：</span>';
+		ss += '<select name="company" style="width: 150px">';
+		ss += '<option value="">选择公司</option>';
+		for (var i = 0; i < obj1.data.length; i++) {
+			ss += '<option value="'+obj1.data[i].dCode+'">' + obj1.data[i].dName
+					+ '</option>';
+		}
+		ss += '</select></span>';
+		$("#lineList2Form").append(ss);//....
+		
 	});
 	
 	function lookLine(id, name) {
@@ -333,7 +354,7 @@
 			return;
 		}
 	    url += '&load=detail&id='+rowsData[0].id;
-		createdetailwindow(title,url,width,600);
+		createdetailwindow(title,url,700,600);
 	}
 	
 	

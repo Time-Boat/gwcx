@@ -60,7 +60,7 @@ public class TransferOrderController extends BaseController {
 	@RequestMapping(params = "transferDriverList")
 	public ModelAndView transferDriverList(HttpServletRequest request, HttpServletResponse response) {
 		request.setAttribute("cityList",getOpencity());
-		request.setAttribute("lineNameList",getLine2());
+		request.setAttribute("lineNameList",getLine());
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
 	}
 	
@@ -99,7 +99,7 @@ public class TransferOrderController extends BaseController {
 		request.setAttribute("lineOrderCode",lineOrderCode);
 		request.setAttribute("carplateList",getCarPlate());	
 		request.setAttribute("driverList",getDriver());	
-		request.setAttribute("lineNameList",getLine());
+		request.setAttribute("lineNameList",getLine2());
 		return new ModelAndView("yhy/transferOrder/transferOrderAirList");
 	}
 	
@@ -185,7 +185,7 @@ public class TransferOrderController extends BaseController {
 	public String getLine2(){
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type  in('2','3','4','5');";
+		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type in('2','3');";
 		List<Object> list = this.systemService.findListbySql(sql);
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){

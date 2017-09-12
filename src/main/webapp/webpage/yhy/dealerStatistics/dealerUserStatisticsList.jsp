@@ -6,7 +6,7 @@
 	<div region="center" style="padding: 0px; border: 0px">
 		<t:datagrid name="dealerStatisticsList" title="用户汇总统计"
 			actionUrl="dealerStatisticsController.do?dealerUserdatagrid"
-			idField="id" fit="true" checkbox="true" queryMode="group">
+			idField="id" fit="true" queryMode="group">
 			<t:dgCol title="渠道商名称" field="account" width="120" align="center"></t:dgCol>
 			<t:dgCol title="注册时间" field="createTime" editor="datebox" width="150"
 				formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group"

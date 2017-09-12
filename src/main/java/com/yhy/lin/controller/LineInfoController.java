@@ -100,7 +100,7 @@ public class LineInfoController extends BaseController {
 					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ");
 		} else {
 			jObject = lineInfoService.getDatagrid3(lineInfos, cityID, beginTime, endTime, dataGrid, lstartTime_begin,
-					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ",username,departname);
+					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ",username,departname,null);   //最后一个参数平台审核员的问题，这个业务暂时不做，先放着
 		}
 		responseDatagrid(response, jObject);
 	}
@@ -163,7 +163,7 @@ public class LineInfoController extends BaseController {
 					LineInfoEntity lin = systemService.getEntity(LineInfoEntity.class, lines.getLineId());
 					if (StringUtil.isNotEmpty(lines)) {
 						List<Line_busStopEntity> list = this.systemService.findByQueryString(
-								"from Line_busStopEntity where siteOrder!='99' and lineId='" + id + "' and siteOrder>" + lines.getSiteOrder());
+								"from Line_busStopEntity where siteOrder!='99' and lineId='" + lin.getId() + "' and siteOrder>" + lines.getSiteOrder());
 						if (list.size() > 0) {
 							for (int i = 0; i < list.size(); i++) {
 								Line_busStopEntity buss = list.get(i);

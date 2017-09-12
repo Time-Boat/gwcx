@@ -6,7 +6,7 @@
 	<div region="center" style="padding: 0px; border: 0px">
 		<t:datagrid name="userStatList" title="用户汇总统计"
 			actionUrl="transferStatisticsController.do?userdatagrid" idField="id"
-			fit="true" checkbox="true" queryMode="group">
+			fit="true" queryMode="group">
 
 			<t:dgCol title="注册时间" field="createTime" editor="datebox"
 				formatter="yyyy-MM-dd hh:mm:ss" query="true" width="120" queryMode="group"

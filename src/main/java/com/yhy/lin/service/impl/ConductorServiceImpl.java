@@ -21,7 +21,7 @@ import net.sf.json.JSONObject;
 public class ConductorServiceImpl extends CommonServiceImpl implements ConductorServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, ConductorEntity conductors, String cr_bg,String cr_en) {
+	public JSONObject getDatagrid(DataGrid dataGrid, ConductorEntity conductors, String cr_bg,String cr_en,String lineId) {
 		// TODO Auto-generated method stub
 		
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -43,8 +43,8 @@ public class ConductorServiceImpl extends CommonServiceImpl implements Conductor
 			queryCondition.append(" and d.phoneNumber like '" + conductors.getPhoneNumber() +"%' ");
 		}
 		
-		if(StringUtil.isNotEmpty(conductors.getPhoneNumber())){
-			queryCondition.append(" and d.jurisdiction like '%" + conductors.getJurisdiction() +"%' ");
+		if(StringUtil.isNotEmpty(lineId)){
+			queryCondition.append(" and d.line_ids like '%" + lineId+"%' ");
 		}
 		if(StringUtil.isNotEmpty(conductors.getStatus())){
 			queryCondition.append(" and d.status ='" + conductors.getStatus() +"' ");

@@ -9,8 +9,7 @@
 		<t:datagrid name="dealerStatisticsList" title="订单收入统计"
 			autoLoadData="true"
 			actionUrl="dealerStatisticsController.do?dealerOrderdatagrid"
-			fitColumns="true" idField="id" fit="true" queryMode="group"
-			checkbox="true">
+			fitColumns="true" idField="id" fit="true" queryMode="group">
 			<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 			<t:dgCol title="渠道商名称" field="account" align="center"></t:dgCol>
 			<t:dgCol title="订单完成时间" field="orderCompletedTime" editor="datebox"
@@ -23,7 +22,7 @@
 			<t:dgCol title="发车时间" field="orderStartime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
 			<t:dgCol title="下单联系人" field="realName" align="center"></t:dgCol>
 			<t:dgCol title="乘车联系人" field="orderContactsname" align="center"></t:dgCol>
-			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
+			<t:dgCol title="所属公司" field="departname" align="center"></t:dgCol>
 			<t:dgCol title="订单状态" field="orderStatus"
 				dictionary="orderStatus" align="center"></t:dgCol>
 			<t:dgCol title="订单数量" field="orderNumbers" align="center"></t:dgCol>

@@ -10,6 +10,7 @@
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="站点名称" field="name" query="true"  align="center" width="80"></t:dgCol>
 	<t:dgCol title="站点地址" field="stopLocation"  align="center" width="120"></t:dgCol>
+	<t:dgCol title="站点类型" field="stationType" dictionary="sType" query="true" align="center" width="120"></t:dgCol>
 	<%-- <t:dgCol title="状态" field="status" replace="启用_0,禁用_1" align="center" query="true"  width="60"></t:dgCol> --%>
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center" width="100"></t:dgCol>
 	<t:dgCol title="创建人" field="createPeople"  align="center" width="60"></t:dgCol>
