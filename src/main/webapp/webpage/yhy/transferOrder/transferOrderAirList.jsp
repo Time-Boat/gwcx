@@ -121,6 +121,11 @@
 				tip('未付款的订单不能安排车辆');
 				return;
 			}
+			//判断订单状态，已完成订单不能安排司机车辆
+			if(rows[i].orderStatus == '0'){
+				tip('已完成订单不能安排司机车辆');
+				return;
+			}
 			
 			//判断选中的订单是不是在同一条线路上
 			if(lineId == rows[i].lineId){

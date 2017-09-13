@@ -135,14 +135,16 @@
 		//添加所属公司条件
 		var json = $("#companyList").val();
 		console.log(json);
-		var obj1 = eval('(' + json + ')');
+		var obj1 = "";
 		var ss = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		ss += 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属公司">选择公司：</span>';
 		ss += '<select name="company" style="width: 150px">';
 		ss += '<option value="">选择公司</option>';
-		for (var i = 0; i < obj1.data.length; i++) {
-			ss += '<option value="'+obj1.data[i].dCode+'">' + obj1.data[i].dName
-					+ '</option>';
+		if(json != null && json != ""){
+			obj1 = eval('(' + json + ')');
+			for (var i = 0; i < obj1.data.length; i++) {
+				ss += '<option value="'+obj1.data[i].dCode+'">' + obj1.data[i].dName + '</option>';
+			}
 		}
 		ss += '</select></span>';
 		$("#lineList2Form").append(ss);//....

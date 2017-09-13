@@ -58,8 +58,10 @@ public class LineInfoSpecializedController extends BaseController {
 		boolean hasPermission = checkRole(user, AppGlobals.PLATFORM_LINE_AUDIT);
 		if (hasPermission) {
 			String oc = user.getOrgCompany();
-			String json = getCompany(oc);
-			request.setAttribute("companyList", json);
+			if(StringUtil.isNotEmpty(oc)){
+				String json = getCompany(oc);
+				request.setAttribute("companyList", json);
+			}
 		}
 		return new ModelAndView("yhy/linesSpecial/lineList");
 	}

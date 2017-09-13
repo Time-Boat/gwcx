@@ -1155,7 +1155,7 @@ public class UserController extends BaseController {
 			for(TSDepart depart:departs){
 				departCodes += depart.getOrgCode()+",";
 			}
-			user.setDepartid(departCodes.substring(0,departCodes.length()-1));
+			user.setDepartid(departCodes.substring(0,departCodes.length()));
 		}
 		modelMap.put(NormalExcelConstants.FILE_NAME,"用户表");
 		modelMap.put(NormalExcelConstants.CLASS,TSUser.class);

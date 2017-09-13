@@ -134,13 +134,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			if(StringUtil.isNotEmpty(company)){
 				sqlWhere.append(" and b.org_code like '" + company + "%' ");
 			}else{
-				sqlWhere.append("and (");
+				sqlWhere.append("and ( 1=2 ");
 				String[] ocArr = oc.split(",");
 				for (int i = 0; i < ocArr.length; i++) {
-					if(i == ocArr.length-1)
-						sqlWhere.append(" b.org_code like '"+ocArr[i]+"%' ");
-					else
-						sqlWhere.append(" b.org_code like '"+ocArr[i]+"%' or ");
+					sqlWhere.append(" or b.org_code like '"+ocArr[i]+"%' ");
 				}
 				sqlWhere.append(")");
 			}
