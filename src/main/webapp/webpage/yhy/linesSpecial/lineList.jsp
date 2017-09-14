@@ -24,9 +24,7 @@
 	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status" query="true" align="center" width="50"></t:dgCol>
 	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="50"></t:dgCol>
-	<%-- <t:dgCol title="发车时间" field="lstartTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
-	<t:dgCol title="预计到达时间" field="lendTime" editor="datebox" formatter="hh:mm:ss" query="true" queryMode="group"  align="center" width="120"></t:dgCol>
-	 --%>
+	
 	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="50"></t:dgCol>
 	 
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="50"></t:dgCol>
@@ -340,14 +338,7 @@
 		createwindow(title,url,width,height);
 		
 	}
-	/* 
-	function detail(title,url,id,width,height){
-		/* var rows = $("#lineList2").datagrid("getSelections");
-		url=url+"&id="+rows[0].id;
-		createwindow(title,url,'800px','600px'); 
-		detail(title,url,'lineList2',null,600)
-	} 
-	*/
+	
 	function detail(title,url, id,width,height) {
 		var rowsData = $('#'+id).datagrid('getSelections');
 		
@@ -362,7 +353,5 @@
 	    url += '&load=detail&id='+rowsData[0].id;
 		createdetailwindow(title,url,700,600);
 	}
-	
-	
 	
 </script>

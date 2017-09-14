@@ -29,10 +29,10 @@
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		<t:dgCol title="初审时间" field="firstAuditDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
 		<t:dgCol title="初审人" field="firstAuditUser" align="center"></t:dgCol>
-		<t:dgCol title="初审状态" field="firstAuditStatus" dictionary="first_audit_status" align="center"></t:dgCol>
+		<t:dgCol title="初审状态" field="firstAuditStatus" dictionary="audit_status" align="center"></t:dgCol>
 		<t:dgCol title="复审时间" field="lastAuditDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
 		<t:dgCol title="复审人" field="lastAuditUser" align="center"></t:dgCol>
-		<t:dgCol title="复审状态" field="lastAuditStatus"  dictionary="last_audit_status" align="center"></t:dgCol>
+		<t:dgCol title="复审状态" field="lastAuditStatus"  dictionary="audit_status" align="center"></t:dgCol>
 		<%-- <t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol> --%>
 		<t:dgCol title="订单状态" field="orderStatus" replace="取消订单待退款_3,取消订单完成退款_4" dictionary="orderStatus" query="true" align="center"></t:dgCol>

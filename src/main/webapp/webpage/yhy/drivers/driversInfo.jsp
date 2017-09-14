@@ -191,7 +191,7 @@
 					</td>
 					<td class="value">
 						<div class="form" id="filediv"></div>
-						<div class="form"><t:upload name="file_upload" uploader="driversInfoController.do?saveOrUpdate" extend="*.jpg;*.jpeg;*.png;*.jpg;" 
+						<div class="form"><t:upload name="file_upload" uploader="driversInfoController.do?saveImgUrl" extend="*.jpg;*.jpeg;*.png;*.jpg;" 
 							id="file_upload" formId="driversInfo"></t:upload></div>
 						<%-- <input type="image" id="drivingLicenseImgUrl" name="drivingLicenseImgUrl"  src="${driversInfoPage.drivingLicenseImgUrl}"> --%>
 					</td>

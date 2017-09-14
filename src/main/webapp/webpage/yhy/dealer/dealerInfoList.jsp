@@ -242,12 +242,15 @@
    <t:dgCol title="提交申请时间" field="commitApplyDate" align="center" width="120" formatter="yyyy-MM-dd hh:mm:ss"></t:dgCol>
    <t:dgCol title="申请内容" field="applyType" dictionary="apply_type" align="center" width="120"></t:dgCol>
    
-   <t:dgCol title="审核用户" field="auditUser" align="center" width="120"></t:dgCol>
-   <t:dgCol title="审核时间" field="auditDate" align="center" width="120" formatter="yyyy-MM-dd hh:mm:ss" ></t:dgCol>
-   <t:dgCol title="审核状态" field="auditStatus" dictionary="audit_status" query="true" align="center" width="120"></t:dgCol>
+   <t:dgCol title="初审状态" field="auditStatus" dictionary="audit_status" align="center"></t:dgCol>
+   <t:dgCol title="初审时间" field="auditDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
+   <t:dgCol title="初审人" field="auditUser" align="center"></t:dgCol>
+   <t:dgCol title="复审状态" field="lastAuditStatus"  dictionary="audit_status" align="center"></t:dgCol>
+   <t:dgCol title="复审时间" field="lastAuditDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
+   <t:dgCol title="复审人" field="lastAuditUser" align="center"></t:dgCol>
    
    <t:dgCol title="操作" field="opt" ></t:dgCol>
-   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#eq#-1"/>
+   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}"/>
    <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add" operationCode="dealerAdd" ></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update" operationCode="dealerUpdate" ></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
@@ -258,10 +261,14 @@
    <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt> 
    
    <!-- 权限按钮 -->
-   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2||lastAuditStatus#eq#2||auditStatus#eq#-1"></t:dgFunOpt> 
-   <%-- <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>  --%>
+   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&lastAuditStatus#eq#2"></t:dgFunOpt>
+   
    <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#eq#2"></t:dgFunOpt> 
-   <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2||lastAuditStatus#eq#2"></t:dgFunOpt> 
+   <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2"></t:dgFunOpt> 
+   <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="lastAuditStatus#eq#2"></t:dgFunOpt> 
+   
    <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgreeMA" exp="auditStatus#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgreePA" exp="lastAuditStatus#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerRejectMA" exp="auditStatus#eq#0"></t:dgFunOpt>

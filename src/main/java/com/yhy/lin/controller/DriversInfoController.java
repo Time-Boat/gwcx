@@ -60,7 +60,7 @@ public class DriversInfoController extends BaseController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(params = "list")
+	@RequestMapping(params = "driversInfoList")
 	public ModelAndView list(HttpServletRequest request) {
 		request.setAttribute("cityList",getOpencity());
 		return new ModelAndView("yhy/drivers/driversInfoList");
@@ -198,9 +198,9 @@ public class DriversInfoController extends BaseController {
 	 * @param ids
 	 * @return
 	 */
-	@RequestMapping(params = "saveOrUpdate", method = RequestMethod.POST)
+	@RequestMapping(params = "saveImgUrl", method = RequestMethod.POST)
 	@ResponseBody
-	public AjaxJson saveOrUpdate(DriversInfoEntity driversInfo,HttpServletRequest request) throws Exception {
+	public AjaxJson saveImgUrl(DriversInfoEntity driversInfo,HttpServletRequest request) throws Exception {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		driversInfo = systemService.get(DriversInfoEntity.class, driversInfo.getId());

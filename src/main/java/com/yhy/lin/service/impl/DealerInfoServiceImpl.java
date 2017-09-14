@@ -32,8 +32,8 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		String sql = "select d.id,d.account,d.create_date,d.QR_code_url,d.scan_count,d.phone,d.manager,d.position,d.bank_account,d.status,d.audit_user,"
-				+ "d.audit_date,d.audit_status,d.commit_apply_date,d.apply_type,u.username "
+		String sql = "select d.id,d.account,d.create_date,d.QR_code_url,d.scan_count,d.phone,d.manager,d.position,d.bank_account,d.status,"
+				+ " d.audit_user,d.audit_date,d.audit_status,d.last_audit_user,d.last_audit_date,d.last_audit_status,d.commit_apply_date,d.apply_type,u.username "
 				+ " from dealer_info d join t_s_base_user u on d.create_user_id = u.id join t_s_depart t on t.id = d.departId ";
 		if (!sqlWhere.isEmpty()) {
 			sql += sqlWhere;
@@ -60,6 +60,9 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 				,new Db2Page("auditUser", "audit_user", null)
 				,new Db2Page("auditDate", "audit_date", null)
 				,new Db2Page("auditStatus", "audit_status", null)
+				,new Db2Page("lastAuditUser", "last_audit_user", null)
+				,new Db2Page("lastAuditDate", "last_audit_date", null)
+				,new Db2Page("lastAuditStatus", "last_audit_status", null)
 				,new Db2Page("commitApplyDate", "commit_apply_date", null)
 				,new Db2Page("applyType", "apply_type", null)
 				,new Db2Page("status", "status", null)

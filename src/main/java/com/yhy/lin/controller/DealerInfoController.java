@@ -74,7 +74,6 @@ public class DealerInfoController extends BaseController {
 	 * @param dataGrid
 	 * @param user
 	 */
-
 	@RequestMapping(params = "datagrid")
 	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
@@ -228,7 +227,12 @@ public class DealerInfoController extends BaseController {
 			// 清空审核状态
 			dealerInfo.setAuditDate(null);
 			dealerInfo.setAuditUser("");
-
+			dealerInfo.setRejectReason("");
+			dealerInfo.setLastAuditDate(null);
+			dealerInfo.setLastAuditUser("");
+			dealerInfo.setLastAuditStatus("");
+			dealerInfo.setLastRejectReason("");
+			
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器失败";
@@ -302,21 +306,28 @@ public class DealerInfoController extends BaseController {
 		
 		try {
 			String apply = dealerInfo.getApplyType();
-			
 			String status = dealerInfo.getAuditStatus();
-			//如果初审状态是待审核状态，则进行初审
-			if("0".equals(status)){
-				dealerInfo.setAuditStatus("");
+			String recheck = dealerInfo.getLastAuditStatus();
+			
+			if("0".equals(status)){				//如果初审状态是待审核状态，则进行初审
+				dealerInfo.setAuditDate(AppUtil.getDate());
+				dealerInfo.setAuditStatus("1");
+				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+				dealerInfo.setLastAuditStatus("0");
+			} else if("0".equals(recheck)){		//如果复审状态是待审核状态，则进行复审
+				dealerInfo.setLastAuditDate(AppUtil.getDate());
+				dealerInfo.setLastAuditStatus("1");
+				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
 			}
 			
-			if ("0".equals(apply)) {
-				dealerInfo.setStatus("0");
-			} else {
-				dealerInfo.setStatus("2");
+			//如果是复审，则要改变渠道商合作状态
+			if("0".equals(recheck)){
+				if ("0".equals(apply)) {
+					dealerInfo.setStatus("0");
+				} else {
+					dealerInfo.setStatus("2");
+				}
 			}
-			dealerInfo.setAuditDate(AppUtil.getDate());
-			dealerInfo.setAuditStatus("1");
-			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
@@ -344,11 +355,22 @@ public class DealerInfoController extends BaseController {
 
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
-			dealerInfo.setAuditDate(AppUtil.getDate());
-			dealerInfo.setAuditStatus("2");
-			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
-			dealerInfo.setRejectReason(rejectReason);
-
+			
+			String status = dealerInfo.getAuditStatus();
+			String recheck = dealerInfo.getLastAuditStatus();
+			
+			if("0".equals(status)){				//如果初审状态是待审核状态，则进行初审
+				dealerInfo.setAuditDate(AppUtil.getDate());
+				dealerInfo.setAuditStatus("2");
+				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+				dealerInfo.setRejectReason(rejectReason);
+			} else if("0".equals(recheck)){		//如果复审状态是待审核状态，则进行复审
+				dealerInfo.setLastAuditDate(AppUtil.getDate());
+				dealerInfo.setLastAuditStatus("2");
+				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
+				dealerInfo.setLastRejectReason(rejectReason);
+			}
+			
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器异常";
@@ -359,7 +381,7 @@ public class DealerInfoController extends BaseController {
 		return j;
 	}
 
-	// 获取拒绝退款原因
+	// 获取拒绝原因
 	@RequestMapping(params = "getReason")
 	@ResponseBody
 	public AjaxJson getReason(HttpServletRequest request) {
@@ -369,7 +391,12 @@ public class DealerInfoController extends BaseController {
 		String id = request.getParameter("id");// id
 
 		DealerInfoEntity t = dealerInfoService.getEntity(DealerInfoEntity.class, id);
-		String reasont = t.getRejectReason();
+		String reasont = "";
+		if("2".equals(t.getAuditStatus())){
+			reasont = t.getRejectReason();
+		}else{
+			reasont = t.getLastRejectReason();
+		}
 
 		j.setSuccess(true);
 		j.setMsg(reasont);
