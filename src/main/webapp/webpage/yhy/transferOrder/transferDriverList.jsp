@@ -28,33 +28,39 @@
 	$(function() {
 		var json = $("#lineNames").val();
 		var json1 = $("#citylie").val();
-		var obj = eval('(' + json + ')');
-		var obj1 = eval('(' + json1 + ')');
 		
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
 		var a3 = '<select name="lineId" style="width: 150px">';
 		var c1 = '<option value="">选择所属线路</option>';
-		for (var i = 0; i < obj.data.length; i++) {
-			c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName
-					+ '</option>';
+		
+		if(json.indexOf("lineId")>0){
+			var obj = eval('(' + json + ')');
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName+ '</option>';
+			}
 		}
+		
 		var a4 = '</select></span>';
 		
 		var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
 		var aa3 = '<select name="cityID" style="width: 150px">';
 		var cc1 = '<option value="">选择城市</option>';
-		for (var i = 0; i < obj1.data.length; i++) {
-			cc1 += '<option value="'+obj1.data[i].cityID+'">' + obj1.data[i].cityName
-					+ '</option>';
+		
+		if(json1.indexOf("cityID")>0){
+			var obj1 = eval('(' + json1 + ')');
+			for (var i = 0; i < obj1.data.length; i++) {
+				cc1 += '<option value="'+obj1.data[i].cityID+'">' + obj1.data[i].cityName+ '</option>';
+			}
 		}
+		
 		var aa4 = '</select></span>';
 		$("#transferDriverListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2 + aa3 + cc1 + aa4);
 			
 	});
 
-	//安排车辆司机 
+	// 安排车辆司机 
 	function editCarAndDriver(title,url,id,width,height){
 		
 		var rows = $("#transferDriverList").datagrid("getSelections");

@@ -6,6 +6,7 @@ import org.jeecgframework.core.common.service.CommonService;
 import org.jeecgframework.core.interceptors.DateConvertEditor;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.web.system.service.UserService;
@@ -15,6 +16,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.yhy.lin.app.util.AppGlobals;
 
 import net.sf.json.JSONObject;
 
@@ -282,6 +285,43 @@ public class BaseController {
 		json.delete(json.length()-1, json.length());
 		json.append("]}");
 		
+		return json.toString();
+	}
+	
+	/**
+	 * 获取渠道商用户信息
+	 */
+	public String getAccount(){
+		StringBuffer sql = new StringBuffer();
+		
+		sql.append("select d.id,d.account from dealer_info d, t_s_depart td where status='0' ");
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and d.create_user_id = '" + userId + "' ");
+		}
+		sql.append(" and td.org_code like '" + orgCode + "%' and td.id=d.departId");
+				
+		List<Object> list = this.systemService.findListbySql(sql.toString());
+		StringBuffer json = new StringBuffer("{'data':[");
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				Object[] ob = (Object[]) list.get(i);
+				String id = ob[0]+"";
+				String account = ob[1]+"";
+					json.append("{");
+					json.append("'id':'" +id + "',");
+					json.append("'account':'"+ account + "'");
+					json.append("},");
+			}
+		}
+		json.delete(json.length()-1, json.length());
+		json.append("]}");
 		return json.toString();
 	}
 }

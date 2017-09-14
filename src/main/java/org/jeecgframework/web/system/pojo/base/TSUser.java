@@ -37,7 +37,18 @@ public class TSUser extends TSBaseUser implements java.io.Serializable {
 	private java.lang.String updateName;
 	/**管理公司(只有角色中包含平台线路审核员，此字段才有值)*/
 	private java.lang.String orgCompany;
+	/**角色类型   0：线路审核员   1：渠道商审核员   2：退款审核员 (只有角色中包含审核员，此字段才有值)*/
+	private java.lang.String roleType;
 	
+	@Column(name = "role_type", length = 1)
+	public java.lang.String getRoleType() {
+		return roleType;
+	}
+
+	public void setRoleType(java.lang.String roleType) {
+		this.roleType = roleType;
+	}
+
 	@Column(name = "org_company", length = 255)
 	public java.lang.String getOrgCompany() {
 		return orgCompany;

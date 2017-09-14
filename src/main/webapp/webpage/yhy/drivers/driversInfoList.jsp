@@ -33,14 +33,15 @@
 <script type="text/javascript">
 	$(function() {
 		var json = $("#citylie").val();
-		var obj = eval('(' + json + ')');
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
 		var a3 = '<select name="cityID" style="width: 150px">';
 		var c1 = '<option value="">所在城市</option>';
-		for (var i = 0; i < obj.data.length; i++) {
-			c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
-					+ '</option>';
+		if(json.indexOf("cityID")>0){
+			var obj = eval('(' + json + ')');
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName+ '</option>';
+			}
 		}
 		var a4 = '</select></span>';
 		$("#driversInfoListForm").append(a1 + a2 + a3 + c1 + a4);

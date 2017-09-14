@@ -28,13 +28,15 @@
  
  	$(function(){
  		var json = $("#companys").val();
- 		var obj = eval('(' + json + ')');
  		var a1 = '<span style="display:-moz-inline-box;display:inline-block;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="公司名称">公司名称：</span>';
  		var a3 = '<select name="companyId" style="width: 150px">';
  		var c1 = '<option value="">选择入住公司</option>';
-		for(var i=0;i<obj.data.length;i++){
-			c1 += '<option value="'+obj.data[i].id+'">'+obj.data[i].departname+'</option>';
+ 		if(json.indexOf("departname")>0){
+			var obj = eval('(' + json + ')');
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].id+'">'+obj.data[i].departname+'</option>';
+			}
 		}
  		var a4 = '</select></span>';
  		$("#staffInfoListForm").append(a1+a2+a3+c1+a4);

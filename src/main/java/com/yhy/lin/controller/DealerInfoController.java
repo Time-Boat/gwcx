@@ -14,12 +14,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
@@ -30,7 +28,6 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
-import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
 
 import net.sf.json.JSONObject;
@@ -65,6 +62,7 @@ public class DealerInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "dealerInfoList")
 	public ModelAndView list(HttpServletRequest request) {
+		request.setAttribute("accountList",getAccount());
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
 
@@ -301,8 +299,16 @@ public class DealerInfoController extends BaseController {
 		String id = req.getParameter("id");
 
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+		
 		try {
 			String apply = dealerInfo.getApplyType();
+			
+			String status = dealerInfo.getAuditStatus();
+			//如果初审状态是待审核状态，则进行初审
+			if("0".equals(status)){
+				dealerInfo.setAuditStatus("");
+			}
+			
 			if ("0".equals(apply)) {
 				dealerInfo.setStatus("0");
 			} else {

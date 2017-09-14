@@ -39,17 +39,20 @@
 
 	$(function() {
 		var json = $("#accounts").val();
-		var obj = eval('(' + json + ')');
+		
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="渠道商名称">渠道商名称：</span>';
 		var a3 = '<select name="accountId" style="width: 150px">';
 		var c1 = '<option value="">选择渠道商</option>';
-		for (var i = 0; i < obj.data.length; i++) {
-			c1 += '<option value="'+obj.data[i].id+'">' + obj.data[i].account
-					+ '</option>';
+		if(json.indexOf("account")>0){
+			var obj = eval('(' + json + ')');
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].id+'">' + obj.data[i].account+ '</option>';
+			}
 		}
 		var a4 = '</select></span>';
 		$("#dealerStatisticsListForm").append(a1 + a2 + a3 + c1 + a4);
+		
 		$(".datagrid-toolbar")
 				.append(
 						"<div id='total' hidden='true'><label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;渠道商累计用户量：</label><label id='orderTotal'></label> </div>");

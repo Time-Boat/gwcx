@@ -70,7 +70,51 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String applyType;
 	/**拒绝原因 */
 	private String rejectReason;
+	/**复审审核状态   0：复审待审核     1：复审通过    2：复审未通过*/
+	private String lastAuditStatus;
+	/**复审人id*/
+	private String lastAuditUser;
+	/**复审时间*/
+	private Date lastAuditDate;
+	/**复审拒绝原因*/
+	private String lastRejectReason;
 	
+	@Column(name ="LAST_AUDIT_STATUS",nullable=true,length=1)
+	public String getLastAuditStatus() {
+		return lastAuditStatus;
+	}
+
+	public void setLastAuditStatus(String lastAuditStatus) {
+		this.lastAuditStatus = lastAuditStatus;
+	}
+	
+	@Column(name ="LAST_AUDIT_USER",nullable=true,length=32)
+	public String getLastAuditUser() {
+		return lastAuditUser;
+	}
+
+	public void setLastAuditUser(String lastAuditUser) {
+		this.lastAuditUser = lastAuditUser;
+	}
+
+	@Column(name ="LAST_AUDIT_DATE",nullable=true)
+	public Date getLastAuditDate() {
+		return lastAuditDate;
+	}
+
+	public void setLastAuditDate(Date lastAuditDate) {
+		this.lastAuditDate = lastAuditDate;
+	}
+
+	@Column(name ="LAST_REJECT_REASON",nullable=true,length=500)
+	public String getLastRejectReason() {
+		return lastRejectReason;
+	}
+
+	public void setLastRejectReason(String lastRejectReason) {
+		this.lastRejectReason = lastRejectReason;
+	}
+
 	@Column(name ="REJECT_REASON",nullable=true,length=500)
 	public String getRejectReason() {
 		return rejectReason;

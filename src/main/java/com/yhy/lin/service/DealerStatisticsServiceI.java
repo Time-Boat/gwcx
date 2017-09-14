@@ -21,7 +21,7 @@ public interface DealerStatisticsServiceI extends CommonService {
 	public JSONObject getDealerOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String lineName,
 			String orderType,String account, String fc_begin, String fc_end);
 
-	public String getWhere4(String lineName, String orderType, String account, String fc_begin,String fc_end);
+	public String getWhere4(TransferorderEntity transferorder,String lineName, String orderType, String account, String fc_begin,String fc_end);
 	
 	public String getWhere(String account, String fc_begin,String fc_end);
 	

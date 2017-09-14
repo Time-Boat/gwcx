@@ -361,8 +361,21 @@ public class UserController extends BaseController {
 		
 		String id = request.getParameter("id");
 		
-		List<String> orgList = systemService.findListbySql(
-				"select org_company from t_s_user where org_company is not null and id != '" + id + "'");
+		String roleType = request.getParameter("roleType");
+		
+		//角色类型
+		StringBuffer rArr = new StringBuffer("%");
+		for(int i = 0; i < roleType.length(); i++){
+			rArr.append(roleType.charAt(i) + "%");
+		}
+		
+		String sql = "select org_company from t_s_user where org_company is not null and role_type REGEXP ('[" + rArr.toString() + "]') ";
+		
+		if(StringUtil.isNotEmpty(id)){
+			sql += " and id != '" + id + "' ";
+		}
+		
+		List<String> orgList = systemService.findListbySql(sql);
 		
 		StringBuffer orgs = new StringBuffer();
 		for(String org : orgList){
@@ -586,20 +599,23 @@ public class UserController extends BaseController {
 		//平台线路管理员管理公司    (找个字段存进去)
 		String orgCodes = req.getParameter("lineOrgCode");
 		
+		String roleType = req.getParameter("roleType");
+		
 		if (StringUtil.isNotEmpty(user.getId())) {
 			TSUser users = systemService.getEntity(TSUser.class, user.getId());
 			users.setEmail(user.getEmail());
 			users.setOfficePhone(user.getOfficePhone());
 			users.setMobilePhone(user.getMobilePhone());
 			
-			if(StringUtil.isNotEmpty(orgCodes)){
+			if(StringUtil.isNotEmpty(orgCodes) && StringUtil.isNotEmpty(roleType)){
 				users.setOrgCompany(orgCodes);
+				users.setRoleType(roleType);
 			}
 			
             systemService.executeSql("delete from t_s_user_org where user_id=?", user.getId());
             saveUserOrgList(req, user);
 //            users.setTSDepart(user.getTSDepart());
-
+            
 			users.setRealName(user.getRealName());
 			users.setStatus(Globals.User_Normal);
 			users.setActivitiSync(user.getActivitiSync());
@@ -622,9 +638,12 @@ public class UserController extends BaseController {
 //				}
 				user.setStatus(Globals.User_Normal);
 				user.setDeleteFlag(Globals.Delete_Normal);
-				if(StringUtil.isNotEmpty(orgCodes)){
+				
+				if(StringUtil.isNotEmpty(orgCodes) && StringUtil.isNotEmpty(roleType)){
 					user.setOrgCompany(orgCodes);
+					user.setRoleType(roleType);
 				}
+				
 				systemService.save(user);
                 // todo zhanggm 保存多个组织机构
                 saveUserOrgList(req, user);

@@ -145,6 +145,9 @@ public interface AppGlobals {
 	/** 平台退款审核员 */
 	public static final String PLATFORM_REFUND_AUDIT = "refundAudit";
 	
+	/** 平台渠道商审核员 */
+	public static final String PLATFORM_DEALER_AUDIT = "dealerAudit";
+	
 	/** 子公司管理员 */
 	public static final String SUBSIDIARY_ADMIN = "companyAdmin";
 	

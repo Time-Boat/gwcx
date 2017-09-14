@@ -54,7 +54,7 @@ public class LineInfoSpecializedController extends BaseController {
 	public ModelAndView lineList(HttpServletRequest request) {
 		request.setAttribute("cityList", getOpencity());
 
-		TSUser user = ResourceUtil.getSessionUserName();
+		/*TSUser user = ResourceUtil.getSessionUserName();
 		boolean hasPermission = checkRole(user, AppGlobals.PLATFORM_LINE_AUDIT);
 		if (hasPermission) {
 			String oc = user.getOrgCompany();
@@ -62,7 +62,7 @@ public class LineInfoSpecializedController extends BaseController {
 				String json = getCompany(oc);
 				request.setAttribute("companyList", json);
 			}
-		}
+		}*/
 		return new ModelAndView("yhy/linesSpecial/lineList");
 	}
 
@@ -70,7 +70,7 @@ public class LineInfoSpecializedController extends BaseController {
 	 * 获得子公司
 	 * 
 	 * @return
-	 */
+	 *//*
 	public String getCompany(String oc) {
 
 		String[] ocArr = oc.split(",");
@@ -99,7 +99,7 @@ public class LineInfoSpecializedController extends BaseController {
 		json.delete(json.length() - 1, json.length());
 		json.append("]}");
 		return json.toString();
-	}
+	}*/
 
 	@RequestMapping(params = "datagrid")
 	public void datagrid(LineInfoEntity lineInfos, HttpServletRequest request, HttpServletResponse response,
@@ -115,13 +115,13 @@ public class LineInfoSpecializedController extends BaseController {
 		String lendTime_begin = request.getParameter("lendTime_begin");
 		String lendTime_end = request.getParameter("lendTime_end");
 
-		String company = request.getParameter("company");
+//		String company = request.getParameter("company");
 
 		// 因为调用的方法一样，所以在外层来处理... 忘记是啥意思了。。。
 		linetype = " >='" + linetype + "' ";
 		JSONObject jObject = lineInfoService.getDatagrid3(lineInfos, cityid, beginTime, endTime, dataGrid,
 				lstartTime_begin, lstartTime_end, lendTime_begin, lendTime_end, linetype, username, departname,
-				company);
+				null);
 		responseDatagrid(response, jObject);
 	}
 

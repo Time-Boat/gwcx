@@ -61,7 +61,7 @@
   </div>
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
-<input type="hidden" value="${companyList}" id="companyList" />
+<%-- <input type="hidden" value="${companyList}" id="companyList" /> --%>
 <div region="east" style="width: 490px;" split="true">
 <div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
@@ -120,33 +120,37 @@
 	$(function() {
 		//添加城市条件
 		var json = $("#citylie").val();
-		var obj = eval('(' + json + ')');
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
 		var a3 = '<select name="cityID" style="width: 150px">';
 		var c1 = '<option value="">选择城市</option>';
-		for (var i = 0; i < obj.data.length; i++) {
-			c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName
-					+ '</option>';
+		
+		if(json.indexOf("cityID")>0){
+			var obj = eval('(' + json + ')');
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].cityID+'">' + obj.data[i].cityName+ '</option>';
+			}
 		}
 		var a4 = '</select></span>';
 		$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);//....
 		
-		//添加所属公司条件
-		var json = $("#companyList").val();
+		/* //添加所属公司条件
+		var json1 = $("#companyList").val();
 		console.log(json);
 		var obj1 = "";
 		var ss = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		ss += 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属公司">选择公司：</span>';
 		ss += '<select name="company" style="width: 150px">';
 		ss += '<option value="">选择公司</option>';
-		if(json != null && json != ""){
-			obj1 = eval('(' + json + ')');
+		
+		if(json1.indexOf("dCode")>0){
+			var obj1 = eval('(' + json1 + ')');
 			for (var i = 0; i < obj1.data.length; i++) {
 				ss += '<option value="'+obj1.data[i].dCode+'">' + obj1.data[i].dName + '</option>';
 			}
 		}
-		ss += '</select></span>';
+		
+		ss += '</select></span>'; */
 		$("#lineList2Form").append(ss);//....
 		
 	});

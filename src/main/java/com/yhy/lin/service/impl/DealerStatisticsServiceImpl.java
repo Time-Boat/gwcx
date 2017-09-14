@@ -107,7 +107,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 	@Override
 	public JSONObject getDealerOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String lineName,
 			String orderType, String account, String fc_begin, String fc_end) {
-		String sqlWhere = getWhere4(lineName, orderType, account, fc_begin, fc_end);
+		String sqlWhere = getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -200,9 +200,14 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		return sql.toString();
 	}
 	
-	public String getWhere4(String lineName, String orderType, String account, String fc_begin,
+	public String getWhere4(TransferorderEntity transferorder,String lineName, String orderType, String account, String fc_begin,
 			String fc_end) {
 		StringBuffer sql = new StringBuffer();
+		
+		//订单编号
+		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
+			sql.append(" and t.order_id like '%" + transferorder.getOrderId() + "%'");
+		}
 		
 		//渠道商
 		if (StringUtil.isNotEmpty(account)) {
@@ -236,4 +241,5 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 
 		return sql.toString();
 	}
+
 }

@@ -67,7 +67,7 @@
 	  		}
 	  		
 	  		//修改要提交的action
-	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1));
+	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1)) + "&roleType=" + roleType;
 	  		return b;
 	  	}
 
@@ -115,18 +115,29 @@
 		//是否已经加载过数据,不重复加载
 		var isLoad = false;
 		
+		//角色类型    0：线路审核员   1：渠道商审核员   2：退款审核员
+		var roleType = "";
+		
 		//弹出框确定之后的回调函数
 		function roleSuccess(){
-			
+			roleType = "";
 			var names = $('#roleName').val();
 			if(typeof(names) != 'undefined' && names != null && names != ''){
 				var arr = names.split(",");
 				for(var i=0;i<arr.length;i++){
-					if(arr[i] == '平台线路审核员'){
-						oc = true;
-						break;
-					}else{
-						oc = false;
+					switch (arr[i]) {
+				        case "平台线路审核员":
+				        	roleType += "0";
+				        	oc = true;
+				            break;
+				        case "平台渠道商审核员":
+				        	roleType += "1";
+				        	oc = true;
+				            break;
+				        case "平台退款审核员":
+				        	roleType += "2";
+				        	oc = true;
+				            break;
 					}
 				}
 				if(oc){
@@ -136,9 +147,9 @@
 				}
 			}
 			
-			if(!isLoad && oc){
+			if(oc){
 				$.get(
-					"userController.do?getCompany&id="+$('#id').val(),
+					"userController.do?getCompany&id="+$('#id').val()+"&roleType="+roleType,
 					function(data){
 						console.log(data);
 						if(data.success){
@@ -157,7 +168,7 @@
 								td += '<span class="demo--checkbox demo--radioInput"></span> ' + obj[i].departname;
 								td += '</label> ';
 							}
-							$("#company_td").append(td);
+							$("#company_td").empty().append(td);
 							//<span class="Validform_checktip"></span>
 						}
 						isLoad = true;

@@ -33,18 +33,19 @@
 <input type="hidden" value="${lineNameList}" id="lineNames" />
  <script type="text/javascript">
  
-//进入触发 
+	//进入触发 
 	$(function() {
 		var json = $("#lineNames").val();
-		var obj = eval('(' + json + ')');
-		
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
 		var a3 = '<select name="lineId" style="width: 150px">';
 		var c1 = '<option value="">选择所属线路</option>';
-		for (var i = 0; i < obj.data.length; i++) {
-			c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName
-					+ '</option>';
+		
+		if(json.indexOf("lineId")>0){
+			var obj = eval('(' + json + ')');
+			for (var i = 0; i < obj.data.length; i++) {
+				c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName+ '</option>';
+			}
 		}
 		var a4 = '</select></span>';
 		$("#conductorListForm").append(a1 + a2 + a3 + c1 + a4);

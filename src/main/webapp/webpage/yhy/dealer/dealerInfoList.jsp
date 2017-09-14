@@ -167,11 +167,11 @@
 				tip('请选择编辑项目');
 				return;
 			}
-			if (rowsData.lengt > 1) {
+			if (rowsData.length > 1) {
 				tip('请选择一条记录再编辑');
 				return;
 			}
-			if (rowsData[0].auditStatus == 0) {
+			if (rowsData[0].auditStatus == 0 || rowsData[0].lastAuditStatus == 0) {
 				tip('审核状态中不能被编辑');
 				return;
 			}
@@ -206,13 +206,31 @@
 			url += '&ids='+ids;
 			createwindow(title,url,width,height);
 		}
+		//初始化查询条件
+		$(function() {
+			var json = $("#accounts").val();
+			
+			var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+	 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="渠道商名称">渠道商名称：</span>';
+			var a3 = '<select name="accountId" style="width: 150px">';
+			var c1 = '<option value="">选择渠道商</option>';
+			if(json.indexOf("account")>0){
+				var obj = eval('(' + json + ')');
+				for (var i = 0; i < obj.data.length; i++) {
+					c1 += '<option value="'+obj.data[i].id+'">' + obj.data[i].account+ '</option>';
+				}
+			}
+			var a4 = '</select></span>';
+			
+			$("#dealerInfoListForm").append(a1 + a2 + a3 + c1 + a4);
+		});
 		
 	</script>
 	<a hidden="true" id="downloadCode" download ></a>
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" queryMode="group">
    <t:dgCol title="编号" field="id" hidden="true" ></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
-   <t:dgCol title="渠道商名称" field="account" query="true" align="center" width="120"></t:dgCol>
+   <t:dgCol title="渠道商名称" field="account" align="center" width="120"></t:dgCol>
    <t:dgCol title="合作状态" field="status" query="true" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建人" field="username" query="true" align="center" width="80"></t:dgCol>
@@ -230,8 +248,8 @@
    
    <t:dgCol title="操作" field="opt" ></t:dgCol>
    <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#eq#-1"/>
-   <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add"></t:dgToolBar>
-   <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update"></t:dgToolBar>
+   <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add" operationCode="dealerAdd" ></t:dgToolBar>
+   <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update" operationCode="dealerUpdate" ></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
    <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerInfoController.do?getAttacheList" funname="dealerAllot" operationCode="allotAttache" ></t:dgToolBar> 
    
@@ -240,16 +258,19 @@
    <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt> 
    
    <!-- 权限按钮 -->
-   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2"></t:dgFunOpt> 
-   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt> 
-   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&auditStatus#eq#1"></t:dgFunOpt> 
-   <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2"></t:dgFunOpt> 
-   <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgree" exp="auditStatus#eq#0"></t:dgFunOpt> 
-   <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerReject" exp="auditStatus#eq#0"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2||lastAuditStatus#eq#2||auditStatus#eq#-1"></t:dgFunOpt> 
+   <%-- <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>  --%>
+   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#eq#2"></t:dgFunOpt> 
+   <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2||lastAuditStatus#eq#2"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgreeMA" exp="auditStatus#eq#0"></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgreePA" exp="lastAuditStatus#eq#0"></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerRejectMA" exp="auditStatus#eq#0"></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerRejectPA" exp="lastAuditStatus#eq#0"></t:dgFunOpt>
    
   </t:datagrid>
   </div>
   <div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
     data-options="modal:true" closed="true" >
   </div>
+  <input type="text" value="${accountList}" id="accounts" type="hidden" />
  </div>
