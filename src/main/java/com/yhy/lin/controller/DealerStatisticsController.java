@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.DealerStatisticsServiceI;
 
@@ -60,9 +61,10 @@ public class DealerStatisticsController extends BaseController {
 		String account = request.getParameter("accountId");
 		String fc_begin = request.getParameter("createTime_begin");
 		String fc_end = request.getParameter("createTime_end");
-
-		JSONObject jObject = dsService.getDealerUserDatagrid(carcustomer, dataGrid,account,fc_begin, fc_end);
-
+		
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+		JSONObject jObject = dsService.getDealerUserDatagrid(carcustomer, dataGrid,account,fc_begin, fc_end, hasPermission);
+		
 		responseDatagrid(response, jObject);
 	}
 	
@@ -91,9 +93,10 @@ public class DealerStatisticsController extends BaseController {
 		String orderType = request.getParameter("ordertype");
 		String lineName = request.getParameter("lineName");
 		String account = request.getParameter("accountId");
-
+		
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
 		JSONObject jObject = dsService.getDealerOrderDatagrid(transferorder, dataGrid, lineName, orderType,
-				account, fc_begin, fc_end);
+				account, fc_begin, fc_end, hasPermission);
 		responseDatagrid(response, jObject);
 	}
 	
@@ -111,15 +114,17 @@ public class DealerStatisticsController extends BaseController {
 		String lineName = request.getParameter("lineName");
 		String account = request.getParameter("accountId");
 
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+		
 		StringBuffer orsql = new StringBuffer();
 		orsql.append(
-				"select SUM(t.order_numbers),SUM(t.order_totalPrice ) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id "
-				+ "LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id and f.id="
-				+ "d.dealer_id and t.order_status='0' and td.id=f.departId ");
-		if (!dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end)
+				" select SUM(t.order_numbers),SUM(t.order_totalPrice ) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id "
+				+ " LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id and f.id= "
+				+ " d.dealer_id and t.order_status='0' and td.id=f.departId ");
+		if (!dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end, hasPermission)
 				.isEmpty()) {
 			orsql.append(dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin,
-					fc_end));
+					fc_end, hasPermission));
 		}
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 
@@ -133,7 +138,7 @@ public class DealerStatisticsController extends BaseController {
 			} else {
 				sumorder = 0;
 			}
-
+			
 			BigDecimal bsum = (BigDecimal) ob[1];
 			if(bsum!=null){
 				sumPrice=sumPrice.add(bsum);
@@ -164,10 +169,12 @@ public class DealerStatisticsController extends BaseController {
 		
 		StringBuffer orsql = new StringBuffer();
 		orsql.append(
-				"select count(*) from car_customer s, dealer_customer d,dealer_info f,t_s_depart td  where s.open_id = d.open_id and f.id=d.dealer_id and td.id=f.departId ");
+				"select count(*) from car_customer s, dealer_customer d,dealer_info f,t_s_depart b  where s.open_id = d.open_id and f.id=d.dealer_id and b.id=f.departId ");
 		
-		if (!dsService.getWhere(account,fc_begin, fc_end).isEmpty()) {
-			orsql.append(dsService.getWhere(account,fc_begin,fc_end));
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+		
+		if (!dsService.getWhere(account, fc_begin, fc_end, hasPermission).isEmpty()) {
+			orsql.append(dsService.getWhere(account,fc_begin,fc_end, hasPermission));
 		}
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 		int sumUser = 0;

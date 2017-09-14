@@ -596,7 +596,7 @@ public class UserController extends BaseController {
 		String roleid = oConvertUtils.getString(req.getParameter("roleid"));
 		String password = oConvertUtils.getString(req.getParameter("password"));
 		
-		//平台线路管理员管理公司    (找个字段存进去)
+		//平台管理员管理公司    (找个字段存进去)
 		String orgCodes = req.getParameter("lineOrgCode");
 		
 		String roleType = req.getParameter("roleType");

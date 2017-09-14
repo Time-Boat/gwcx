@@ -232,6 +232,7 @@
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
    <t:dgCol title="渠道商名称" field="account" align="center" width="120"></t:dgCol>
    <t:dgCol title="合作状态" field="status" query="true" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
+   <t:dgCol title="所属公司" field="departname" query="true" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建人" field="username" query="true" align="center" width="80"></t:dgCol>
    <t:dgCol title="推广人数" field="scanCount" align="center" width="60"></t:dgCol>

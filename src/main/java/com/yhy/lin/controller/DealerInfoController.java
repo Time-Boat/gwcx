@@ -62,7 +62,7 @@ public class DealerInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "dealerInfoList")
 	public ModelAndView list(HttpServletRequest request) {
-		request.setAttribute("accountList",getAccount());
+		request.setAttribute("accountList", getAccount());
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
 
@@ -78,10 +78,14 @@ public class DealerInfoController extends BaseController {
 	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 
-		/*String status = request.getParameter("status");
-		String auditStatus = request.getParameter("auditStatus");*/
+		/*
+		 * String status = request.getParameter("status"); String auditStatus =
+		 * request.getParameter("auditStatus");
+		 */
 		String username = request.getParameter("username");
-		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo,username);
+		String departname = request.getParameter("departname");
+		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo, username, hasPermission, departname);
 
 		responseDatagrid(response, jObject);
 	}
@@ -91,7 +95,7 @@ public class DealerInfoController extends BaseController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(params = "del")
+	@RequestMapping(params = "del") 
 	@ResponseBody
 	public AjaxJson del(DealerInfoEntity dealerInfo, HttpServletRequest request) {
 		String message = null;
@@ -139,7 +143,7 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setStatus("1");
 			dealerInfo.setAuditStatus("-1");
 			dealerInfo.setQrCodeUrl("");
-			
+
 			dealerInfoService.save(dealerInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
@@ -232,7 +236,7 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setLastAuditUser("");
 			dealerInfo.setLastAuditStatus("");
 			dealerInfo.setLastRejectReason("");
-			
+
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器失败";
@@ -274,11 +278,11 @@ public class DealerInfoController extends BaseController {
 		try {
 			String[] idArr = ids.split(",");
 			for (int i = 0; i < idArr.length; i++) {
-			
+
 				DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, idArr[i]);
 				dealerInfo.setCreateUserId(userId);
 				list.add(dealerInfo);
-			}	
+			}
 			dealerInfoService.saveAllEntitie(list);
 		} catch (Exception e) {
 			message = "服务器异常";
@@ -303,25 +307,25 @@ public class DealerInfoController extends BaseController {
 		String id = req.getParameter("id");
 
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
-		
+
 		try {
 			String apply = dealerInfo.getApplyType();
 			String status = dealerInfo.getAuditStatus();
 			String recheck = dealerInfo.getLastAuditStatus();
-			
-			if("0".equals(status)){				//如果初审状态是待审核状态，则进行初审
+
+			if ("0".equals(status)) { // 如果初审状态是待审核状态，则进行初审
 				dealerInfo.setAuditDate(AppUtil.getDate());
 				dealerInfo.setAuditStatus("1");
 				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 				dealerInfo.setLastAuditStatus("0");
-			} else if("0".equals(recheck)){		//如果复审状态是待审核状态，则进行复审
+			} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
 				dealerInfo.setLastAuditDate(AppUtil.getDate());
 				dealerInfo.setLastAuditStatus("1");
 				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
 			}
-			
-			//如果是复审，则要改变渠道商合作状态
-			if("0".equals(recheck)){
+
+			// 如果是复审，则要改变渠道商合作状态
+			if ("0".equals(recheck)) {
 				if ("0".equals(apply)) {
 					dealerInfo.setStatus("0");
 				} else {
@@ -355,22 +359,22 @@ public class DealerInfoController extends BaseController {
 
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
-			
+
 			String status = dealerInfo.getAuditStatus();
 			String recheck = dealerInfo.getLastAuditStatus();
-			
-			if("0".equals(status)){				//如果初审状态是待审核状态，则进行初审
+
+			if ("0".equals(status)) { // 如果初审状态是待审核状态，则进行初审
 				dealerInfo.setAuditDate(AppUtil.getDate());
 				dealerInfo.setAuditStatus("2");
 				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 				dealerInfo.setRejectReason(rejectReason);
-			} else if("0".equals(recheck)){		//如果复审状态是待审核状态，则进行复审
+			} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
 				dealerInfo.setLastAuditDate(AppUtil.getDate());
 				dealerInfo.setLastAuditStatus("2");
 				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
 				dealerInfo.setLastRejectReason(rejectReason);
 			}
-			
+
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器异常";
@@ -392,9 +396,9 @@ public class DealerInfoController extends BaseController {
 
 		DealerInfoEntity t = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		String reasont = "";
-		if("2".equals(t.getAuditStatus())){
+		if ("2".equals(t.getAuditStatus())) {
 			reasont = t.getRejectReason();
-		}else{
+		} else {
 			reasont = t.getLastRejectReason();
 		}
 
@@ -428,7 +432,8 @@ public class DealerInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		try {
 			String creditCode = request.getParameter("creditCode");
-			List<DealerInfoEntity> list = this.systemService.findHql("from DealerInfoEntity where creditCode=? and status !=2 ", creditCode);
+			List<DealerInfoEntity> list = this.systemService
+					.findHql("from DealerInfoEntity where creditCode=? and status !=2 ", creditCode);
 			if (list.size() > 0) {
 				message = "公司社会信用代码已经存在";
 				success = false;

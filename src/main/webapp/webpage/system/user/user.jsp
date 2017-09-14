@@ -55,7 +55,7 @@
 		}
 	  	
 	  	//提交前验证手机号
-	  	function cp(){
+	  	function cpUser(){
 	  		var lineOrgCodes = "";
 	  		$("input:checkbox[name='lineOrgCode']:checked").each(function() { // 遍历name=lineOrgCode的多选框
 	  			lineOrgCodes += $(this).val() + ",";  // 每一个被选中项的值
@@ -65,9 +65,9 @@
 	  			tip("至少选择一个责任公司");
 	  			return false;
 	  		}
-	  		
+	  		console.log("lineOrgCode : " + lineOrgCodes + "------------" + "roleType : " + roleType);
 	  		//修改要提交的action
-	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1)) + "&roleType=" + roleType;
+	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1) + "&roleType=" + roleType);
 	  		return b;
 	  	}
 
@@ -169,6 +169,7 @@
 								td += '</label> ';
 							}
 							$("#company_td").empty().append(td);
+							console.log(roleType);
 							//<span class="Validform_checktip"></span>
 						}
 						isLoad = true;
@@ -193,7 +194,7 @@
   </style>
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="userController" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cp()">
+<t:formvalid formid="userController" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cpUser()">
 	<input id="id" name="id" type="hidden" value="${user.id }">
 	<input id="orgCompanys" name="orgCompanys" type="hidden" value="${user.orgCompany }">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">

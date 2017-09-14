@@ -20,7 +20,7 @@
   			$("#age").val(age);
   		}
   	}
-  
+
   	function uploadFile(data){
   		//alert($(".uploadify-queue-item").length);
   		if($(".uploadify-queue-item").length>0){

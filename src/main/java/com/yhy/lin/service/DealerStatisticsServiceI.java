@@ -16,13 +16,13 @@ import net.sf.json.JSONObject;
 public interface DealerStatisticsServiceI extends CommonService {
 
 	public JSONObject getDealerUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid,String account, String fc_begin,
-			String fc_end);
+			String fc_end, boolean hasPermission);
 	
 	public JSONObject getDealerOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String lineName,
-			String orderType,String account, String fc_begin, String fc_end);
+			String orderType,String account, String fc_begin, String fc_end, boolean hasPermission);
 
-	public String getWhere4(TransferorderEntity transferorder,String lineName, String orderType, String account, String fc_begin,String fc_end);
+	public String getWhere4(TransferorderEntity transferorder,String lineName, String orderType, String account, String fc_begin,String fc_end, boolean hasPermission);
 	
-	public String getWhere(String account, String fc_begin,String fc_end);
+	public String getWhere(String account, String fc_begin,String fc_end, boolean hasPermission);
 	
 }
