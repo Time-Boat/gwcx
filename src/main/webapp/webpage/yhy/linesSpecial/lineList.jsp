@@ -148,8 +148,8 @@
 			}
 		}
 		
-		ss += '</select></span>'; */
-		$("#lineList2Form").append(ss);//....
+		ss += '</select></span>'; 
+		$("#lineList2Form").append(ss);//....*/
 		
 	});
 	

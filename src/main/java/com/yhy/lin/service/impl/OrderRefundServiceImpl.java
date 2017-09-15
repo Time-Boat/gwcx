@@ -54,7 +54,6 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		String sqlCnt = "select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ " left join driversinfo d on b.driverId =d.id "
 				+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId,t_s_depart p ";
-		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
 		} 
@@ -66,7 +65,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime, p.departname ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId = c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId "
-				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user"
+				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user "
 				+ " ,t_s_depart p  ");
 		
 		if (!sqlWhere.isEmpty()) {
@@ -168,7 +167,22 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			}
 		}
 		
-		sql.append(" and t.org_code like '" + orgCode + "%' ");
+		String oc = user.getOrgCompany();
+		
+		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
+		if(hasPermission && StringUtil.isNotEmpty(oc)){
+			sql.append("and ( 1=2 ");
+			
+			String[] ocArr = oc.split(",");
+			
+			for (int i = 0; i < ocArr.length; i++) {
+				sql.append(" or t.org_code like '"+ocArr[i]+"%' ");
+			}
+			sql.append(")");
+		} else {
+			sql.append(" and t.org_code like '"+orgCode+"%'");
+		}
+		
 		sql.append(" and order_status in('3','4','5') ");
 		sql.append(" order by a.order_status,a.refund_time desc");
 
