@@ -193,6 +193,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if(StringUtil.isNotEmpty(lineType)){//接送机的线路判断
 			sqlWhere.append(" and a.type "+lineType);
 		}
+		sqlWhere.append(" and a.deleteFlag='0' ");
 		
 		return sqlWhere.toString();
 	}
@@ -291,7 +292,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from lineinfo a LEFT JOIN t_s_depart t on a.departId = t.ID where a.deleteFlag='0' and t.org_code like '"+code+"%' and type " + ywlx + " ";
+		String sqlCnt = "select count(*) from lineinfo a LEFT JOIN t_s_depart t on a.departId = t.ID where a.deleteFlag='0' and a.status='0' and t.org_code like '"+code+"%' and type " + ywlx + " ";
 		if(StringUtil.isNotEmpty(lineInfos.getName())){
 			sqlCnt +=" and a.name like '%"+lineInfos.getName()+"%'";
 		}
@@ -299,7 +300,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
 		sql.append("select a.id,a.name ");
-		sql.append(" from lineinfo a LEFT JOIN t_s_depart t on a.departId = t.ID where type " + ywlx + " and a.deleteFlag='0' and t.org_code like '"+code+"%'");
+		sql.append(" from lineinfo a LEFT JOIN t_s_depart t on a.departId = t.ID where type " + ywlx + " and a.deleteFlag='0' and a.status='0' and t.org_code like '"+code+"%'");
 		if(StringUtil.isNotEmpty(lineInfos.getName())){
 			sql.append(" and a.name like '%"+lineInfos.getName()+"%'");
 		}

@@ -23,6 +23,7 @@
             <div style="float: left;">
                 <a href="#" class="easyui-linkbutton" plain="true" icon="icon-add" onclick="addOrg()"><t:mutiLang langKey="common.add.param" langArg="common.department"/></a>
                 <a href="#" class="easyui-linkbutton" plain="true" icon="icon-edit" onclick="update('<t:mutiLang langKey="common.edit.param" langArg="common.department"/>','departController.do?update','departList',660,550)"><t:mutiLang langKey="common.edit.param" langArg="common.department"/></a>
+                <a href="#" class="easyui-linkbutton" plain="true" icon="icon-edit" onclick="lockCompanies()"><t:mutiLang langKey="锁定子公司" langArg="common.department"/></a>
                 <a href="#" class="easyui-linkbutton" plain="true" icon="icon-put" onclick="ImportXls()"><t:mutiLang langKey="excelImport" langArg="common.department"/></a>
                 <a href="#" class="easyui-linkbutton" plain="true" icon="icon-putout" onclick="ExportXls()"><t:mutiLang langKey="excelOutput" langArg="common.department"/></a>
                 <a href="#" class="easyui-linkbutton" plain="true" icon="icon-putout" onclick="ExportXlsByT()"><t:mutiLang langKey="templateDownload" langArg="common.department"/></a>
@@ -102,5 +103,50 @@
     //模板下载
     function ExportXlsByT() {
         JeecgExcelExport("departController.do?exportXlsByT","departList");
+    }
+    
+    function getJson(key){ 
+        var jsonObj={"name":"傅红雪","age":"24","profession":"刺客"}; 
+        //1、使用eval方法     
+        var eValue=eval('jsonObj.'+key); 
+        alert(eValue); 
+        //2、遍历Json串获取其属性 
+        for(var item in jsonObj){ 
+            if(item==key){  //item 表示Json串中的属性，如'name' 
+                var jValue=jsonObj[item];//key所对应的value 
+                alert(jValue); 
+            } 
+        } 
+    } 
+    
+    
+    //锁定子公司
+    function lockCompanies(){
+    	 var id = "";
+         var rowsData = $('#departList').datagrid('getSelected');
+         if (rowsData!=null) {
+             id = rowsData.id;
+         }
+        for(var item in rowsData){
+        	if(item=='fieldMap.orgType'){
+        		if(rowsData[item]!='2'){
+        			tip('请选择机构类型为子公司的组织机构进行锁定！');
+               	 return;
+        		}
+        	}
+        }
+         
+         $.ajax({
+             type:"post",
+             url:"departController.do?lockCompanies&id="+id,
+             dataType:'json',
+             success:function(data){
+             	 var t = eval('('+data.jsonStr+')');
+ 					tip(t.msg);
+            		$('#win').window('close');
+ 	           	//刷新当前窗体
+ 	           	$('#departList').datagrid('reload');
+             }
+         });
     }
 </script>

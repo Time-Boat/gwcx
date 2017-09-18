@@ -1,5 +1,11 @@
 package com.yhy.lin.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
@@ -62,7 +70,6 @@ public class DealerInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "dealerInfoList")
 	public ModelAndView list(HttpServletRequest request) {
-		request.setAttribute("accountList", getAccount());
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
 
@@ -95,7 +102,7 @@ public class DealerInfoController extends BaseController {
 	 * 
 	 * @return
 	 */
-	@RequestMapping(params = "del") 
+	@RequestMapping(params = "del")
 	@ResponseBody
 	public AjaxJson del(DealerInfoEntity dealerInfo, HttpServletRequest request) {
 		String message = null;
@@ -125,6 +132,7 @@ public class DealerInfoController extends BaseController {
 		String userId = ResourceUtil.getSessionUserName().getId();
 		dealerInfo.setCreateUserId(userId);
 		dealerInfo.setDepartId(departId);
+
 		if (StringUtil.isNotEmpty(dealerInfo.getId())) {
 			message = "渠道商信息更新成功";
 			DealerInfoEntity t = dealerInfoService.get(DealerInfoEntity.class, dealerInfo.getId());
@@ -143,6 +151,7 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setStatus("1");
 			dealerInfo.setAuditStatus("-1");
 			dealerInfo.setQrCodeUrl("");
+			dealerInfo.setDealerFilePath("");
 
 			dealerInfoService.save(dealerInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
@@ -419,6 +428,157 @@ public class DealerInfoController extends BaseController {
 			req.setAttribute("dealerInfoPage", dealerInfo);
 		}
 		return new ModelAndView("yhy/dealer/dealerInfo");
+	}
+
+	/**
+	 * 渠道商材料上传跳转页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "dealerUploadFile")
+	public ModelAndView dealerUploadFile(HttpServletRequest request) {
+		String id = request.getParameter("id");
+		request.setAttribute("did", id);
+		return new ModelAndView("yhy/dealer/dealerUploadFile");
+	}
+
+	int i = 0;
+
+	/**
+	 * 保存文件
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "saveFile")
+	@ResponseBody
+	public AjaxJson saveFile(HttpServletRequest request, HttpServletResponse response) {
+		
+		System.out.println(i++);
+		AjaxJson j = new AjaxJson();
+		j.setSuccess(false);
+		
+		String id = request.getParameter("did");
+		System.out.println(id);
+		if (!StringUtil.isNotEmpty(id)) {
+			return j;
+		}
+		
+		InputStream input = null;
+		FileOutputStream fos = null;
+		
+		try {
+			MultipartHttpServletRequest mRequest = null;
+			MultipartFile file = null;
+			mRequest = (MultipartHttpServletRequest) request;// request强制转换注意
+			file = mRequest.getFile("file");
+			
+			input = file.getInputStream();
+			
+			String filePath = AppGlobals.IMAGE_BASE_FILE_PATH + AppGlobals.DEALER_FILE_PATH;
+			
+			// 文件夹是否存在
+			boolean mkDir = false;
+			File f = new File(filePath);
+			if (!f.isDirectory()) {
+				mkDir = f.mkdirs();
+			} else {
+				mkDir = true;
+			}
+			
+			// String suffix =
+			// file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			
+			String DBUrl = AppGlobals.DEALER_FILE_PATH + System.currentTimeMillis() + "&&"
+					+ file.getOriginalFilename();
+			// 一个渠道商只保存一份文件
+			// String DBUrl = AppGlobals.DEALER_FILE_PATH + id + suffix;
+			
+			if (mkDir) {
+				fos = new FileOutputStream(AppGlobals.IMAGE_BASE_FILE_PATH + DBUrl);
+				int size = 0;
+				byte[] buffer = new byte[1024];
+				while ((size = input.read(buffer, 0, 1024)) != -1) {
+					fos.write(buffer, 0, size);
+				}
+				
+				DealerInfoEntity dealerInfo = systemService.get(DealerInfoEntity.class, id);
+				File df = new File(AppGlobals.IMAGE_BASE_FILE_PATH + dealerInfo.getDealerFilePath());
+				if (df.exists()) {
+					df.delete();
+				}
+				dealerInfo.setDealerFilePath(DBUrl);
+				systemService.saveOrUpdate(dealerInfo);
+				j.setSuccess(true);
+				j.setMsg("上传文件成功");
+			}
+
+		} catch (Exception e) {
+			j.setMsg("服务器异常");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (fos != null)
+					fos.close();
+				if (input != null)
+					input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return j;
+	}
+
+	/**
+	 * 下载文件
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "fileDown")
+	@ResponseBody
+	public void fileDown(HttpServletRequest request, HttpServletResponse response) {
+
+		String id = request.getParameter("did");
+
+		DealerInfoEntity dealerInfo = systemService.get(DealerInfoEntity.class, id);
+
+		String fileName = AppGlobals.IMAGE_BASE_FILE_PATH + dealerInfo.getDealerFilePath(); // 原来文件的路径
+		String filepath = dealerInfo.getDealerFilePath()
+				.substring(dealerInfo.getDealerFilePath().lastIndexOf("&&") + 2); // 修改后的文件名
+
+		// 新建文件输入输出流
+		OutputStream output = null;
+		FileInputStream fis = null;
+		try {
+			response.setHeader("Content-Disposition",
+					"attachment; filename=" + new String(filepath.getBytes("utf-8"), "iso-8859-1"));
+			// 新建File对象
+			File f = new File(fileName);
+			// 新建文件输入输出流对象
+			output = response.getOutputStream();
+			fis = new FileInputStream(f);
+			// 设置每次写入缓存大小
+			byte[] b = new byte[(int) f.length()];
+			// out.print(f.length());
+			// 把输出流写入客户端
+			int i = 0;
+			while ((i = fis.read(b)) > 0) {
+				output.write(b, 0, i);
+				System.out.println("打印" + i);
+			}
+			output.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (fis != null)
+					fis.close();
+				if (output != null)
+					output.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	/**

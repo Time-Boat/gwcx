@@ -39,6 +39,10 @@
 			//window.open(qrCodeUrl);
 		}
 		
+		function downloadFile(id){
+			window.location.href="dealerInfoController.do?fileDown&did="+id;
+		}
+		
 		function lookQRCode(qrCodeUrl){
 			window.open(qrCodeUrl);	
 		}
@@ -206,6 +210,12 @@
 			url += '&ids='+ids;
 			createwindow(title,url,width,height);
 		}
+		
+		//上传文件
+		function dealerUploadFile(id){
+			createdetailwindow("选择文件","dealerInfoController.do?dealerUploadFile&id="+id,"800px","500px");
+		}
+		
 		//初始化查询条件
 		$(function() {
 			var json = $("#accounts").val();
@@ -225,12 +235,19 @@
 			$("#dealerInfoListForm").append(a1 + a2 + a3 + c1 + a4);
 		});
 		
+		
 	</script>
 	<a hidden="true" id="downloadCode" download ></a>
+	<a hidden="true" id="downloadFile" download ></a>
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" queryMode="group">
    <t:dgCol title="编号" field="id" hidden="true" ></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
+<<<<<<< .mine
+   <t:dgCol title="附件地址" field="dealerFilePath" hidden="true" width="120"></t:dgCol>
    <t:dgCol title="渠道商名称" field="account" align="center" width="120"></t:dgCol>
+=======
+   <t:dgCol title="渠道商名称" field="account" query="true" align="center" width="120"></t:dgCol>
+>>>>>>> .r774
    <t:dgCol title="合作状态" field="status" query="true" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
    <t:dgCol title="所属公司" field="departname" query="true" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
@@ -252,14 +269,15 @@
    
    <t:dgCol title="操作" field="opt" ></t:dgCol>
    <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}"/>
-   <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add" operationCode="dealerAdd" ></t:dgToolBar>
+   <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add" operationCode="dealerAdd" height="800" width="1000" ></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update" operationCode="dealerUpdate" ></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="dealerInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
    <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerInfoController.do?getAttacheList" funname="dealerAllot" operationCode="allotAttache" ></t:dgToolBar> 
    
    <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true&&status#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt>
-   <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="下载" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt> 
+   <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="二维码下载" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt> 
+   <t:dgFunOpt funname="downloadFile(id)"  title="附件下载" operationCode="dealerDownload" exp="dealerFilePath#empty#false"></t:dgFunOpt> 
    
    <!-- 权限按钮 -->
    <t:dgFunOpt funname="dealerApply(id)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
@@ -275,10 +293,13 @@
    <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerRejectMA" exp="auditStatus#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="dealerReject(id)" title="拒绝" operationCode="dealerRejectPA" exp="lastAuditStatus#eq#0"></t:dgFunOpt>
    
+   <t:dgFunOpt funname="dealerUploadFile(id)" title="上传" operationCode="dealerUpload" exp="status#eq#1&&auditStatus#eq#2" ></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerUploadFile(id)" title="上传" operationCode="dealerUpload" exp="status#eq#1&&auditStatus#eq#-1" ></t:dgFunOpt>
+   <t:dgFunOpt funname="dealerUploadFile(id)" title="上传" operationCode="dealerUpload" exp="status#eq#1&&lastAuditStatus#eq#2" ></t:dgFunOpt>
+   
   </t:datagrid>
   </div>
   <div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
     data-options="modal:true" closed="true" >
   </div>
-  <input type="text" value="${accountList}" id="accounts" type="hidden" />
  </div>

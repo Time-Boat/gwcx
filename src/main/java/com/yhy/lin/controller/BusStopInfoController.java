@@ -97,7 +97,9 @@ public class BusStopInfoController extends BaseController {
 	@RequestMapping(params="datagrid")
 	public void datagrid(BusStopInfoEntity busStopInfo,HttpServletRequest request,HttpServletResponse response,DataGrid dataGrid){
 		String cityID = request.getParameter("cityID");
-		JSONObject jObject = busStopInfoService.getDatagrid(busStopInfo, dataGrid,cityID);
+		String createTime_begin = request.getParameter("createTime_begin");
+		String createTime_end = request.getParameter("createTime_end");
+		JSONObject jObject = busStopInfoService.getDatagrid(busStopInfo, dataGrid,cityID,createTime_begin,createTime_end);
 		responseDatagrid(response, jObject);
 	}
 	

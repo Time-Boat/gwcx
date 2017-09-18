@@ -78,7 +78,18 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private Date lastAuditDate;
 	/**复审拒绝原因*/
 	private String lastRejectReason;
+	/**渠道商文件路径*/
+	private String dealerFilePath;
 	
+	@Column(name ="DEALER_FILE_PATH",nullable=true,length=255)
+	public String getDealerFilePath() {
+		return dealerFilePath;
+	}
+
+	public void setDealerFilePath(String dealerFilePath) {
+		this.dealerFilePath = dealerFilePath;
+	}
+
 	@Column(name ="LAST_AUDIT_STATUS",nullable=true,length=1)
 	public String getLastAuditStatus() {
 		return lastAuditStatus;

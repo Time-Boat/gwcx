@@ -56,18 +56,21 @@
 	  	
 	  	//提交前验证手机号
 	  	function cpUser(){
-	  		var lineOrgCodes = "";
-	  		$("input:checkbox[name='lineOrgCode']:checked").each(function() { // 遍历name=lineOrgCode的多选框
-	  			lineOrgCodes += $(this).val() + ",";  // 每一个被选中项的值
-	  		});
 	  		
-	  		if(lineOrgCodes == ""){
-	  			tip("至少选择一个责任公司");
-	  			return false;
+	  		if(roleType != ""){
+		  		var lineOrgCodes = "";
+		  		$("input:checkbox[name='lineOrgCode']:checked").each(function() { // 遍历name=lineOrgCode的多选框
+		  			lineOrgCodes += $(this).val() + ",";  // 每一个被选中项的值
+		  		});
+		  		
+		  		if(lineOrgCodes == ""){
+		  			tip("至少选择一个责任公司");
+		  			return false;
+		  		}
+		  		console.log("lineOrgCode : " + lineOrgCodes + "------------" + "roleType : " + roleType);
+		  		//修改要提交的action
+		  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1) + "&roleType=" + roleType);
 	  		}
-	  		console.log("lineOrgCode : " + lineOrgCodes + "------------" + "roleType : " + roleType);
-	  		//修改要提交的action
-	  		$('#userController').attr("action","userController.do?saveUser&lineOrgCode=" + lineOrgCodes.substring(0,lineOrgCodes.length-1) + "&roleType=" + roleType);
 	  		return b;
 	  	}
 
@@ -144,6 +147,7 @@
 					$('#company_tr').show();
 				}else{
 					$('#company_tr').hide();
+					roleType = "";
 				}
 			}
 			

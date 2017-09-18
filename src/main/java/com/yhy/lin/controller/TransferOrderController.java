@@ -20,6 +20,8 @@ import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.p3.core.common.utils.DateUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -152,10 +154,25 @@ public class TransferOrderController extends BaseController {
 	 * 获取线路(接送火车)
 	 */
 	public String getLine1(){
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		TSUser user = ResourceUtil.getSessionUserName();
+		TSDepart depart = user.getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = user.getId();
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("select l.id,l.name from lineinfo l LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN t_s_base_user u on l.createUserId=u.ID where l.status='0' and l.type in('4','5')");
+		
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type  in('4','5');";
-		List<Object> list = this.systemService.findListbySql(sql);
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and l.createUserId = '" + userId + "' ");
+		}
+		if (StringUtil.isNotEmpty(orgCode)) {
+			sql.append(" and t.org_code like '" + orgCode + "%'");
+		}
+		
+		List<Object> list = this.systemService.findListbySql(sql.toString());
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){
 			for (int i = 0; i < list.size(); i++) {
@@ -183,10 +200,25 @@ public class TransferOrderController extends BaseController {
 	 * 获取线路
 	 */
 	public String getLine2(){
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		TSUser user = ResourceUtil.getSessionUserName();
+		TSDepart depart = user.getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = user.getId();
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("select l.id,l.name from lineinfo l LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN t_s_base_user u on l.createUserId=u.ID where l.status='0' and l.type in('2','3')");
+		
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'  and l.type in('2','3');";
-		List<Object> list = this.systemService.findListbySql(sql);
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and l.createUserId = '" + userId + "' ");
+		}
+		if (StringUtil.isNotEmpty(orgCode)) {
+			sql.append(" and t.org_code like '" + orgCode + "%'");
+		}
+		
+		List<Object> list = this.systemService.findListbySql(sql.toString());
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){
 			for (int i = 0; i < list.size(); i++) {
@@ -210,7 +242,6 @@ public class TransferOrderController extends BaseController {
 		return json.toString();
 	}
 	
-
 	// 接送机订单查询
 	@RequestMapping(params = "transferOrderSearchList")
 	public ModelAndView transferOrderSearchList(HttpServletRequest request, HttpServletResponse response) {

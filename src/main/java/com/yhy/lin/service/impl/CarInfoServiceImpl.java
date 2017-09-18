@@ -44,7 +44,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
 			queryCondition.append(" and c.create_user_id = '" + userId + "' ");
 		}*/
-		if(orgCode.length()>6){
+		/*if(orgCode.length()>6){
 			String code = orgCode.substring(0, 6);
 			if("1".equals(carAndDriver)){
 				queryCondition.append(" and t.org_code like '" + code + "%' ");
@@ -53,6 +53,16 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 			}
 		}else{
 			queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
+		}*/
+		
+		String code = "";
+		if(orgCode.length()>6){
+			code= orgCode.substring(0,6);
+		}else{
+			code=orgCode;
+		}
+		if(StringUtil.isNotEmpty(code)){
+			queryCondition.append(" and t.org_code like '"+code+"%'");
 		}
 		
 		if(StringUtil.isNotEmpty(userCar)){

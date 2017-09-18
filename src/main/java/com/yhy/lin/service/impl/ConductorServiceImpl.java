@@ -21,16 +21,29 @@ import net.sf.json.JSONObject;
 public class ConductorServiceImpl extends CommonServiceImpl implements ConductorServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, ConductorEntity conductors, String cr_bg,String cr_en,String lineId) {
+	public JSONObject getDatagrid(DataGrid dataGrid, ConductorEntity conductors, String cr_bg,String cr_en,String lineId,String username) {
 		// TODO Auto-generated method stub
 		
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		String code = "";
+		if(orgCode.length()>6){
+			code= orgCode.substring(0,6);
+		}else{
+			code=orgCode;
+		}
 		
 		StringBuffer queryCondition = new StringBuffer(" where d.delete_flag = '0'");
 	    
-		if(StringUtil.isNotEmpty(orgCode)){
-			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
+		if(StringUtil.isNotEmpty(code)){
+			queryCondition.append(" and t.org_code like '"+code+"%'");
 		}
+		if(StringUtil.isNotEmpty(username)){
+			queryCondition.append(" and u.username like '%"+username+"%'");
+		}
+		if(StringUtil.isNotEmpty(cr_bg)&&StringUtil.isNotEmpty(cr_en)){
+			queryCondition.append(" and d.create_date between '"+cr_bg+"' and '"+cr_en+"'");
+		}
+		
 		if(StringUtil.isNotEmpty(conductors.getSex())){
 			queryCondition.append(" and d.sex = '"+conductors.getSex()+"' ");
 		}
@@ -51,7 +64,7 @@ public class ConductorServiceImpl extends CommonServiceImpl implements Conductor
 		}
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from conductor d LEFT JOIN t_s_depart t on t.ID= d.departId " + queryCondition.toString();
+		String sqlCnt = "select count(*) from conductor d LEFT JOIN t_s_depart t on t.ID= d.departId LEFT JOIN t_s_base_user u on u.ID=d.create_user_id" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 

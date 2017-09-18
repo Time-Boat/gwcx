@@ -26,8 +26,8 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	private JdbcDao jdbcDao;
 	
 	@Override
-	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid,String cityID){
-		String sqlWhere = getBusSqlWhere(busStopInfo,cityID);
+	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid,String cityID,String createTime_begin,String createTime_end){
+		String sqlWhere = getBusSqlWhere(busStopInfo,cityID,createTime_begin,createTime_end);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from busstopinfo a ";
 		if (!sqlWhere.isEmpty()) {
@@ -63,12 +63,16 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		return jObject;
 	}
 
-	public String getBusSqlWhere(BusStopInfoEntity busStopInfo,String cityID) {
+	public String getBusSqlWhere(BusStopInfoEntity busStopInfo,String cityID,String createTime_begin,String createTime_end) {
 		StringBuffer sqlWhere = new StringBuffer(" a.deleteFlag='0' ");
 
 		if (StringUtil.isNotEmpty(busStopInfo.getName())) {
 			
 			sqlWhere.append(" and  a.name like '%"+busStopInfo.getName()+"%'");
+		}
+		
+		if (StringUtil.isNotEmpty(createTime_begin) && StringUtil.isNotEmpty(createTime_end)) {
+			sqlWhere.append(" and a.createTime between '" + createTime_begin + "' and '" + createTime_end + "'");
 		}
 		if (StringUtil.isNotEmpty(cityID)) {
 			

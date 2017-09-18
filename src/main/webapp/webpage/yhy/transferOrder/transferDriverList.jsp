@@ -12,8 +12,8 @@
 		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
 		<t:dgCol title="线路类型" field="lineType" dictionary="transferTy" align="center" query="true"></t:dgCol>
 		<t:dgCol title="车票数量" field="orderNumber" align="center"></t:dgCol>
-		<t:dgCol title="已安排订单数量" field="alreadyarranged" align="center"></t:dgCol>
-		<t:dgCol title="未安排订单数量" field="notarranged" align="center"></t:dgCol>
+		<t:dgCol title="已安排车票数量" field="alreadyarranged" align="center"></t:dgCol>
+		<t:dgCol title="未安排车票数量" field="notarranged" align="center"></t:dgCol>
 		
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		

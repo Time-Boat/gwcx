@@ -307,6 +307,14 @@ public class UserController extends BaseController {
 				logger.info("锁定用户成功，将" + c + "条订单状态改变为历史订单数据");
 			}
 			
+			//有没有渠道商平台审核员这个角色
+			boolean hasPermission1 = checkRole(user, AppGlobals.PLATFORM_DEALER_AUDIT);
+			if(hasPermission1){
+				//将渠道商选择的公司清空，方便其他渠道商审核员来选择
+				int c = userService.executeSql("update t_s_user set org_company=null,role_type=null where id=?", id);
+				logger.info("锁定用户成功，将" + c + "条订单状态改变为历史订单数据");
+			}
+			
 			message = "用户：" + user.getUserName() + "锁定成功!";
 		}else if("1".equals(lockValue)){
 			message = "用户：" + user.getUserName() + "激活成功!";

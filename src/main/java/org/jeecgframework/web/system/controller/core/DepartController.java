@@ -755,5 +755,167 @@ public class DepartController extends BaseController {
 		j.setMsg(jsonArray.toString());
 		return j;
 	}
-
+	
+	@RequestMapping(params = "lockCompanies")
+	@ResponseBody
+	public AjaxJson lockCompanies(HttpServletRequest request, HttpServletResponse response){
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		StringBuffer str = new StringBuffer();
+		if(StringUtil.isNotEmpty(id)){
+			TSDepart depart = this.systemService.getEntity(TSDepart.class, id);
+			String orgcode=depart.getOrgCode();
+			
+			Boolean lockuser=lockUser(orgcode);//锁定用户
+			if(lockuser==false){
+				str.append("锁定用户失败");
+			}
+			Boolean conductor=lockconductor(orgcode);//锁定子公司对验票员的处理
+			if(conductor==false){
+				if (StringUtil.isNotEmpty(str)) {
+					str.append("锁定验票员失败");
+				}else{
+					str.append("，锁定验票员失败");
+				}
+				
+			}
+			Boolean deiver=lockdriver(orgcode);//锁定司机
+			if(deiver==false){
+				if (StringUtil.isNotEmpty(str)) {
+					str.append("锁定司机失败");
+				}else{
+					str.append("，锁定司机失败");
+				}
+				
+			}
+			Boolean car=lockcar(orgcode);//锁定车辆
+			if(car==false){
+				if (StringUtil.isNotEmpty(str)) {
+					str.append("锁定车辆失败");
+				}else{
+					str.append("，锁定车辆失败");
+				}
+				
+			}
+			Boolean line = lockLine(orgcode);//锁定子公司，停用相关线路
+			if(line==false){
+				if (StringUtil.isNotEmpty(str)) {
+					str.append("停用线路失败");
+				}else{
+					str.append("，停用线路失败");
+				}
+				
+			}
+		}
+		if (StringUtil.isNotEmpty(str.toString())) {
+			j.setMsg(str.toString());
+		}else{
+			j.setMsg("锁定子公司成功！");
+		}
+		return j;
+	}
+	
+	//锁定用户
+	public Boolean lockUser(String orgcode){
+		boolean flag = false;
+		StringBuffer str = new StringBuffer();
+		str.append("UPDATE t_s_base_user u");
+		if(orgcode.length()==6){
+			str.append(",(select u.* from t_s_depart t LEFT JOIN t_s_user_org o on o.org_id=t.ID LEFT JOIN t_s_base_user u on u.ID=o.user_id where t.org_code like '");
+			str.append(orgcode);
+			str.append("%') r set u.delete_flag='1' where r.id=u.ID and u.delete_flag='0'");
+		}
+		try {
+			systemService.updateBySqlString(str.toString());
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
+	}
+	
+	//锁定验票员
+	public Boolean lockconductor(String orgcode){
+		boolean flag = false;
+		StringBuffer str = new StringBuffer();
+		str.append("UPDATE conductor c");
+		if(orgcode.length()==6){
+			str.append(",(select c.* from conductor c LEFT JOIN t_s_depart t on t.ID= c.departId where t.org_code like '");
+			str.append(orgcode);
+			str.append("%') r set c.delete_flag='1' where r.id=c.ID and c.delete_flag='0'");
+		}
+		try {
+			systemService.updateBySqlString(str.toString());
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
+	}
+	
+	//锁定司机
+	public Boolean lockdriver(String orgcode){
+		boolean flag = false;
+		StringBuffer str = new StringBuffer();
+		str.append("UPDATE driversinfo d");
+		if(orgcode.length()==6){
+			str.append(",(select d.* from driversinfo d LEFT JOIN t_s_depart t on d.departId=t.ID where t.org_code like '");
+			str.append(orgcode);
+			str.append("%') r set d.deleteFlag='1' where r.id=d.ID and d.deleteFlag='0'");
+		}
+		try {
+			systemService.updateBySqlString(str.toString());
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
+	}
+	
+	//锁定车辆
+	public Boolean lockcar(String orgcode){
+		boolean flag = false;
+		StringBuffer str = new StringBuffer();
+		str.append("UPDATE car_info c");
+		if(orgcode.length()==6){
+			str.append(",(SELECT c.* from car_info c LEFT JOIN t_s_depart t on c.departId=t.ID where t.org_code like '");
+			str.append(orgcode);
+			str.append("%') r set c.delete_flag='1' where r.id=c.ID and c.delete_flag='0'");
+		}
+		try {
+			systemService.updateBySqlString(str.toString());
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
+	}
+	
+	//线路处理--》锁定子公司，相关线路处理
+	public Boolean lockLine(String orgcode){
+		boolean flag = false;
+		StringBuffer str = new StringBuffer();
+		str.append("UPDATE lineinfo l");
+		if(orgcode.length()==6){
+			str.append(",(select l.* from lineinfo l LEFT JOIN t_s_depart t on l.departId = t.ID where t.org_code like '");
+			str.append(orgcode);
+			str.append("%') r set l.status='1',l.deleteFlag='1',l.application_status='0',l.review_reason=NULL,l.trial_reason=NULL,"
+					+ "l.application_time=NULL,l.application_user_id=NULL,l.apply_content=NULL,l.first_application_time =NULL,"
+					+ "l.last_application_time=NULL where r.id=l.ID and l.deleteFlag='0' and l.status!='1' and l.application_status!='0'");
+		}
+		try {
+			systemService.updateBySqlString(str.toString());
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
+	}
+	
 }
+

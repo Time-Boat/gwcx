@@ -112,10 +112,11 @@ public class ConductorController extends BaseController {
 	public void datagrid(ConductorEntity conductors, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		
+		String username = request.getParameter("username");
 		String cr_bg = request.getParameter("createDate_begin");//创建时间
 		String cr_en = request.getParameter("createDate_end");
 		String lineId = request.getParameter("lineId");
-		JSONObject jObject = conductorService.getDatagrid(dataGrid,conductors,cr_bg,cr_en,lineId);
+		JSONObject jObject = conductorService.getDatagrid(dataGrid,conductors,cr_bg,cr_en,lineId,username);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -189,7 +190,6 @@ public class ConductorController extends BaseController {
 			}
 		} else {
 			message = "验票员: " + conductor.getName() + "被添加成功";
-			conductor.setStatus("0");
 			try {
 				
 				conductorService.save(conductor);

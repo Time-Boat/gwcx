@@ -491,10 +491,12 @@ public class LineInfoSpecializedController extends BaseController {
 			}
 			if ("1".equals(line.getApplicationStatus())) {
 				line.setApplicationStatus("5");// 初审拒绝
+				line.setFirstApplicationTime(AppUtil.getDate());
 			} else if ("2".equals(line.getApplicationStatus())) {
 				line.setApplicationStatus("6");// 复审拒绝
+				line.setLastApplicationTime(AppUtil.getDate());
 			}
-
+			
 			line.setApplicationTime(AppUtil.getDate());
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 		}

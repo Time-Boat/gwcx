@@ -25,11 +25,17 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
-		StringBuffer queryCondition = new StringBuffer(" where 1=1 ");
+		String code = "";
+		if(orgCode.length()>6){
+			code= orgCode.substring(0,6);
+		}else{
+			code=orgCode;
+		}
 		
+		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag='0' ");
 		 
-		if(StringUtil.isNotEmpty(orgCode)){
-			queryCondition.append(" and t.org_code like '"+orgCode+"%'");
+		if(StringUtil.isNotEmpty(code)){
+			queryCondition.append(" and t.org_code like '"+code+"%'");
 		}
 	    
 		if(StringUtil.isNotEmpty(driversInfo.getSex())){
