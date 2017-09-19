@@ -769,14 +769,13 @@ public class DepartController extends BaseController {
 		if(StringUtil.isNotEmpty(id)){
 			TSDepart depart = this.systemService.getEntity(TSDepart.class, id);
 			String orgcode=depart.getOrgCode();
-			
-			Boolean lockuser=lockUser(orgcode);//锁定用户
 			if(StringUtil.isNotEmpty(depart)){
 				depart.setStatus("1");
 			}
 			
+			Boolean lockuser=lockUser(orgcode);//锁定用户
 			if(lockuser==false){
-				str.append("锁定用户失败");
+				str.append("锁定用户失败！");
 			}
 			Boolean conductor=lockconductor(orgcode);//锁定子公司对验票员的处理
 			if(conductor==false){
@@ -814,6 +813,14 @@ public class DepartController extends BaseController {
 				}
 				
 			}
+			Boolean dealer = lockdealer(orgcode);
+			if(dealer==false){
+				if (StringUtil.isNotEmpty(str)) {
+					str.append("锁定渠道商失败！");
+				}else{
+					str.append("，锁定渠道商失败！");
+				}
+			}
 		}
 		if (StringUtil.isNotEmpty(str.toString())) {
 			j.setMsg(str.toString());
@@ -821,6 +828,30 @@ public class DepartController extends BaseController {
 			j.setMsg("锁定子公司成功！");
 		}
 		return j;
+	}
+	
+	public Boolean lockdealer(String orgcode){
+		
+		boolean flag = false;
+		StringBuffer str = new StringBuffer();
+		str.append("UPDATE dealer_info d ");
+		if(orgcode.length()==6){
+			str.append(",(select d.* from t_s_depart t,dealer_info d where d.departId=t.ID and t.org_code like '");
+			str.append(orgcode);
+			str.append("%') r "
+					+ "set d.status='2' and d.audit_user=null and d.audit_date= null and d.audit_status='-1' and d.commit_apply_date=null"
+					+ " and d.commit_apply_user=null and d.apply_type=null and d.reject_reason=NULL and d.last_audit_user=NULL"
+					+ " and d.last_audit_date=NULL and d.last_audit_status =NULL and d.last_reject_reason= NULL and "
+					+ "d.dealer_file_path = NULL where d.id=r.id");
+		}
+		try {
+			systemService.updateBySqlString(str.toString());
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
 	}
 	
 	//锁定用户
@@ -913,7 +944,8 @@ public class DepartController extends BaseController {
 			str.append(orgcode);
 			str.append("%') r set l.status='1',l.deleteFlag='1',l.application_status='0',l.review_reason=NULL,l.trial_reason=NULL,"
 					+ "l.application_time=NULL,l.application_user_id=NULL,l.apply_content=NULL,l.first_application_time =NULL,"
-					+ "l.last_application_time=NULL where r.id=l.ID and l.deleteFlag='0' and l.status!='1' and l.application_status!='0'");
+					+ "l.last_application_time=NULL and l.first_application_user =null and l.last_application_user =null "
+					+ " where r.id=l.ID and l.deleteFlag='0' and l.status!='1' and l.application_status!='0'");
 		}
 		try {
 			systemService.updateBySqlString(str.toString());

@@ -443,6 +443,7 @@ public class LineInfoSpecializedController extends BaseController {
 		if(StringUtil.isNotEmpty(line)){
 			if("1".equals(line.getApplicationStatus())){
 				line.setApplicationStatus("2");//初审
+				line.setFirstApplicationUser(ResourceUtil.getSessionUserName().getId());
 				line.setFirstApplicationTime(AppUtil.getDate());
 			}else if("2".equals(line.getApplicationStatus())){
 				if("0".equals(line.getStatus())){
@@ -453,9 +454,9 @@ public class LineInfoSpecializedController extends BaseController {
 					line.setStatus("0");//已下架
 				}
 				line.setLastApplicationTime(AppUtil.getDate());
+				line.setLastApplicationUser(ResourceUtil.getSessionUserName().getId());
 			}
-			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
-
+			//line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 		}
 		try {
 			message = "申请成功！";

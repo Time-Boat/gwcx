@@ -24,8 +24,8 @@ import org.jeecgframework.web.system.pojo.base.TSUser;
 public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String username, boolean hasPermission, String departname) {
-		String sqlWhere = getWhere(dealerInfo, username, hasPermission, departname);
+	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String username, boolean hasPermissionP, boolean hasPermissionC, String departname) {
+		String sqlWhere = getWhere(dealerInfo, username, hasPermissionP, hasPermissionC, departname);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_info d left join t_s_base_user u on d.create_user_id = u.id join t_s_depart b on b.id = d.departId "
 				+ " LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p "
@@ -78,7 +78,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		return jObject;
 	}
 	
-	public String getWhere(DealerInfoEntity dealerInfo,String username, boolean hasPermission, String departname) {
+	public String getWhere(DealerInfoEntity dealerInfo,String username, boolean hasPermissionP,boolean hasPermissionC, String departname) {
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -115,7 +115,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		String oc = user.getOrgCompany();
 		
 		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPermission && StringUtil.isNotEmpty(oc)){
+		if(hasPermissionP && StringUtil.isNotEmpty(oc)){
 			sql.append("and ( 1=2 ");
 			
 			String[] ocArr = oc.split(",");
@@ -126,6 +126,16 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			sql.append(")");
 		} else {
 			sql.append(" and b.org_code like '"+orgCode+"%'");
+		}
+		
+		//审核员的角色
+		if(hasPermissionP){
+			sql.append(" and d.audit_status = '1' ");
+		}
+		
+		//商务经理的角色
+		if(hasPermissionC){
+			sql.append(" and d.audit_status != '-1' ");
 		}
 		
 		return sql.toString();

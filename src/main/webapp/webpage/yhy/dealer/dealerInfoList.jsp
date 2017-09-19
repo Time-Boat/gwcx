@@ -261,10 +261,9 @@
    <t:dgCol title="负责人" field="manager" align="center" width="70"></t:dgCol>
    <t:dgCol title="地址" field="position" align="center" width="120"></t:dgCol>
    
+   <t:dgCol title="初审状态" field="auditStatus" dictionary="audit_status" query="true" align="center"></t:dgCol>
    <t:dgCol title="申请内容" field="applyType" dictionary="apply_type" align="center" width="120"></t:dgCol>
-   
-   <t:dgCol title="初审状态" field="auditStatus" dictionary="audit_status" align="center"></t:dgCol>
-   <t:dgCol title="复审状态" field="lastAuditStatus"  dictionary="audit_status" align="center"></t:dgCol>
+   <t:dgCol title="复审状态" field="lastAuditStatus"  dictionary="last_audit_status" query="true" align="center"></t:dgCol>
    <%-- <t:dgCol title="初审时间" field="auditDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
    <t:dgCol title="提交申请时间" field="commitApplyDate" align="center" width="120" formatter="yyyy-MM-dd hh:mm:ss"></t:dgCol>
    <t:dgCol title="初审人" field="auditUser" align="center"></t:dgCol>
