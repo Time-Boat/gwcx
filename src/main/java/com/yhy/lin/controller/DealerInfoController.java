@@ -26,6 +26,7 @@ import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
@@ -236,6 +237,7 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setCommitApplyDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("0");
 			dealerInfo.setApplyType("0");
+			dealerInfo.setCommitApplyUser(ResourceUtil.getSessionUserName().getId());
 
 			// 清空审核状态
 			dealerInfo.setAuditDate(null);
@@ -428,6 +430,25 @@ public class DealerInfoController extends BaseController {
 			req.setAttribute("dealerInfoPage", dealerInfo);
 		}
 		return new ModelAndView("yhy/dealer/dealerInfo");
+	}
+	
+	/**
+	 * 渠道商信息列表详情页跳转
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "dealerDetail")
+	public ModelAndView dealerDetail(DealerInfoEntity dealerInfo, HttpServletRequest req) {
+		if (StringUtil.isNotEmpty(dealerInfo.getId())) {
+			dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, dealerInfo.getId());
+			String userId = dealerInfo.getCommitApplyUser();
+			if(StringUtil.isNotEmpty(userId)){
+				TSUser user = dealerInfoService.getEntity(TSUser.class, userId);
+				req.setAttribute("userName",user.getUserName());
+			}
+			req.setAttribute("dealerInfoPage", dealerInfo);
+		}
+		return new ModelAndView("yhy/dealer/dealerDetail");
 	}
 
 	/**

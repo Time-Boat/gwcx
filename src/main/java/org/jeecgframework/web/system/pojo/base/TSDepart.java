@@ -39,6 +39,8 @@ public class TSDepart extends IdEntity implements java.io.Serializable {
 	private String address;//详细地址
 	@Excel(name = "地址")
 	private String orgAddress;//地址
+	@Excel(name = "状态")
+	private String status;//状态
 	private List<TSDepart> TSDeparts = new ArrayList<TSDepart>();//下属部门
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -130,6 +132,15 @@ public class TSDepart extends IdEntity implements java.io.Serializable {
 
 	public void setOrgAddress(String orgAddress) {
 		this.orgAddress = orgAddress;
+	}
+
+	@Column(name = "status", length = 1)
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 }

@@ -261,10 +261,27 @@ public class BaseController {
 	 * 获取线路
 	 */
 	public String getLine(){
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		//String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		// 添加了权限
-		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'";
-		List<Object> list = this.systemService.findListbySql(sql);
+		//String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + orgCode + "%'";
+		TSUser user = ResourceUtil.getSessionUserName();
+		TSDepart depart = user.getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = user.getId();
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("select l.id,l.name from lineinfo l LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN t_s_base_user u on l.createUserId=u.ID where l.status='0' ");
+		// 添加了权限
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and l.createUserId = '" + userId + "' ");
+		}
+		if (StringUtil.isNotEmpty(orgCode)) {
+			sql.append(" and t.org_code like '" + orgCode + "%'");
+		}
+		
+		List<Object> list = this.systemService.findListbySql(sql.toString());
 		StringBuffer json = new StringBuffer("{'data':[");
 		if(list.size()>0){
 			for (int i = 0; i < list.size(); i++) {

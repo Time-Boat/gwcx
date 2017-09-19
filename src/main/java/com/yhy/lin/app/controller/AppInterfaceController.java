@@ -231,7 +231,6 @@ public class AppInterfaceController extends AppBaseController {
 				}
 				
 			} catch (ParameterException e) {
-				// TODO: handle exception
 				statusCode = e.getCode();
 				msg = e.getErrorMessage();
 				logger.error(e.getErrorMessage());

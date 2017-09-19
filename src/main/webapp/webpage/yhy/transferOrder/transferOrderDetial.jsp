@@ -115,7 +115,39 @@
 					<input  class="inputxt" id="orderTotalPrice"name="orderTotalPrice" value="${tView.orderTotalPrice}">  		
 					<span class="Validform_checktip"></span>
 				</td>
-			<tr> 
+			<tr>
+			<tr>
+				<td align="right">
+					<label class="Validform_label">航班号：</label>
+				</td>
+				<td class="value">
+					<input  class="inputxt" id="orderFlightnumber"name="orderFlightnumber" value="${tView.orderFlightnumber}">  		
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="right">
+					<label class="Validform_label">火车车次：</label>
+				</td>
+				<td class="value">
+					<input  class="inputxt" id="orderTrainnumber"name="orderTrainnumber" value="${tView.orderTrainnumber}">  		
+					<span class="Validform_checktip"></span>
+				</td>
+			</tr>
+			<tr>
+				<td align="right">
+					<label class="Validform_label">购票人手机号：</label>
+				</td>
+				<td class="value">
+					<input  class="inputxt" id="orderTotalPrice"name="customerPhone" value="${tView.customerPhone}">  		
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="right">
+					<label class="Validform_label">预计到达时间：</label>
+				</td>
+				<td class="value">
+					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="orderExpectedarrival" name="orderExpectedarrival" ignore="ignore"
+					value="<fmt:formatDate value='${tView.orderExpectedarrival}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
+				</td>
+			</tr>
 			<tr>
 				<td align="left" colspan="4">
 					<label class="Validform_label">司机车辆安排</label>

@@ -39,9 +39,18 @@
     </div>
     <script type="text/javascript">
 	    
-	    $(function(){
+	    /* $(function(){
 	    	console.log(uploader);
-	    });
+	    }); */
+	    
+	    function fileSuccess(){
+	    	var win = frameElement.api.opener;//获取父窗口
+  			//刷新主表单父窗口
+  			win.reloadTable();
+  			
+  			//关闭当前弹出框
+  			frameElement.api.close();
+	    }
 	    
     </script>
 </body>

@@ -169,7 +169,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		
 		String oc = user.getOrgCompany();
 		
-		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
+		//如果是平台退款审核员权限，则根据其选择的子公司来过滤筛选
 		if(hasPermission && StringUtil.isNotEmpty(oc)){
 			sql.append("and ( 1=2 ");
 			

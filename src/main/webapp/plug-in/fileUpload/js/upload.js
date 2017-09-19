@@ -68,25 +68,25 @@
                 '<p class="progress"><span></span></p>' +
                 '</li>'),
 
-                $btns = $('<div class="file-panel">' +
-                    '<span class="cancel">删除</span>' + '</div>').appendTo($li),
-                $prgress = $li.find('p.progress span'),
-                $wrap = $li.find('p.imgWrap'),
-                $info = $('<p class="error"></p>'),
+            $btns = $('<div class="file-panel">' +
+                '<span class="cancel">删除</span>' + '</div>').appendTo($li),
+            $prgress = $li.find('p.progress span'),
+            $wrap = $li.find('p.imgWrap'),
+            $info = $('<p class="error"></p>'),
 
-                showError = function(code) {
-                    switch (code) {
-                        case 'interrupt':
-                            text = '上传暂停';
-                            break;
+            showError = function(code) {
+                switch (code) {
+                    case 'interrupt':
+                        text = '上传暂停';
+                        break;
 
-                        default:
-                            text = '上传失败，请重试';
-                            break;
-                    }
+                    default:
+                        text = '上传失败，请重试';
+                        break;
+                }
 
-                    $info.text(text).appendTo($li);
-                };
+                $info.text(text).appendTo($li);
+            };
 
             if (file.getStatus() === 'invalid') {
                 showError(file.statusText);
@@ -250,7 +250,8 @@
                 case 'finish':
                     stats = uploader.getStats();
                     if (stats.successNum) {
-                        alert('上传成功');
+                    	fileSuccess();
+                        //alert('上传成功');
                     } else {
                         // 没有成功的图片，重设
                         state = 'done';

@@ -15,7 +15,7 @@ public class TransferorderView implements java.io.Serializable {
 	private String  orderStartingstationName;//起点站名称
 	private String  orderTerminusstationName;//终点站名称
 	private Date  orderStartime;//发车时间
-	private String orderExpectedarrival;//预计到达时间
+	private Date orderExpectedarrival;//预计到达时间
 	private String  orderUnitprice;//单价
 	private String  orderNumbers;//车票数量
     private String  orderPaytype;//支付方式0：微信 1：支付宝 2：银联
@@ -38,6 +38,7 @@ public class TransferorderView implements java.io.Serializable {
 	
 	private String cityName; //城市名称
 	private String cityId; //城市id
+	private String customerPhone; //购票人手机号
 	
 	public String getCityName() {
 		return cityName;
@@ -111,10 +112,10 @@ public class TransferorderView implements java.io.Serializable {
 		this.orderTerminusstationName = orderTerminusstationName;
 	}
 	
-	public String getOrderExpectedarrival() {
+	public Date getOrderExpectedarrival() {
 		return orderExpectedarrival;
 	}
-	public void setOrderExpectedarrival(String orderExpectedarrival) {
+	public void setOrderExpectedarrival(Date orderExpectedarrival) {
 		this.orderExpectedarrival = orderExpectedarrival;
 	}
 	public String getOrderUnitprice() {
@@ -221,6 +222,13 @@ public class TransferorderView implements java.io.Serializable {
 	public void setApplicationTime(Date applicationTime) {
 		this.applicationTime = applicationTime;
 	}
-	
+
+	public String getCustomerPhone() {
+		return customerPhone;
+	}
+
+	public void setCustomerPhone(String customerPhone) {
+		this.customerPhone = customerPhone;
+	}
 	
 }

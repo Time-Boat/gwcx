@@ -12,6 +12,7 @@
             <t:dgCol title="common.org.code" field="orgCode" treefield="fieldMap.orgCode"></t:dgCol>
             <t:dgCol title="common.org.type" field="orgType" dictionary="orgtype" treefield="fieldMap.orgType"></t:dgCol>
             <t:dgCol title="common.mobile" field="mobile" treefield="fieldMap.mobile"></t:dgCol>
+            <t:dgCol title="common.status" field="status" dictionary="org_status" treefield="fieldMap.status"></t:dgCol>
             <t:dgCol title="common.fax" field="fax" treefield="fieldMap.fax"></t:dgCol>
             <t:dgCol title="common.address" field="address" treefield="fieldMap.address"></t:dgCol>
             <t:dgCol title="common.operation" field="opt"></t:dgCol>

@@ -4,14 +4,6 @@
 <html>
  <head>
   <title>渠道商信息</title>
-  	
-  	<!-- 图片上传js -->
-	<script type="text/javascript" src="plug-in/fileUpload/js/jquery.js"></script>
-    <script type="text/javascript" src="plug-in/fileUpload/js/webuploader.js"></script>
-    <script type="text/javascript" src="plug-in/fileUpload/js/md5.js"></script>
-    <script type="text/javascript" src="plug-in/fileUpload/js/upload.js"></script>
-    <link rel="stylesheet" type="text/css" href="plug-in/fileUpload/css/style.css" />
-    
   <t:base type="jquery,easyui,tools,DatePicker"></t:base>
   <script type="text/javascript">
   
@@ -119,37 +111,6 @@
 							   value="${dealerInfoPage.creditCode}">
 						<span id="checkCreditCode" class="Validform_checktip"></span>
 					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							渠道商材料:
-						</label>
-					</td>
-					<td class="value" >
-						<div id="wrapper">
-					        <div id="container" style='width:600px;'>
-					            <!--头部，相册选择和格式选择-->
-					            <div id="uploader">
-					                <div class="queueList">
-					                    <div id="dndArea" class="placeholder">
-					                        <div id="filePicker"></div>
-					                        <p>或将文件拖到这里</p>
-					                    </div>
-					                </div>
-					                <div class="statusBar" style="display:none;">
-					                    <div class="progress">
-					                        <span class="text">0%</span>
-					                        <span class="percentage"></span>
-					                    </div><div class="info"></div>
-					                    <div class="btns">
-					                        <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
-					                    </div>
-					                </div>
-					            </div>
-					        </div>
-					    </div>
-				    </td>
 				</tr>
 			</table>
 		</t:formvalid>

@@ -183,6 +183,9 @@ public class DepartController extends BaseController {
 			systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 		} else {
             message = MutiLangUtil.paramAddSuccess("common.department");
+            if(AppGlobals.ORG_SUBSIDIARY_TYPE.equals(depart.getOrgType())){
+            	depart.setStatus("0");
+            }
 			userService.save(depart);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
@@ -346,6 +349,7 @@ public class DepartController extends BaseController {
 		fieldMap.put("mobile", "mobile");
 		fieldMap.put("fax", "fax");
 		fieldMap.put("address", "address");
+		fieldMap.put("status", "status");
         treeGridModel.setFieldMap(fieldMap);
         treeGrids = systemService.treegrid(departList, treeGridModel);
 
@@ -767,6 +771,10 @@ public class DepartController extends BaseController {
 			String orgcode=depart.getOrgCode();
 			
 			Boolean lockuser=lockUser(orgcode);//锁定用户
+			if(StringUtil.isNotEmpty(depart)){
+				depart.setStatus("1");
+			}
+			
 			if(lockuser==false){
 				str.append("锁定用户失败");
 			}
@@ -819,11 +827,11 @@ public class DepartController extends BaseController {
 	public Boolean lockUser(String orgcode){
 		boolean flag = false;
 		StringBuffer str = new StringBuffer();
-		str.append("UPDATE t_s_base_user u");
+		str.append("UPDATE t_s_base_user u,t_s_user f");
 		if(orgcode.length()==6){
 			str.append(",(select u.* from t_s_depart t LEFT JOIN t_s_user_org o on o.org_id=t.ID LEFT JOIN t_s_base_user u on u.ID=o.user_id where t.org_code like '");
 			str.append(orgcode);
-			str.append("%') r set u.delete_flag='1' where r.id=u.ID and u.delete_flag='0'");
+			str.append("%') r set u.delete_flag='1' and f.org_company is NULL  where u.ID=f.id and r.id=u.ID and u.delete_flag='0'");
 		}
 		try {
 			systemService.updateBySqlString(str.toString());
@@ -918,4 +926,3 @@ public class DepartController extends BaseController {
 	}
 	
 }
-

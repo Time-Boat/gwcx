@@ -66,6 +66,8 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String auditStatus;
 	/**提交申请时间 */
 	private Date commitApplyDate;
+	/**提交申请人 */
+	private String commitApplyUser;
 	/**申请类型 */
 	private String applyType;
 	/**拒绝原因 */
@@ -80,6 +82,7 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String lastRejectReason;
 	/**渠道商文件路径*/
 	private String dealerFilePath;
+	
 	
 	@Column(name ="DEALER_FILE_PATH",nullable=true,length=255)
 	public String getDealerFilePath() {
@@ -142,6 +145,15 @@ public class DealerInfoEntity implements java.io.Serializable {
 
 	public void setApplyType(String applyType) {
 		this.applyType = applyType;
+	}
+
+	@Column(name ="COMMIT_APPLY_USER",nullable=true,length=32)
+	public String getCommitApplyUser() {
+		return commitApplyUser;
+	}
+
+	public void setCommitApplyUser(String commitApplyUser) {
+		this.commitApplyUser = commitApplyUser;
 	}
 
 	@Column(name ="COMMIT_APPLY_DATE",nullable=true)
