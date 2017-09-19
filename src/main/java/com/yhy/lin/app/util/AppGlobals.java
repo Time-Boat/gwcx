@@ -51,10 +51,10 @@ public interface AppGlobals {
 	/** 包车 */
 
 	/** windows图片base路径 */
-	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
+	//public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
 
 	/** linux图片base路径 */
-//	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
+	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
 
 	/** app客户头像路径 */
 	public static final String APP_USER_FILE_PATH = "/image/user/";

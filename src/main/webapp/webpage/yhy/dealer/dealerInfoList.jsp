@@ -216,7 +216,7 @@
 			createdetailwindow("选择文件","dealerInfoController.do?dealerUploadFile&id="+id,"800px","500px");
 		}
 		
-		//初始化查询条件
+		/* //初始化查询条件
 		$(function() {
 			var json = $("#accounts").val();
 			
@@ -233,7 +233,7 @@
 			var a4 = '</select></span>';
 			
 			$("#dealerInfoListForm").append(a1 + a2 + a3 + c1 + a4);
-		});
+		}); */
 		
 		
 	</script>
@@ -242,12 +242,8 @@
   <t:datagrid name="dealerInfoList" title="渠道商信息" actionUrl="dealerInfoController.do?datagrid" idField="id" fit="true" checkbox="true" queryMode="group">
    <t:dgCol title="编号" field="id" hidden="true" ></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
-<<<<<<< .mine
    <t:dgCol title="附件地址" field="dealerFilePath" hidden="true" width="120"></t:dgCol>
-   <t:dgCol title="渠道商名称" field="account" align="center" width="120"></t:dgCol>
-=======
    <t:dgCol title="渠道商名称" field="account" query="true" align="center" width="120"></t:dgCol>
->>>>>>> .r774
    <t:dgCol title="合作状态" field="status" query="true" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
    <t:dgCol title="所属公司" field="departname" query="true" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>

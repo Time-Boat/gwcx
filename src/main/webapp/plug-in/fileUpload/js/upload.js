@@ -43,8 +43,12 @@
         chunked: true,
         formData: {"did" : $('#did').val()},
         accept: {
-            
+            /*title: 'Images',
+            extensions: 'gif,jpg,jpeg,bmp,png',
+            mimeTypes: 'image/*'*/
         },
+        fileSizeLimit: 1024 * 1024 * 2, //单个文件大小限制为2M
+        fileNumLimit: 1, //所有文件数量限制为1
         server: 'dealerInfoController.do?saveFile'
         // server: 'http://www.2betop.net/fileupload.php',
         });
@@ -313,7 +317,21 @@
         });
 
         uploader.onError = function(code) {
-            alert('Eroor: ' + code);
+        	
+        	switch (code) {
+			case 'Q_EXCEED_NUM_LIMIT':
+				alert('文件个数超过系统限制上限');
+				break;
+			case 'Q_EXCEED_SIZE_LIMIT':
+				alert('文件大小超过系统限制上限');
+				break;
+			case 'Q_TYPE_DENIED':
+				alert('请选择指定文件类型');
+				break;
+			default:
+				alert('Error:' + code);
+				break;
+			}
         };
 
         $upload.on('click', function() {
