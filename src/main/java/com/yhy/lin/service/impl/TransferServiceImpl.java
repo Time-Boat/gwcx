@@ -429,7 +429,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 不需要显示退款状态的订单
 		sql.append(" and a.lineOrderCode is not null and a.order_status in('1','2') ");
 
-		sql.append(" GROUP BY a.lineOrderCode ");
+		sql.append(" GROUP BY a.lineOrderCode ORDER BY a.order_startime");
 
 		return sql.toString();
 	}

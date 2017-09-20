@@ -311,7 +311,7 @@ public class BaseController {
 	public String getAccount(){
 		StringBuffer sql = new StringBuffer();
 		
-		sql.append("select d.id,d.account from dealer_info d, t_s_depart td where status='0' ");
+		sql.append("select d.id,d.account from dealer_info d, t_s_depart td where d.status='0' ");
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
