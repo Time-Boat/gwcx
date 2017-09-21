@@ -291,8 +291,10 @@
    <t:dgFunOpt funname="dealerApply(id,dealerFilePath)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
    <t:dgFunOpt funname="dealerApply(id,dealerFilePath)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&lastAuditStatus#eq#2"></t:dgFunOpt>
    
-   <%-- <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#eq#2"></t:dgFunOpt> 
-   <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#ne#0"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&auditStatus#eq#2"></t:dgFunOpt> 
+   
+   <%-- <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2"></t:dgFunOpt> 
    <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="lastAuditStatus#eq#2"></t:dgFunOpt>  --%>
    
    <t:dgFunOpt funname="dealerAgree(id)" title="同意" operationCode="dealerAgreeMA" exp="auditStatus#eq#0"></t:dgFunOpt>

@@ -101,6 +101,10 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			sql.append(" and d.audit_status = '" + dealerInfo.getAuditStatus() + "' ");
 		}
 		
+		if(StringUtil.isNotEmpty(dealerInfo.getLastAuditStatus())){
+			sql.append(" and d.last_audit_status = '" + dealerInfo.getLastAuditStatus() + "' ");
+		}
+		
 		TSUser user = ResourceUtil.getSessionUserName();
 		TSDepart depart = user.getCurrentDepart();
 		String orgCode = depart.getOrgCode();

@@ -16,14 +16,14 @@
           url:"dealerInfoController.do?checkCreditCode&creditCode="+creditCode,
           dataType:'json',
           success:function(d){
-         		var obj = eval('('+d.jsonStr+')');
-         		b = obj.success;
-         		if(!b){
-         			tip(obj.msg);
-         			$('#checkCreditCode').text(obj.msg).css({color:"red"});
-         		}else{
-         			$('#checkCreditCode').text('通过信息验证！').css({color:"#71b83d"});
-         		}
+	       		var obj = eval('('+d.jsonStr+')');
+	       		b = obj.success;
+	       		if(!b){
+	       			tip(obj.msg);
+	       			$('#checkCreditCode').text(obj.msg).css({color:"red"});
+	       		}else{
+	       			$('#checkCreditCode').text('通过信息验证！').css({color:"#71b83d"});
+	       		}
           }
       });
 	}

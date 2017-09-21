@@ -839,9 +839,9 @@ public class DepartController extends BaseController {
 			str.append(",(select d.* from t_s_depart t,dealer_info d where d.departId=t.ID and t.org_code like '");
 			str.append(orgcode);
 			str.append("%') r "
-					+ "set d.status='2' and d.audit_user=null and d.audit_date= null and d.audit_status='-1' and d.commit_apply_date=null"
-					+ " and d.commit_apply_user=null and d.apply_type=null and d.reject_reason=NULL and d.last_audit_user=NULL"
-					+ " and d.last_audit_date=NULL and d.last_audit_status =NULL and d.last_reject_reason= NULL and "
+					+ "set d.status='2',d.audit_user=null,d.audit_date= null,d.audit_status='-1',d.commit_apply_date=null"
+					+ " ,d.commit_apply_user=null,d.apply_type=null,d.reject_reason=NULL,d.last_audit_user=NULL"
+					+ " ,d.last_audit_date=NULL,d.last_audit_status =NULL,d.last_reject_reason= NULL,"
 					+ "d.dealer_file_path = NULL where d.id=r.id");
 		}
 		try {
@@ -862,7 +862,7 @@ public class DepartController extends BaseController {
 		if(orgcode.length()==6){
 			str.append(",(select u.* from t_s_depart t LEFT JOIN t_s_user_org o on o.org_id=t.ID LEFT JOIN t_s_base_user u on u.ID=o.user_id where t.org_code like '");
 			str.append(orgcode);
-			str.append("%') r set u.delete_flag='1' and f.org_company is NULL  where u.ID=f.id and r.id=u.ID and u.delete_flag='0'");
+			str.append("%') r set u.delete_flag='1',u.status='0',f.org_company=NULL  where u.ID=f.id and r.id=u.ID and u.delete_flag='0'");
 		}
 		try {
 			systemService.updateBySqlString(str.toString());
@@ -944,7 +944,7 @@ public class DepartController extends BaseController {
 			str.append(orgcode);
 			str.append("%') r set l.status='1',l.deleteFlag='1',l.application_status='0',l.review_reason=NULL,l.trial_reason=NULL,"
 					+ "l.application_time=NULL,l.application_user_id=NULL,l.apply_content=NULL,l.first_application_time =NULL,"
-					+ "l.last_application_time=NULL and l.first_application_user =null and l.last_application_user =null "
+					+ "l.last_application_time=NULL,l.first_application_user =null,l.last_application_user =null "
 					+ " where r.id=l.ID and l.deleteFlag='0' and l.status!='1' and l.application_status!='0'");
 		}
 		try {
