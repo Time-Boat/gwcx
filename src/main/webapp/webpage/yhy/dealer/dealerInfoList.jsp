@@ -284,14 +284,15 @@
    <t:dgFunOpt funname="generateQRCode(id)" title="生成二维码" exp="qrCodeUrl#empty#true&&status#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="lookQRCode(qrCodeUrl)" title="预览" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="downloadQRCode(qrCodeUrl)" title="二维码下载" exp="qrCodeUrl#empty#false&&status#eq#0"></t:dgFunOpt> 
-   <t:dgFunOpt funname="downloadFile(id)"  title="附件下载" operationCode="dealerDownload" exp="dealerFilePath#empty#false"></t:dgFunOpt> 
+   <t:dgFunOpt funname="downloadFile(id)"  title="附件下载" operationCode="dealerDownload" exp="dealerFilePath#empty#false&&status#eq#0"></t:dgFunOpt> 
    
    <!-- 权限按钮 -->
    <t:dgFunOpt funname="dealerApply(id,dealerFilePath)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
    <t:dgFunOpt funname="dealerApply(id,dealerFilePath)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
    <t:dgFunOpt funname="dealerApply(id,dealerFilePath)"  title="提交申请" operationCode="dealerApply" exp="status#eq#1&&lastAuditStatus#eq#2"></t:dgFunOpt>
    
-   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#ne#0"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#eq#1"></t:dgFunOpt> 
+   <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&lastAuditStatus#eq#2"></t:dgFunOpt> 
    <t:dgFunOpt funname="dealerDisable(id)"  title="申请停用" operationCode="dealerDisable" exp="status#eq#0&&auditStatus#eq#2"></t:dgFunOpt> 
    
    <%-- <t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="rejectReason" exp="auditStatus#eq#2"></t:dgFunOpt> 

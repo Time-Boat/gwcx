@@ -4,7 +4,6 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
@@ -14,7 +13,6 @@ import net.sf.json.JSONObject;
 import java.util.List;
 import java.util.Map;
 
-import org.jeecgframework.core.annotation.Ehcache;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
@@ -82,7 +80,6 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		return jObject;
 	}
 	
-	@BussAnnotation
 	public String getWhere(DealerInfoEntity dealerInfo,String username, boolean hasPermissionP,boolean hasPermissionC, String departname) {
 		
 		StringBuffer sql = new StringBuffer();

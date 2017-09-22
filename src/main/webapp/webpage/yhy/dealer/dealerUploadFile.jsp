@@ -14,7 +14,7 @@
     
 </head>
 <body>
-	<input hidden="true" id="did" value="${did}" />
+	<input hidden="true" id="did" value="${dealerId}" />
     <div id="wrapper">
         <div id="container">
             <!--头部，相册选择和格式选择-->

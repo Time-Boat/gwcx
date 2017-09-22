@@ -618,7 +618,7 @@ public class UserController extends BaseController {
 			users.setOfficePhone(user.getOfficePhone());
 			users.setMobilePhone(user.getMobilePhone());
 			
-			if(StringUtil.isNotEmpty(orgCodes) && StringUtil.isNotEmpty(roleType)){
+			if(StringUtil.isNotEmpty(roleType)){
 				users.setOrgCompany(orgCodes);
 				users.setRoleType(roleType);
 			}

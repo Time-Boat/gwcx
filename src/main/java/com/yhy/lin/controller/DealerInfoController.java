@@ -31,9 +31,6 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 
-import javax.validation.Validator;
-
-import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
@@ -62,8 +59,6 @@ public class DealerInfoController extends BaseController {
 	private DealerInfoServiceI dealerInfoService;
 	@Autowired
 	private SystemService systemService;
-	@Autowired
-	private Validator validator;
 
 	/**
 	 * 渠道商信息列表 页面跳转
@@ -71,7 +66,6 @@ public class DealerInfoController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping(params = "dealerInfoList")
-	@BussAnnotation
 	public ModelAndView list(HttpServletRequest request) {
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
@@ -85,7 +79,6 @@ public class DealerInfoController extends BaseController {
 	 * @param user
 	 */
 	@RequestMapping(params = "datagrid")
-	@BussAnnotation
 	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 
@@ -209,10 +202,21 @@ public class DealerInfoController extends BaseController {
 
 		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 		try {
+
 			dealerInfo.setCommitApplyDate(AppUtil.getDate());
 			dealerInfo.setAuditStatus("0");
 			dealerInfo.setApplyType("1");
+			dealerInfo.setCommitApplyUser(ResourceUtil.getSessionUserName().getId());
 
+			// 清空审核状态
+			dealerInfo.setAuditDate(null);
+			dealerInfo.setAuditUser("");
+			dealerInfo.setRejectReason("");
+			dealerInfo.setLastAuditDate(null);
+			dealerInfo.setLastAuditUser("");
+			dealerInfo.setLastAuditStatus("");
+			dealerInfo.setLastRejectReason("");
+			
 			dealerInfoService.saveOrUpdate(dealerInfo);
 		} catch (Exception e) {
 			message = "服务器失败";
@@ -384,6 +388,7 @@ public class DealerInfoController extends BaseController {
 				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 				dealerInfo.setRejectReason(rejectReason);
 			} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
+				
 				dealerInfo.setLastAuditDate(AppUtil.getDate());
 				dealerInfo.setLastAuditStatus("2");
 				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
@@ -463,7 +468,7 @@ public class DealerInfoController extends BaseController {
 	@RequestMapping(params = "dealerUploadFile")
 	public ModelAndView dealerUploadFile(HttpServletRequest request) {
 		String id = request.getParameter("id");
-		request.setAttribute("did", id);
+		request.setAttribute("dealerId", id);
 		return new ModelAndView("yhy/dealer/dealerUploadFile");
 	}
 
