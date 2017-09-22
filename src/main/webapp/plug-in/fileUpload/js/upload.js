@@ -43,9 +43,9 @@
         chunked: true,
         formData: {"did" : $('#did').val()},
         accept: {
-            /*title: 'Images',
-            extensions: 'gif,jpg,jpeg,bmp,png',
-            mimeTypes: 'image/*'*/
+            title: 'Images',
+            extensions: 'jpg,jpeg,png',
+            mimeTypes: 'image/jpg,image/jpeg,image/png'   //可以用image/*通配符   但是在chrome中点击打开文件按钮的时候太慢了，所以就写死了
         },
         fileSizeLimit: 1024 * 1024 * 2, //单个文件大小限制为2M
         fileNumLimit: 1, //所有文件数量限制为1

@@ -22,8 +22,8 @@
 		<mybatis.version>3.1.1</mybatis.version>
 
 		<!-- 辅助依赖包 -->
-		<cglib.version>2.2</cglib.version>
-		<aspectj.version>1.6.9</aspectj.version>
+		<cglib.version>3.1</cglib.version>
+		<aspectj.version>1.7.4</aspectj.version>
 		<jodd.version>3.3.7</jodd.version>
 		<javassist.version>3.15.0-GA</javassist.version>
 		<ant.version>1.6.5</ant.version>

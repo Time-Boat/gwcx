@@ -1,8 +1,10 @@
 package com.yhy.lin.service.impl;
 
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
@@ -12,6 +14,7 @@ import net.sf.json.JSONObject;
 import java.util.List;
 import java.util.Map;
 
+import org.jeecgframework.core.annotation.Ehcache;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
@@ -19,13 +22,14 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 
-@Service("dealerInfoService")
+@Service("DealerInfoService")
 @Transactional
 public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerInfoServiceI {
 
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String username, boolean hasPermissionP, boolean hasPermissionC, String departname) {
-		String sqlWhere = getWhere(dealerInfo, username, hasPermissionP, hasPermissionC, departname);
+		//通过AOP代理调用getWhere方法即可走事务切面              必须得通过接口调用getWhere
+		String sqlWhere = ((DealerInfoServiceI) AopContext.currentProxy()).getWhere(dealerInfo, username, hasPermissionP, hasPermissionC, departname);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_info d left join t_s_base_user u on d.create_user_id = u.id join t_s_depart b on b.id = d.departId "
 				+ " LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p "
@@ -78,12 +82,13 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		return jObject;
 	}
 	
+	@BussAnnotation
 	public String getWhere(DealerInfoEntity dealerInfo,String username, boolean hasPermissionP,boolean hasPermissionC, String departname) {
 		
 		StringBuffer sql = new StringBuffer();
 		
 		if(StringUtil.isNotEmpty(departname)){
-			sql.append(" and  p.departname like '%"+departname+"%'");
+			sql.append(" and  p.departname like '%" + departname + "%'");
 		}
 		
 		if(StringUtil.isNotEmpty(dealerInfo.getAccount())){
@@ -119,14 +124,16 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		String oc = user.getOrgCompany();
 		
 		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPermissionP && StringUtil.isNotEmpty(oc)){
+		if(hasPermissionP){
 			sql.append("and ( 1=2 ");
 			
-			String[] ocArr = oc.split(",");
-			
-			for (int i = 0; i < ocArr.length; i++) {
-				sql.append(" or b.org_code like '"+ocArr[i]+"%' ");
+			if(StringUtil.isNotEmpty(oc)){
+				String[] ocArr = oc.split(",");
+				for (int i = 0; i < ocArr.length; i++) {
+					sql.append(" or b.org_code like '"+ocArr[i]+"%' ");
+				}
 			}
+			
 			sql.append(")");
 		} else {
 			sql.append(" and b.org_code like '"+orgCode+"%'");

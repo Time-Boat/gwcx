@@ -33,6 +33,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
@@ -70,6 +71,7 @@ public class DealerInfoController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping(params = "dealerInfoList")
+	@BussAnnotation
 	public ModelAndView list(HttpServletRequest request) {
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
@@ -83,6 +85,7 @@ public class DealerInfoController extends BaseController {
 	 * @param user
 	 */
 	@RequestMapping(params = "datagrid")
+	@BussAnnotation
 	public void datagrid(DealerInfoEntity dealerInfo, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 
@@ -95,7 +98,7 @@ public class DealerInfoController extends BaseController {
 		boolean hasPermissionP = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
 		boolean hasPermissionC = checkRole(AppGlobals.COMMERCIAL_MANAGER);
 		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo, username, hasPermissionP, hasPermissionC, departname);
-
+		
 		responseDatagrid(response, jObject);
 	}
 

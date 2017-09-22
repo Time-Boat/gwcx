@@ -8,7 +8,8 @@
             http://www.springframework.org/schema/context/spring-context-3.0.xsd
             http://www.springframework.org/schema/aop  
             http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
-	<aop:aspectj-autoproxy />
+	<aop:aspectj-autoproxy expose-proxy="true" />
 	
-	<context:component-scan base-package="com.yhy.lin.app.quartz,org.jeecgframework.core.interceptors" />
+	<context:component-scan base-package="com.yhy.lin,org.jeecgframework.core.interceptors" />
+	
 </beans>

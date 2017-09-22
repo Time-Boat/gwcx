@@ -36,6 +36,7 @@
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
+	<t:dgToolBar funname="coerceShelves(id)" title="强制下架" icon="icon-put" url="lineInfoSpecializedController.do?coerceShelves" operationCode="coerceShelves" ></t:dgToolBar>
 	
 	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
@@ -176,20 +177,38 @@
 	}
 	
 	//申请下架 
-	function applicationShelf(id) {
+	function coerceShelves(id) {
 		
-		$.ajax({
-            type:"post",
-            url:"lineInfoSpecializedController.do?agree&id="+id,
-            dataType:'json',
-            success:function(data){
-            	 var t = eval('('+data.jsonStr+')');
-					tip(t.msg);
-           		$('#win').window('close');
-	           	//刷新当前窗体
-	           	$('#lineList2').datagrid('reload');
-            }
-        });
+		var ids = '';
+		var rows = $("#lineList2").datagrid("getSelections");
+		for(var i=0;i<rows.length;i++){
+			ids+=rows[i].id;
+			ids+=',';
+		}
+		ids = ids.substring(0,ids.length-1);
+		if(ids.length==0){
+			tip('请选择强制下架的线路');
+			return;
+		}
+		if(rows[0].status=='1'){
+			tip('未上架线路不能下架！');
+			return;
+		}
+		//url += '&ids='+ids;
+		
+		$.dialog.confirm('确定要强制下架？',function(r){
+		    if (r){
+		    	$.post(
+		    		"lineInfoSpecializedController.do?coerceShelves",	
+					{'id':ids},
+					function(data){
+						var obj = eval('(' + data + ')');
+						tip(obj.msg);
+						$('#lineList2').datagrid('reload');
+					}
+				);		
+		    }
+		});
 	}
 	
 	//同意

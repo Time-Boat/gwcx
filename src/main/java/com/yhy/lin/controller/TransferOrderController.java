@@ -276,7 +276,7 @@ public class TransferOrderController extends BaseController {
 	@RequestMapping(params = "traindatagrid")
 	public void traindatagrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
-		
+		//long startTime=System.currentTimeMillis();   //获取开始时间
 		String orderTypes = request.getParameter("orderTypes");
 		String lineOrderCode = request.getParameter("lineOrderCode");
 		String orderStartingstation = request.getParameter("orderStartingstation");
@@ -301,8 +301,9 @@ public class TransferOrderController extends BaseController {
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
 		JSONObject jObject = transferService.getDatagrid2(transferorder, dataGrid,lineOrderCode,orderTypes,orderStartingstation, orderTerminusstation
 				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
-
+		//long endTime=System.currentTimeMillis(); //获取结束时间
 		responseDatagrid(response, jObject);
+		
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package com.yhy.lin.app.quartz;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Component;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
  * @author Administrator
  * @date 2017年9月20日 下午2:42:11
  */
+@Aspect
 @Component
 public class IUserImpl implements IUser {
 
@@ -57,7 +59,8 @@ public class IUserImpl implements IUser {
 		BeanFactory factory = new ClassPathXmlApplicationContext("spring-mvc-aop.xml");
 		IUser user = (IUser) factory.getBean("IUserImpl");
 		user.findAll();
-
+		System.out.println();
+		user.findUser("Tom");
 		//User u = new User();
 		//u.setUsername("Tom");
 		//user.findUser(u.getUsername());

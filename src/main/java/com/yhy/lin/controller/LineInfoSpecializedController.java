@@ -514,4 +514,43 @@ public class LineInfoSpecializedController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
+	
+	/**
+	 * 强制下架
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(params = "coerceShelves")
+	@ResponseBody
+	public AjaxJson coerceShelves(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		if(StringUtil.isNotEmpty(id)){
+			String ids[]= id.split(",");
+			for (int i = 0; i < ids.length; i++) {
+				LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, ids[i]);
+				if(StringUtil.isNotEmpty(line)){
+					line.setStatus("1");
+					line.setApplyContent("1");//申请内容
+					line.setApplicationStatus("0");
+					line.setApplicationTime(AppUtil.getDate());
+					line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+				}
+				try {
+					message = "强制下架成功！";
+					this.systemService.saveOrUpdate(line);
+				} catch (Exception e) {
+					// TODO: handle exception
+					message = "服务器异常！";
+				}
+			}
+			
+		}else{
+			message="没有选中要强制下架的线路！";
+		}
+		
+		j.setMsg(message);
+		return j;
+	}
 }

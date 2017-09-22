@@ -109,17 +109,17 @@ public class DepartController extends BaseController {
 	/**
 	 * 删除部门：
 	 * <ul>
-     *     组织机构下存在子机构时
-     *     <li>不允许删除 组织机构</li>
+	 *     组织机构下存在子机构时
+	 *     <li>不允许删除 组织机构</li>
 	 * </ul>
 	 * <ul>
-     *     组织机构下存在用户时
-     *     <li>不允许删除 组织机构</li>
+	 *     组织机构下存在用户时
+	 *     <li>不允许删除 组织机构</li>
 	 * </ul>
 	 * <ul>
-     *     组织机构下 不存在子机构 且 不存在用户时
-     *     <li>删除 组织机构-角色 信息</li>
-     *     <li>删除 组织机构 信息</li>
+	 *     组织机构下 不存在子机构 且 不存在用户时
+	 *     <li>删除 组织机构-角色 信息</li>
+	 *     <li>删除 组织机构 信息</li>
 	 * </ul>
 	 * @return 删除的结果信息
 	 */
@@ -129,20 +129,20 @@ public class DepartController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		depart = systemService.getEntity(TSDepart.class, depart.getId());
-       
-        if (depart.getTSDeparts().size() == 0) {
-            //Long userCount = systemService.getCountForJdbc("select count(1) from t_s_user_org where org_id='" + depart.getId() + "'");
-            //if(userCount == 0) { // 组织机构下没有用户时，该组织机构才允许删除。
-                systemService.executeSql("delete from t_s_role_org where org_id=?", depart.getId());
-                systemService.delete(depart);
-                message = MutiLangUtil.paramDelSuccess("common.department");
-                systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-            //}
-        } else {
-            message = MutiLangUtil.paramDelFail("common.department");
-        }
 
-        j.setMsg(message);
+		if (depart.getTSDeparts().size() == 0) {
+			//Long userCount = systemService.getCountForJdbc("select count(1) from t_s_user_org where org_id='" + depart.getId() + "'");
+			//if(userCount == 0) { // 组织机构下没有用户时，该组织机构才允许删除。
+			systemService.executeSql("delete from t_s_role_org where org_id=?", depart.getId());
+			systemService.delete(depart);
+			message = MutiLangUtil.paramDelSuccess("common.department");
+			systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+			//}
+		} else {
+			message = MutiLangUtil.paramDelFail("common.department");
+		}
+
+		j.setMsg(message);
 		return j;
 	}
 
@@ -178,38 +178,38 @@ public class DepartController extends BaseController {
 		String city = request.getParameter("cityId");
 		depart.setOrgAddress(province+city);
 		if (StringUtil.isNotEmpty(depart.getId())) {
-            message = MutiLangUtil.paramUpdSuccess("common.department");
+			message = MutiLangUtil.paramUpdSuccess("common.department");
 			userService.saveOrUpdate(depart);
 			systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 		} else {
-            message = MutiLangUtil.paramAddSuccess("common.department");
-            if(AppGlobals.ORG_SUBSIDIARY_TYPE.equals(depart.getOrgType())){
-            	depart.setStatus("0");
-            }
+			message = MutiLangUtil.paramAddSuccess("common.department");
+			if(AppGlobals.ORG_SUBSIDIARY_TYPE.equals(depart.getOrgType())){
+				depart.setStatus("0");
+			}
 			userService.save(depart);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
 
-        j.setMsg(message);
+		j.setMsg(message);
 		return j;
 	}
 	@RequestMapping(params = "add")
 	public ModelAndView add(TSDepart depart,OpenCityEntity openCity, HttpServletRequest req) {
 		List<TSDepart> departList = systemService.getList(TSDepart.class);
 		req.setAttribute("departList", departList);
-//        这个if代码段没有用吧，注释之
-//		if (StringUtil.isNotEmpty(depart.getId())) {
-//			TSDepart tspDepart = new TSDepart();
-//			TSDepart tsDepart = new TSDepart();
-//			depart = systemService.getEntity(TSDepart.class, depart.getId());
-//			tspDepart.setId(depart.getId());
-//			tspDepart.setDepartname(depart.getDepartname());
-//			tsDepart.setTSPDepart(tspDepart);
-//			req.setAttribute("depart", tsDepart);
-//		}
-        req.setAttribute("pid", depart.getId());
-        List<ProvincesEntity> pList = systemService.getList(ProvincesEntity.class);
-        req.setAttribute("pList", pList);
+		//        这个if代码段没有用吧，注释之
+		//		if (StringUtil.isNotEmpty(depart.getId())) {
+		//			TSDepart tspDepart = new TSDepart();
+		//			TSDepart tsDepart = new TSDepart();
+		//			depart = systemService.getEntity(TSDepart.class, depart.getId());
+		//			tspDepart.setId(depart.getId());
+		//			tspDepart.setDepartname(depart.getDepartname());
+		//			tsDepart.setTSPDepart(tspDepart);
+		//			req.setAttribute("depart", tsDepart);
+		//		}
+		req.setAttribute("pid", depart.getId());
+		List<ProvincesEntity> pList = systemService.getList(ProvincesEntity.class);
+		req.setAttribute("pList", pList);
 		if (StringUtil.isNotEmpty(openCity.getId())) {
 			openCity = systemService.getEntity(OpenCityEntity.class, openCity.getId());
 			req.setAttribute("openCityPage", openCity);
@@ -235,11 +235,11 @@ public class DepartController extends BaseController {
 			req.setAttribute("depart", depart);
 		}
 		String orgAddress=depart.getOrgAddress();
-		
+
 		List<ProvincesEntity> pList = systemService.getList(ProvincesEntity.class);
 		req.setAttribute("pList", pList);
-		
-		
+
+
 		if (StringUtil.isNotEmpty(orgAddress)) {
 			String provinceId=orgAddress.substring(0, 6);
 			String cityId = orgAddress.substring(6,12);
@@ -250,17 +250,17 @@ public class DepartController extends BaseController {
 			}
 			List<CitiesEntity> cList = systemService.findByProperty(CitiesEntity.class, "provinceId", provinceId);
 			req.setAttribute("cList", cList);
-			
+
 			List<CitiesEntity> ci = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
 			if(ci.size()>0){
 				CitiesEntity city = ci.get(0);
 				req.setAttribute("city", city);
 			}
 		}
-		
+
 		return new ModelAndView("system/depart/depart");
 	}
-	
+
 	/**
 	 * 父级权限列表
 	 * 
@@ -300,7 +300,7 @@ public class DepartController extends BaseController {
 	@ResponseBody
 	public Object departgrid(TSDepart tSDepart,HttpServletRequest request, HttpServletResponse response, TreeGrid treegrid) {
 		CriteriaQuery cq = new CriteriaQuery(TSDepart.class);
-		
+
 		if("yes".equals(request.getParameter("isSearch"))){
 			treegrid.setId(null);
 			tSDepart.setId(null);
@@ -308,7 +308,7 @@ public class DepartController extends BaseController {
 		if(null != tSDepart.getDepartname()){
 			org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, tSDepart);
 		}
-		
+
 		if (treegrid.getId() != null) {
 			cq.eq("TSPDepart.id", treegrid.getId());
 		}
@@ -322,9 +322,9 @@ public class DepartController extends BaseController {
 			}else{
 				cq.eq("TSPDepart.id", departId);
 			}
-			
+
 		}
-		
+
 		cq.add();
 		List<TreeGrid> departList =null;
 		departList=systemService.getListByCriteriaQuery(cq, false);
@@ -333,7 +333,7 @@ public class DepartController extends BaseController {
 			TSDepart parDepart = new TSDepart();
 			tSDepart.setTSPDepart(parDepart);
 			org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, tSDepart);
-		    departList =systemService.getListByCriteriaQuery(cq, false);
+			departList =systemService.getListByCriteriaQuery(cq, false);
 		}
 		List<TreeGrid> treeGrids = new ArrayList<TreeGrid>();
 		TreeGridModel treeGridModel = new TreeGridModel();
@@ -343,21 +343,21 @@ public class DepartController extends BaseController {
 		treeGridModel.setSrc("description");
 		treeGridModel.setIdField("id");
 		treeGridModel.setChildList("TSDeparts");
-        Map<String,Object> fieldMap = new HashMap<String, Object>();
-        fieldMap.put("orgCode", "orgCode");
-        fieldMap.put("orgType", "orgType");
+		Map<String,Object> fieldMap = new HashMap<String, Object>();
+		fieldMap.put("orgCode", "orgCode");
+		fieldMap.put("orgType", "orgType");
 		fieldMap.put("mobile", "mobile");
 		fieldMap.put("fax", "fax");
 		fieldMap.put("address", "address");
 		fieldMap.put("status", "status");
-        treeGridModel.setFieldMap(fieldMap);
-        treeGrids = systemService.treegrid(departList, treeGridModel);
+		treeGridModel.setFieldMap(fieldMap);
+		treeGrids = systemService.treegrid(departList, treeGridModel);
 
-        JSONArray jsonArray = new JSONArray();
-        for (TreeGrid treeGrid : treeGrids) {
-            jsonArray.add(JSON.parse(treeGrid.toJson()));
-        }
-        return jsonArray;
+		JSONArray jsonArray = new JSONArray();
+		for (TreeGrid treeGrid : treeGrids) {
+			jsonArray.add(JSON.parse(treeGrid.toJson()));
+		}
+		return jsonArray;
 	}
 	//----
 	/**
@@ -374,7 +374,7 @@ public class DepartController extends BaseController {
 		request.setAttribute("departid", departid);
 		return new ModelAndView("system/depart/departUserList");
 	}
-	
+
 	/**
 	 * 方法描述:  成员列表dataGrid
 	 * 作    者： yiming.zhang
@@ -403,9 +403,9 @@ public class DepartController extends BaseController {
 			DetachedCriteria dc = cq.getDetachedCriteria();
 			DetachedCriteria dcDepart = dc.createCriteria("userOrgList");
 			dcDepart.add(Restrictions.eq("tsDepart.id", departid));
-            // 这种方式也是可以的
-//            DetachedCriteria dcDepart = dc.createAlias("userOrgList", "userOrg");
-//            dcDepart.add(Restrictions.eq("userOrg.tsDepart.id", departid));
+			// 这种方式也是可以的
+			//            DetachedCriteria dcDepart = dc.createAlias("userOrgList", "userOrg");
+			//            dcDepart.add(Restrictions.eq("userOrg.tsDepart.id", departid));
 
 		}
 		Short[] userstate = new Short[] { Globals.User_Normal, Globals.User_ADMIN };
@@ -416,152 +416,152 @@ public class DepartController extends BaseController {
 	}
 	//----
 
-    /**
-     * 获取机构树-combotree
-     * @param request
-     * @return
-     */
-    @RequestMapping(params = "getOrgTree")
-    @ResponseBody
-    public List<ComboTree> getOrgTree(HttpServletRequest request) {
-//        findHql不能处理is null条件
-//        List<TSDepart> departsList = systemService.findHql("from TSPDepart where TSPDepart.id is null");
-        List<TSDepart> departsList = systemService.findByQueryString("from TSDepart where TSPDepart.id is null");
-        List<ComboTree> comboTrees = new ArrayList<ComboTree>();
-        ComboTreeModel comboTreeModel = new ComboTreeModel("id", "departname", "TSDeparts");
-        comboTrees = systemService.ComboTree(departsList, comboTreeModel, null, true);
-        return comboTrees;
-    }
+	/**
+	 * 获取机构树-combotree
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(params = "getOrgTree")
+	@ResponseBody
+	public List<ComboTree> getOrgTree(HttpServletRequest request) {
+		//        findHql不能处理is null条件
+		//        List<TSDepart> departsList = systemService.findHql("from TSPDepart where TSPDepart.id is null");
+		List<TSDepart> departsList = systemService.findByQueryString("from TSDepart where TSPDepart.id is null");
+		List<ComboTree> comboTrees = new ArrayList<ComboTree>();
+		ComboTreeModel comboTreeModel = new ComboTreeModel("id", "departname", "TSDeparts");
+		comboTrees = systemService.ComboTree(departsList, comboTreeModel, null, true);
+		return comboTrees;
+	}
 
-    /**
-     * 添加 用户到组织机构 的页面  跳转
-     * @param req request
-     * @return 处理结果信息
-     */
-    @RequestMapping(params = "goAddUserToOrg")
-    public ModelAndView goAddUserToOrg(HttpServletRequest req) {
-        req.setAttribute("orgId", req.getParameter("orgId"));
-        return new ModelAndView("system/depart/noCurDepartUserList");
-    }
-    
-    /**
-     * 获取 除当前 组织之外的用户信息列表
-     * @param request request
-     * @return 处理结果信息
-     */
-    @RequestMapping(params = "addUserToOrgList")
-    public void addUserToOrgList(TSUser user, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+	/**
+	 * 添加 用户到组织机构 的页面  跳转
+	 * @param req request
+	 * @return 处理结果信息
+	 */
+	@RequestMapping(params = "goAddUserToOrg")
+	public ModelAndView goAddUserToOrg(HttpServletRequest req) {
+		req.setAttribute("orgId", req.getParameter("orgId"));
+		return new ModelAndView("system/depart/noCurDepartUserList");
+	}
 
-        String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-        //是不是子公司管理员
-  		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
-  		//子公司管理员只能看到自己公司的用户
-  		
-  		List<TSUser> userList = new ArrayList<>();
-        //查出所有在orgCode范围的用户id
-  		if(hasPermission){
-  			//查出所有在orgCode范围的用户id
-  			List<Object[]> orgArrList = systemService.findHql(
-  	  				"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb where d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id "
-  	  				+ "and d.orgCode like '" + orgCode + "%' and tb.status!=0 and tb.deleteFlag=0 and tb.id !='"+ResourceUtil.getSessionUserName().getId()+"' ");
-  	        for (Object[] departs : orgArrList) {
-  	        	userList.add((TSUser) departs[3]);
-  	        }
-  		}
-  		
+	/**
+	 * 获取 除当前 组织之外的用户信息列表
+	 * @param request request
+	 * @return 处理结果信息
+	 */
+	@RequestMapping(params = "addUserToOrgList")
+	public void addUserToOrgList(TSUser user, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		//是不是子公司管理员
+		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
+		//子公司管理员只能看到自己公司的用户
+
+		List<TSUser> userList = new ArrayList<>();
+		//查出所有在orgCode范围的用户id
+		if(hasPermission){
+			//查出所有在orgCode范围的用户id
+			List<Object[]> orgArrList = systemService.findHql(
+					"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb where d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id "
+							+ "and d.orgCode like '" + orgCode + "%' and tb.status!=0 and tb.deleteFlag=0 and tb.id !='"+ResourceUtil.getSessionUserName().getId()+"' ");
+			for (Object[] departs : orgArrList) {
+				userList.add((TSUser) departs[3]);
+			}
+		}
+
 		String orgId = request.getParameter("orgId");
-        CriteriaQuery cq = new CriteriaQuery(TSUser.class, dataGrid);
-        org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
-        
-        // 获取 当前组织机构的用户信息
-        if(StringUtil.isNotEmpty(orgId)){
-	        CriteriaQuery subCq = new CriteriaQuery(TSUserOrg.class);
-	        subCq.setProjection(Property.forName("tsUser.id"));
-	        subCq.eq("tsDepart.id", orgId);
-	        subCq.add();
-	        
-	        cq.add(Property.forName("id").notIn(subCq.getDetachedCriteria()));
-        }
-        cq.add();
-        
-        this.systemService.getDataGridReturn(cq, true);
-        
-        //修改要显示的数据为之前过滤的数据
-        if(hasPermission){
-        	dataGrid.setResults(userList);
-        }
-        
-        TagUtil.datagrid(response, dataGrid);
-    }
-    
-    /**
-     * 添加 用户到组织机构
-     * @param req request
-     * @return 处理结果信息
-     */
-    @RequestMapping(params = "doAddUserToOrg")
-    @ResponseBody
-    public AjaxJson doAddUserToOrg(HttpServletRequest req) {
-    	String message = null;
-        AjaxJson j = new AjaxJson();
-        TSDepart depart = systemService.getEntity(TSDepart.class, req.getParameter("orgId"));
-        saveOrgUserList(req, depart);
-        message =  MutiLangUtil.paramAddSuccess("common.user");
-//      systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
-        j.setMsg(message);
+		CriteriaQuery cq = new CriteriaQuery(TSUser.class, dataGrid);
+		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
 
-        return j;
-    }
-    /**
-     * 保存 组织机构-用户 关系信息
-     * @param request request
-     * @param depart depart
-     */
-    private void saveOrgUserList(HttpServletRequest request, TSDepart depart) {
-        String orgIds = oConvertUtils.getString(request.getParameter("userIds"));
+		// 获取 当前组织机构的用户信息
+		if(StringUtil.isNotEmpty(orgId)){
+			CriteriaQuery subCq = new CriteriaQuery(TSUserOrg.class);
+			subCq.setProjection(Property.forName("tsUser.id"));
+			subCq.eq("tsDepart.id", orgId);
+			subCq.add();
 
-        List<TSUserOrg> userOrgList = new ArrayList<TSUserOrg>();
-        List<String> userIdList = extractIdListByComma(orgIds);
-        for (String userId : userIdList) {
-            TSUser user = new TSUser();
-            user.setId(userId);
+			cq.add(Property.forName("id").notIn(subCq.getDetachedCriteria()));
+		}
+		cq.add();
 
-            TSUserOrg userOrg = new TSUserOrg();
-            userOrg.setTsUser(user);
-            userOrg.setTsDepart(depart);
+		this.systemService.getDataGridReturn(cq, true);
 
-            userOrgList.add(userOrg);
-        }
-        if (!userOrgList.isEmpty()) {
-            systemService.batchSave(userOrgList);
-        }
-    }
+		//修改要显示的数据为之前过滤的数据
+		if(hasPermission){
+			dataGrid.setResults(userList);
+		}
 
-    /**
-     * 用户选择机构列表跳转页面
-     *
-     * @return
-     */
-    @RequestMapping(params = "departSelect")
-    public String departSelect(HttpServletRequest req) {
-    	
-    	String orgIds = req.getParameter("orgIds");
-    	req.setAttribute("orgIds", orgIds);
-    	
-        return "system/depart/departSelect";
-    }
-    /**
-     * 角色显示列表
-     *
-     * @param response response
-     * @param dataGrid dataGrid
-     */
-    @RequestMapping(params = "departSelectDataGrid")
-    public void datagridRole(HttpServletResponse response, DataGrid dataGrid) {
-        CriteriaQuery cq = new CriteriaQuery(TSDepart.class, dataGrid);
-        this.systemService.getDataGridReturn(cq, true);
-        TagUtil.datagrid(response, dataGrid);
-    }
+		TagUtil.datagrid(response, dataGrid);
+	}
+
+	/**
+	 * 添加 用户到组织机构
+	 * @param req request
+	 * @return 处理结果信息
+	 */
+	@RequestMapping(params = "doAddUserToOrg")
+	@ResponseBody
+	public AjaxJson doAddUserToOrg(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		TSDepart depart = systemService.getEntity(TSDepart.class, req.getParameter("orgId"));
+		saveOrgUserList(req, depart);
+		message =  MutiLangUtil.paramAddSuccess("common.user");
+		//      systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
+		j.setMsg(message);
+
+		return j;
+	}
+	/**
+	 * 保存 组织机构-用户 关系信息
+	 * @param request request
+	 * @param depart depart
+	 */
+	private void saveOrgUserList(HttpServletRequest request, TSDepart depart) {
+		String orgIds = oConvertUtils.getString(request.getParameter("userIds"));
+
+		List<TSUserOrg> userOrgList = new ArrayList<TSUserOrg>();
+		List<String> userIdList = extractIdListByComma(orgIds);
+		for (String userId : userIdList) {
+			TSUser user = new TSUser();
+			user.setId(userId);
+
+			TSUserOrg userOrg = new TSUserOrg();
+			userOrg.setTsUser(user);
+			userOrg.setTsDepart(depart);
+
+			userOrgList.add(userOrg);
+		}
+		if (!userOrgList.isEmpty()) {
+			systemService.batchSave(userOrgList);
+		}
+	}
+
+	/**
+	 * 用户选择机构列表跳转页面
+	 *
+	 * @return
+	 */
+	@RequestMapping(params = "departSelect")
+	public String departSelect(HttpServletRequest req) {
+
+		String orgIds = req.getParameter("orgIds");
+		req.setAttribute("orgIds", orgIds);
+
+		return "system/depart/departSelect";
+	}
+	/**
+	 * 角色显示列表
+	 *
+	 * @param response response
+	 * @param dataGrid dataGrid
+	 */
+	@RequestMapping(params = "departSelectDataGrid")
+	public void datagridRole(HttpServletResponse response, DataGrid dataGrid) {
+		CriteriaQuery cq = new CriteriaQuery(TSDepart.class, dataGrid);
+		this.systemService.getDataGridReturn(cq, true);
+		TagUtil.datagrid(response, dataGrid);
+	}
 
 	/**
 	 * 导入功能跳转
@@ -686,19 +686,19 @@ public class DepartController extends BaseController {
 	@RequestMapping(params = "getDepartInfo")
 	@ResponseBody
 	public AjaxJson getDepartInfo(HttpServletRequest request, HttpServletResponse response){
-		
+
 		AjaxJson j = new AjaxJson();
-		
+
 		String orgIds = request.getParameter("orgIds");
-		
+
 		String[] ids = new String[]{}; 
 		if(StringUtils.isNotBlank(orgIds)){
 			orgIds = orgIds.substring(0, orgIds.length()-1);
 			ids = orgIds.split("\\,");
 		}
-		
+
 		String parentid = request.getParameter("parentid");
-		
+
 		if(!StringUtil.isNotEmpty(parentid)){
 			//通过当前用户所属组织机构id来进行查询
 			parentid = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
@@ -708,14 +708,14 @@ public class DepartController extends BaseController {
 				parentid = "";
 			}
 		}
-				
+
 		List<TSDepart> tSDeparts = new ArrayList<TSDepart>();
-		
+
 		StringBuffer hql = new StringBuffer(" from TSDepart t where 1=1 ");
 		if(StringUtils.isNotBlank(parentid)){
-			
+
 			TSDepart dePart = this.systemService.getEntity(TSDepart.class, parentid);
-			
+
 			hql.append(" and TSPDepart = ?");
 			tSDeparts = this.systemService.findHql(hql.toString(), dePart);
 		} else {
@@ -726,12 +726,12 @@ public class DepartController extends BaseController {
 		if(tSDeparts.size()>0){
 			Map<String,Object> map = null;
 			String sql = null;
-			 Object[] params = null;
+			Object[] params = null;
 			for(TSDepart depart:tSDeparts){
 				map = new HashMap<String,Object>();
 				map.put("id", depart.getId());
 				map.put("name", depart.getDepartname());
-				
+
 				if(ids.length>0){
 					for(String id:ids){
 						if(id.equals(depart.getId())){
@@ -739,7 +739,7 @@ public class DepartController extends BaseController {
 						}
 					}
 				}
-				
+
 				if(StringUtils.isNotBlank(parentid)){
 					map.put("pId", parentid);
 				} else{
@@ -759,7 +759,7 @@ public class DepartController extends BaseController {
 		j.setMsg(jsonArray.toString());
 		return j;
 	}
-	
+
 	@RequestMapping(params = "lockCompanies")
 	@ResponseBody
 	public AjaxJson lockCompanies(HttpServletRequest request, HttpServletResponse response){
@@ -769,10 +769,12 @@ public class DepartController extends BaseController {
 		if(StringUtil.isNotEmpty(id)){
 			TSDepart depart = this.systemService.getEntity(TSDepart.class, id);
 			String orgcode=depart.getOrgCode();
+
+			//锁定子公司，子公司状态修改为终止合作
 			if(StringUtil.isNotEmpty(depart)){
 				depart.setStatus("1");
 			}
-			
+
 			Boolean lockuser=lockUser(orgcode);//锁定用户
 			if(lockuser==false){
 				str.append("锁定用户失败！");
@@ -784,7 +786,7 @@ public class DepartController extends BaseController {
 				}else{
 					str.append("，锁定验票员失败");
 				}
-				
+
 			}
 			Boolean deiver=lockdriver(orgcode);//锁定司机
 			if(deiver==false){
@@ -793,7 +795,7 @@ public class DepartController extends BaseController {
 				}else{
 					str.append("，锁定司机失败");
 				}
-				
+
 			}
 			Boolean car=lockcar(orgcode);//锁定车辆
 			if(car==false){
@@ -802,7 +804,7 @@ public class DepartController extends BaseController {
 				}else{
 					str.append("，锁定车辆失败");
 				}
-				
+
 			}
 			Boolean line = lockLine(orgcode);//锁定子公司，停用相关线路
 			if(line==false){
@@ -811,7 +813,7 @@ public class DepartController extends BaseController {
 				}else{
 					str.append("，停用线路失败");
 				}
-				
+
 			}
 			Boolean dealer = lockdealer(orgcode);
 			if(dealer==false){
@@ -829,9 +831,13 @@ public class DepartController extends BaseController {
 		}
 		return j;
 	}
-	
+	/**
+	 * 锁定渠道商
+	 * @param orgcode
+	 * @return
+	 */
 	public Boolean lockdealer(String orgcode){
-		
+
 		boolean flag = false;
 		StringBuffer str = new StringBuffer();
 		str.append("UPDATE dealer_info d ");
@@ -853,7 +859,7 @@ public class DepartController extends BaseController {
 		}
 		return flag;
 	}
-	
+
 	//锁定用户
 	public Boolean lockUser(String orgcode){
 		boolean flag = false;
@@ -873,7 +879,7 @@ public class DepartController extends BaseController {
 		}
 		return flag;
 	}
-	
+
 	//锁定验票员
 	public Boolean lockconductor(String orgcode){
 		boolean flag = false;
@@ -893,7 +899,7 @@ public class DepartController extends BaseController {
 		}
 		return flag;
 	}
-	
+
 	//锁定司机
 	public Boolean lockdriver(String orgcode){
 		boolean flag = false;
@@ -913,7 +919,7 @@ public class DepartController extends BaseController {
 		}
 		return flag;
 	}
-	
+
 	//锁定车辆
 	public Boolean lockcar(String orgcode){
 		boolean flag = false;
@@ -933,9 +939,41 @@ public class DepartController extends BaseController {
 		}
 		return flag;
 	}
-	
+
 	//线路处理--》锁定子公司，相关线路处理
 	public Boolean lockLine(String orgcode){
+		boolean flag = false;
+		StringBuffer start = new StringBuffer();
+		StringBuffer end = new StringBuffer();
+		StringBuffer busstop = new StringBuffer();
+		StringBuffer line = new StringBuffer();
+		
+		if(orgcode.length()==6){
+			start.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.startLocation=s.startId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
+			start.append(orgcode+"%'");
+			end.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
+			end.append(orgcode+"%'");
+			busstop.append("DELETE b.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
+			busstop.append(orgcode+"%'");
+			line.append("DELETE l.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
+			line.append(orgcode+"%'");
+		}
+		
+		try {
+			systemService.executeSql(start.toString());//删除起点关联表数据
+			systemService.executeSql(end.toString());//删除终点关联表数据
+			systemService.executeSql(busstop.toString());//删除线路和站点关联表数据
+			systemService.executeSql(line.toString());//删除线路
+			flag=true;
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return flag;
+	}
+
+	//线路处理--》锁定子公司，相关线路处理
+	/*public Boolean lockLine(String orgcode){
 		boolean flag = false;
 		StringBuffer str = new StringBuffer();
 		str.append("UPDATE lineinfo l");
@@ -955,6 +993,6 @@ public class DepartController extends BaseController {
 			e.printStackTrace();
 		}
 		return flag;
-	}
-	
+	}*/
+
 }

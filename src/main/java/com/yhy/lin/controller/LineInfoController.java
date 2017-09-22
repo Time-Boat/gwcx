@@ -786,9 +786,7 @@ public class LineInfoController extends BaseController {
 			}
 		}
 
-		System.out.println(st.toString());
 		List<Object> bList = systemService.findListbySql(st.toString());
-
 		if (bList.size() > 0) {
 			for (int i = 0; i < bList.size(); i++) {
 				Object[] ob = (Object[]) bList.get(i);
