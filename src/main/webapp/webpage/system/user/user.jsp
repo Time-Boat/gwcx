@@ -52,6 +52,7 @@
 	           		}
 	            }
 	        });
+			return b;
 		}
 	  	
 	  	//提交前验证手机号
@@ -67,7 +68,7 @@
 		  		
 		  		if(lineOrgCodes == ""){
 		  			tip("至少选择一个责任公司");
-		  			a = false;
+		  			return false;
 		  		}
 		  		console.log("lineOrgCode : " + lineOrgCodes + "------------" + "roleType : " + roleType);
 		  		//修改要提交的action
@@ -81,6 +82,15 @@
 		  			}
 				});
 	  		} */
+	  		var rolelist = $('#forroleName').combobox('getValues');
+	  		var phone = $("#mobilePhone").val();
+	  		//提交前验证角色
+	  		if(checkRoles(rolelist)==false){
+	  			return false;
+	  		}
+	  		if(checkPhone(phone)==false){
+	  			return false;
+	  		}
 	  	}
 
 		function openDepartmentSelect() {
@@ -91,6 +101,8 @@
 			   {name: '<t:mutiLang langKey="common.confirm"/>', callback: callbackDepartmentSelect, focus: true},
 			   {name: '<t:mutiLang langKey="common.cancel"/>', callback: function (){}}
 		   ]}).zindex();
+			//getroles();
+			//onchange="getroles()"
 		}
 			
 		function callbackDepartmentSelect() {
@@ -109,6 +121,7 @@
 			 $('#departname').blur();		
 			 $('#orgIds').val(ids);		
 			}
+			  getroles();
 		}
 		
 		function callbackClean(){
@@ -197,6 +210,65 @@
 			roleSuccess();
 		});
 		
+		function getroles(){
+			var orgIds = $("#orgIds").val();
+			var rolelist = new Array();
+			Array.prototype.indexOf = function(val) {
+	            for (var i = 0; i < this.length; i++) {
+	                if (this[i] == val) return i;
+	            }
+	            return -1;
+	        };
+	        Array.prototype.remove = function(val) {
+	            var index = this.indexOf(val);
+	            if (index > -1) {
+	                this.splice(index, 1);
+	            }
+	        };
+			
+			$('#forroleName').combobox({  
+                url:'userController.do?getroles&orgIds='+orgIds, //后台获取下拉框数据的url  
+                method:'get',  
+                panelHeight:'auto',//设置为固定高度，combobox出现竖直滚动条  
+                valueField:'roleid',
+                textField:'roleName',
+                multiple:true,
+                required : true,
+                editable : false,
+                onSelect: function (row) { //选中一个选项时调用 
+                	var roleId = row.roleid;
+                	rolelist.push(roleId);
+                	checkRoles(rolelist);
+                },
+                onUnselect:function (row) { //选中一个选项时调用 
+                	var roleId = row.roleid;
+                	rolelist.remove(roleId);
+                	checkRoles(rolelist);
+                },
+			});
+		}
+		
+		function checkRoles(rolelist){
+			 $.ajax({
+	             type:"post",
+	             url: 'userController.do?checkRoles&rolelist='+rolelist,
+	             dataType:'json',
+	             success:function(d){
+	            	 var obj = eval('('+d.jsonStr+')');
+	            		b = obj.success;
+	            		
+	            		if(!b){
+	            			tip(obj.msg);
+	            			$('#check_role').text(obj.msg).css({color:"red"});
+	            		}else{
+	            			$('#check_role').text('通过信息验证！').css({color:"#71b83d"});
+	            			
+	            		}
+	             }
+	         });
+			 return b;
+		}
+		
     </script>
       <!-- 多选框样式 -->
   <style type="text/css">
@@ -268,7 +340,7 @@
                 
                 <input id="departname" name="departname" type="text" readonly="readonly" class="inputxt" datatype="*" value="${departname}">
                 <input id="orgIds" name="orgIds" type="hidden" value="${orgIds}">
-                <a href="#" class="easyui-linkbutton" plain="true" icon="icon-search" id="departSearch" onclick="openDepartmentSelect()">选择</a>
+                <a href="#" class="easyui-linkbutton" plain="true" icon="icon-search" id="departSearch"  onclick="openDepartmentSelect()">选择</a>
                 <a href="#" class="easyui-linkbutton" plain="true" icon="icon-redo" id="departRedo" onclick="callbackClean()">清空</a>
                 <span class="Validform_checktip"><t:mutiLang langKey="please.muti.department"/></span>
             </td>
@@ -277,10 +349,16 @@
 			<td align="right"><label class="Validform_label"> <t:mutiLang langKey="common.role"/>: </label></td>
 			<td class="value" nowrap>
                 <input name="roleid" name="roleid" type="hidden" value="${id}" id="roleid">
-                <input name="roleName" class="inputxt" value="${roleName }" id="roleName" readonly="readonly" datatype="*" />
-                <t:choose hiddenName="roleid" hiddenid="id" url="userController.do?roles" name="roleList"
+                <%--<input name="roleName" class="inputxt" value="${roleName }" id="roleName" readonly="readonly" datatype="*" />
+                 <t:choose hiddenName="roleid" hiddenid="id" url="userController.do?roles" name="roleList"
                           icon="icon-search" title="common.role.list" textname="roleName" isclear="true" isInit="true" fun="roleSuccess" ></t:choose>
-                <span class="Validform_checktip"><t:mutiLang langKey="role.muti.select"/></span>
+                 
+                 <input class="easyui-combobox" name="roleName" id="roleName" value="${roleName }">--%>
+                 <select id="forroleName" style="width: 152px" name="roleName" class="easyui-combobox"  data-options="multiple:true, editable: false,panelHeight:'auto',valueField:'roleid',textField:'roleName'"> 
+						 
+                </select>
+                
+                <span class="Validform_checktip" id="check_role"><t:mutiLang langKey="role.muti.select"/></span>
             </td>
 		</tr>
 		<tr id="company_tr" hidden="true">
@@ -295,7 +373,7 @@
 		<tr>
 			<td align="right" nowrap><label class="Validform_label">  <t:mutiLang langKey="common.phone"/>: </label></td>
 			<td class="value">
-                <input class="inputxt" name="mobilePhone" value="${user.mobilePhone}" datatype="m" errormsg="手机号码不正确"  onchange="checkPhone(this.value);" >
+                <input class="inputxt" id="mobilePhone" name="mobilePhone" value="${user.mobilePhone}" datatype="m" errormsg="手机号码不正确"  onchange="checkPhone(this.value);" >
                 <span class="Validform_checktip" id="check_phone"></span>
             </td>
 		</tr>

@@ -88,9 +88,7 @@ public class DealerInfoController extends BaseController {
 		 */
 		String username = request.getParameter("username");
 		String departname = request.getParameter("departname");
-		boolean hasPermissionP = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
-		boolean hasPermissionC = checkRole(AppGlobals.COMMERCIAL_MANAGER);
-		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo, username, hasPermissionP, hasPermissionC, departname);
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo, username, departname);
 		
 		responseDatagrid(response, jObject);
 	}

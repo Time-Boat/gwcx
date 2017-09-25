@@ -9,13 +9,13 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.web.system.pojo.base.TSDepart;
-import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.UserService;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.LineInfoView;
@@ -33,7 +33,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	@Override
 	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,
 			String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username,String departname, String company){
-		String sqlWhere = getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username,departname,company);
+		String sqlWhere = ((LineInfoServiceI) AopContext.currentProxy()).getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username,departname,company);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = " select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id= "
@@ -89,59 +89,61 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		return jObject;
 	}
 
+	@BussAnnotation(orgType = {AppGlobals.PLATFORM_LINE_AUDIT, AppGlobals.OPERATION_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
+			objTableUserId = " a.createUserId ", orgTable="b", appendSql = " and a.application_status in('2','3','4','6') ")
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company){
 
-		TSUser user = ResourceUtil.getSessionUserName();
-		String roles = userService.getUserRole(user);
-		TSDepart depart = user.getCurrentDepart();
-		
-		String orgCode = depart.getOrgCode();
-		String orgType = depart.getOrgType();
-		String userId = user.getId();
-		
-		String oc = user.getOrgCompany();
-		
 		StringBuffer sqlWhere = new StringBuffer();
 
-		//是否有平台线路审核员权限
-		boolean hasPLA = false;
-		//循环用户角色列表
-		String a[] = roles.split(",");
-		for (int i = 0; i < a.length; i++) {
-			String role = a[i];
-			if(AppGlobals.PLATFORM_LINE_AUDIT.equals(role)){
-				sqlWhere.append(" and a.application_status in('2','3','4','6') ");
-				hasPLA = true;
-			}
-			if(AppGlobals.OPERATION_MANAGER.equals(role)){
-				sqlWhere.append(" and a.application_status in('1','2','3','4','5','6') ");
-			}
-		}
-		
-		//如果是平台线路审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPLA){
-			if(StringUtil.isNotEmpty(company) && StringUtil.isNotEmpty(oc)){
-				sqlWhere.append(" and b.org_code like '" + company + "%' ");
-			}else{
-				sqlWhere.append("and ( 1=2 ");
-				
-				String[] ocArr = oc.split(",");
-				
-				for (int i = 0; i < ocArr.length; i++) {
-					sqlWhere.append(" or b.org_code like '"+ocArr[i]+"%' ");
-				}
-				sqlWhere.append(")");
-			}
-		} else {
-			sqlWhere.append(" and b.org_code like '"+orgCode+"%'");
-		}
-		
-		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-			sqlWhere.append(" and a.createUserId = '" + userId + "' ");
-		}
+//		TSUser user = ResourceUtil.getSessionUserName();
+//		String roles = userService.getUserRole(user);
+//		TSDepart depart = user.getCurrentDepart();
+//		
+//		String orgCode = depart.getOrgCode();
+//		String orgType = depart.getOrgType();
+//		String userId = user.getId();
+//		
+//		String oc = user.getOrgCompany();
+//
+//		//是否有平台线路审核员权限
+//		boolean hasPLA = false;
+//		//循环用户角色列表
+//		String a[] = roles.split(",");
+//		for (int i = 0; i < a.length; i++) {
+//			String role = a[i];
+//			if(AppGlobals.PLATFORM_LINE_AUDIT.equals(role)){
+//				sqlWhere.append(" and a.application_status in('2','3','4','6') ");
+//				hasPLA = true;
+//			}
+//			if(AppGlobals.OPERATION_MANAGER.equals(role)){
+//				sqlWhere.append(" and a.application_status in('1','2','3','4','5','6') ");
+//			}
+//		}
+//		
+//		//如果是平台线路审核员权限，则根据其选择的子公司来过滤筛选
+//		if(hasPLA){
+//			if(StringUtil.isNotEmpty(company) && StringUtil.isNotEmpty(oc)){
+//				sqlWhere.append(" and b.org_code like '" + company + "%' ");
+//			}else{
+//				sqlWhere.append("and ( 1=2 ");
+//				
+//				String[] ocArr = oc.split(",");
+//				
+//				for (int i = 0; i < ocArr.length; i++) {
+//					sqlWhere.append(" or b.org_code like '"+ocArr[i]+"%' ");
+//				}
+//				sqlWhere.append(")");
+//			}
+//		} else {
+//			sqlWhere.append(" and b.org_code like '"+orgCode+"%'");
+//		}
+//		
+//		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+//		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+//			sqlWhere.append(" and a.createUserId = '" + userId + "' ");
+//		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getCreateUserId())){
 			sqlWhere.append(" and a.createUserId = '"+lineInfo.getCreateUserId()+"' ");

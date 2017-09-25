@@ -4,6 +4,7 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
@@ -15,19 +16,16 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.web.system.pojo.base.TSDepart;
-import org.jeecgframework.web.system.pojo.base.TSUser;
 
 @Service("DealerInfoService")
 @Transactional
 public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String username, boolean hasPermissionP, boolean hasPermissionC, String departname) {
+	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String username, String departname) {
 		//通过AOP代理调用getWhere方法即可走事务切面              必须得通过接口调用getWhere
-		String sqlWhere = ((DealerInfoServiceI) AopContext.currentProxy()).getWhere(dealerInfo, username, hasPermissionP, hasPermissionC, departname);
+		String sqlWhere = ((DealerInfoServiceI) AopContext.currentProxy()).getWhere(dealerInfo, username, departname);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_info d left join t_s_base_user u on d.create_user_id = u.id join t_s_depart b on b.id = d.departId "
 				+ " LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p "
@@ -80,7 +78,9 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		return jObject;
 	}
 	
-	public String getWhere(DealerInfoEntity dealerInfo,String username, boolean hasPermissionP,boolean hasPermissionC, String departname) {
+	@BussAnnotation(orgType = {AppGlobals.PLATFORM_DEALER_AUDIT, AppGlobals.COMMERCIAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
+			objTableUserId = " d.create_user_id ", orgTable="b", appendSql = " and d.audit_status = '1' ")
+	public String getWhere(DealerInfoEntity dealerInfo,String username, String departname) {
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -107,44 +107,39 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			sql.append(" and d.last_audit_status = '" + dealerInfo.getLastAuditStatus() + "' ");
 		}
 		
-		TSUser user = ResourceUtil.getSessionUserName();
-		TSDepart depart = user.getCurrentDepart();
-		String orgCode = depart.getOrgCode();
-		String orgType = depart.getOrgType();
-		String userId = user.getId();
-		
-		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-			sql.append(" and d.create_user_id = '" + userId + "' ");
-		}
-		
-		String oc = user.getOrgCompany();
-		
-		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPermissionP){
-			sql.append("and ( 1=2 ");
-			
-			if(StringUtil.isNotEmpty(oc)){
-				String[] ocArr = oc.split(",");
-				for (int i = 0; i < ocArr.length; i++) {
-					sql.append(" or b.org_code like '"+ocArr[i]+"%' ");
-				}
-			}
-			
-			sql.append(")");
-		} else {
-			sql.append(" and b.org_code like '"+orgCode+"%'");
-		}
-		
-		//审核员的角色
-		if(hasPermissionP){
-			sql.append(" and d.audit_status = '1' ");
-		}
-		
-		//商务经理的角色
-		if(hasPermissionC){
-			sql.append(" and d.audit_status != '-1' ");
-		}
+//		TSUser user = ResourceUtil.getSessionUserName();
+//		TSDepart depart = user.getCurrentDepart();
+//		String orgCode = depart.getOrgCode();
+//		String orgType = depart.getOrgType();
+//		String userId = user.getId();
+//		
+//		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+//		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+//			sql.append(" and d.create_user_id = '" + userId + "' ");
+//		}
+//		
+//		String oc = user.getOrgCompany();
+//		
+//		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
+//		if(hasPermissionP){
+//			sql.append("and ( 1=2 ");
+//			
+//			if(StringUtil.isNotEmpty(oc)){
+//				String[] ocArr = oc.split(",");
+//				for (int i = 0; i < ocArr.length; i++) {
+//					sql.append(" or b.org_code like '"+ocArr[i]+"%' ");
+//				}
+//			}
+//			sql.append(")");
+//			sql.append(" and d.audit_status = '1' ");
+//		} else {
+//			sql.append(" and b.org_code like '"+orgCode+"%'");
+//		}
+//		
+//		//商务经理的角色
+//		if(hasPermissionC){
+//			sql.append(" and d.audit_status != '-1' ");
+//		}
 		
 		return sql.toString();
 	}

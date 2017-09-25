@@ -395,8 +395,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	public String getWhere3(TransferorderEntity transferorder,String cityid,String lineId,String lineOrderCode,String lineType) {
 
 		// 添加了权限
-		
-		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
 		String orgCode = depart.getOrgCode();
 		String orgType = depart.getOrgType();

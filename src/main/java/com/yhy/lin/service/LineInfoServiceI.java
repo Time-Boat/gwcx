@@ -20,4 +20,10 @@ public interface LineInfoServiceI extends CommonService{
 	
 	// 根据id查询线路详细信息
 	public LineInfoView getDetail(String id);
+	
+	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
+			String endTime,String lstartTime_begin,String lstartTime_end,
+			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company);
+	
+	
 }

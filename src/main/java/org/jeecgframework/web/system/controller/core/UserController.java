@@ -46,6 +46,7 @@ import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSFunction;
 import org.jeecgframework.web.system.pojo.base.TSRole;
 import org.jeecgframework.web.system.pojo.base.TSRoleFunction;
+import org.jeecgframework.web.system.pojo.base.TSRoleOrg;
 import org.jeecgframework.web.system.pojo.base.TSRoleUser;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.pojo.base.TSUserOrg;
@@ -1348,5 +1349,87 @@ public class UserController extends BaseController {
 	@RequestMapping(params = "userSelect")
 	public String userSelect() {
 		return "system/user/userSelect";
+	}
+	
+	/**
+	 * 获取角色
+	 */
+	@RequestMapping(params = "getroles")
+	@ResponseBody
+	public JSONArray getroles(HttpServletRequest request){
+		JSONArray jsonArray = new JSONArray();
+		JSONObject jsonObj = new JSONObject();
+		String roid = request.getParameter("orgIds");
+		//StringBuffer str = new StringBuffer();
+		if (StringUtil.isNotEmpty(roid)) {
+			String ro[]= roid.split(",");
+			for (int i = 0; i < ro.length; i++) {
+				List<TSRoleOrg> listrole = this.systemService.findByProperty(TSRoleOrg.class, "tsDepart.id", ro[i]);
+				if(listrole.size()>0){
+					for (int j = 0; j < listrole.size(); j++) {
+						jsonObj.put("roleid", listrole.get(j).getTsRole().getId());
+						jsonObj.put("roleName", listrole.get(j).getTsRole().getRoleName());
+						jsonArray.add(jsonObj);
+					}
+					
+				}
+			}
+		}
+		return jsonArray;
+	}
+	
+	/**
+	 * 验证角色
+	 */
+	@RequestMapping(params = "checkRoles")
+	@ResponseBody
+	public AjaxJson checkRoles(HttpServletRequest request){
+		String message = "";
+		AjaxJson json = new AjaxJson();
+		boolean success = false;
+		String rolelist = request.getParameter("rolelist");
+		String roleid[]= rolelist.split(",");
+		List<Integer> list = new ArrayList<>();
+		if(roleid.length>1){
+			for (int i = 0; i < roleid.length; i++) {
+				List<TSRoleOrg> listrole = this.systemService.findByProperty(TSRoleOrg.class, "tsRole.id", roleid[i]);
+				List<Integer> orglist = new ArrayList<>();
+				if(listrole.size()>0){
+					for (int j = 0; j < listrole.size(); j++) {
+						int type= Integer.parseInt(listrole.get(j).getTsDepart().getOrgType());
+						orglist.add(type);
+					}
+				}
+				Collections.sort(orglist);
+				list.add(orglist.get(orglist.size()-1));
+			}
+			if(list.size()>1){
+				for (int i = 1; i < list.size(); i++) {
+					if(list.get(i)!=list.get(i-1)){
+						message="只能选择同等级的角色！";
+						success=false;
+					}else{
+						success=true;
+					}
+				}
+			}else if(list.size()==1){
+				success=true;
+			}else{
+				message="没有选中的角色！";
+				success=false;
+			}
+		}else if(roleid.length==1){
+			success=true;
+		}else{
+			message="没有选中的角色！";
+			success=false;
+		}
+		
+		json.setSuccess(success);
+		if (StringUtil.isNotEmpty(message)) {
+			json.setMsg(message);
+		}
+		
+		return json;
 	}
 }

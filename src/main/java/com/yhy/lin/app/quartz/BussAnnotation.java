@@ -30,13 +30,28 @@ import java.lang.annotation.Target;
  * PACKAGE           -- 包上 
  * 
  * 3.Documented    -- 让这个Annotation类型的信息能够显示在API说明文档上；没有添加的话，使用javadoc生成的API文件找不到这个类型生成的信息 
- */  
+ */
 @Retention(RetentionPolicy.RUNTIME)  
-@Target({ElementType.METHOD, ElementType.TYPE})  
+@Target(ElementType.METHOD)  
 @Documented  
 public @interface BussAnnotation {  
-    //组织机构类型 
-    String orgType() default "";  
-    //操作内容  
-    String option() default "";  
+    /**
+     * 组织机构类型 
+     */
+    String[] orgType() default "";  
+    
+    /**
+     * 根据模块来附加的sql
+     */
+    String appendSql() default "";  
+    
+    /**
+     * 当前对象表的userId    如:d.create_user_id
+     */
+    String objTableUserId();
+    
+    /**
+     * 组织机构表别名
+     */
+    String orgTable();
 }  

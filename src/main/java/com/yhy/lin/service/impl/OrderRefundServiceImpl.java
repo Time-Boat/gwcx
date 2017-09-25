@@ -16,6 +16,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -24,11 +25,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.controller.AppInterfaceController;
 import com.yhy.lin.app.entity.RefundReqData;
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.wechat.MobiMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
+import com.yhy.lin.service.LineInfoServiceI;
 import com.yhy.lin.service.OrderRefundServiceI;
 
 import net.sf.json.JSONObject;
@@ -46,8 +49,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
-			String rf_begin, String rf_end, String orderStartingstation, String orderTerminusstation, boolean hasPermission, String departname) {
-		String sqlWhere = getWhere(transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation, hasPermission, departname);
+			String rf_begin, String rf_end, String orderStartingstation, String orderTerminusstation, String departname) {
+		String sqlWhere = ((OrderRefundServiceI) AopContext.currentProxy()).getWhere(
+				transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation, departname);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -57,6 +61,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
 		} 
+		
+		sqlCnt += " order by a.order_status,a.refund_time desc";
+		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status, ");
@@ -71,6 +78,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
 		}
+		
+		sql.append(" order by a.order_status,a.refund_time desc");
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -106,8 +115,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		return jObject;
 	}
 
+	@BussAnnotation(orgType = {AppGlobals.PLATFORM_REFUND_AUDIT, AppGlobals.ORG_JOB_TYPE}, 
+			objTableUserId = " l.createUserId ", orgTable="t", appendSql = " and a.first_audit_status = '1' ")
 	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end,String orderStartingstation,
-			String orderTerminusstation, boolean hasPermission, String departname) {
+			String orderTerminusstation, String departname) {
 
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 		
@@ -151,40 +162,39 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 			sql.append(" and  a.order_contactsname like '%" + transferorder.getOrderContactsname() + "%'");
 		}
 
-		TSUser user = ResourceUtil.getSessionUserName();
-		String orgCode = user.getCurrentDepart().getOrgCode();
-		String orgType = user.getCurrentDepart().getOrgType();
-		String userId = user.getId();
-		
-		//看是否是平台审核员
-		if(hasPermission){
-			//平台审核员只能看到初审通过的订单
-			sql.append(" and a.first_audit_status = '1' ");
-		}else{
-			//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-			if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-				sql.append(" and l.createUserId = '" + userId + "' ");
-			}
-		}
-		
-		String oc = user.getOrgCompany();
-		
-		//如果是平台退款审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPermission && StringUtil.isNotEmpty(oc)){
-			sql.append("and ( 1=2 ");
-			
-			String[] ocArr = oc.split(",");
-			
-			for (int i = 0; i < ocArr.length; i++) {
-				sql.append(" or t.org_code like '"+ocArr[i]+"%' ");
-			}
-			sql.append(")");
-		} else {
-			sql.append(" and t.org_code like '"+orgCode+"%'");
-		}
+//		TSUser user = ResourceUtil.getSessionUserName();
+//		String orgCode = user.getCurrentDepart().getOrgCode();
+//		String orgType = user.getCurrentDepart().getOrgType();
+//		String userId = user.getId();
+//		
+//		//看是否是平台审核员
+//		if(hasPermission){
+//			//平台审核员只能看到初审通过的订单
+//			sql.append(" and a.first_audit_status = '1' ");
+//		}else{
+//			//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+//			if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+//				sql.append(" and l.createUserId = '" + userId + "' ");
+//			}
+//		}
+//		
+//		String oc = user.getOrgCompany();
+//		
+//		//如果是平台退款审核员权限，则根据其选择的子公司来过滤筛选
+//		if(hasPermission && StringUtil.isNotEmpty(oc)){
+//			sql.append("and ( 1=2 ");
+//			
+//			String[] ocArr = oc.split(",");
+//			
+//			for (int i = 0; i < ocArr.length; i++) {
+//				sql.append(" or t.org_code like '"+ocArr[i]+"%' ");
+//			}
+//			sql.append(")");
+//		} else {
+//			sql.append(" and t.org_code like '"+orgCode+"%'");
+//		}
 		
 		sql.append(" and order_status in('3','4','5') ");
-		sql.append(" order by a.order_status,a.refund_time desc");
 
 		return sql.toString();
 	}

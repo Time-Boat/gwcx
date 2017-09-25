@@ -68,10 +68,10 @@ public class OrderRefundController extends BaseController {
 		String departname = request.getParameter("departname");
 		
 		//有没有平台退款的权限
-		boolean hasPermission = checkRole(AppGlobals.PLATFORM_REFUND_AUDIT);
+//		boolean hasPermission = checkRole(AppGlobals.PLATFORM_REFUND_AUDIT);
 		
 		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end,rf_begin,rf_end,orderStartingstation,
-				orderTerminusstation, hasPermission, departname);
+				orderTerminusstation, departname);
 		
 		responseDatagrid(response, jObject);
 	}
