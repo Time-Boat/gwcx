@@ -6,6 +6,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.ProvincesEntity;
+import com.yhy.lin.entity.TransferorderEntity;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -806,15 +807,11 @@ public class DepartController extends BaseController {
 				}
 
 			}
-			Boolean line = lockLine(orgcode);//锁定子公司，停用相关线路
-			if(line==false){
-				if (StringUtil.isNotEmpty(str)) {
-					str.append("停用线路失败");
-				}else{
-					str.append("，停用线路失败");
-				}
-
+			String line = lockLine(orgcode);//锁定子公司，停用相关线路
+			if (StringUtil.isNotEmpty(str)) {
+				str.append(line);
 			}
+			
 			Boolean dealer = lockdealer(orgcode);
 			if(dealer==false){
 				if (StringUtil.isNotEmpty(str)) {
@@ -941,58 +938,48 @@ public class DepartController extends BaseController {
 	}
 
 	//线路处理--》锁定子公司，相关线路处理
-	public Boolean lockLine(String orgcode){
-		boolean flag = false;
+	public String lockLine(String orgcode){
+		String message=null;
 		StringBuffer start = new StringBuffer();
 		StringBuffer end = new StringBuffer();
 		StringBuffer busstop = new StringBuffer();
 		StringBuffer line = new StringBuffer();
-		
-		if(orgcode.length()==6){
-			start.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.startLocation=s.startId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
-			start.append(orgcode+"%'");
-			end.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
-			end.append(orgcode+"%'");
-			busstop.append("DELETE b.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
-			busstop.append(orgcode+"%'");
-			line.append("DELETE l.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
-			line.append(orgcode+"%'");
-		}
-		
-		try {
-			systemService.executeSql(start.toString());//删除起点关联表数据
-			systemService.executeSql(end.toString());//删除终点关联表数据
-			systemService.executeSql(busstop.toString());//删除线路和站点关联表数据
-			systemService.executeSql(line.toString());//删除线路
-			flag=true;
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		return flag;
-	}
-
-	//线路处理--》锁定子公司，相关线路处理
-	/*public Boolean lockLine(String orgcode){
-		boolean flag = false;
 		StringBuffer str = new StringBuffer();
-		str.append("UPDATE lineinfo l");
-		if(orgcode.length()==6){
-			str.append(",(select l.* from lineinfo l LEFT JOIN t_s_depart t on l.departId = t.ID where t.org_code like '");
-			str.append(orgcode);
-			str.append("%') r set l.status='1',l.deleteFlag='1',l.application_status='0',l.review_reason=NULL,l.trial_reason=NULL,"
-					+ "l.application_time=NULL,l.application_user_id=NULL,l.apply_content=NULL,l.first_application_time =NULL,"
-					+ "l.last_application_time=NULL,l.first_application_user =null,l.last_application_user =null "
-					+ " where r.id=l.ID and l.deleteFlag='0' and l.status!='1' and l.application_status!='0'");
+		
+		str.append("select a.* from lineinfo l LEFT JOIN t_s_depart t on t.ID=l.departId LEFT JOIN transferorder a on a.line_id = l.id where a.order_status in ('1','2','3')");
+		if(StringUtil.isNotEmpty(orgcode)){
+			str.append(" and t.org_code like '");
+			str.append(orgcode+"%'");
 		}
-		try {
-			systemService.updateBySqlString(str.toString());
-			flag=true;
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
+		
+		List<TransferorderEntity> list = this.systemService.findListbySql(str.toString());
+		if(list.size()>0){
+			 message="该公司有待出行、待派车或者取消订单待退款的订单，请先处理再锁定！";
+		}else{
+			if(orgcode.length()==6){
+				start.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.startLocation=s.startId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
+				start.append(orgcode+"%'");
+				end.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
+				end.append(orgcode+"%'");
+				busstop.append("DELETE b.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
+				busstop.append(orgcode+"%'");
+				line.append("DELETE l.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
+				line.append(orgcode+"%'");
+			}
+			
+			try {
+				
+				systemService.executeSql(start.toString());//删除起点关联表数据
+				systemService.executeSql(end.toString());//删除终点关联表数据
+				systemService.executeSql(busstop.toString());//删除线路和站点关联表数据
+				systemService.executeSql(line.toString());//删除线路
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+				message="停用线路出现异常，停用线路失败！";
+			}
 		}
-		return flag;
-	}*/
+		return message;
+	}
 
 }

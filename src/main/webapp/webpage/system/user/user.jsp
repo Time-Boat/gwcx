@@ -145,8 +145,9 @@
 		
 		//弹出框确定之后的回调函数
 		function roleSuccess(){
+			console.log(1);
 			roleType = "";
-			var names = $('#roleName').val();
+			var names = $('#forroleName').combobox('getText');
 			if(typeof(names) != 'undefined' && names != null && names != ''){
 				var arr = names.split(",");
 				for(var i=0;i<arr.length;i++){
@@ -168,11 +169,16 @@
 				if(oc){
 					$('#company_tr').show();
 				}else{
+					console.log(2);
 					$('#company_tr').hide();
 					roleType = "";
 				}
+			}else{
+				oc = false;
+				console.log(3);
+				$('#company_tr').hide();
+				roleType = "";
 			}
-			
 			if(oc){
 				$.get(
 					"userController.do?getCompany&id="+$('#id').val()+"&roleType="+roleType,
@@ -190,7 +196,7 @@
 								}else{
 									td += '<input class="demo--radio" name="lineOrgCode" type="checkbox" value="' + obj[i].org_code + '" />';
 								}
-									
+								
 								td += '<span class="demo--checkbox demo--radioInput"></span> ' + obj[i].departname;
 								td += '</label> ';
 							}
@@ -236,11 +242,13 @@
                 required : true,
                 editable : false,
                 onSelect: function (row) { //选中一个选项时调用 
+                	roleSuccess();
                 	var roleId = row.roleid;
                 	rolelist.push(roleId);
                 	checkRoles(rolelist);
                 },
                 onUnselect:function (row) { //选中一个选项时调用 
+                	roleSuccess();
                 	var roleId = row.roleid;
                 	rolelist.remove(roleId);
                 	checkRoles(rolelist);

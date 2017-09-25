@@ -624,7 +624,11 @@ public class SystemController extends BaseController {
             systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 
 		} else {
-
+			
+			if("2".equals(depart.getOrgType())){
+				depart.setStatus("0");
+			}
+			
 //			String orgCode = systemService.generateOrgCode(depart.getId(), pid);
 //			depart.setOrgCode(orgCode);
 			if(oConvertUtils.isNotEmpty(pid)){
