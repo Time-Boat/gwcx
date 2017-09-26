@@ -144,6 +144,7 @@
 		function roleSuccess(){
 			roleType = "";
 			var names = $('#forroleName').combobox('getText');
+			console.log(names);
 			if(typeof(names) != 'undefined' && names != null && names != ''){
 				var arr = names.split(",");
 				for(var i=0;i<arr.length;i++){
@@ -207,7 +208,6 @@
 		}
 		
 		$(function(){
-			roleSuccess();
 			$("#departname").prev().hide();
 			
 			var json = $("#rolelist").val();
@@ -224,8 +224,9 @@
 				var roname = roleName.substring(0,roleName.length-1);
 				$('#forroleName').combobox('setValue', rold);
 				$('#forroleName').combobox('setText', roname);
-				
 			}
+			
+			roleSuccess();
 		});
 		
 		function getroles(){

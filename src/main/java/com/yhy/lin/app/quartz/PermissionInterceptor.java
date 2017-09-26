@@ -72,6 +72,9 @@ public class PermissionInterceptor {
 		System.out.println(pj.getSignature().getName());
 		System.out.println(buss.objTableUserId());
 		
+		//是否有审核员权限
+		boolean isAudit = false;
+		
 		// 权限的处理
 		TSUser user = ResourceUtil.getSessionUserName();
 		TSDepart depart = user.getCurrentDepart();
@@ -94,10 +97,13 @@ public class PermissionInterceptor {
 			case AppGlobals.PLATFORM_DEALER_AUDIT:
 			case AppGlobals.PLATFORM_LINE_AUDIT:
 			case AppGlobals.PLATFORM_REFUND_AUDIT:
+				
+				isAudit = true;
+				
 				// 如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
 				if (checkRole(AppGlobals.PLATFORM_DEALER_AUDIT) || checkRole(AppGlobals.PLATFORM_LINE_AUDIT) || checkRole(AppGlobals.PLATFORM_REFUND_AUDIT)) {
 					sql.append("and ( 1=2 ");
-
+					
 					if (StringUtil.isNotEmpty(oc)) {
 						String[] ocArr = oc.split(",");
 						for (int i = 0; i < ocArr.length; i++) {
@@ -120,20 +126,22 @@ public class PermissionInterceptor {
 			case AppGlobals.OPERATION_MANAGER:
 				// 运营经理的角色
 				if(checkRole(AppGlobals.OPERATION_MANAGER)){
-					sql.append(" and a.application_status in('1','2','3','4','5','6') ");
+					
 				}
 				break;
-//			case AppGlobals.COMMERCIAL_MANAGER:
-//				// 商务经理的角色
-//				if (checkRole(AppGlobals.COMMERCIAL_MANAGER)) {
-//					sql.append(" and d.audit_status != '-1' ");
-//				}
+//			case AppGlobals.XM_ADMIN:
+//				sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
 //				break;
 			default:
 				break;
 			}
 		}
 
+		//如果没有审核员权限，则添加过滤条件
+		if(!isAudit){
+			sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
+		}
+		
 		return sql.toString();
 	}
 	

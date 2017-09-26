@@ -401,7 +401,7 @@ public class UserController extends BaseController {
 		}
 		
 		List<Map<String, Object>> list = systemService.findForJdbc(
-				"select departname,org_code from t_s_depart where status='0' LENGTH(org_code) = 6 and org_code not in(" + orgs1.toString().substring(0, orgs1.length() - 1) + ") " );
+				"select departname,org_code from t_s_depart where status='0' and LENGTH(org_code) = 6 and org_code not in(" + orgs1.toString().substring(0, orgs1.length() - 1) + ") " );
 		String json = JSONArray.fromObject(list).toString();
 		if(StringUtil.isNotEmpty(json)){
 			j.setObj(json);
