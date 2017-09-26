@@ -605,7 +605,8 @@ public class UserController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		// 得到用户的角色
-		String roleid = oConvertUtils.getString(req.getParameter("roleid"));
+		String[] forroleName =  req.getParameterValues("forroleName");
+		//String roleid = oConvertUtils.getString(req.getParameter("roleid"));
 		String password = oConvertUtils.getString(req.getParameter("password"));
 		
 		//平台管理员管理公司    (找个字段存进去)
@@ -635,9 +636,16 @@ public class UserController extends BaseController {
 			List<TSRoleUser> ru = systemService.findByProperty(TSRoleUser.class, "TSUser.id", user.getId());
 			systemService.deleteAllEntitie(ru);
 			message = "用户: " + users.getUserName() + "更新成功";
-			if (StringUtil.isNotEmpty(roleid)) {
-				saveRoleUser(users, roleid);
+			
+			if(forroleName.length>0){
+				for (int i = 0; i < forroleName.length; i++) {
+					String roleid = forroleName[i];
+					if (StringUtil.isNotEmpty(roleid)) {
+						saveRoleUser(user, roleid);
+					}
+				}
 			}
+			
 			systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 		} else {
 			TSUser users = systemService.findUniqueByProperty(TSUser.class, "userName",user.getUserName());
@@ -660,8 +668,13 @@ public class UserController extends BaseController {
                 // todo zhanggm 保存多个组织机构
                 saveUserOrgList(req, user);
 				message = "用户: " + user.getUserName() + "添加成功";
-				if (StringUtil.isNotEmpty(roleid)) {
-					saveRoleUser(user, roleid);
+				if(forroleName.length>0){
+					for (int i = 0; i < forroleName.length; i++) {
+						String roleid = forroleName[i];
+						if (StringUtil.isNotEmpty(roleid)) {
+							saveRoleUser(user, roleid);
+						}
+					}
 				}
 				systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 			}
@@ -788,12 +801,45 @@ public class UserController extends BaseController {
 			user = systemService.getEntity(TSUser.class, user.getId());
 			
 			req.setAttribute("user", user);
+			
+			/*String str = "select r.* from t_s_base_user u LEFT JOIN t_s_role_user ru on ru.userid=u.ID LEFT JOIN t_s_role r on ru.roleid=r.ID where u.ID='"+user.getId()+"'";
+			List<TSRole> lits = this.systemService.findListbySql(str);
+			if(lits.size()>0){
+				for (int i = 0; i < lits.size(); i++) {
+					
+				}
+			}*/
+			
+			String role=this.userService.getUserRole(user);
+			String roles[] = role.split(",");
+			List<TSRole> rolelist = new ArrayList<>();
+			for (int i = 0; i < roles.length; i++) {
+				String ro = roles[i];
+				List<TSRole> list = this.systemService.findByProperty(TSRole.class, "roleCode", ro);
+				rolelist.add(list.get(0));
+			}
+			//req.setAttribute("role", rolelist);
+			StringBuffer json = new StringBuffer("{'data':[");
+			if(rolelist.size()>0){
+				for (int i = 0; i < rolelist.size(); i++) {
+					TSRole ob =  rolelist.get(i);
+					String id = ob.getId();
+					String roleName = ob.getRoleName();
+						json.append("{");
+						json.append("'roleid':'" +id + "',");
+						json.append("'roleName':'"+ roleName + "'");
+						json.append("},");
+					}
+				}
+			json.delete(json.length()-1, json.length());
+			json.append("]}");
+			req.setAttribute("role", json);
 			idandname(req, user);
 			getOrgInfos(req, user);
 		}
 		req.setAttribute("tsDepart", tsDepart);
         //req.setAttribute("orgIdList", JSON.toJSON(orgIdList));
-
+		
 
         return new ModelAndView("system/user/user");
 	}

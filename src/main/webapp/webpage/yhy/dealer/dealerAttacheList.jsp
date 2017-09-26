@@ -5,11 +5,11 @@
 <div id="main_depart_list" class="easyui-layout" fit="true">
     <div region="center"  style="padding:0px;border:0px">
         <t:datagrid name="dealerCurDepartUserList" title="common.operation"
-                    actionUrl="departController.do?addUserToOrgList" fit="true" fitColumns="true"
+                    actionUrl="departController.do?addUserToOrgList&dealer=1" fit="true" fitColumns="true"
                     idField="id" queryMode="group">
             <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
             <t:dgCol title="用户名" sortable="false" field="userName" width="120" ></t:dgCol>
-            <t:dgCol title="真是姓名" field="realName" width="120" ></t:dgCol>
+            <t:dgCol title="真实姓名" field="realName" width="120" ></t:dgCol>
             <t:dgCol title="状态" sortable="true" field="status" replace="common.active_1,common.inactive_0,super.admin_-1" width="120" ></t:dgCol>
         </t:datagrid>
     </div>

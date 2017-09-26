@@ -130,9 +130,6 @@
 		}
 		
 		function setOrgIds() {}
-		$(function(){
-			$("#departname").prev().hide();
-		});
 		
 		//开关
 		var oc = false;
@@ -145,7 +142,6 @@
 		
 		//弹出框确定之后的回调函数
 		function roleSuccess(){
-			console.log(1);
 			roleType = "";
 			var names = $('#forroleName').combobox('getText');
 			if(typeof(names) != 'undefined' && names != null && names != ''){
@@ -169,13 +165,11 @@
 				if(oc){
 					$('#company_tr').show();
 				}else{
-					console.log(2);
 					$('#company_tr').hide();
 					roleType = "";
 				}
 			}else{
 				oc = false;
-				console.log(3);
 				$('#company_tr').hide();
 				roleType = "";
 			}
@@ -196,7 +190,7 @@
 								}else{
 									td += '<input class="demo--radio" name="lineOrgCode" type="checkbox" value="' + obj[i].org_code + '" />';
 								}
-								
+									
 								td += '<span class="demo--checkbox demo--radioInput"></span> ' + obj[i].departname;
 								td += '</label> ';
 							}
@@ -214,11 +208,30 @@
 		
 		$(function(){
 			roleSuccess();
+			$("#departname").prev().hide();
+			
+			var json = $("#rolelist").val();
+			
+			if(json.indexOf("roleid")>0){
+				var obj = eval('(' + json + ')');
+				var roleid = '';
+				var roleName='';
+				for (var i = 0; i < obj.data.length; i++) {
+					roleid += obj.data[i].roleid+',';
+					roleName+=obj.data[i].roleName+','
+				}
+				var rold = roleid.substring(0,roleid.length-1);
+				var roname = roleName.substring(0,roleName.length-1);
+				$('#forroleName').combobox('setValue', rold);
+				$('#forroleName').combobox('setText', roname);
+				
+			}
 		});
 		
 		function getroles(){
 			var orgIds = $("#orgIds").val();
 			var rolelist = new Array();
+			var ri="";
 			Array.prototype.indexOf = function(val) {
 	            for (var i = 0; i < this.length; i++) {
 	                if (this[i] == val) return i;
@@ -244,14 +257,21 @@
                 onSelect: function (row) { //选中一个选项时调用 
                 	roleSuccess();
                 	var roleId = row.roleid;
+                	ri+=roleId;
                 	rolelist.push(roleId);
+                	
                 	checkRoles(rolelist);
+                	//var rold = ri.substring(0,ri.length-1);
+    				//$('#forroleName').combobox('setValue', rold);
                 },
                 onUnselect:function (row) { //选中一个选项时调用 
                 	roleSuccess();
                 	var roleId = row.roleid;
+                	ri+=roleId;
                 	rolelist.remove(roleId);
                 	checkRoles(rolelist);
+                	//var rold = ri.substring(0,ri.length-1);
+    				//$('#forroleName').combobox('setValue', rold);
                 },
 			});
 		}
@@ -291,6 +311,8 @@
 <t:formvalid formid="userController" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cpUser()" ><%-- btnsub="aaab"  --%>
 	<input id="id" name="id" type="hidden" value="${user.id }">
 	<input id="orgCompanys" name="orgCompanys" type="hidden" value="${user.orgCompany }">
+	<input id="rolelist" type="hidden" value="${role}">
+	
 	<!-- <input id="aaab" name="aaab" value="提交按钮"> -->
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 		<tr>
@@ -362,8 +384,8 @@
                           icon="icon-search" title="common.role.list" textname="roleName" isclear="true" isInit="true" fun="roleSuccess" ></t:choose>
                  
                  <input class="easyui-combobox" name="roleName" id="roleName" value="${roleName }">--%>
-                 <select id="forroleName" style="width: 152px" name="roleName" class="easyui-combobox"  data-options="multiple:true, editable: false,panelHeight:'auto',valueField:'roleid',textField:'roleName'"> 
-						 
+                 <select id="forroleName" style="width: 152px" name="forroleName" class="easyui-combobox"  data-options="multiple:true, editable: false,panelHeight:'auto',valueField:'roleid',textField:'roleName'"> 
+						
                 </select>
                 
                 <span class="Validform_checktip" id="check_role"><t:mutiLang langKey="role.muti.select"/></span>

@@ -454,9 +454,9 @@ public class DepartController extends BaseController {
 	public void addUserToOrgList(TSUser user, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-		//是不是子公司管理员
+		//是不是商务经理
 		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
-		//子公司管理员只能看到自己公司的用户
+		//商务经理只能看到自己公司的用户
 
 		List<TSUser> userList = new ArrayList<>();
 		//查出所有在orgCode范围的用户id
@@ -465,6 +465,20 @@ public class DepartController extends BaseController {
 			List<Object[]> orgArrList = systemService.findHql(
 					"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb where d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id "
 							+ "and d.orgCode like '" + orgCode + "%' and tb.status!=0 and tb.deleteFlag=0 and tb.id !='"+ResourceUtil.getSessionUserName().getId()+"' ");
+			for (Object[] departs : orgArrList) {
+				userList.add((TSUser) departs[3]);
+			}
+		}
+		
+		String dealer = request.getParameter("dealer");
+		boolean hasPermission1 = checkRole(AppGlobals.XM_ADMIN);
+		//查出所有在orgCode范围的用户id
+		if(hasPermission1 && "1".equals(dealer)){
+			//查出所有在orgCode范围的用户id
+			List<Object[]> orgArrList = systemService.findHql(
+					"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb,TSRole tr,TSRoleUser tru where tru.TSUser.id = ts.id and tru.TSRole.id = tr.id and "
+						+ " d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id and tr.roleName='商务经理' "
+						+ " and tb.status!=0 and tb.deleteFlag=0 and tb.id !='"+ResourceUtil.getSessionUserName().getId()+"' ");
 			for (Object[] departs : orgArrList) {
 				userList.add((TSUser) departs[3]);
 			}
@@ -488,8 +502,9 @@ public class DepartController extends BaseController {
 		this.systemService.getDataGridReturn(cq, true);
 
 		//修改要显示的数据为之前过滤的数据
-		if(hasPermission){
+		if(hasPermission || hasPermission1){
 			dataGrid.setResults(userList);
+			dataGrid.setTotal(userList.size());
 		}
 
 		TagUtil.datagrid(response, dataGrid);

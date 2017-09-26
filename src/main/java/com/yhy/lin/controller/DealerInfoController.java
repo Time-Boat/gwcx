@@ -67,6 +67,12 @@ public class DealerInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "dealerInfoList")
 	public ModelAndView list(HttpServletRequest request) {
+		
+		//如果是项目管理员，则不限制分配的条件
+		if(checkRole(AppGlobals.XM_ADMIN)){
+			request.setAttribute("ap", "1");
+		}
+		
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
 
