@@ -26,7 +26,9 @@ import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
@@ -303,15 +305,18 @@ public class DealerInfoController extends BaseController {
 			for (int i = 0; i < idArr.length; i++) {
 
 				DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, idArr[i]);
+				TSUserOrg t = dealerInfoService.findUniqueByProperty(TSUserOrg.class, "tsUser.id", userId);
 				dealerInfo.setCreateUserId(userId);
+				dealerInfo.setDepartId(t.getTsDepart().getId());
 				list.add(dealerInfo);
 			}
+			
 			dealerInfoService.saveAllEntitie(list);
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
 		}
-		message = "审核成功";
+		message = "分配成功";
 		j.setMsg(message);
 		return j;
 	}

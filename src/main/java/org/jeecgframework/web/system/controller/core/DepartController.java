@@ -726,6 +726,7 @@ public class DepartController extends BaseController {
 		}
 
 		List<TSDepart> tSDeparts = new ArrayList<TSDepart>();
+		List<TSDepart> tSDeparta = new ArrayList<TSDepart>();
 
 		StringBuffer hql = new StringBuffer(" from TSDepart t where 1=1 ");
 		if(StringUtils.isNotBlank(parentid)){
@@ -734,16 +735,26 @@ public class DepartController extends BaseController {
 
 			hql.append(" and TSPDepart = ?");
 			tSDeparts = this.systemService.findHql(hql.toString(), dePart);
+			if(tSDeparts.size()>0){
+				for (int i = 0; i < tSDeparts.size(); i++) {
+					String a = tSDeparts.get(i).getStatus();
+					if(!"1".equals(a)){
+						tSDeparta.add(tSDeparts.get(i));
+					}
+				}
+			}
+			
 		} else {
 			hql.append(" and t.orgType = ?");
 			tSDeparts = this.systemService.findHql(hql.toString(), "1");
+			tSDeparta.addAll(tSDeparts);
 		}
 		List<Map<String,Object>> dateList = new ArrayList<Map<String,Object>>();
-		if(tSDeparts.size()>0){
+		if(tSDeparta.size()>0){
 			Map<String,Object> map = null;
 			String sql = null;
 			Object[] params = null;
-			for(TSDepart depart:tSDeparts){
+			for(TSDepart depart:tSDeparta){
 				map = new HashMap<String,Object>();
 				map.put("id", depart.getId());
 				map.put("name", depart.getDepartname());
@@ -958,7 +969,7 @@ public class DepartController extends BaseController {
 		StringBuffer start = new StringBuffer();
 		StringBuffer end = new StringBuffer();
 		StringBuffer busstop = new StringBuffer();
-		StringBuffer line = new StringBuffer();
+		//StringBuffer line = new StringBuffer();
 		StringBuffer str = new StringBuffer();
 		
 		str.append("select a.* from lineinfo l LEFT JOIN t_s_depart t on t.ID=l.departId LEFT JOIN transferorder a on a.line_id = l.id where a.order_status in ('1','2','3')");
@@ -978,8 +989,8 @@ public class DepartController extends BaseController {
 				end.append(orgcode+"%'");
 				busstop.append("DELETE b.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
 				busstop.append(orgcode+"%'");
-				line.append("DELETE l.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
-				line.append(orgcode+"%'");
+				//line.append("DELETE l.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
+				//line.append(orgcode+"%'");
 			}
 			
 			try {
@@ -987,7 +998,7 @@ public class DepartController extends BaseController {
 				systemService.executeSql(start.toString());//删除起点关联表数据
 				systemService.executeSql(end.toString());//删除终点关联表数据
 				systemService.executeSql(busstop.toString());//删除线路和站点关联表数据
-				systemService.executeSql(line.toString());//删除线路
+				//systemService.executeSql(line.toString());//删除线路
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();

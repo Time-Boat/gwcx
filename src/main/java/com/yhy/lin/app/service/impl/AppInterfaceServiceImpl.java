@@ -278,7 +278,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 		for (Map<String, Object> map : list) {
 			// 会出现空指针么...
-			Date date = (Date) map.get("order_startime");
+			String date = map.get("order_startime") + "";
 			Date date1 = (Date) map.get("applicationTime");
 
 			aod.setId(map.get("id") + "");
@@ -290,7 +290,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setOrderTotalPrice(map.get("order_totalPrice") + "");
 			aod.setOrderNumbers(map.get("order_numbers") + "");
 
-			aod.setOrderStartime(DateUtils.date2Str(date, DateUtils.datetimeFormat));
+			aod.setOrderStartime(date);
 			aod.setApplicationTime(DateUtils.date2Str(date1, DateUtils.datetimeFormat));
 
 			aod.setOrderContactsname(map.get("order_contactsname") + "");
@@ -302,7 +302,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
 
 			// 发车时间
-			aod.setStationStartTime(DateUtils.date2Str(date, DateUtils.short_time_sdf));
+			aod.setStationStartTime(date.substring(date.lastIndexOf(":")-2, date.length()));
 
 			// // 线路时长
 			// String lineTime = map.get("lineTimes") + "";

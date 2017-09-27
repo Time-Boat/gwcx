@@ -818,7 +818,7 @@ public class UserController extends BaseController {
 				List<TSRole> list = this.systemService.findByProperty(TSRole.class, "roleCode", ro);
 				rolelist.add(list.get(0));
 			}
-			//req.setAttribute("role", rolelist);
+			//req.setAttribute("rolelist", rolelist);
 			StringBuffer json = new StringBuffer("{'data':[");
 			if(rolelist.size()>0){
 				for (int i = 0; i < rolelist.size(); i++) {
@@ -838,6 +838,8 @@ public class UserController extends BaseController {
 			getOrgInfos(req, user);
 		}
 		req.setAttribute("tsDepart", tsDepart);
+		//List<TSRole> rol = this.systemService.getList(TSRole.class);
+		//req.setAttribute("tsTSRole", rol);
         //req.setAttribute("orgIdList", JSON.toJSON(orgIdList));
 		
 

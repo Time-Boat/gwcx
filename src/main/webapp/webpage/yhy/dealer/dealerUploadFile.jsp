@@ -23,6 +23,7 @@
                     <div id="dndArea" class="placeholder">
                         <div id="filePicker"></div>
                         <p>或将文件拖到这里</p>
+                        <p>支持jpg,jpeg,png,bmp格式</p>
                     </div>
                 </div>
                 <div class="statusBar" style="display:none;">

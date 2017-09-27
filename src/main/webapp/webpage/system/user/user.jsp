@@ -222,7 +222,7 @@
 				}
 				var rold = roleid.substring(0,roleid.length-1);
 				var roname = roleName.substring(0,roleName.length-1);
-				$('#forroleName').combobox('setValue', rold);
+				$('#forroleName').combobox('setValues', rold);
 				$('#forroleName').combobox('setText', roname);
 			}
 			
@@ -323,7 +323,7 @@
 			<td class="value" width="85%">
                 <c:if test="${user.id!=null }"> ${user.userName } </c:if>
                 <c:if test="${user.id==null }">
-                    <input id="userName" class="inputxt" name="userName" validType="t_s_base_user,userName,id" value="${user.userName }" datatype="s2-10" />
+                    <input id="userName" class="inputxt" name="userName" onblur="javascript:this.value = this.value.trim();" validType="t_s_base_user,userName,id" value="${user.userName }" datatype="s2-10" />
                     <span class="Validform_checktip"> <t:mutiLang langKey="username.rang2to10"/></span>
                 </c:if>
             </td>

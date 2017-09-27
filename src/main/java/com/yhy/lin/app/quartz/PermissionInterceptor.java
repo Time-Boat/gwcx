@@ -36,18 +36,18 @@ public class PermissionInterceptor {
 
 	// 定义切入点 @Pointcut("execution(public * com.jay..*.*(..))") -- 表示对com.jay
 	// 包下的所有方法都可添加切入点
-	@Pointcut("execution(* com.yhy.lin.*.*.*(..)) && @annotation(com.yhy.lin.app.quartz.BussAnnotation )")
-	public void joinPointPermission() {
-	}
+//	@Pointcut("execution(* com.yhy.lin.*.*.*(..)) && @annotation(com.yhy.lin.app.quartz.BussAnnotation )")
+//	public void joinPointPermission() {
+//	}
 
-	@Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping) ")
-	private void requestMapping() {
-	}
+//	@Pointcut("@annotation(org.springframework.web.bind.annotation.RequestMapping) ")
+//	private void requestMapping() {
+//	}
 
 	/**
 	 * 环绕通知 用于拦截指定内容，记录用户的操作
 	 */
-	@Around(value = "requestMapping()")
+	@Around("execution(* com.yhy.lin.*.*.*(..)) && @annotation(org.springframework.web.bind.annotation.RequestMapping) ")
 	public Object requestMapping(ProceedingJoinPoint pj) throws Throwable {
 		Object object = pj.proceed();
 		System.out.println(pj.getSignature().getName());
@@ -126,7 +126,7 @@ public class PermissionInterceptor {
 			case AppGlobals.OPERATION_MANAGER:
 				// 运营经理的角色
 				if(checkRole(AppGlobals.OPERATION_MANAGER)){
-					
+					sql.append(" and a.application_status in('1','2','3','4','5','6') ");
 				}
 				break;
 //			case AppGlobals.XM_ADMIN:
