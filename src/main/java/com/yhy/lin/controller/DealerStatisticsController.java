@@ -62,8 +62,8 @@ public class DealerStatisticsController extends BaseController {
 		String fc_begin = request.getParameter("createTime_begin");
 		String fc_end = request.getParameter("createTime_end");
 		
-		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
-		JSONObject jObject = dsService.getDealerUserDatagrid(carcustomer, dataGrid,account,fc_begin, fc_end, hasPermission);
+//		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+		JSONObject jObject = dsService.getDealerUserDatagrid(carcustomer, dataGrid,account,fc_begin, fc_end);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -94,9 +94,9 @@ public class DealerStatisticsController extends BaseController {
 		String lineName = request.getParameter("lineName");
 		String account = request.getParameter("accountId");
 		
-		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+//		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
 		JSONObject jObject = dsService.getDealerOrderDatagrid(transferorder, dataGrid, lineName, orderType,
-				account, fc_begin, fc_end, hasPermission);
+				account, fc_begin, fc_end);
 		responseDatagrid(response, jObject);
 	}
 	
@@ -114,17 +114,15 @@ public class DealerStatisticsController extends BaseController {
 		String lineName = request.getParameter("lineName");
 		String account = request.getParameter("accountId");
 
-		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+//		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
 		
 		StringBuffer orsql = new StringBuffer();
 		orsql.append(
 				" select SUM(t.order_numbers),SUM(t.order_totalPrice ) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id "
 				+ " LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td where w.open_id = d.open_id and f.id= "
 				+ " d.dealer_id and t.order_status='0' and td.id=f.departId ");
-		if (!dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end, hasPermission)
-				.isEmpty()) {
-			orsql.append(dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin,
-					fc_end, hasPermission));
+		if (!dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end).isEmpty()) {
+			orsql.append(dsService.getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end));
 		}
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 
@@ -171,10 +169,10 @@ public class DealerStatisticsController extends BaseController {
 		orsql.append(
 				"select count(*) from car_customer s, dealer_customer d,dealer_info f,t_s_depart b  where s.open_id = d.open_id and f.id=d.dealer_id and b.id=f.departId ");
 		
-		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
+//		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);
 		
-		if (!dsService.getWhere(account, fc_begin, fc_end, hasPermission).isEmpty()) {
-			orsql.append(dsService.getWhere(account,fc_begin,fc_end, hasPermission));
+		if (!dsService.getWhere(account, fc_begin, fc_end).isEmpty()) {
+			orsql.append(dsService.getWhere(account,fc_begin,fc_end));
 		}
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 		int sumUser = 0;

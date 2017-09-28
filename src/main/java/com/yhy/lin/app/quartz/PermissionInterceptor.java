@@ -88,52 +88,52 @@ public class PermissionInterceptor {
 		String[] ps = buss.orgType();
 		for (String p : ps) {
 			switch (p) {
-			// 判断机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-			case AppGlobals.ORG_JOB_TYPE:
-				if (AppGlobals.ORG_JOB_TYPE.equals(orgType)) {
-					sql.append(" and " + buss.objTableUserId() + " = '" + userId + "' ");
-				}
-				break;
-			case AppGlobals.PLATFORM_DEALER_AUDIT:
-			case AppGlobals.PLATFORM_LINE_AUDIT:
-			case AppGlobals.PLATFORM_REFUND_AUDIT:
-				
-				isAudit = true;
-				
-				// 如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-				if (checkRole(AppGlobals.PLATFORM_DEALER_AUDIT) || checkRole(AppGlobals.PLATFORM_LINE_AUDIT) || checkRole(AppGlobals.PLATFORM_REFUND_AUDIT)) {
-					sql.append("and ( 1=2 ");
-					
-					if (StringUtil.isNotEmpty(oc)) {
-						String[] ocArr = oc.split(",");
-						for (int i = 0; i < ocArr.length; i++) {
-							sql.append(" or " + buss.orgTable() + ".org_code like '" + ocArr[i] + "%' ");
-						}
+				// 判断机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+				case AppGlobals.ORG_JOB_TYPE:
+					if (AppGlobals.ORG_JOB_TYPE.equals(orgType)) {
+						sql.append(" and " + buss.objTableUserId() + " = '" + userId + "' ");
 					}
+					break;
+				case AppGlobals.PLATFORM_DEALER_AUDIT:
+				case AppGlobals.PLATFORM_LINE_AUDIT:
+				case AppGlobals.PLATFORM_REFUND_AUDIT:
 					
-					sql.append(")");
-					sql.append(buss.appendSql());
-				} else {
-					sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
-				}
-				break;
-			case AppGlobals.COMMERCIAL_MANAGER:
-				// 商务经理的角色
-				if (checkRole(AppGlobals.COMMERCIAL_MANAGER)) {
-					sql.append(" and d.audit_status != '-1' ");
-				}
-				break;
-			case AppGlobals.OPERATION_MANAGER:
-				// 运营经理的角色
-				if(checkRole(AppGlobals.OPERATION_MANAGER)){
-					sql.append(" and a.application_status in('1','2','3','4','5','6') ");
-				}
-				break;
-//			case AppGlobals.XM_ADMIN:
-//				sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
-//				break;
-			default:
-				break;
+					isAudit = true;
+					
+					// 如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
+					if (checkRole(AppGlobals.PLATFORM_DEALER_AUDIT) || checkRole(AppGlobals.PLATFORM_LINE_AUDIT) || checkRole(AppGlobals.PLATFORM_REFUND_AUDIT)) {
+						sql.append("and ( 1=2 ");
+						
+						if (StringUtil.isNotEmpty(oc)) {
+							String[] ocArr = oc.split(",");
+							for (int i = 0; i < ocArr.length; i++) {
+								sql.append(" or " + buss.orgTable() + ".org_code like '" + ocArr[i] + "%' ");
+							}
+						}
+						
+						sql.append(")");
+						sql.append(buss.appendSql());
+					} else {
+						sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
+					}
+					break;
+				case AppGlobals.COMMERCIAL_MANAGER:
+					// 商务经理的角色
+					if (checkRole(AppGlobals.COMMERCIAL_MANAGER)) {
+						sql.append(" and d.audit_status != '-1' ");
+					}
+					break;
+				case AppGlobals.OPERATION_MANAGER:
+					// 运营经理的角色
+					if(checkRole(AppGlobals.OPERATION_MANAGER)){
+						sql.append(" and a.application_status in('1','2','3','4','5','6') ");
+					}
+					break;
+	//			case AppGlobals.XM_ADMIN:
+	//				sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
+	//				break;
+				default:
+					break;
 			}
 		}
 

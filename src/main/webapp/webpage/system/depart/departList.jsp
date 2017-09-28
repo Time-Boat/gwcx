@@ -149,5 +149,6 @@
  	           	$('#departList').datagrid('reload');
              }
          });
+         $('#departList').datagrid('reload');
     }
 </script>

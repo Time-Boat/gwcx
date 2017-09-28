@@ -11,12 +11,15 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.TransferorderEntity;
+import com.yhy.lin.service.DealerInfoServiceI;
 import com.yhy.lin.service.DealerStatisticsServiceI;
 import com.yhy.lin.service.TransferStatisticsServiceI;
 
@@ -68,10 +71,11 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 	}
 
 	@Override
-	public JSONObject getDealerUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String account,String fc_begin,
-			String fc_end, boolean hasPermission) {
-		String sqlWhere = getWhere(account,fc_begin, fc_end, hasPermission);
+	public JSONObject getDealerUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String account,String fc_begin, String fc_end) {
+		String sqlWhere = ((DealerStatisticsServiceI) AopContext.currentProxy()).getWhere(account,fc_begin, fc_end);
 
+		sqlWhere += " ORDER BY s.create_time desc ";
+		
 		StringBuffer sql = new StringBuffer();
 		String sqlCnt = "select count(*) from car_customer s, dealer_customer d,dealer_info f, t_s_depart b, t_s_base_user u "
 				+ " LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p "
@@ -112,9 +116,11 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 
 	@Override
 	public JSONObject getDealerOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String lineName,
-			String orderType, String account, String fc_begin, String fc_end, boolean hasPermission) {
-		String sqlWhere = getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end, hasPermission);
-
+			String orderType, String account, String fc_begin, String fc_end) {
+		String sqlWhere = ((DealerStatisticsServiceI) AopContext.currentProxy()).getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end);
+		
+		sqlWhere += " order by t.order_completed_time desc ";
+		
 		StringBuffer sql = new StringBuffer();
 
 		String sqlCnt = "select count(*) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id LEFT JOIN car_customer w on w.id= "
@@ -180,7 +186,8 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		return jObject;
 	}
 	
-	public String getWhere(String account,String fc_begin, String fc_end, boolean hasPermission) {
+	@BussAnnotation(orgType = {AppGlobals.PLATFORM_DEALER_AUDIT, AppGlobals.ORG_JOB_TYPE}, objTableUserId = " f.create_user_id ", orgTable="b" )
+	public String getWhere(String account,String fc_begin, String fc_end) {
 		StringBuffer sql = new StringBuffer();
 		//渠道商
 		if (StringUtil.isNotEmpty(account)) {
@@ -191,39 +198,38 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 			sql.append(" and s.create_time between '" + fc_begin + "' and '" + fc_end + "'");
 		}
 		
-		TSUser user = ResourceUtil.getSessionUserName();
-		TSDepart depart = user.getCurrentDepart();
-		String orgCode = depart.getOrgCode();
-		String orgType = depart.getOrgType();
-		String userId = user.getId();
-		
-		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-			sql.append(" and f.create_user_id = '" + userId + "' ");
-		}
-		
-		String oc = user.getOrgCompany();
-		
-		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPermission && StringUtil.isNotEmpty(oc)){
-			sql.append("and ( 1=2 ");
-			
-			String[] ocArr = oc.split(",");
-			
-			for (int i = 0; i < ocArr.length; i++) {
-				sql.append(" or b.org_code like '"+ocArr[i]+"%' ");
-			}
-			sql.append(")");
-		} else {
-			sql.append(" and b.org_code like '"+orgCode+"%'");
-		}
+//		TSUser user = ResourceUtil.getSessionUserName();
+//		TSDepart depart = user.getCurrentDepart();
+//		String orgCode = depart.getOrgCode();
+//		String orgType = depart.getOrgType();
+//		String userId = user.getId();
+//		
+//		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+//		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+//			sql.append(" and f.create_user_id = '" + userId + "' ");
+//		}
+//		
+//		String oc = user.getOrgCompany();
+//		
+//		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
+//		if(hasPermission && StringUtil.isNotEmpty(oc)){
+//			sql.append("and ( 1=2 ");
+//			
+//			String[] ocArr = oc.split(",");
+//			
+//			for (int i = 0; i < ocArr.length; i++) {
+//				sql.append(" or b.org_code like '"+ocArr[i]+"%' ");
+//			}
+//			sql.append(")");
+//		} else {
+//			sql.append(" and b.org_code like '"+orgCode+"%'");
+//		}
 				
-		sql.append(" ORDER BY s.create_time desc");
 		return sql.toString();
 	}
 	
-	public String getWhere4(TransferorderEntity transferorder,String lineName, String orderType, String account, String fc_begin,
-			String fc_end, boolean hasPermission) {
+	@BussAnnotation(orgType = {AppGlobals.PLATFORM_DEALER_AUDIT, AppGlobals.ORG_JOB_TYPE}, objTableUserId = " f.create_user_id ", orgTable="td" )
+	public String getWhere4(TransferorderEntity transferorder,String lineName, String orderType, String account, String fc_begin, String fc_end) {
 		StringBuffer sql = new StringBuffer();
 		
 		//订单编号
@@ -248,35 +254,33 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 			sql.append(" and  l.name like '%" + lineName + "%'");
 		}
 		
-		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
-		String orgCode = depart.getOrgCode();
-		String orgType = depart.getOrgType();
-		String userId = ResourceUtil.getSessionUserName().getId();
+//		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+//		String orgCode = depart.getOrgCode();
+//		String orgType = depart.getOrgType();
+//		String userId = ResourceUtil.getSessionUserName().getId();
+//		
+//		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+//		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+//			sql.append(" and f.create_user_id = '" + userId + "' ");
+//		}
+//		
+//		TSUser user = ResourceUtil.getSessionUserName();
+//		String oc = user.getOrgCompany();
+//		
+//		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
+//		if(hasPermission && StringUtil.isNotEmpty(oc)){
+//			sql.append("and ( 1=2 ");
+//			
+//			String[] ocArr = oc.split(",");
+//			
+//			for (int i = 0; i < ocArr.length; i++) {
+//				sql.append(" or td.org_code like '"+ocArr[i]+"%' ");
+//			}
+//			sql.append(")");
+//		} else {
+//			sql.append(" and td.org_code like '"+orgCode+"%'");
+//		}
 		
-		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-			sql.append(" and f.create_user_id = '" + userId + "' ");
-		}
-		
-		TSUser user = ResourceUtil.getSessionUserName();
-		String oc = user.getOrgCompany();
-		
-		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-		if(hasPermission && StringUtil.isNotEmpty(oc)){
-			sql.append("and ( 1=2 ");
-			
-			String[] ocArr = oc.split(",");
-			
-			for (int i = 0; i < ocArr.length; i++) {
-				sql.append(" or td.org_code like '"+ocArr[i]+"%' ");
-			}
-			sql.append(")");
-		} else {
-			sql.append(" and td.org_code like '"+orgCode+"%'");
-		}
-		
-		sql.append(" order by t.order_completed_time desc");
-
 		return sql.toString();
 	}
 

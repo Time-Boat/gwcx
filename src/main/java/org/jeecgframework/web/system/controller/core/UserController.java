@@ -795,20 +795,11 @@ public class UserController extends BaseController {
 		}
 		req.setAttribute("departList", departList);*/
 
-        List<String> orgIdList = new ArrayList<String>();
         TSDepart tsDepart = new TSDepart();
 		if (StringUtil.isNotEmpty(user.getId())) {
 			user = systemService.getEntity(TSUser.class, user.getId());
 			
 			req.setAttribute("user", user);
-			
-			/*String str = "select r.* from t_s_base_user u LEFT JOIN t_s_role_user ru on ru.userid=u.ID LEFT JOIN t_s_role r on ru.roleid=r.ID where u.ID='"+user.getId()+"'";
-			List<TSRole> lits = this.systemService.findListbySql(str);
-			if(lits.size()>0){
-				for (int i = 0; i < lits.size(); i++) {
-					
-				}
-			}*/
 			
 			String role=this.userService.getUserRole(user);
 			String roles[] = role.split(",");
@@ -818,7 +809,6 @@ public class UserController extends BaseController {
 				List<TSRole> list = this.systemService.findByProperty(TSRole.class, "roleCode", ro);
 				rolelist.add(list.get(0));
 			}
-			//req.setAttribute("rolelist", rolelist);
 			StringBuffer json = new StringBuffer("{'data':[");
 			if(rolelist.size()>0){
 				for (int i = 0; i < rolelist.size(); i++) {
@@ -838,10 +828,6 @@ public class UserController extends BaseController {
 			getOrgInfos(req, user);
 		}
 		req.setAttribute("tsDepart", tsDepart);
-		//List<TSRole> rol = this.systemService.getList(TSRole.class);
-		//req.setAttribute("tsTSRole", rol);
-        //req.setAttribute("orgIdList", JSON.toJSON(orgIdList));
-		
 
         return new ModelAndView("system/user/user");
 	}
@@ -1452,14 +1438,32 @@ public class UserController extends BaseController {
 				list.add(orglist.get(orglist.size()-1));
 			}
 			if(list.size()>1){
-				for (int i = 1; i < list.size(); i++) {
+				
+				Set set = new  HashSet(); 
+		         List newList = new  ArrayList(); 
+		         for (int cd:list) {
+		            if(set.add(cd)){
+		                newList.add(cd);
+		            }
+		        }
+		         if(newList.size()>1){
+		        	 message="只能选择同等级的角色！";
+		        	 success=false;
+		         }else if(newList.size()==1){
+		        	 success=true;
+		         }else{
+		        	 success=false;
+		        	 message="没有选中角色！";
+		         }
+				
+				/*for (int i = 1; i < list.size(); i++) {
 					if(list.get(i)!=list.get(i-1)){
 						message="只能选择同等级的角色！";
 						success=false;
 					}else{
 						success=true;
 					}
-				}
+				}*/
 			}else if(list.size()==1){
 				success=true;
 			}else{

@@ -101,8 +101,6 @@
 			   {name: '<t:mutiLang langKey="common.confirm"/>', callback: callbackDepartmentSelect, focus: true},
 			   {name: '<t:mutiLang langKey="common.cancel"/>', callback: function (){}}
 		   ]}).zindex();
-			//getroles();
-			//onchange="getroles()"
 		}
 			
 		function callbackDepartmentSelect() {
@@ -121,6 +119,7 @@
 			 $('#departname').blur();		
 			 $('#orgIds').val(ids);		
 			}
+			  $('#forroleName').combobox('clear');
 			  getroles();
 		}
 		
@@ -222,17 +221,45 @@
 				}
 				var rold = roleid.substring(0,roleid.length-1);
 				var roname = roleName.substring(0,roleName.length-1);
-				$('#forroleName').combobox('setValues', rold);
+				$('#forroleName').combobox('setValue', rold);
 				$('#forroleName').combobox('setText', roname);
 			}
 			
 			roleSuccess();
+			getroles();
 		});
+		
+		function contains(arr, obj) {  
+		    var i = arr.length;  
+		    while (i--) {  
+		        if (arr[i] === obj) {  
+		            return true;  
+		        }  
+		    }  
+		    return false;  
+		}  
 		
 		function getroles(){
 			var orgIds = $("#orgIds").val();
 			var rolelist = new Array();
-			var ri="";
+			var rolenamelist = new Array();
+			var rold = $('#forroleName').combobox('getValues');
+			if(rold.length>0){
+				var ro = rold[0].split(",");
+				for (var i = 0; i < ro.length; i++) {
+					rolelist.push(ro[i]);
+				}
+			}
+			
+			var roname=$('#forroleName').combobox('getText');
+			
+			if(roname.length>0){
+				var name= roname.split(",");
+				for (var i = 0; i < name.length; i++) {
+					rolenamelist.push(name[i]);
+				}
+			}
+			
 			Array.prototype.indexOf = function(val) {
 	            for (var i = 0; i < this.length; i++) {
 	                if (this[i] == val) return i;
@@ -255,24 +282,43 @@
                 multiple:true,
                 required : true,
                 editable : false,
+                onLoadSuccess : function() {
+                	$('#forroleName').combobox('setValue', rold);
+    				$('#forroleName').combobox('setText', roname);
+    				checkRoles(rolelist);
+                },
                 onSelect: function (row) { //选中一个选项时调用 
                 	roleSuccess();
                 	var roleId = row.roleid;
-                	ri+=roleId;
-                	rolelist.push(roleId);
+                	var roleName=row.roleName;
+                	if(contains(rolelist, roleId)==false){
+                		rolelist.push(roleId);
+                	}else{
+                		$("#forroleName").combobox('unselect',roleId);
+                		return
+                	}
+                	if(contains(rolenamelist, roleName)==false){
+                		rolenamelist.push(roleName);
+                	}
+                	var opts = $(this).combobox('options');
                 	
                 	checkRoles(rolelist);
-                	//var rold = ri.substring(0,ri.length-1);
-    				//$('#forroleName').combobox('setValue', rold);
+                	$('#forroleName').combobox('setValue', rolelist);
+                	$('#forroleName').combobox('setText', rolenamelist);
                 },
                 onUnselect:function (row) { //选中一个选项时调用 
                 	roleSuccess();
                 	var roleId = row.roleid;
-                	ri+=roleId;
-                	rolelist.remove(roleId);
+                	var roleName=row.roleName;
+                	if(contains(rolelist, roleId)==true){
+                		rolelist.remove(roleId);
+                	}
+                	if(contains(rolenamelist, roleName)==true){
+                		rolenamelist.remove(roleName);
+                	}
                 	checkRoles(rolelist);
-                	//var rold = ri.substring(0,ri.length-1);
-    				//$('#forroleName').combobox('setValue', rold);
+                	$('#forroleName').combobox('setValue', rolelist);
+                	$('#forroleName').combobox('setText', rolenamelist);
                 },
 			});
 		}
@@ -312,8 +358,7 @@
 <t:formvalid formid="userController" dialog="true" usePlugin="password" layout="table" action="userController.do?saveUser" beforeSubmit="cpUser()" ><%-- btnsub="aaab"  --%>
 	<input id="id" name="id" type="hidden" value="${user.id }">
 	<input id="orgCompanys" name="orgCompanys" type="hidden" value="${user.orgCompany }">
-	<input id="rolelist" type="hidden" value="${role}">
-	
+	<input id="rolelist" type="hidden" value="${role}">	
 	<!-- <input id="aaab" name="aaab" value="提交按钮"> -->
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 		<tr>
@@ -386,7 +431,6 @@
                  
                  <input class="easyui-combobox" name="roleName" id="roleName" value="${roleName }">--%>
                  <select id="forroleName" style="width: 152px" name="forroleName" class="easyui-combobox"  data-options="multiple:true, editable: false,panelHeight:'auto',valueField:'roleid',textField:'roleName'"> 
-						
                 </select>
                 
                 <span class="Validform_checktip" id="check_role"><t:mutiLang langKey="role.muti.select"/></span>
