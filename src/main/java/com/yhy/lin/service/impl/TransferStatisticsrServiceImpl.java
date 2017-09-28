@@ -87,9 +87,9 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	@Override
 	public JSONObject getOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,String orderStatus, String lineName,
-			String orderType, String driverName, String fc_begin, String fc_end) {
+			String orderType, String driverName, String fc_begin, String fc_end,String departname) {
 
-		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin, fc_end);
+		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin, fc_end,departname);
 		sqlWhere+=" order by a.applicationTime desc";
 		StringBuffer sql = new StringBuffer();
 
@@ -160,8 +160,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	@Override
 	public JSONObject getrefundDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,
-			String orderStartingstation, String orderTerminusstation, String lineName, String orderType) {
-		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName, orderType);
+			String orderStartingstation, String orderTerminusstation, String lineName, String orderType,String departname) {
+		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName, orderType,departname);
 
 		sqlWhere+=" order by a.refund_completed_time desc";
 		
@@ -231,7 +231,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 	@BussAnnotation(orgType = { AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " l.createUserId ", orgTable="t")
 	public String getWhere2(String OrderId,String OrderStatus,String lineName, String orderType, String driverName, String fc_begin,
-			String fc_end) {
+			String fc_end,String departname) {
 		
 		//String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
@@ -268,6 +268,10 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		if (StringUtil.isNotEmpty(driverName)) {
 			sql.append(" and  d.name like '%" + driverName + "%'");
 		}
+		//所属公司
+		if (StringUtil.isNotEmpty(departname)) {
+			sql.append(" and  p.departname like '%" + departname + "%'");
+		}
 		
 		return sql.toString();
 	}
@@ -298,7 +302,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 	@BussAnnotation(orgType = { AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " l.createUserId ", orgTable="t")
 	public String getWhere1(String orderId,String orderStartingstation, String orderTerminusstation, String lineName,
-			String orderType) {
+			String orderType,String departname) {
 		
 		//String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
@@ -325,6 +329,9 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		// 线路名称
 		if (StringUtil.isNotEmpty(lineName)) {
 			sql.append(" and  l.name like '%" + lineName + "%'");
+		}
+		if (StringUtil.isNotEmpty(departname)) {
+			sql.append(" and p.departname like '%" + departname + "%'");
 		}
 		
 		return sql.toString();

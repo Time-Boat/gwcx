@@ -796,62 +796,82 @@ public class DepartController extends BaseController {
 		if(StringUtil.isNotEmpty(id)){
 			TSDepart depart = this.systemService.getEntity(TSDepart.class, id);
 			String orgcode=depart.getOrgCode();
-
-			//锁定子公司，子公司状态修改为终止合作
-			if(StringUtil.isNotEmpty(depart)){
-				depart.setStatus("1");
-			}
-
-			Boolean lockuser=lockUser(orgcode);//锁定用户
-			if(lockuser==false){
-				str.append("锁定用户失败！");
-			}
-			Boolean conductor=lockconductor(orgcode);//锁定子公司对验票员的处理
-			if(conductor==false){
-				if (StringUtil.isNotEmpty(str)) {
-					str.append("锁定验票员失败");
-				}else{
-					str.append("，锁定验票员失败");
-				}
-
-			}
-			Boolean deiver=lockdriver(orgcode);//锁定司机
-			if(deiver==false){
-				if (StringUtil.isNotEmpty(str)) {
-					str.append("锁定司机失败");
-				}else{
-					str.append("，锁定司机失败");
-				}
-
-			}
-			Boolean car=lockcar(orgcode);//锁定车辆
-			if(car==false){
-				if (StringUtil.isNotEmpty(str)) {
-					str.append("锁定车辆失败");
-				}else{
-					str.append("，锁定车辆失败");
-				}
-
-			}
-			String line = lockLine(orgcode);//锁定子公司，停用相关线路
-			if (StringUtil.isNotEmpty(str)) {
-				str.append(line);
+			
+			StringBuffer strs = new StringBuffer();
+			
+			strs.append("select a.* from lineinfo l LEFT JOIN t_s_depart t on t.ID=l.departId LEFT JOIN transferorder a on a.line_id = l.id where a.order_status in ('1','2','3')");
+			if(StringUtil.isNotEmpty(orgcode)){
+				strs.append(" and t.org_code like '");
+				strs.append(orgcode+"%'");
 			}
 			
-			Boolean dealer = lockdealer(orgcode);
-			if(dealer==false){
-				if (StringUtil.isNotEmpty(str)) {
-					str.append("锁定渠道商失败！");
+			List<TransferorderEntity> list = this.systemService.findListbySql(strs.toString());
+			if(list.size()>0){
+				j.setMsg("该公司还有未完成的订单，请先处理再锁定！");
+			}else{
+				//锁定子公司，子公司状态修改为终止合作
+				if(StringUtil.isNotEmpty(depart)){
+					depart.setStatus("1");
+				}
+
+				Boolean lockuser=lockUser(orgcode);//锁定用户
+				if(lockuser==false){
+					str.append("锁定用户失败！");
+				}
+				Boolean conductor=lockconductor(orgcode);//锁定子公司对验票员的处理
+				if(conductor==false){
+					if (StringUtil.isNotEmpty(str)) {
+						str.append("锁定验票员失败");
+					}else{
+						str.append("，锁定验票员失败");
+					}
+
+				}
+				Boolean deiver=lockdriver(orgcode);//锁定司机
+				if(deiver==false){
+					if (StringUtil.isNotEmpty(str)) {
+						str.append("锁定司机失败");
+					}else{
+						str.append("，锁定司机失败");
+					}
+
+				}
+				Boolean car=lockcar(orgcode);//锁定车辆
+				if(car==false){
+					if (StringUtil.isNotEmpty(str)) {
+						str.append("锁定车辆失败");
+					}else{
+						str.append("，锁定车辆失败");
+					}
+
+				}
+				Boolean line = lockLine(orgcode);//锁定子公司，停用相关线路
+				if(line==false){
+					if (StringUtil.isNotEmpty(str)) {
+						str.append("停用线路失败！");
+					}else{
+						str.append("，停用线路失败！");
+					}
+				}
+				
+				Boolean dealer = lockdealer(orgcode);
+				if(dealer==false){
+					if (StringUtil.isNotEmpty(str)) {
+						str.append("锁定渠道商失败！");
+					}else{
+						str.append("，锁定渠道商失败！");
+					}
+				}
+				if (StringUtil.isNotEmpty(str.toString())) {
+					j.setMsg(str.toString());
 				}else{
-					str.append("，锁定渠道商失败！");
+					j.setMsg("锁定子公司成功！");
 				}
 			}
-		}
-		if (StringUtil.isNotEmpty(str.toString())) {
-			j.setMsg(str.toString());
-		}else{
-			j.setMsg("锁定子公司成功！");
-		}
+			}
+
+			
+		
 		return j;
 	}
 	/**
@@ -964,24 +984,13 @@ public class DepartController extends BaseController {
 	}
 
 	//线路处理--》锁定子公司，相关线路处理
-	public String lockLine(String orgcode){
-		String message=null;
+	public Boolean lockLine(String orgcode){
+		boolean flag = false;
 		StringBuffer start = new StringBuffer();
 		StringBuffer end = new StringBuffer();
 		StringBuffer busstop = new StringBuffer();
 		//StringBuffer line = new StringBuffer();
-		StringBuffer str = new StringBuffer();
 		
-		str.append("select a.* from lineinfo l LEFT JOIN t_s_depart t on t.ID=l.departId LEFT JOIN transferorder a on a.line_id = l.id where a.order_status in ('1','2','3')");
-		if(StringUtil.isNotEmpty(orgcode)){
-			str.append(" and t.org_code like '");
-			str.append(orgcode+"%'");
-		}
-		
-		List<TransferorderEntity> list = this.systemService.findListbySql(str.toString());
-		if(list.size()>0){
-			 message="该公司有待出行、待派车或者取消订单待退款的订单，请先处理再锁定！";
-		}else{
 			if(orgcode.length()==6){
 				start.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.startLocation=s.startId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
 				start.append(orgcode+"%'");
@@ -999,13 +1008,14 @@ public class DepartController extends BaseController {
 				systemService.executeSql(end.toString());//删除终点关联表数据
 				systemService.executeSql(busstop.toString());//删除线路和站点关联表数据
 				//systemService.executeSql(line.toString());//删除线路
+				flag=true;
 			} catch (Exception e) {
 				// TODO: handle exception
 				e.printStackTrace();
-				message="停用线路出现异常，停用线路失败！";
+				flag=false;
 			}
-		}
-		return message;
+		
+		return flag;
 	}
 
 }

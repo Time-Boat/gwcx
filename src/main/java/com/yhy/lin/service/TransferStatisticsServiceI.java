@@ -14,16 +14,16 @@ public interface TransferStatisticsServiceI extends CommonService {
 			String fc_end);
 
 	public JSONObject getOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String orderId,String orderStatus,String lineName,
-			String orderType,String driverName, String fc_begin, String fc_end);
+			String orderType,String driverName, String fc_begin, String fc_end,String departname);
 
 	public JSONObject getrefundDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,
-			String orderStartingstation, String orderTerminusstation, String lineName, String orderType);
+			String orderStartingstation, String orderTerminusstation, String lineName, String orderType,String departname);
 
 	public String getWhere2(String OrderId,String OrderStatus,String lineName, String orderType, String driverName, String fc_begin,
-			String fc_end);
+			String fc_end,String departname);
 
 	public String getWhere1(String orderId,String orderStartingstation, String orderTerminusstation, String lineName,
-			String orderType);
+			String orderType,String departname);
 	public String getWhere(String fc_begin,String fc_end);
 	
 }

@@ -481,8 +481,6 @@ public class DealerInfoController extends BaseController {
 		return new ModelAndView("yhy/dealer/dealerUploadFile");
 	}
 
-	int i = 0;
-
 	/**
 	 * 保存文件
 	 * 
@@ -492,7 +490,6 @@ public class DealerInfoController extends BaseController {
 	@ResponseBody
 	public AjaxJson saveFile(HttpServletRequest request, HttpServletResponse response) {
 		
-		System.out.println(i++);
 		AjaxJson j = new AjaxJson();
 		j.setSuccess(false);
 		
@@ -582,29 +579,41 @@ public class DealerInfoController extends BaseController {
 		DealerInfoEntity dealerInfo = systemService.get(DealerInfoEntity.class, id);
 
 		String fileName = AppGlobals.IMAGE_BASE_FILE_PATH + dealerInfo.getDealerFilePath(); // 原来文件的路径
-		String filepath = dealerInfo.getDealerFilePath()
-				.substring(dealerInfo.getDealerFilePath().lastIndexOf("&&") + 2); // 修改后的文件名
-
+		
+		String filepath = "";
+		
 		// 新建文件输入输出流
 		OutputStream output = null;
 		FileInputStream fis = null;
 		try {
-			response.setHeader("Content-Disposition",
-					"attachment; filename=" + new String(filepath.getBytes("utf-8"), "iso-8859-1"));
-			// 新建File对象
-			File f = new File(fileName);
 			// 新建文件输入输出流对象
 			output = response.getOutputStream();
-			fis = new FileInputStream(f);
-			// 设置每次写入缓存大小
-			byte[] b = new byte[(int) f.length()];
-			// out.print(f.length());
-			// 把输出流写入客户端
-			int i = 0;
-			while ((i = fis.read(b)) > 0) {
-				output.write(b, 0, i);
-				System.out.println("打印" + i);
+			
+			if(StringUtil.isNotEmpty(dealerInfo.getDealerFilePath())){
+				filepath = dealerInfo.getDealerFilePath()
+						.substring(dealerInfo.getDealerFilePath().lastIndexOf("&&") + 2); // 修改后的文件名
+				response.setHeader("Content-Disposition",
+						"attachment; filename=" + new String(filepath.getBytes("utf-8"), "iso-8859-1"));
+				// 新建File对象
+				File f = new File(fileName);
+				
+				fis = new FileInputStream(f);
+				// 设置每次写入缓存大小
+				byte[] b = new byte[(int) f.length()];
+				// out.print(f.length());
+				// 把输出流写入客户端
+				int i = 0;
+				while ((i = fis.read(b)) > 0) {
+					output.write(b, 0, i);
+					System.out.println("打印" + i);
+				}
+			}else{
+				//先这样处理一下....
+				String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=gb2312' /> <script type='text/javascript'>alert('附件不存在');window.history.back();</script></head><body></body></html>";
+				byte[] b = html.getBytes();
+				output.write(b, 0, b.length);
 			}
+			
 			output.flush();
 		} catch (Exception e) {
 			e.printStackTrace();

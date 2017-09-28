@@ -56,11 +56,11 @@ public class IUserImpl implements IUser {
 	
 	@SuppressWarnings("resource")
 	public static void main(String as[]) {
-		BeanFactory factory = new ClassPathXmlApplicationContext("spring-mvc-aop.xml");
-		IUser user = (IUser) factory.getBean("IUserImpl");
-		user.findAll();
-		System.out.println();
-		user.findUser("Tom");
+//		BeanFactory factory = new ClassPathXmlApplicationContext("spring-mvc-aop.xml");
+//		IUser user = (IUser) factory.getBean("IUserImpl");
+//		user.findAll();
+//		System.out.println();
+//		user.findUser("Tom");
 		//User u = new User();
 		//u.setUsername("Tom");
 		//user.findUser(u.getUsername());
@@ -68,6 +68,42 @@ public class IUserImpl implements IUser {
 		/*
 		 * u.setUsername("haha"); user.addUser(u.getUsername());
 		 */
+		
+		Factory.createApi(1).test();
 	}
 
+	interface C{
+		void test();
+	}
+	
+	class ImplA implements C{
+
+		@Override
+		public void test() {
+			System.out.println("ImplA");
+		}
+		
+	}
+	
+	class ImplB implements C{
+		@Override
+		public void test() {
+			System.out.println("ImplB");
+		}
+	}
+	
+	static class Factory{
+		public static C createApi(int type){
+			switch (type) {
+				case 0:
+					return new IUserImpl().new ImplA();
+				case 1:
+					return new IUserImpl().new ImplB();
+				default:
+					return null;
+			}
+			
+		}
+	}
+	
 }

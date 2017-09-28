@@ -1403,7 +1403,10 @@ public class UserController extends BaseController {
 					for (int j = 0; j < listrole.size(); j++) {
 						jsonObj.put("roleid", listrole.get(j).getTsRole().getId());
 						jsonObj.put("roleName", listrole.get(j).getTsRole().getRoleName());
-						jsonArray.add(jsonObj);
+						int json=jsonArray.indexOf(jsonObj);
+						if(json==-1){
+							jsonArray.add(jsonObj);
+						}
 					}
 					
 				}

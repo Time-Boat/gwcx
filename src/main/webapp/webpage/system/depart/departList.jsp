@@ -145,10 +145,10 @@
              	 var t = eval('('+data.jsonStr+')');
  					tip(t.msg);
             		$('#win').window('close');
- 	           	//刷新当前窗体
- 	           	$('#departList').datagrid('reload');
+ 	           
              }
          });
-         $('#departList').datagrid('reload');
+     	//刷新当前窗体
+         reloadTable();
     }
 </script>
