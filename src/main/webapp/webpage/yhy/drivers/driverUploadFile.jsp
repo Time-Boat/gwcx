@@ -3,18 +3,18 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>渠道商材料上传</title>
+    <meta charset="UTF-8">
+    <title>司机图片上传</title>
     <!-- 图片上传js -->
 	<script type="text/javascript" src="plug-in/fileUpload/js/jquery.js"></script>
     <script type="text/javascript" src="plug-in/fileUpload/js/webuploader.js"></script>
     <script type="text/javascript" src="plug-in/fileUpload/js/md5.js"></script>
-    <script type="text/javascript" src="plug-in/fileUpload/js/upload.js"></script>
+    <script type="text/javascript" src="plug-in/fileUpload/js/upload2.js"></script>
     <link rel="stylesheet" type="text/css" href="plug-in/fileUpload/css/style.css" />
     
 </head>
 <body>
-	<input hidden="true" id="did" value="${dealerId}" />
+	<input hidden="true" id="driverId" value="${driverId}" />
     <div id="wrapper">
         <div id="container">
             <!--头部，相册选择和格式选择-->
@@ -39,10 +39,6 @@
         </div>
     </div>
     <script type="text/javascript">
-	    
-	    /* $(function(){
-	    	console.log(uploader);
-	    }); */
 	    
 	    function fileSuccess(){
 	    	var win = frameElement.api.opener;//获取父窗口

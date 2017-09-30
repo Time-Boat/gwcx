@@ -302,7 +302,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
 
 			// 发车时间
-			aod.setStationStartTime(date.substring(date.lastIndexOf(":")-2, date.length()));
+			aod.setStationStartTime(date.substring(date.indexOf(":")-2, date.lastIndexOf(":")));
 
 			// // 线路时长
 			// String lineTime = map.get("lineTimes") + "";

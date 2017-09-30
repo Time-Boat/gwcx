@@ -42,7 +42,7 @@
 	        pick: '#filePicker',
 	        dnd: '#dndArea',
 	        chunked: true,
-	        formData: {"did" : $('#did').val()},
+	        formData: {"driverId" : $('#driverId').val()},
 	        accept: {
 	            title: 'Images',
 	            extensions: 'jpg,jpeg,png,bmp',
@@ -50,7 +50,7 @@
 	        },
 	        fileSizeLimit: 1024 * 1024 * 2, //单个文件大小限制为2M
 	        fileNumLimit: 1, //所有文件数量限制为1
-	        server: 'dealerInfoController.do?saveFile'
+	        server: 'driversInfoController.do?saveFile'
 	        // server: 'http://www.2betop.net/fileupload.php',
         });
 
@@ -252,6 +252,7 @@
                     stats = uploader.getStats();
                     if (stats.successNum) {
                     	fileSuccess();
+                    	//dburl();
                         //alert('上传成功');
                     } else {
                         // 没有成功的图片，重设

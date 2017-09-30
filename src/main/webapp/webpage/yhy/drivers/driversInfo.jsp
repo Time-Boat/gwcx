@@ -183,19 +183,7 @@
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
-				<tr>
-					<td align="right">
-						<label class="Validform_label">
-							图片:
-						</label>
-					</td>
-					<td class="value">
-						<div class="form" id="filediv"></div>
-						<div class="form"><t:upload name="file_upload" uploader="driversInfoController.do?saveImgUrl" extend="*.jpg;*.jpeg;*.png;*.jpg;" 
-							id="file_upload" formId="driversInfo"></t:upload></div>
-						<%-- <input type="image" id="drivingLicenseImgUrl" name="drivingLicenseImgUrl"  src="${driversInfoPage.drivingLicenseImgUrl}"> --%>
-					</td>
-				</tr>
+				
 			</table>
 		</t:formvalid>
  </body>

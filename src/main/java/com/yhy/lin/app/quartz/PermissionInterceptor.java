@@ -69,8 +69,8 @@ public class PermissionInterceptor {
 		Object object = pj.proceed();
 		StringBuffer sql = new StringBuffer((String) object);
 
-		System.out.println(pj.getSignature().getName());
-		System.out.println(buss.objTableUserId());
+//		System.out.println(pj.getSignature().getName());
+//		System.out.println(buss.objTableUserId());
 		
 		//是否有审核员权限
 		boolean isAudit = false;
@@ -120,7 +120,7 @@ public class PermissionInterceptor {
 				case AppGlobals.COMMERCIAL_MANAGER:
 					// 商务经理的角色
 					if (checkRole(AppGlobals.COMMERCIAL_MANAGER)) {
-						sql.append(" and d.audit_status != '-1' ");
+						sql.append(" and (d.audit_status != '-1' or d.status = '2') ");
 					}
 					break;
 				case AppGlobals.OPERATION_MANAGER:

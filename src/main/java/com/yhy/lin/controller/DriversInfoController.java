@@ -1,5 +1,9 @@
 package com.yhy.lin.controller;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Date;
 import java.util.List;
 
@@ -12,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
@@ -24,8 +30,6 @@ import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
-
-import javax.validation.Validator;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DriversInfoEntity;
@@ -182,6 +186,7 @@ public class DriversInfoController extends BaseController {
 		} else {
 			message = "司机信息表添加成功";
 			driversInfo.setCityId(cityId);
+			driversInfo.setIdCardImgUrl("");
 			driversInfo.setCreateDate(new Date(System.currentTimeMillis()));
 			driversInfo.setDeleteFlag(0);
 			driversInfo.setStatus("0");
@@ -238,6 +243,105 @@ public class DriversInfoController extends BaseController {
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/drivers/driversInfo");
+	}
+	
+	/**
+	 * 保存文件
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "saveFile")
+	@ResponseBody
+	public AjaxJson saveFile(HttpServletRequest request, HttpServletResponse response) {
+		
+		AjaxJson j = new AjaxJson();
+		InputStream input = null;
+		FileOutputStream fos = null;
+		MultipartHttpServletRequest mRequest = null;
+		MultipartFile file = null;
+		j.setSuccess(false);
+		
+		String driverId = request.getParameter("driverId");
+		if(driverId!=null){
+		
+		try {
+			
+			mRequest = (MultipartHttpServletRequest) request;// request强制转换注意
+			file = mRequest.getFile("file");
+			
+			input = file.getInputStream();
+			
+			String filePath = AppGlobals.IMAGE_BASE_FILE_PATH + AppGlobals.DRIVER_FILE_PATH;
+			
+			// 文件夹是否存在
+			boolean mkDir = false;
+			File f = new File(filePath);
+			if (!f.isDirectory()) {
+				mkDir = f.mkdirs();
+			} else {
+				mkDir = true;
+			}
+			
+			// String suffix =
+			// file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			
+			String DBUrl = AppGlobals.DRIVER_FILE_PATH + System.currentTimeMillis() + "&&"
+					+ file.getOriginalFilename();
+			// 一个渠道商只保存一份文件
+			// String DBUrl = AppGlobals.DEALER_FILE_PATH + id + suffix;
+			
+			if (mkDir) {
+				fos = new FileOutputStream(AppGlobals.IMAGE_BASE_FILE_PATH + DBUrl);
+				int size = 0;
+				byte[] buffer = new byte[1024];
+				while ((size = input.read(buffer, 0, 1024)) != -1) {
+					fos.write(buffer, 0, size);
+				}
+				
+				if(StringUtil.isNotEmpty(driverId)) {
+					DriversInfoEntity driverinfo = systemService.get(DriversInfoEntity.class, driverId);
+					if(StringUtil.isNotEmpty(driverinfo)){
+						File df = new File(AppGlobals.IMAGE_BASE_FILE_PATH + driverinfo.getIdCardImgUrl());
+						if (df.exists()) {
+							df.delete();
+						}
+						driverinfo.setIdCardImgUrl(DBUrl);
+						systemService.saveOrUpdate(driverinfo);
+						j.setSuccess(true);
+						j.setMsg("上传文件成功");
+					}
+				}else{
+					j.setMsg("请选择司机！");
+				}
+			}
+
+		} catch (Exception e) {
+			j.setMsg("服务器异常");
+			e.printStackTrace();
+		} finally {
+			try {
+				if (fos != null)
+					fos.close();
+				if (input != null)
+					input.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		}
+		return j;
+	}
+	
+	/**
+	 * 司机图片上传
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "driverUploadFile")
+	public ModelAndView driverUploadFile(HttpServletRequest request) {
+		String id = request.getParameter("id");
+		request.setAttribute("driverId", id);
+		return new ModelAndView("yhy/drivers/driverUploadFile");
 	}
 	
 	/**

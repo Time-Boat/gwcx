@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.HttpUtils;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
@@ -575,9 +577,9 @@ public class DealerInfoController extends BaseController {
 	public void fileDown(HttpServletRequest request, HttpServletResponse response) {
 
 		String id = request.getParameter("did");
-
+		
 		DealerInfoEntity dealerInfo = systemService.get(DealerInfoEntity.class, id);
-
+		
 		String fileName = AppGlobals.IMAGE_BASE_FILE_PATH + dealerInfo.getDealerFilePath(); // 原来文件的路径
 		
 		String filepath = "";
@@ -585,18 +587,28 @@ public class DealerInfoController extends BaseController {
 		// 新建文件输入输出流
 		OutputStream output = null;
 		FileInputStream fis = null;
+		
+		//判断是否是IE浏览器
+		boolean isMSIE = HttpUtils.isMSBrowser(request);
+		
 		try {
-			// 新建文件输入输出流对象
-			output = response.getOutputStream();
-			
 			if(StringUtil.isNotEmpty(dealerInfo.getDealerFilePath())){
 				filepath = dealerInfo.getDealerFilePath()
 						.substring(dealerInfo.getDealerFilePath().lastIndexOf("&&") + 2); // 修改后的文件名
-				response.setHeader("Content-Disposition",
-						"attachment; filename=" + new String(filepath.getBytes("utf-8"), "iso-8859-1"));
+				
+				//IE浏览器的下载文件要编码UTF-8。。。    
+				if (isMSIE) {
+					filepath = URLEncoder.encode(filepath, "UTF-8");
+	            } else {
+	            	filepath = new String(filepath.getBytes("UTF-8"), "ISO-8859-1");
+	            }
+				
+				response.setHeader("Content-Disposition", "attachment; filename=" + filepath);
+				
 				// 新建File对象
 				File f = new File(fileName);
-				
+				// 新建文件输入输出流对象
+				output = response.getOutputStream();
 				fis = new FileInputStream(f);
 				// 设置每次写入缓存大小
 				byte[] b = new byte[(int) f.length()];
@@ -611,12 +623,15 @@ public class DealerInfoController extends BaseController {
 				//先这样处理一下....
 				String html = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=gb2312' /> <script type='text/javascript'>alert('附件不存在');window.history.back();</script></head><body></body></html>";
 				byte[] b = html.getBytes();
+				// 新建文件输入输出流对象
+				output = response.getOutputStream();
 				output.write(b, 0, b.length);
 			}
 			
 			output.flush();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//QQ浏览器用IE内核或报错，其他浏览器包括IE是正常的
+			if(!isMSIE) e.printStackTrace();
 		} finally {
 			try {
 				if (fis != null)
@@ -624,7 +639,7 @@ public class DealerInfoController extends BaseController {
 				if (output != null)
 					output.close();
 			} catch (IOException e) {
-				e.printStackTrace();
+				if(!isMSIE) e.printStackTrace();
 			}
 		}
 	}

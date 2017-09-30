@@ -69,7 +69,15 @@ public class IUserImpl implements IUser {
 		 * u.setUsername("haha"); user.addUser(u.getUsername());
 		 */
 		
-		Factory.createApi(1).test();
+//		Factory.createApi(1).test();
+		
+		ImplB b = new IUserImpl().new ImplB();
+		ImplB a = new IUserImpl().new ImplB();
+		Map<String,Object> m = new HashMap<>();
+		Map<String,Object> m1 = new HashMap<>();
+		m.put("a", a);
+		m1.put("a", b);
+		System.out.println(m.equals(m1));
 	}
 
 	interface C{
@@ -86,10 +94,20 @@ public class IUserImpl implements IUser {
 	}
 	
 	class ImplB implements C{
+		
 		@Override
 		public void test() {
 			System.out.println("ImplB");
 		}
+		
+		@Override
+		public boolean equals(Object obj) {
+			if(obj instanceof ImplB){
+				return true;
+			}
+			return false;
+		}
+		
 	}
 	
 	static class Factory{

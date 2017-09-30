@@ -989,7 +989,9 @@ public class DepartController extends BaseController {
 		StringBuffer start = new StringBuffer();
 		StringBuffer end = new StringBuffer();
 		StringBuffer busstop = new StringBuffer();
+		StringBuffer str = new StringBuffer();
 		//StringBuffer line = new StringBuffer();
+		str.append("UPDATE lineinfo l");
 		
 			if(orgcode.length()==6){
 				start.append("DELETE s.* from lineinfo l LEFT JOIN start_end s on l.startLocation=s.startId LEFT JOIN t_s_depart t on l.departId=t.ID where t.org_code like '");
@@ -1000,6 +1002,11 @@ public class DepartController extends BaseController {
 				busstop.append(orgcode+"%'");
 				//line.append("DELETE l.* from lineinfo l LEFT JOIN start_end s on l.endLocation=s.endId LEFT JOIN t_s_depart t on l.departId=t.ID LEFT JOIN line_busstop b on b.lineId = l.id where t.org_code like '");
 				//line.append(orgcode+"%'");
+				str.append(",(select l.* from lineinfo l LEFT JOIN t_s_depart t on l.departId = t.ID where t.org_code like '");
+				str.append(orgcode);
+				str.append("%') r set l.status='1',l.deleteFlag='1',l.application_status='0',l.review_reason=NULL,l.trial_reason=NULL,"
+						+ "l.application_time=NULL,l.application_user_id=NULL,l.apply_content=NULL,l.first_application_time =NULL,"
+						+ "l.last_application_time=NULL where r.id=l.ID and l.deleteFlag='0' and l.status!='1' and l.application_status!='0'");
 			}
 			
 			try {
@@ -1008,6 +1015,7 @@ public class DepartController extends BaseController {
 				systemService.executeSql(end.toString());//删除终点关联表数据
 				systemService.executeSql(busstop.toString());//删除线路和站点关联表数据
 				//systemService.executeSql(line.toString());//删除线路
+				systemService.updateBySqlString(str.toString());
 				flag=true;
 			} catch (Exception e) {
 				// TODO: handle exception

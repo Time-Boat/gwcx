@@ -65,7 +65,6 @@
 <div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
 <div id="tt"></div>
-</div>
 
 <script type="text/javascript">
 

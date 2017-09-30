@@ -90,7 +90,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	}
 
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_LINE_AUDIT, AppGlobals.OPERATION_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
-			objTableUserId = " a.createUserId ", orgTable="b", appendSql = " and a.application_status in('1','2','3','4','5','6') ")
+			objTableUserId = " a.createUserId ", orgTable="b", appendSql = " and  CASE WHEN a.status ='0' then a.application_status in('1','2','3','4','5','6') when a.status='1' then a.application_status in('2','3','4','6') END " )
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company){
@@ -195,7 +195,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if(StringUtil.isNotEmpty(lineType)){//接送机的线路判断
 			sqlWhere.append(" and a.type "+lineType);
 		}
-		sqlWhere.append(" and a.deleteFlag='0' ");
+		sqlWhere.append(" and a.deleteFlag='0' and p.status='0'");
 		
 		return sqlWhere.toString();
 	}
