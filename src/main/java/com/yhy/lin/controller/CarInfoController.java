@@ -74,7 +74,6 @@ public class CarInfoController extends BaseController {
 	 * @param dataGrid
 	 * @param user
 	 */
-
 	@RequestMapping(params = "datagrid")
 	public void datagrid(CarInfoEntity carInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		
@@ -157,6 +156,7 @@ public class CarInfoController extends BaseController {
 			message = "车辆信息添加成功";
 			
 			carInfo.setDeleteFlag(0);
+			carInfo.setCarStatus("1");
 			carInfoService.save(carInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}

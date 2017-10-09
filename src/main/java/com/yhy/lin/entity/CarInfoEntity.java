@@ -297,7 +297,7 @@ public class CarInfoEntity implements java.io.Serializable {
 		this.remark = remark;
 	}
 	
-	@Column(name = "DEPART_ID",nullable=true,length=32)
+	@Column(name = "DEPARTID",nullable=true,length=32)
 	public String getDepartId() {
 		return departId;
 	}

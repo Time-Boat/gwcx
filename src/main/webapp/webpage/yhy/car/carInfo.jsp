@@ -25,11 +25,33 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
+							车辆品牌:
+						</label>
+					</td>
+					<td class="value">
+						<t:dictSelect field="carBrand" typeGroupCode="carBrand" hasLabel="false" defaultVal="${carInfoPage.carBrand}" datatype="*"></t:dictSelect>
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							车辆型号:
+						</label>
+					</td>
+					<td class="value">
+					    <input class="inputxt" id="modelNumber" name="modelNumber" datatype="*" value="${carInfoPage.modelNumber}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
 							车辆类型:
 						</label>
 					</td>
 					<td class="value">
-					<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
+						<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
 						<%-- <input class="inputxt" id="carType" name="carType" datatype="*"
 							   value="${carInfoPage.carType}"> --%>
 						<span class="Validform_checktip"></span>
@@ -56,6 +78,18 @@
 					<td class="value">
 						<input class="inputxt" id="stopPosition" name="stopPosition" ignore="ignore"
 							   value="${carInfoPage.stopPosition}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							购置日期:
+						</label>
+					</td>
+					<td class="value">
+						<%-- <input class="inputxt" id="buyDate" name="buyDate" value="${carInfoPage.buyDate}"> --%>
+						<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 150px" value="${carInfoPage.buyDate}" id="buyDate" name="buyDate" >
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
