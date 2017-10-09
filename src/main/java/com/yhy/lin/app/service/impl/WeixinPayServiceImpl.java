@@ -50,8 +50,8 @@ public class WeixinPayServiceImpl extends CommonServiceImpl implements WeixinPay
 			logger.info("WeixinPayServiceImpl   :" + dc.getScanCount());
 			dc.setScanCount(dc.getScanCount() + 1);   //添加一次记录
 			logger.info("WeixinPayServiceImpl   :" + dc.getScanCount());
+			saveOrUpdate(dc);
 		}
-		saveOrUpdate(dc);
 	}
 	
 	

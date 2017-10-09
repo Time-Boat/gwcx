@@ -52,13 +52,76 @@ public class CarInfoEntity implements java.io.Serializable {
 	private java.lang.String stopY;
 	/**纬度*/
 	private java.lang.String stopX;
-	//所属部门
+	/**所属部门*/
 	private String departId;
-	//创建人
+	/**创建人*/
 	private String createUserId;
-	//创建时间
+	/**创建时间*/
 	private Date createTime;
 	
+	/**购置日期*/
+	private Date buyDate;
+	/**车辆品牌*/
+	private String carBrand;
+	/**型号*/
+	private String modelNumber;
+	/**运营状态*/
+	private String carStatus;
+	
+	/**申请状态*/
+	private String applicationStatus;
+	/**初审被拒绝的原因*/
+	private String trialReason;
+	/**复审被拒绝的原因*/
+	private String reviewReason;
+	/**申请人*/
+	private String applicationUserid;
+	/**申请时间*/
+	private Date applicationTime;
+	/**申请内容*/
+	private String applyContent;
+	/**申请时间*/
+	private Date firstApplicationTime;
+	/**申请时间*/
+	private Date lastApplicationTime;
+	/**初审人*/
+	private String firstApplicationUser;
+	/**复审人*/
+	private String lastApplicationUser;
+		
+	@Column(name ="BUY_DATE",nullable=true)
+	public Date getBuyDate() {
+		return buyDate;
+	}
+
+	public void setBuyDate(Date buyDate) {
+		this.buyDate = buyDate;
+	}
+	@Column(name ="CAR_BRAND",nullable=true,length=2)
+	public String getCarBrand() {
+		return carBrand;
+	}
+
+	public void setCarBrand(String carBrand) {
+		this.carBrand = carBrand;
+	}
+	@Column(name ="MODEL_NUMBER",nullable=true,length=255)
+	public String getModelNumber() {
+		return modelNumber;
+	}
+
+	public void setModelNumber(String modelNumber) {
+		this.modelNumber = modelNumber;
+	}
+	@Column(name ="CAR_STATUS",nullable=true,length=1)
+	public String getCarStatus() {
+		return carStatus;
+	}
+
+	public void setCarStatus(String carStatus) {
+		this.carStatus = carStatus;
+	}
+
 	@Column(name ="BUSINESS_TYPE",nullable=true,length=1)
 	public java.lang.String getBusinessType() {
 		return businessType;
@@ -234,7 +297,7 @@ public class CarInfoEntity implements java.io.Serializable {
 		this.remark = remark;
 	}
 	
-	@Column(name = "departId")
+	@Column(name = "DEPART_ID",nullable=true,length=32)
 	public String getDepartId() {
 		return departId;
 	}
@@ -242,7 +305,7 @@ public class CarInfoEntity implements java.io.Serializable {
 		this.departId = departId;
 	}
 
-	@Column(name = "create_user_id")
+	@Column(name = "CREATE_USER_ID",nullable=true,length=32)
 	public String getCreateUserId() {
 		return createUserId;
 	}
@@ -251,13 +314,88 @@ public class CarInfoEntity implements java.io.Serializable {
 		this.createUserId = createUserId;
 	}
 
-	@Column(name = "create_time")
+	@Column(name = "CREATE_TIME",nullable=true)
 	public Date getCreateTime() {
 		return createTime;
 	}
 
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
+	}
+	
+	@Column(name = "APPLICATION_STATUS",nullable=true,length=1)
+	public String getApplicationStatus() {
+		return applicationStatus;
+	}
+	public void setApplicationStatus(String applicationStatus) {
+		this.applicationStatus = applicationStatus;
+	}
+	
+	@Column(name = "TRIAL_REASON",nullable=true,length=500)
+	public String getTrialReason() {
+		return trialReason;
+	}
+	public void setTrialReason(String trialReason) {
+		this.trialReason = trialReason;
+	}
+	
+	@Column(name = "REVIEW_REASON",nullable=true,length=500)
+	public String getReviewReason() {
+		return reviewReason;
+	}
+	public void setReviewReason(String reviewReason) {
+		this.reviewReason = reviewReason;
+	}
+	
+	@Column(name = "APPLICATION_USER_ID",nullable=true,length=32)
+	public String getApplicationUserid() {
+		return applicationUserid;
+	}
+	public void setApplicationUserid(String applicationUserid) {
+		this.applicationUserid = applicationUserid;
+	}
+	@Column(name = "APPLICATION_TIME",nullable=true)
+	public Date getApplicationTime() {
+		return applicationTime;
+	}
+	public void setApplicationTime(Date applicationTime) {
+		this.applicationTime = applicationTime;
+	}
+	@Column(name = "APPLY_CONTENT",nullable=true,length=1)
+	public String getApplyContent() {
+		return applyContent;
+	}
+	public void setApplyContent(String applyContent) {
+		this.applyContent = applyContent;
+	}
+	
+	@Column(name = "FIRST_APPLICATION_TIME",nullable=true)
+	public Date getFirstApplicationTime() {
+		return firstApplicationTime;
+	}
+	public void setFirstApplicationTime(Date firstApplicationTime) {
+		this.firstApplicationTime = firstApplicationTime;
+	}
+	@Column(name = "LAST_APPLICATION_TIME",nullable=true)
+	public Date getLastApplicationTime() {
+		return lastApplicationTime;
+	}
+	public void setLastApplicationTime(Date lastApplicationTime) {
+		this.lastApplicationTime = lastApplicationTime;
+	}
+	@Column(name = "FIRST_APPLICATION_USER",nullable=true,length=32)
+	public String getFirstApplicationUser() {
+		return firstApplicationUser;
+	}
+	public void setFirstApplicationUser(String firstApplicationUser) {
+		this.firstApplicationUser = firstApplicationUser;
+	}
+	@Column(name = "LAST_APPLICATION_USER",nullable=true,length=32)
+	public String getLastApplicationUser() {
+		return lastApplicationUser;
+	}
+	public void setLastApplicationUser(String lastApplicationUser) {
+		this.lastApplicationUser = lastApplicationUser;
 	}
 	
 }

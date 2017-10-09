@@ -112,8 +112,16 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 							,new Db2Page("username", "username")
 							,new Db2Page("createTime", "create_time")
 							,new Db2Page("businessType", "business_type")
+							
+							,new Db2Page("buyDate", "buy_date")
+							,new Db2Page("carBrand", "car_brand")
+							,new Db2Page("modelNumber", "model_number")
+							
+							,new Db2Page("applicationStatus", "application_status")
+							,new Db2Page("carStatus", "car_status")
+							,new Db2Page("applyContent", "apply_content")
 							,new Db2Page("remark", "remark")
-					};
+					}; 
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
 	}
