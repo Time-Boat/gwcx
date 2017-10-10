@@ -31,6 +31,8 @@ import com.yhy.lin.app.util.AppGlobals;
 @Component
 public class PermissionInterceptor {
 
+	//写个切面，统计每个接口被访问的次数
+	
 	@Autowired
 	private UserService userService;
 
@@ -127,6 +129,12 @@ public class PermissionInterceptor {
 					// 运营经理的角色
 					if(checkRole(AppGlobals.OPERATION_MANAGER)){
 						sql.append(" and a.application_status in('1','2','3','4','5','6') ");
+					}
+					break;
+				case AppGlobals.TECHNICAL_MANAGER:
+					// 技术经理的角色
+					if(checkRole(AppGlobals.TECHNICAL_MANAGER)){
+						sql.append(" and c.audit_status != '-1' ");
 					}
 					break;
 	//			case AppGlobals.XM_ADMIN:

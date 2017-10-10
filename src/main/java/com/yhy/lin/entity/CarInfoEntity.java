@@ -69,25 +69,19 @@ public class CarInfoEntity implements java.io.Serializable {
 	private String carStatus;
 	
 	/**申请状态*/
-	private String applicationStatus;
-	/**初审被拒绝的原因*/
-	private String trialReason;
-	/**复审被拒绝的原因*/
-	private String reviewReason;
+	private String auditStatus;
+	/**拒绝原因*/
+	private String rejectReason;
 	/**申请人*/
-	private String applicationUserid;
+	private String auditUserid;
 	/**申请时间*/
-	private Date applicationTime;
+	private Date applyTime;
 	/**申请内容*/
 	private String applyContent;
-	/**申请时间*/
-	private Date firstApplicationTime;
-	/**申请时间*/
-	private Date lastApplicationTime;
+	/**审核时间*/
+	private Date auditTime;
 	/**初审人*/
-	private String firstApplicationUser;
-	/**复审人*/
-	private String lastApplicationUser;
+	private String auditUser;
 		
 	@Column(name ="BUY_DATE",nullable=true)
 	public Date getBuyDate() {
@@ -323,43 +317,35 @@ public class CarInfoEntity implements java.io.Serializable {
 		this.createTime = createTime;
 	}
 	
-	@Column(name = "APPLICATION_STATUS",nullable=true,length=1)
-	public String getApplicationStatus() {
-		return applicationStatus;
+	@Column(name = "AUDIT_STATUS",nullable=true,length=1)
+	public String getAuditStatus() {
+		return auditStatus;
 	}
-	public void setApplicationStatus(String applicationStatus) {
-		this.applicationStatus = applicationStatus;
-	}
-	
-	@Column(name = "TRIAL_REASON",nullable=true,length=500)
-	public String getTrialReason() {
-		return trialReason;
-	}
-	public void setTrialReason(String trialReason) {
-		this.trialReason = trialReason;
+	public void setAuditStatus(String auditStatus) {
+		this.auditStatus = auditStatus;
 	}
 	
-	@Column(name = "REVIEW_REASON",nullable=true,length=500)
-	public String getReviewReason() {
-		return reviewReason;
+	@Column(name = "REJECT_REASON",nullable=true,length=500)
+	public String getRejectReason() {
+		return rejectReason;
 	}
-	public void setReviewReason(String reviewReason) {
-		this.reviewReason = reviewReason;
+	public void setRejectReason(String rejectReason) {
+		this.rejectReason = rejectReason;
 	}
 	
-	@Column(name = "APPLICATION_USER_ID",nullable=true,length=32)
-	public String getApplicationUserid() {
-		return applicationUserid;
+	@Column(name = "AUDIT_USER_ID",nullable=true,length=32)
+	public String getAuditUserid() {
+		return auditUserid;
 	}
-	public void setApplicationUserid(String applicationUserid) {
-		this.applicationUserid = applicationUserid;
+	public void setAuditUserid(String auditUserid) {
+		this.auditUserid = auditUserid;
 	}
-	@Column(name = "APPLICATION_TIME",nullable=true)
-	public Date getApplicationTime() {
-		return applicationTime;
+	@Column(name = "APPLY_TIME",nullable=true)
+	public Date getApplyTime() {
+		return applyTime;
 	}
-	public void setApplicationTime(Date applicationTime) {
-		this.applicationTime = applicationTime;
+	public void setApplyTime(Date applyTime) {
+		this.applyTime = applyTime;
 	}
 	@Column(name = "APPLY_CONTENT",nullable=true,length=1)
 	public String getApplyContent() {
@@ -369,33 +355,19 @@ public class CarInfoEntity implements java.io.Serializable {
 		this.applyContent = applyContent;
 	}
 	
-	@Column(name = "FIRST_APPLICATION_TIME",nullable=true)
-	public Date getFirstApplicationTime() {
-		return firstApplicationTime;
+	@Column(name = "AUDIT_TIME",nullable=true)
+	public Date getAuditTime() {
+		return auditTime;
 	}
-	public void setFirstApplicationTime(Date firstApplicationTime) {
-		this.firstApplicationTime = firstApplicationTime;
+	public void setAuditTime(Date auditTime) {
+		this.auditTime = auditTime;
 	}
-	@Column(name = "LAST_APPLICATION_TIME",nullable=true)
-	public Date getLastApplicationTime() {
-		return lastApplicationTime;
+	@Column(name = "AUDIT_USER",nullable=true,length=32)
+	public String getAuditUser() {
+		return auditUser;
 	}
-	public void setLastApplicationTime(Date lastApplicationTime) {
-		this.lastApplicationTime = lastApplicationTime;
-	}
-	@Column(name = "FIRST_APPLICATION_USER",nullable=true,length=32)
-	public String getFirstApplicationUser() {
-		return firstApplicationUser;
-	}
-	public void setFirstApplicationUser(String firstApplicationUser) {
-		this.firstApplicationUser = firstApplicationUser;
-	}
-	@Column(name = "LAST_APPLICATION_USER",nullable=true,length=32)
-	public String getLastApplicationUser() {
-		return lastApplicationUser;
-	}
-	public void setLastApplicationUser(String lastApplicationUser) {
-		this.lastApplicationUser = lastApplicationUser;
+	public void setAuditUser(String auditUser) {
+		this.auditUser = auditUser;
 	}
 	
 }

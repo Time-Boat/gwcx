@@ -1,12 +1,16 @@
 package com.yhy.lin.service.impl;
 
+import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.CarInfoEntity;
+import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
+import com.yhy.lin.service.DealerInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -30,73 +34,31 @@ import org.jeecgframework.web.system.pojo.base.TSDepart;
 public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate, String carType, String status, String businessType,String carAndDriver) {
+	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate,
+			String carType, String status, String businessType, String carAndDriver) {
 		
-		StringBuffer queryCondition = new StringBuffer(" where c.delete_flag = '0' ");
+		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, licencePlate, carType, status, businessType);
 		
-		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
-		String orgCode = depart.getOrgCode();
-		/*String orgType = depart.getOrgType();
-		String userId = ResourceUtil.getSessionUserName().getId();
+		String sqlCnt = " select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
+				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id "
+				+ " where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ";
 		
-		
-		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-			queryCondition.append(" and c.create_user_id = '" + userId + "' ");
-		}*/
-		/*if(orgCode.length()>6){
-			String code = orgCode.substring(0, 6);
-			if("1".equals(carAndDriver)){
-				queryCondition.append(" and t.org_code like '" + code + "%' ");
-			}else{
-				queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
-			}
-		}else{
-			queryCondition.append(" and t.org_code like '" + orgCode + "%' ");
-		}*/
-		
-		String code = "";
-		if(orgCode.length()>6){
-			code= orgCode.substring(0,6);
-		}else{
-			code=orgCode;
-		}
-		if(StringUtil.isNotEmpty(code)){
-			queryCondition.append(" and t.org_code like '"+code+"%'");
+		if (!sqlWhere.isEmpty()) {
+			sqlCnt += sqlWhere;
 		}
 		
-		if(StringUtil.isNotEmpty(userCar)){
-			queryCondition.append(" and c.status = '" + userCar + "' ");
-			if(StringUtil.isNotEmpty(lpId)){
-				queryCondition.append(" or c.id = '" + lpId + "' ");
-			}
-		}
-		
-		if(StringUtil.isNotEmpty(businessType)){
-			queryCondition.append(" and c.business_type = '"+businessType+"' ");
-		}
-		
-		if(StringUtil.isNotEmpty(licencePlate)){
-			queryCondition.append(" and c.licence_plate like '"+licencePlate+"%' ");
-		}
-		
-		if(StringUtil.isNotEmpty(carType)){
-			queryCondition.append(" and car_type like '"+carType+"%' ");
-		}
-		
-		if(StringUtil.isNotEmpty(status)){
-			queryCondition.append(" and c.status = '"+status+"' ");
-		}
-		
-		String sqlCnt = "select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
-				+ "LEFT JOIN t_s_base_user u on d.create_user_id = u.id " + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id "
-	    		+ "LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id " + queryCondition.toString());
+	    sql.append(" select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id ");
+		sql.append(" LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id ");
+		sql.append(" where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
 		
+	    if (!sqlWhere.isEmpty()) {
+	    	sql.append(sqlWhere);
+		}
+	    
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 					Db2Page[] db2Pages = {
@@ -117,7 +79,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 							,new Db2Page("carBrand", "car_brand")
 							,new Db2Page("modelNumber", "model_number")
 							
-							,new Db2Page("applicationStatus", "application_status")
+							,new Db2Page("auditStatus", "audit_status")
 							,new Db2Page("carStatus", "car_status")
 							,new Db2Page("applyContent", "apply_content")
 							,new Db2Page("remark", "remark")
@@ -177,5 +139,37 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		}
 		return dList;
 	}
-
+	
+	@BussAnnotation(orgType = {AppGlobals.TECHNICAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
+			objTableUserId = " c.create_user_id ", orgTable="t") //, appendSql = " and d.audit_status = '1' "
+	public String getWhere(String lpId, String licencePlate, String userCar, String carType, String status, String businessType) {
+		
+		StringBuffer sql = new StringBuffer();
+		
+		if(StringUtil.isNotEmpty(userCar)){
+			sql.append(" and c.status = '" + userCar + "' ");
+			if(StringUtil.isNotEmpty(lpId)){
+				sql.append(" or c.id = '" + lpId + "' ");
+			}
+		}
+		
+		if(StringUtil.isNotEmpty(businessType)){
+			sql.append(" and c.business_type = '"+businessType+"' ");
+		}
+		
+		if(StringUtil.isNotEmpty(licencePlate)){
+			sql.append(" and c.licence_plate like '"+licencePlate+"%' ");
+		}
+		
+		if(StringUtil.isNotEmpty(carType)){
+			sql.append(" and car_type like '"+carType+"%' ");
+		}
+		
+		if(StringUtil.isNotEmpty(status)){
+			sql.append(" and c.status = '"+status+"' ");
+		}
+		
+		return sql.toString();
+	}
+	
 }

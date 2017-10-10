@@ -1,5 +1,6 @@
 package com.yhy.lin.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSType;
 import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
@@ -27,6 +29,7 @@ import javax.validation.Validator;
 
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.CarInfoEntity;
+import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
 
@@ -157,6 +160,7 @@ public class CarInfoController extends BaseController {
 			
 			carInfo.setDeleteFlag(0);
 			carInfo.setCarStatus("1");
+			carInfo.setAuditStatus("-1");
 			carInfoService.save(carInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
@@ -214,6 +218,7 @@ public class CarInfoController extends BaseController {
 		req.setAttribute("driversList", driversList);
 		return new ModelAndView("yhy/car/carInfo");
 	}
+	
 	/**
 	 * 线路排班列表页面跳转
 	 * 
@@ -226,4 +231,201 @@ public class CarInfoController extends BaseController {
 		req.setAttribute("cityList",getOpencity());
 		return new ModelAndView("/yhy/car/driverAndCity");
 	}
+	
+	/**
+	 * 申请停用
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "carDisable")
+	@ResponseBody
+	public AjaxJson dealerDisable(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+
+		String id = req.getParameter("id");
+
+		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
+		try {
+
+			carInfo.setAuditTime(AppUtil.getDate());
+			carInfo.setAuditStatus("0");
+			carInfo.setApplyContent("1");
+			carInfo.setAuditUserid(ResourceUtil.getSessionUserName().getId());
+
+			// 清空审核状态
+			carInfo.setAuditTime(null);
+			carInfo.setAuditUser("");
+			carInfo.setRejectReason("");
+			
+			systemService.saveOrUpdate(carInfo);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "申请成功";
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 提交申请
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "carApply")
+	@ResponseBody
+	public AjaxJson dealerApply(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+
+		String id = req.getParameter("id");
+
+		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
+		try {
+			carInfo.setAuditTime(AppUtil.getDate());
+			carInfo.setAuditStatus("0");
+			carInfo.setApplyContent("0");
+			carInfo.setAuditUserid(ResourceUtil.getSessionUserName().getId());
+
+			// 清空审核状态
+			carInfo.setAuditTime(null);
+			carInfo.setAuditUser("");
+			carInfo.setRejectReason("");
+
+			systemService.saveOrUpdate(carInfo);
+		} catch (Exception e) {
+			message = "服务器失败";
+			e.printStackTrace();
+		}
+		message = "申请成功";
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 分配专员
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "carAllotAttache")
+	@ResponseBody
+	public AjaxJson allotAttache(HttpServletRequest req) {
+		AjaxJson j = new AjaxJson();
+		String message = null;
+
+		String userId = req.getParameter("userId");
+		String ids = req.getParameter("ids");
+
+		List<CarInfoEntity> list = new ArrayList<>();
+
+		try {
+			String[] idArr = ids.split(",");
+			for (int i = 0; i < idArr.length; i++) {
+
+				CarInfoEntity dealerInfo = systemService.getEntity(CarInfoEntity.class, idArr[i]);
+				TSUserOrg t = systemService.findUniqueByProperty(TSUserOrg.class, "tsUser.id", userId);
+				dealerInfo.setCreateUserId(userId);
+				dealerInfo.setDepartId(t.getTsDepart().getId());
+				list.add(dealerInfo);
+			}
+			
+			systemService.saveAllEntitie(list);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "分配成功";
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 同意审核
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "carAgree")
+	@ResponseBody
+	public AjaxJson dealerAgree(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+
+		String id = req.getParameter("id");
+
+		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
+
+		try {
+			String apply = carInfo.getApplyContent();
+
+			carInfo.setAuditTime(AppUtil.getDate());
+			carInfo.setAuditStatus("1");
+			carInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+
+			if ("0".equals(apply)) {
+				carInfo.setCarStatus("0");
+			} else {
+				carInfo.setCarStatus("1");
+			}
+
+			systemService.saveOrUpdate(carInfo);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "审核成功";
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 拒绝审核
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "carReject")
+	@ResponseBody
+	public AjaxJson dealerReject(HttpServletRequest req) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+
+		String id = req.getParameter("id");
+		String rejectReason = req.getParameter("rejectReason");
+
+		CarInfoEntity dealerInfo = systemService.getEntity(CarInfoEntity.class, id);
+		try {
+
+			dealerInfo.setAuditTime(AppUtil.getDate());
+			dealerInfo.setAuditStatus("2");
+			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			dealerInfo.setRejectReason(rejectReason);
+
+			systemService.saveOrUpdate(dealerInfo);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "审核成功";
+		j.setMsg(message);
+		return j;
+	}
+
+	// 获取拒绝原因
+	@RequestMapping(params = "getReason")
+	@ResponseBody
+	public AjaxJson getReason(HttpServletRequest request) {
+		
+		AjaxJson j = new AjaxJson();
+		
+		String id = request.getParameter("id");// id
+		
+		CarInfoEntity t = systemService.getEntity(CarInfoEntity.class, id);
+		String reasont = "";
+		reasont = t.getRejectReason();
+		
+		j.setSuccess(true);
+		j.setMsg(reasont);
+		return j;
+	}
+	
 }

@@ -1116,7 +1116,7 @@
     	getOrder();
     });
  
-  setInterval("getOrder()",600000);
+ //setInterval("getOrder()",600000);
   ///setInterval("getOrderStartime()",3000);
 </script>
  
