@@ -3,12 +3,14 @@ package com.yhy.lin.app.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.UUID;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -59,7 +61,8 @@ public class WeixinPayController extends AppBaseController{
 	private WeixinPayService wxService;
 	
 	// private stxatic String baseUrl = "http://localhost:8080/gwcx";
-	private static String baseUrl = "http://car.cywtrip.com/gwcx";
+	// private static String baseUrl = "http://car.cywtrip.com/gwcx";
+	private static String baseUrl = "http://" + AppGlobals.SERVER_BASE_URL + "/gwcx";
 
 	/**
 	 * Logger for this class
@@ -176,7 +179,7 @@ public class WeixinPayController extends AppBaseController{
 
 			// 这里notify_url是 支付完成后微信发给该链接信息，可以判断会员是否支付成功，改变订单状态等。
 //			String notify_url = baseUrl + "/wx/notifyUrl.do";
-			String notify_url = "http://car.cywtrip.com/gwcx/wx/notifyUrl.do";
+			String notify_url = baseUrl + "/gwcx/wx/notifyUrl.do";
 
 			SortedMap<String, String> packageParams = new TreeMap<String, String>();
 			packageParams.put("appid", AppGlobals.WECHAT_ID);
@@ -452,6 +455,38 @@ public class WeixinPayController extends AppBaseController{
 		return new ModelAndView("yhy/wechat/payResult");
 	}
 	
+	@RequestMapping(params = "checkToken")
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {  
+        String signature = request.getParameter("signature");  
+        String timestamp = request.getParameter("timestamp");  
+        String nonce = request.getParameter("nonce");  
+        String echostr = request.getParameter("echostr");  
+        logger.info("signature : " + signature);
+        logger.info("timestamp : " + timestamp);
+        logger.info("nonce : " + nonce);
+        logger.info("echostr : " + echostr);
+        
+        PrintWriter out = response.getWriter();  
+        if (checkSignature(signature, timestamp, nonce)){  
+        	logger.info("check token : ok");  
+            out.print(echostr);  
+        }
+        out.close();  
+    }  
+	
+	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
+        String[] arr = new String[] { AppGlobals.SERVER_TOKEN, timestamp, nonce };  
+        // sort  
+        Arrays.sort(arr);  
+        
+        // generate String
+        String content = arr[0]+arr[1]+arr[2];  
+        
+        // shal code  
+        String temp = Sha1Util.getSha1(content);  
+        return temp.equalsIgnoreCase(signature);  
+    }  
+	
 	/**
 	 * 微信消息推送回调
 	 * 
@@ -518,8 +553,8 @@ public class WeixinPayController extends AppBaseController{
 		}
 		
 //		PrintWriter out = response.getWriter();  
-//        out.print("");
-//        out.close();
+//      out.print("");
+//      out.close();
         
 		logger.info("跳转的url" + url);
         if(StringUtil.isNotEmpty(url)){
@@ -566,21 +601,21 @@ public class WeixinPayController extends AppBaseController{
 			logger.info("wxOauth2    isNew:" + isNew);
 			
 			if(!StringUtil.isNotEmpty(isNew)){
-				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+				return "redirect:http://" + AppGlobals.SERVER_BASE_URL + "/job/" + reUrl + ".html";
 			}
 			
 			//如果这个用户已经绑定了渠道商，则不需要再去获得他的openId     新用户肯定是没有openId的...
 			CarCustomerEntity car = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", phone);
 //			String openId = car.getOpenId();
 //			if(StringUtil.isNotEmpty(openId)){
-//				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+//				return "redirect:http://" + AppGlobals.SERVER_BASE_URL + "/job/" + reUrl + ".html";
 //			}
 			
 			//解密的结果是不是正确的       解密耗时久，所以放在两个条件之后
 			String plaintext = PasswordUtil.decrypt(isNew, car.getToken(), PasswordUtil.getStaticSalt());
 			logger.info("wxOauth2    plaintext:" + plaintext);
 			if(!plaintext.equals(phone)){
-				return "redirect:http://car.cywtrip.com/job/" + reUrl + ".html";
+				return "redirect:http://" + AppGlobals.SERVER_BASE_URL + "/job/" + reUrl + ".html";
 			}
 			
 			backUri = backUri + "&redirect_uri=" + reUrl + "&phone=" + phone + "&isNew" + plaintext;
@@ -615,7 +650,7 @@ public class WeixinPayController extends AppBaseController{
 		String phone = request.getParameter("phone");
 		String redirect_uri = request.getParameter("redirect_uri");
 		
-		String url = "redirect:http://car.cywtrip.com/job/" + redirect_uri + ".html";
+		String url = "redirect:http://" + AppGlobals.SERVER_BASE_URL + "/job/" + redirect_uri + ".html";
 		
 		logger.info("code:" + code);
 		logger.info("toIndex    redirect_uri:" + redirect_uri);

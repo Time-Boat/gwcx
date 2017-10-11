@@ -51,7 +51,6 @@
 	        fileSizeLimit: 1024 * 1024 * 2, //单个文件大小限制为2M
 	        fileNumLimit: 1, //所有文件数量限制为1
 	        server: 'driversInfoController.do?saveFile'
-	        // server: 'http://www.2betop.net/fileupload.php',
         });
 
         

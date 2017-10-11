@@ -492,14 +492,15 @@ public class LineInfoSpecializedController extends BaseController {
 			}
 			if ("1".equals(line.getApplicationStatus())) {
 				line.setApplicationStatus("5");// 初审拒绝
+				line.setFirstApplicationUser(ResourceUtil.getSessionUserName().getId());
 				line.setFirstApplicationTime(AppUtil.getDate());
 			} else if ("2".equals(line.getApplicationStatus())) {
 				line.setApplicationStatus("6");// 复审拒绝
+				line.setLastApplicationUser(ResourceUtil.getSessionUserName().getId());
 				line.setLastApplicationTime(AppUtil.getDate());
 			}
-			
-			line.setApplicationTime(AppUtil.getDate());
-			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+			//line.setApplicationTime(AppUtil.getDate());
+			//line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 		}
 
 		try {
@@ -534,8 +535,10 @@ public class LineInfoSpecializedController extends BaseController {
 					line.setStatus("1");
 					line.setApplyContent("1");//申请内容
 					line.setApplicationStatus("0");
-					line.setApplicationTime(AppUtil.getDate());
-					line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+					line.setLastApplicationTime(AppUtil.getDate());
+					line.setLastApplicationUser(ResourceUtil.getSessionUserName().getId());
+					//line.setApplicationTime(AppUtil.getDate());
+					//line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 				}
 				try {
 					message = "强制下架成功！";

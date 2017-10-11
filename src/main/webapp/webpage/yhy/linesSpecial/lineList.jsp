@@ -13,7 +13,7 @@
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
 	
-	<t:dgCol title="线路类型" field="type" replace="公务班车_0,接送包车_1,接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="线路类型" field="type" query="true" replace="接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="50"></t:dgCol>
 	<%--<t:dgCol title="出车时间段" field="dispath" dictionary="dispathtime" align="center" width="90"></t:dgCol> --%>
 	<%--
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>

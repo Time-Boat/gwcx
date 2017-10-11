@@ -160,6 +160,9 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		if(StringUtil.isNotEmpty(username)){
 			sqlWhere.append(" and u.username like '%"+username+"%'");
 		}
+		if(StringUtil.isNotEmpty(lineInfo.getType())){
+			sqlWhere.append(" and a.type= '"+lineInfo.getType()+"'");
+		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getStatus())){
 			sqlWhere.append(" and a.status = '"+lineInfo.getStatus()+"'");

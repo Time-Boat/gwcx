@@ -1,5 +1,7 @@
 package com.yhy.lin.app.wechat.menu;
 
+import com.yhy.lin.app.util.AppGlobals;
+
 /**
 * Description : 订票
 * @author Administrator
@@ -7,7 +9,7 @@ package com.yhy.lin.app.wechat.menu;
 */
 public class BuyTicket extends Menu{
 	
-	private String ticketUrl = "http://car.cywtrip.com/job/index.html";
+	private String ticketUrl = "http://" + AppGlobals.SERVER_BASE_URL + "/job/index.html";
 	
 	@Override
 	String execute(MenuContext mc) {

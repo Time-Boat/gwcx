@@ -43,9 +43,9 @@ public class WeixinPayServiceImpl extends CommonServiceImpl implements WeixinPay
 		logger.info("saveOpenId：" + s);
 		
 		List<Map<String,Object>> list = findForJdbc(sql, phone);
-		String dealerId = list.get(0).get("dealer_id") + "";
-		logger.info(dealerId);
-		if(StringUtil.isNotEmpty(dealerId)){
+		if(list.size() > 0){
+			String dealerId = list.get(0).get("dealer_id") + "";
+			logger.info(dealerId);
 			dc = get(DealerInfoEntity.class, dealerId);
 			logger.info("WeixinPayServiceImpl   :" + dc.getScanCount());
 			dc.setScanCount(dc.getScanCount() + 1);   //添加一次记录

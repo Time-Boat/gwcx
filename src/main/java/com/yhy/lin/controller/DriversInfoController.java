@@ -32,6 +32,7 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.DriversInfoServiceI;
@@ -190,6 +191,7 @@ public class DriversInfoController extends BaseController {
 			driversInfo.setCreateDate(new Date(System.currentTimeMillis()));
 			driversInfo.setDeleteFlag(0);
 			driversInfo.setStatus("0");
+			driversInfo.setApplicationStatus("-1");
 			driversInfoService.save(driversInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
@@ -243,6 +245,36 @@ public class DriversInfoController extends BaseController {
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/drivers/driversInfo");
+	}
+	
+	/**
+	 * 查看线路详情
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "driverdetail")
+	public ModelAndView driverdetail(DriversInfoEntity driversInfo,HttpServletRequest req) {
+		if (StringUtil.isNotEmpty(driversInfo.getId())) {
+			driversInfo = driversInfoService.getEntity(DriversInfoEntity.class, driversInfo.getId());
+			req.setAttribute("driversInfoPage", driversInfo);
+			if(StringUtil.isNotEmpty(driversInfo.getAuditor())) {
+				TSUser auditor = this.systemService.getEntity(TSUser.class, driversInfo.getAuditor());
+				req.setAttribute("auditor", auditor);
+			}
+			if(StringUtil.isNotEmpty(driversInfo.getApplicationUserId())) {
+				TSUser user = this.systemService.getEntity(TSUser.class, driversInfo.getApplicationUserId());
+				req.setAttribute("user", user);
+			}
+			
+		}
+		if(StringUtil.isNotEmpty(req.getParameter("type"))){
+			String type = req.getParameter("type");
+			req.setAttribute("type", type);
+		}
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
+		
+		return new ModelAndView("yhy/drivers/driverDetial");
 	}
 	
 	/**
@@ -372,6 +404,132 @@ public class DriversInfoController extends BaseController {
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 		
 		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请启动
+	 */
+	@RequestMapping(params = "applyEnable")
+	@ResponseBody
+	public AjaxJson applyEnable(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		
+		if(StringUtil.isNotEmpty(id)){
+			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
+			if(StringUtil.isNotEmpty(driver)){
+				driver.setApplicationStatus("0");//待审核
+				if("0".equals(driver.getStatus())){
+					driver.setApplyContent("0");//申请内容
+				}else{
+					driver.setApplyContent("1");//申请内容
+				}
+				driver.setApplicationTime(AppUtil.getDate());
+				driver.setApplicationUserId(ResourceUtil.getSessionUserName().getId());
+			}
+			try {
+				message = "申请成功！";
+				this.systemService.saveOrUpdate(driver);
+			} catch (Exception e) {
+				// TODO: handle exception
+				message = "服务器异常！";
+			}
+		}
+		
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 审核同意
+	 */
+	@RequestMapping(params = "agree")
+	@ResponseBody
+	public AjaxJson agree(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		if(StringUtil.isNotEmpty(id)){
+			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
+			if(StringUtil.isNotEmpty(driver)){
+				driver.setApplicationStatus("1");
+				if("0".equals(driver.getStatus())){
+					driver.setStatus("1");;//申请内容
+				}else{
+					driver.setStatus("0");;//申请内容
+				}
+				
+				driver.setAuditor(ResourceUtil.getSessionUserName().getId());
+				driver.setAuditTime(AppUtil.getDate());
+			}
+		
+		try {
+			message = "申请成功！";
+			this.systemService.saveOrUpdate(driver);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常！";
+		}
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请拒绝
+	 */
+	@RequestMapping(params = "refuse")
+	@ResponseBody
+	public AjaxJson refuse(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String rejectReason = request.getParameter("rejectReason");
+		
+		if (StringUtil.isNotEmpty(id)) {
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, id);
+
+			if (StringUtil.isNotEmpty(driver)) {
+				driver.setRefusalReason(rejectReason);
+				driver.setApplicationStatus("2");
+				driver.setAuditor(ResourceUtil.getSessionUserName().getId());
+				driver.setAuditTime(AppUtil.getDate());
+			}
+
+			try {
+				message = "拒绝成功！";
+				this.systemService.saveOrUpdate(driver);
+			} catch (Exception e) {
+				// TODO: handle exception
+				message = "服务器异常！";
+			}
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 获取拒绝原因
+	 */
+	@RequestMapping(params = "getReason")
+	@ResponseBody
+	public AjaxJson getReason(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		if (StringUtil.isNotEmpty(id)) {
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, id);
+
+			if (StringUtil.isNotEmpty(driver)) {
+				message=driver.getRefusalReason();
+			}
+		}
+		
 		j.setMsg(message);
 		return j;
 	}

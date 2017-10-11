@@ -40,8 +40,8 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, licencePlate, carType, status, businessType);
 		
 		String sqlCnt = " select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
-				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id "
-				+ " where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ";
+				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id,t_s_depart p "
+				+ " where c.delete_flag = '0' and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ";
 		
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -52,8 +52,8 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
 	    sql.append(" select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id ");
-		sql.append(" LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id ");
-		sql.append(" where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
+		sql.append(" LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id,t_s_depart p ");
+		sql.append(" where c.delete_flag = '0' and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
 		
 	    if (!sqlWhere.isEmpty()) {
 	    	sql.append(sqlWhere);

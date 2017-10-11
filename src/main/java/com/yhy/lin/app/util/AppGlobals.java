@@ -3,11 +3,14 @@ package com.yhy.lin.app.util;
 /**
  * Description : app全局常量 (也包括web端的一些常量)
  * 
- * @author Time
+ * @author Timer
  * @date 2017年5月4日 上午9:34:30
  */
 public interface AppGlobals {
 
+	/** 服务器地址 */
+	public static final String SERVER_BASE_URL = "www.youngloong.com";
+	
 	/** app 返回状态 */
 	/** 返回成功 */
 	public static final String APP_SUCCESS = "000";
@@ -84,6 +87,9 @@ public interface AppGlobals {
 	public static final String CHECK_PHONE = "^1[34578]\\d{9}$";
 
 	/** 微信第三方支付 */
+	/** 微信服务器验证token */
+	public static final String SERVER_TOKEN = "longyouchuxing2017";
+	
 	/** 退款url */
 	public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 
@@ -91,10 +97,12 @@ public interface AppGlobals {
 	public static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=%1&appid=%2&secret=%3";
 	
 	/** 微信appId */
-	public static final String WECHAT_ID = "wx1775577d8050cf73";
-
+//	public static final String WECHAT_ID = "wx1775577d8050cf73";
+	public static final String WECHAT_ID = "wx8833558481d9167e";
+	
 	/** 微信第三方唯一凭证密码 */
-	public static final String WECHAT_APP_SECRET = "807e12ebcb667f66820d4b4eb9118467";
+//	public static final String WECHAT_APP_SECRET = "807e12ebcb667f66820d4b4eb9118467";
+	public static final String WECHAT_APP_SECRET = "295837c0efff32c1bd73534458f9b45c";
 
 	/** 收款商家商户号 */
 	public static final String MCH_ID = "1481189932";
@@ -116,7 +124,6 @@ public interface AppGlobals {
 	 * 商品名称
 	 */
 	public static final String SP_NAME = "龙游出行app支付";
-
 	
 	/**
 	 * web平台角色权限

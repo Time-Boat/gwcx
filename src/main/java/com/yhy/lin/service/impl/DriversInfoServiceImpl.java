@@ -60,7 +60,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.idCardImgUrl,d.cityId,c.city,d.create_user_id,u.username from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID LEFT JOIN t_s_base_user u on u.ID=d.create_user_id" + queryCondition.toString());
+	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.status,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.idCardImgUrl,d.cityId,c.city,d.create_user_id,d.application_status,d.refusal_reason,d.application_time,d.application_user_id,d.apply_content,u.username,bu.username as applicationUserName,d.auditor,d.audit_time,tb.username as auditorUserName from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID LEFT JOIN t_s_base_user u on u.ID=d.create_user_id LEFT JOIN t_s_base_user bu on bu.ID=d.application_user_id LEFT JOIN t_s_base_user tb on tb.ID=d.auditor " + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -73,9 +73,19 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 							,new Db2Page("cityName", "city")
 							,new Db2Page("name", "name")
 							,new Db2Page("age", "age")
+							,new Db2Page("status", "status")
 							,new Db2Page("idCard", "idCard")
 							,new Db2Page("createDate", "createDate")
 							,new Db2Page("createUserId", "create_user_id")
+							,new Db2Page("applicationStatus", "application_status")
+							,new Db2Page("refusalReason", "refusal_reason")
+							,new Db2Page("applicationTime", "application_time")
+							,new Db2Page("applicationUserId", "application_user_id")
+							,new Db2Page("applicationUserName", "applicationUserName")
+							,new Db2Page("auditTime", "audit_time")
+							,new Db2Page("auditor", "auditor")
+							,new Db2Page("auditorUserName", "auditorUserName")
+							,new Db2Page("applyContent", "apply_content")
 							,new Db2Page("username", "username")
 							,new Db2Page("remark", "remark")
 							,new Db2Page("drivingLicense", "driving_license")
