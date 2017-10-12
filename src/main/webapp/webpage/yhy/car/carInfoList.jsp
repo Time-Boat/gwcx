@@ -40,7 +40,7 @@
 		}
 		
 		function carReject(id){
-			$('#carWin').empty().append(rejectWindow());
+			$('#carWin').empty().append(carRejectWindow());
 			$('#carWin').window('open'); // open a window
 			$('#carRejectReason').attr("readonly",false);
 			$('#carRejectReason').val("");
@@ -105,7 +105,7 @@
 		}
 		
 		function carLookRejectReason(id){
-			$('#carWin').empty().append(rejectWindow());
+			$('#carWin').empty().append(carRejectWindow());
 			$('#carWin').window('open');
 			$('#carRejectReason').attr("readonly",true);
 			$('#carReason').html("拒绝原因");
@@ -137,10 +137,10 @@
 				tip('审核状态中不能被编辑！');
 				return;
 			}
-			if (rowsData[0].status == 2) {
+			/* if (rowsData[0].status == 2) {
 				tip('已终止的渠道商不能进行编辑！');
 				return;
-			}
+			} */
 			if(isRestful!='undefined'&&isRestful){
 				url += '/'+rowsData[0].id;
 			}else{
@@ -158,25 +158,26 @@
 			var ids = '';
 			var rows = $("#carInfoList").datagrid("getSelections");
 			for(var i=0;i<rows.length;i++){
-				if(ap != '1'){
+				/* if(ap != '1'){
 					if(rows[i].status != '0' || rows[i].auditStatus == '0' || rows[i].lastAuditStatus == '0'){
 						tip('只有合作中的渠道商，并且不是待审核状态才能被分配！');
 						return;
 					}
-				}
+				} */
 				ids+=rows[i].id;
 				ids+=',';
 			}
 			ids = ids.substring(0,ids.length-1);
 			if(ids.length==0){
-				tip('请选择要分配的渠道商');
+				tip('请选择要分配的车辆');
 				return;
 			}
 			url += '&ids='+ids;
 			createwindow(title,url,width,height);
 		}
+		
   </script>
-  <t:datagrid name="carInfoList" title="车辆信息" autoLoadData="true" actionUrl="carInfoController.do?datagrid" idField="id" fitColumns="true" queryMode="group" fit="true">
+  <t:datagrid name="carInfoList" title="车辆信息" autoLoadData="true" actionUrl="carInfoController.do?datagrid" checkbox="true" idField="id" fitColumns="true" queryMode="group" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
    <t:dgCol title="车牌号" field="licencePlate" query="true" align="center" width="80"></t:dgCol>
    <t:dgCol title="车辆类型" field="carType" dictionary="car_Type" align="center" query="true" width="50"></t:dgCol>
@@ -202,8 +203,8 @@
    <t:dgDelOpt title="删除" url="carInfoController.do?del&id={id}" />
    <t:dgToolBar title="录入" icon="icon-add" url="carInfoController.do?addorupdate" operationCode="carAdd" funname="add" width="600" height="500"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="carInfoController.do?addorupdate" operationCode="carUpdate" funname="update" height="500" ></t:dgToolBar>
-   <t:dgToolBar title="查看" icon="icon-search" url="carInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
-   <t:dgToolBar title="批量分配" icon="icon-redo" url="carInfoController.do?getAttacheList" funname="carAllot" operationCode="carAllotAttache" ></t:dgToolBar> 
+   <t:dgToolBar title="查看" icon="icon-search" url="carInfoController.do?carDetail" funname="detail" height="700" ></t:dgToolBar>
+   <t:dgToolBar title="批量分配" icon="icon-redo" url="carInfoController.do?getAttacheList" operationCode="carAllotAttache" funname="carAllot" ></t:dgToolBar> 
    
    <t:dgFunOpt funname="carAgree(id)" title="同意" operationCode="carAgreeMA" exp="auditStatus#eq#0"></t:dgFunOpt>
    <t:dgFunOpt funname="carReject(id)" title="拒绝" operationCode="carRejectMA" exp="auditStatus#eq#0"></t:dgFunOpt>
@@ -211,8 +212,8 @@
    <t:dgFunOpt funname="carDisable(id)"  title="申请停用" operationCode="carDisable" exp="carStatus#eq#0&&auditStatus#eq#1"></t:dgFunOpt> 
    <t:dgFunOpt funname="carDisable(id)"  title="申请停用" operationCode="carDisable" exp="carStatus#eq#0&&auditStatus#eq#2"></t:dgFunOpt> 
    
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="status#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="status#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
    
   </t:datagrid>
   </div>

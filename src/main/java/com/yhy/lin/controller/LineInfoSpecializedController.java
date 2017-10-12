@@ -173,6 +173,18 @@ public class LineInfoSpecializedController extends BaseController {
 			LineInfoView view = lineInfoService.getDetail(id);
 			if (view != null) {
 				request.setAttribute("View", view);
+				if (StringUtil.isNotEmpty(view.getApplicationUserid())) {
+					TSUser applicationUser = this.systemService.getEntity(TSUser.class, view.getApplicationUserid());
+					request.setAttribute("applicationUser", applicationUser);
+				}
+				if (StringUtil.isNotEmpty(view.getFirstApplicationUser())) {
+					TSUser firstUser = this.systemService.getEntity(TSUser.class, view.getFirstApplicationUser());
+					request.setAttribute("firstUser", firstUser);
+				}
+				if (StringUtil.isNotEmpty(view.getLastApplicationUser())) {
+					TSUser lastUser = this.systemService.getEntity(TSUser.class, view.getLastApplicationUser());
+					request.setAttribute("lastUser", lastUser);
+				}
 			}
 		}
 

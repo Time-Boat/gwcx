@@ -46,7 +46,7 @@ public class DriversInfoEntity implements java.io.Serializable {
 	private Date createDate;
 	/**用于逻辑删除 0正常  1已删除*/
 	private Integer deleteFlag;
-	/**状态（备用字段）*/
+	/**司机状态  0:未启用，1：已启用*/
 	private String status;
 	/**备注（备用字段）*/
 	private String remark;

@@ -98,7 +98,7 @@
 					</tr>
 				</c:if>
 				<c:choose>
-					<c:when test="${dealerInfoPage.auditStatus != 2 }">
+					<c:when test="${dealerInfoPage.auditStatus == -1 or dealerInfoPage.auditStatus == 0 }">
 						<tr>
 							<td align="right">
 								<label class="Validform_label">初审状态：</label>
@@ -108,13 +108,49 @@
 							</td>
 						</tr>
 					</c:when>
-					<c:otherwise>
+					<c:when test="${dealerInfoPage.auditStatus == 1 }">
+						<tr>
+							<td align="right">
+								<label class="Validform_label">初审状态：</label>
+							</td>
+							<td class="value" colspan="3">
+								<t:dictSelect field="status" typeGroupCode="audit_status" hasLabel="false" defaultVal="${dealerInfoPage.auditStatus}"></t:dictSelect>				  
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<label class="Validform_label">初审时间：</label>
 							</td>
 							<td class="value">
-								<input class="inputxt" value="${dealerInfoPage.auditDate}">
+								<input class="inputxt" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" 
+									value="<fmt:formatDate value='${dealerInfoPage.auditDate}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> 
+								<span class="Validform_checktip"></span>
+							</td>
+							<td align="right">
+								<label class="Validform_label">初审人：</label>
+							</td>
+							<td class="value">
+								<input class="inputxt" value="${dealerInfoPage.auditUser}"> 
+								<span class="Validform_checktip"></span>
+							</td>
+						</tr>
+					</c:when>
+					<c:otherwise>
+						<tr>
+							<td align="right">
+								<label class="Validform_label">初审状态：</label>
+							</td>
+							<td class="value" colspan="3">
+								<t:dictSelect field="status" typeGroupCode="audit_status" hasLabel="false" defaultVal="${dealerInfoPage.auditStatus}"></t:dictSelect>				  
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<label class="Validform_label">初审时间：</label>
+							</td>
+							<td class="value">
+								<input class="inputxt" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" 
+									value="<fmt:formatDate value='${dealerInfoPage.auditDate}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> 
 								<span class="Validform_checktip"></span>
 							</td>
 							<td align="right">
@@ -136,7 +172,9 @@
 					</c:otherwise>
 				</c:choose>
 				<c:choose>
-					<c:when test="${dealerInfoPage.lastAuditStatus != 2 and dealerInfoPage.lastAuditStatus != '' and dealerInfoPage.lastAuditStatus != null}">
+					<%-- <c:when test="${dealerInfoPage.lastAuditStatus != 2 and dealerInfoPage.lastAuditStatus != '' and dealerInfoPage.lastAuditStatus != null}"> --%>
+					<c:when test="${(dealerInfoPage.lastAuditStatus == -1 or dealerInfoPage.lastAuditStatus == 0)
+						 and dealerInfoPage.lastAuditStatus != '' and dealerInfoPage.lastAuditStatus != null}">
 						<tr>
 							<td align="right">
 								<label class="Validform_label">复审状态：</label>
@@ -146,13 +184,50 @@
 							</td>
 						</tr>
 					</c:when>
-					<c:when test="${dealerInfoPage.lastAuditStatus == 2}">
+					<c:when test="${dealerInfoPage.lastAuditStatus == 1}">
+						<tr>
+							<td align="right">
+								<label class="Validform_label">复审状态：</label>
+							</td>
+							<td class="value" colspan="3">
+								<t:dictSelect field="status" typeGroupCode="audit_status" hasLabel="false" defaultVal="${dealerInfoPage.lastAuditStatus}"></t:dictSelect>				  
+							</td>
+						</tr>
 						<tr>
 							<td align="right">
 								<label class="Validform_label">复审时间：</label>
 							</td>
 							<td class="value">
-								<input class="inputxt" value="${dealerInfoPage.lastAuditDate}"> <span class="Validform_checktip"></span>
+								<input class="inputxt" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" 
+									value="<fmt:formatDate value='${dealerInfoPage.lastAuditDate}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> 
+								<span class="Validform_checktip"></span>
+							</td>
+							<td align="right">
+								<label class="Validform_label">复审人：</label>
+							</td>
+							<td class="value">
+								<input class="inputxt" style="width: 150px" value="${dealerInfoPage.lastAuditUser}"> 
+								<span class="Validform_checktip"></span>
+							</td>
+						</tr>
+					</c:when>
+					<c:when test="${dealerInfoPage.lastAuditStatus == 2}">
+						<tr>
+							<td align="right">
+								<label class="Validform_label">复审状态：</label>
+							</td>
+							<td class="value" colspan="3">
+								<t:dictSelect field="status" typeGroupCode="audit_status" hasLabel="false" defaultVal="${dealerInfoPage.lastAuditStatus}"></t:dictSelect>				  
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								<label class="Validform_label">复审时间：</label>
+							</td>
+							<td class="value">
+								<input class="inputxt" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" 
+									value="<fmt:formatDate value='${dealerInfoPage.lastAuditDate}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> 
+								<span class="Validform_checktip"></span>
 							</td>
 							<td align="right">
 								<label class="Validform_label">复审人：</label>
@@ -172,6 +247,7 @@
 						</tr>
 					</c:when>
 				</c:choose>
+				
 				<tr>
 					<td align="right">
 						<label class="Validform_label">备注：</label>

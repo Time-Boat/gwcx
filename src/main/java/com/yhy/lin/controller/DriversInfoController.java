@@ -108,9 +108,12 @@ public class DriversInfoController extends BaseController {
 		String name = request.getParameter("name");
 		String phoneNumber = request.getParameter("phoneNumber");
 		String status =  request.getParameter("status");
-		String cityID= request.getParameter("cityID");
+		String cityID = request.getParameter("cityID");
 		
-		JSONObject jObject = driversInfoService.getDatagrid1(dataGrid ,sex ,name ,phoneNumber,status,cityID);
+		//如果是车辆模块传过来的参数，则限制只显示已经被审核通过的人员
+		String fromPage = request.getParameter("fromPage");
+		
+		JSONObject jObject = driversInfoService.getDatagrid1(dataGrid, sex, name, phoneNumber, status, cityID, fromPage);
 		
 		responseDatagrid(response, jObject);
 	}

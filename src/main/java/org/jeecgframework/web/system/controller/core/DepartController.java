@@ -454,13 +454,13 @@ public class DepartController extends BaseController {
 	public void addUserToOrgList(TSUser user, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-		//是不是商务经理
+		//是否有经理的角色
 		boolean hasPermission = checkRole(AppGlobals.COMMERCIAL_MANAGER);
+		boolean hasPermission2 = checkRole(AppGlobals.TECHNICAL_MANAGER);
 		//商务经理只能看到自己公司的用户
-
 		List<TSUser> userList = new ArrayList<>();
 		//查出所有在orgCode范围的用户id
-		if(hasPermission){
+		if(hasPermission || hasPermission2){
 			//查出所有在orgCode范围的用户id
 			List<Object[]> orgArrList = systemService.findHql(
 					"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb where d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id "
@@ -470,14 +470,29 @@ public class DepartController extends BaseController {
 			}
 		}
 		
-		String dealer = request.getParameter("dealer");
+		//需要查找的角色类型    1：商务经理          2：技术经理
+		String roleType = request.getParameter("roleType");
+		
 		boolean hasPermission1 = checkRole(AppGlobals.XM_ADMIN);
 		//查出所有在orgCode范围的用户id
-		if(hasPermission1 && "1".equals(dealer)){
+		if(hasPermission1){
+			
+			String roleName = "";
+			switch (roleType) {
+			case "1":
+				roleName = "商务经理";
+				break;
+			case "2":
+				roleName = "技术经理";
+				break;
+			default:
+				break;
+			}
+			
 			//查出所有在orgCode范围的用户id
 			List<Object[]> orgArrList = systemService.findHql(
 					"from TSDepart d,TSUserOrg uo,TSUser ts,TSBaseUser tb,TSRole tr,TSRoleUser tru where tru.TSUser.id = ts.id and tru.TSRole.id = tr.id and "
-						+ " d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id and tr.roleName='商务经理' "
+						+ " d.id=uo.tsDepart.id and uo.tsUser.id=ts.id and ts.id=tb.id and tr.roleName='" + roleName + "' "
 						+ " and tb.status!=0 and tb.deleteFlag=0 and tb.id !='"+ResourceUtil.getSessionUserName().getId()+"' ");
 			for (Object[] departs : orgArrList) {
 				userList.add((TSUser) departs[3]);
@@ -502,7 +517,7 @@ public class DepartController extends BaseController {
 		this.systemService.getDataGridReturn(cq, true);
 
 		//修改要显示的数据为之前过滤的数据
-		if(hasPermission || hasPermission1){
+		if(hasPermission || hasPermission1 || hasPermission2){
 			dataGrid.setResults(userList);
 			dataGrid.setTotal(userList.size());
 		}

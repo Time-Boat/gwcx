@@ -4,8 +4,8 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <div id="main_depart_list" class="easyui-layout" fit="true">
     <div region="center"  style="padding:0px;border:0px">
-        <t:datagrid name="dealerCurDepartUserList" title="common.operation"
-                    actionUrl="departController.do?addUserToOrgList&roleType=1" fit="true" fitColumns="true"
+        <t:datagrid name="carCurDepartUserList" title="common.operation"
+                    actionUrl="departController.do?addUserToOrgList&roleType=2" fit="true" fitColumns="true"
                     idField="id" queryMode="group">
             <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
             <t:dgCol title="用户名" sortable="false" field="userName" width="120" ></t:dgCol>
@@ -16,7 +16,7 @@
 </div>
 
 <div style="display: none">
-    <t:formvalid formid="formobj" layout="div" dialog="true" action="dealerInfoController.do?allotAttache&ids=${ids}" beforeSubmit="setUserId">
+    <t:formvalid formid="formobj" layout="div" dialog="true" action="carInfoController.do?carAllotAttache&ids=${ids}" beforeSubmit="setUserId">
         <input id="userId" name="userId">
     </t:formvalid>
 </div>
@@ -28,7 +28,7 @@
 	
     function getUserListSelection(field) {
         var ids = [];
-        var rows = $('#dealerCurDepartUserList').datagrid('getSelections');
+        var rows = $('#carCurDepartUserList').datagrid('getSelections');
         for (var i = 0; i < rows.length; i++) {
             ids.push(rows[i][field]);
         }

@@ -27,6 +27,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 
 import javax.validation.Validator;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
@@ -66,6 +67,12 @@ public class CarInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "carInfoList")
 	public ModelAndView list(HttpServletRequest request) {
+		
+		//如果是项目管理员，则不限制分配的条件
+		if(checkRole(AppGlobals.XM_ADMIN)){
+			request.setAttribute("ap", "1");
+		}
+				
 		return new ModelAndView("yhy/car/carInfoList");
 	}
 
@@ -197,6 +204,7 @@ public class CarInfoController extends BaseController {
 			carInfo = carInfoService.getEntity(CarInfoEntity.class, carInfo.getId());
 			req.setAttribute("carInfoPage", carInfo);
 		}
+		
 		if (StringUtil.isNotEmpty(carInfo.getDriverId())) {
 			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
 			req.setAttribute("driverPage", driver);
@@ -228,6 +236,7 @@ public class CarInfoController extends BaseController {
 	public ModelAndView addCar(HttpServletRequest req) {
 		String lpId = req.getParameter("lpId");
 		req.setAttribute("lpId", lpId);
+		req.setAttribute("fromPage", req.getParameter("fromPage"));
 		req.setAttribute("cityList",getOpencity());
 		return new ModelAndView("/yhy/car/driverAndCity");
 	}
@@ -248,14 +257,14 @@ public class CarInfoController extends BaseController {
 		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
 		try {
 
-			carInfo.setAuditTime(AppUtil.getDate());
+			carInfo.setApplyTime(AppUtil.getDate());
 			carInfo.setAuditStatus("0");
 			carInfo.setApplyContent("1");
-			carInfo.setAuditUserid(ResourceUtil.getSessionUserName().getId());
+			carInfo.setApplyUserId(ResourceUtil.getSessionUserName().getId());
 
 			// 清空审核状态
 			carInfo.setAuditTime(null);
-			carInfo.setAuditUser("");
+			carInfo.setAuditUserId("");
 			carInfo.setRejectReason("");
 			
 			systemService.saveOrUpdate(carInfo);
@@ -283,14 +292,14 @@ public class CarInfoController extends BaseController {
 
 		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
 		try {
-			carInfo.setAuditTime(AppUtil.getDate());
+			carInfo.setApplyTime(AppUtil.getDate());
 			carInfo.setAuditStatus("0");
 			carInfo.setApplyContent("0");
-			carInfo.setAuditUserid(ResourceUtil.getSessionUserName().getId());
+			carInfo.setApplyUserId(ResourceUtil.getSessionUserName().getId());
 
 			// 清空审核状态
 			carInfo.setAuditTime(null);
-			carInfo.setAuditUser("");
+			carInfo.setAuditUserId("");
 			carInfo.setRejectReason("");
 
 			systemService.saveOrUpdate(carInfo);
@@ -301,6 +310,36 @@ public class CarInfoController extends BaseController {
 		message = "申请成功";
 		j.setMsg(message);
 		return j;
+	}
+	
+	/**
+	 * 渠道商信息列表详情页跳转
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "carDetail")
+	public ModelAndView dealerDetail(CarInfoEntity carInfo, HttpServletRequest req) {
+		if (StringUtil.isNotEmpty(carInfo.getId())) {
+			carInfo = systemService.getEntity(CarInfoEntity.class, carInfo.getId());
+			String applyUserId = carInfo.getApplyUserId();
+			if(StringUtil.isNotEmpty(applyUserId)){
+				TSUser user = systemService.getEntity(TSUser.class, applyUserId);
+				req.setAttribute("applyUser", user.getUserName());
+			}
+			String auditUserId = carInfo.getApplyUserId();
+			if(StringUtil.isNotEmpty(auditUserId)){
+				TSUser user = systemService.getEntity(TSUser.class, auditUserId);
+				req.setAttribute("auditUser", user.getUserName());
+			}
+			
+			if (StringUtil.isNotEmpty(carInfo.getDriverId())) {
+				DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
+				req.setAttribute("driverName", driver.getName());
+			}
+			
+			req.setAttribute("carInfoPage", carInfo);
+		}
+		return new ModelAndView("yhy/car/carDetail");
 	}
 	
 	/**
@@ -317,20 +356,28 @@ public class CarInfoController extends BaseController {
 		String userId = req.getParameter("userId");
 		String ids = req.getParameter("ids");
 
-		List<CarInfoEntity> list = new ArrayList<>();
+		List<CarInfoEntity> carList = new ArrayList<>();
+		List<DriversInfoEntity> driverList = new ArrayList<>();
 
 		try {
 			String[] idArr = ids.split(",");
 			for (int i = 0; i < idArr.length; i++) {
 
-				CarInfoEntity dealerInfo = systemService.getEntity(CarInfoEntity.class, idArr[i]);
+				CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, idArr[i]);
 				TSUserOrg t = systemService.findUniqueByProperty(TSUserOrg.class, "tsUser.id", userId);
-				dealerInfo.setCreateUserId(userId);
-				dealerInfo.setDepartId(t.getTsDepart().getId());
-				list.add(dealerInfo);
+				carInfo.setCreateUserId(userId);
+				carInfo.setDepartId(t.getTsDepart().getId());
+				
+				DriversInfoEntity driverInfo = systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
+				driverInfo.setCreateUserId(userId);
+				driverInfo.setDepartId(t.getTsDepart().getId());
+				
+				driverList.add(driverInfo);
+				carList.add(carInfo);
 			}
 			
-			systemService.saveAllEntitie(list);
+			systemService.saveAllEntitie(carList);
+			systemService.saveAllEntitie(driverList);
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -340,6 +387,18 @@ public class CarInfoController extends BaseController {
 		return j;
 	}
 
+	/**
+	 * 专员列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getAttacheList")
+	public ModelAndView getAttacheList(HttpServletRequest req) {
+		String ids = req.getParameter("ids");
+		req.setAttribute("ids", ids);
+		return new ModelAndView("yhy/car/carAttacheList");
+	}
+	
 	/**
 	 * 同意审核
 	 * 
@@ -360,7 +419,7 @@ public class CarInfoController extends BaseController {
 
 			carInfo.setAuditTime(AppUtil.getDate());
 			carInfo.setAuditStatus("1");
-			carInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getUserName());
 
 			if ("0".equals(apply)) {
 				carInfo.setCarStatus("0");
@@ -397,7 +456,7 @@ public class CarInfoController extends BaseController {
 
 			dealerInfo.setAuditTime(AppUtil.getDate());
 			dealerInfo.setAuditStatus("2");
-			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			dealerInfo.setAuditUserId(ResourceUtil.getSessionUserName().getUserName());
 			dealerInfo.setRejectReason(rejectReason);
 
 			systemService.saveOrUpdate(dealerInfo);

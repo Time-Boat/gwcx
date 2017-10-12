@@ -76,10 +76,13 @@ public class LineInfoView implements Serializable {
 	private String startName;//起点站点名称
 	
 	private String endName;//终点站点名称
-	
+	//初审审核人
+	private String firstApplicationUser;
 	//初审时间
 	private Date firstAuditDate;
-	
+	//复审审核人
+	private String lastApplicationUser;
+	//复审时间
 	private Date lastAuditDate;
 	
 	public String getName() {
@@ -286,5 +289,17 @@ public class LineInfoView implements Serializable {
 	}
 	public void setLastAuditDate(Date lastAuditDate) {
 		this.lastAuditDate = lastAuditDate;
+	}
+	public String getFirstApplicationUser() {
+		return firstApplicationUser;
+	}
+	public void setFirstApplicationUser(String firstApplicationUser) {
+		this.firstApplicationUser = firstApplicationUser;
+	}
+	public String getLastApplicationUser() {
+		return lastApplicationUser;
+	}
+	public void setLastApplicationUser(String lastApplicationUser) {
+		this.lastApplicationUser = lastApplicationUser;
 	}
 }

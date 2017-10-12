@@ -97,7 +97,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	}
 	
 	@Override
-	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status,String cityID) {
+	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status,String cityID, String fromPage) {
 		StringBuffer queryCondition = new StringBuffer(" where d.id not in (select ci.driver_id from car_info ci ) ");
 	    
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -108,21 +108,25 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		if(StringUtil.isNotEmpty(sex)){
 			queryCondition.append(" and d.sex = '"+sex+"' ");
 		}
-		
 		if(StringUtil.isNotEmpty(name)){
 			queryCondition.append(" and d.name like '%"+name+"%' ");
 		}
 		if(StringUtil.isNotEmpty(cityID)){
 			queryCondition.append(" and d.cityId= '"+cityID+"' ");
 		}
-		
 		if(StringUtil.isNotEmpty(phoneNumber)){
 			queryCondition.append(" and d.phoneNumber like '" + phoneNumber +"%' ");
 		}
-		if(StringUtil.isNotEmpty(status)){
-			queryCondition.append(" and d.status ='" + status +"' ");
-		}
 		
+		//1是已启用
+		if(StringUtil.isNotEmpty(fromPage)){
+			queryCondition.append(" and d.status = '1' ");
+		}else{
+			if(StringUtil.isNotEmpty(status)){
+				queryCondition.append(" and d.status ='" + status +"' ");
+			}
+		}
+				
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);

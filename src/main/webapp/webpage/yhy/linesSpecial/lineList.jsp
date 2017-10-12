@@ -369,7 +369,7 @@
 			return;
 		}
 	    url += '&load=detail&id='+rowsData[0].id;
-		createdetailwindow(title,url,700,600);
+		createdetailwindow(title,url,700,670);
 	}
 	
 </script>

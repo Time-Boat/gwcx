@@ -70,10 +70,8 @@ public class CarInfoEntity implements java.io.Serializable {
 	
 	/**申请状态*/
 	private String auditStatus;
-	/**拒绝原因*/
-	private String rejectReason;
 	/**申请人*/
-	private String auditUserid;
+	private String applyUserId;
 	/**申请时间*/
 	private Date applyTime;
 	/**申请内容*/
@@ -81,7 +79,9 @@ public class CarInfoEntity implements java.io.Serializable {
 	/**审核时间*/
 	private Date auditTime;
 	/**初审人*/
-	private String auditUser;
+	private String auditUserId;
+	/**拒绝原因*/
+	private String rejectReason;
 		
 	@Column(name ="BUY_DATE",nullable=true)
 	public Date getBuyDate() {
@@ -334,11 +334,11 @@ public class CarInfoEntity implements java.io.Serializable {
 	}
 	
 	@Column(name = "AUDIT_USER_ID",nullable=true,length=32)
-	public String getAuditUserid() {
-		return auditUserid;
+	public String getAuditUserId() {
+		return auditUserId;
 	}
-	public void setAuditUserid(String auditUserid) {
-		this.auditUserid = auditUserid;
+	public void setAuditUserId(String auditUserId) {
+		this.auditUserId = auditUserId;
 	}
 	@Column(name = "APPLY_TIME",nullable=true)
 	public Date getApplyTime() {
@@ -362,12 +362,12 @@ public class CarInfoEntity implements java.io.Serializable {
 	public void setAuditTime(Date auditTime) {
 		this.auditTime = auditTime;
 	}
-	@Column(name = "AUDIT_USER",nullable=true,length=32)
-	public String getAuditUser() {
-		return auditUser;
+	@Column(name = "APPLY_USER_ID",nullable=true,length=32)
+	public String getApplyUserId() {
+		return applyUserId;
 	}
-	public void setAuditUser(String auditUser) {
-		this.auditUser = auditUser;
+	public void setApplyUserId(String applyUserId) {
+		this.applyUserId = applyUserId;
 	}
 	
 }

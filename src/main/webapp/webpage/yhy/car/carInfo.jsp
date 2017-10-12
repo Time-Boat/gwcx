@@ -13,11 +13,11 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							车牌号:
+							车牌号:<c:if test="${carInfoPage.id != undefind }">11111</c:if>
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="licencePlate" name="licencePlate" datatype="*"
+						<input class="inputxt" id="licencePlate" name="licencePlate" datatype="*" <c:if test="${carInfoPage.id != undefind }">disabled="disabled"</c:if>
 							   value="${carInfoPage.licencePlate}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -29,7 +29,14 @@
 						</label>
 					</td>
 					<td class="value">
-						<t:dictSelect field="carBrand" typeGroupCode="carBrand" hasLabel="false" defaultVal="${carInfoPage.carBrand}" datatype="*"></t:dictSelect>
+						<c:choose>
+							<c:when test="${carInfoPage.id != undefind }">
+								<t:dictSelect field="carBrand" typeGroupCode="carBrand" hasLabel="false" readonly="readonly" defaultVal="${carInfoPage.carBrand}" datatype="*"></t:dictSelect>
+							</c:when>
+							<c:otherwise>
+								<t:dictSelect field="carBrand" typeGroupCode="carBrand" hasLabel="false" defaultVal="${carInfoPage.carBrand}" datatype="*"></t:dictSelect>
+							</c:otherwise>
+						</c:choose>
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -40,7 +47,8 @@
 						</label>
 					</td>
 					<td class="value">
-					    <input class="inputxt" id="modelNumber" name="modelNumber" datatype="*" value="${carInfoPage.modelNumber}">
+					    <input class="inputxt" id="modelNumber" name="modelNumber" <c:if test="${carInfoPage.id != undefind }">disabled="disabled"</c:if> 
+					    	datatype="*" value="${carInfoPage.modelNumber}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -51,7 +59,15 @@
 						</label>
 					</td>
 					<td class="value">
-						<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
+						<c:choose>
+							<c:when test="${carInfoPage.id != undefind }">
+								<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" readonly="readonly" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
+							</c:when>
+							<c:otherwise>
+								<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
+							</c:otherwise>
+						</c:choose>
+						
 						<%-- <input class="inputxt" id="carType" name="carType" datatype="*"
 							   value="${carInfoPage.carType}"> --%>
 						<span class="Validform_checktip"></span>
@@ -64,7 +80,7 @@
 						</label>
 					</td>
 					<td class="value">
-					    <input class="inputxt" id="seat" name="seat" datatype="n" 
+					    <input class="inputxt" id="seat" name="seat" datatype="n" <c:if test="${carInfoPage.id != undefind }">disabled="disabled"</c:if>
 					   			 value="${carInfoPage.seat}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -89,7 +105,8 @@
 					</td>
 					<td class="value">
 						<%-- <input class="inputxt" id="buyDate" name="buyDate" value="${carInfoPage.buyDate}"> --%>
-						<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 150px" value="${carInfoPage.buyDate}" id="buyDate" name="buyDate" >
+						<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" <c:if test="${carInfoPage.id != undefind }">disabled="disabled"</c:if>
+							style="width: 150px" value="${carInfoPage.buyDate}" id="buyDate" name="buyDate" >
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -136,7 +153,6 @@
 								<t:dictSelect field="status" typeGroupCode="carType" hasLabel="false" defaultVal="${carInfoPage.status}" datatype="*"></t:dictSelect>	
 							</c:otherwise>
 						</c:choose>
-						
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -169,7 +185,7 @@
 	$("#licenceDriver").click(function(){
 		
 			 	$.dialog.setting.zIndex = 9999;
-			    $.dialog({content: 'url:carInfoController.do?addDriver', zIndex: 2100, lock: true, width:1000, height:600, opacity: 0.4, button: [
+			    $.dialog({content: 'url:carInfoController.do?addDriver&fromPage=1', zIndex: 2100, lock: true, width:1000, height:600, opacity: 0.4, button: [
 			        {name:'确定',  
 			        	callback:function(){
 			        		var iframe = this.iframe.contentWindow;

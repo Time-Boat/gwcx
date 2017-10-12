@@ -369,7 +369,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				+ "a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content,a.lineNumber,a.departId,"
 				+ "a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as "
 				+ "endname,a.application_status,p.departname,a.application_time,a.trial_reason,a.review_reason,a.first_application_time,"
-				+ "a.last_application_time from lineinfo a inner join t_s_depart b on a.departId =b.ID left join "
+				+ "a.last_application_time,a.application_user_id,a.first_application_user,a.last_application_user from lineinfo a inner join t_s_depart b on a.departId =b.ID left join "
 				+ "cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id="
 				+ "a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN "
 				+ "t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else "
@@ -430,6 +430,15 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				}
 				if (obj[33] != null) {
 					lineInfoView.setLastAuditDate(sdf.parse(obj[33].toString()));
+				}
+				if (obj[34] != null) {
+					lineInfoView.setApplicationUserid(String.valueOf(obj[34]));
+				}
+				if (obj[35] != null) {
+					lineInfoView.setFirstApplicationUser(String.valueOf(obj[35]));
+				}
+				if (obj[36] != null) {
+					lineInfoView.setLastApplicationUser(String.valueOf(obj[36]));
 				}
 				
 			} catch (Exception e) {

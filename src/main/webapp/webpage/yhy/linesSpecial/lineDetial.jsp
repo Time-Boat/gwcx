@@ -159,7 +159,33 @@
 				</td>
 				
 			</tr>
+			<tr>	
+				<td align="right">
+					<label class="Validform_label">申请人：</label>
+				</td>
+				<td class="value">
+					<input  class="inputxt" id="applicationUser" name="applicationUser" value="${applicationUser.userName}">  		
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="right">
+					<label class="Validform_label">申请时间：</label>
+				</td>
+				
+				<td class="value">
+					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="applicationTime" name="applicationTime" 
+					value="<fmt:formatDate value='${View.applicationTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
+				</td>
+				
 			<tr>
+			<tr>
+			
+				<td align="right">
+					<label class="Validform_label">初审审核人：</label>
+				</td>
+				<td class="value">
+					<input  class="inputxt" id="firstUser" name="firstUser" value="${firstUser.userName}">  		
+					<span class="Validform_checktip"></span>
+				</td>
 				<td align="right">
 					<label class="Validform_label">初审时间：</label>
 				</td>
@@ -168,7 +194,15 @@
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="firstAuditDate" name="firstAuditDate" 
 					value="<fmt:formatDate value='${View.firstAuditDate}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> <span class="Validform_checktip"></span>
 				</td>
-				
+			</tr>
+			<tr>
+				<td align="right">
+					<label class="Validform_label">复审审核人：</label>
+				</td>
+				<td class="value">
+					<input  class="inputxt" id="lastUser" name="lastUser" value="${lastUser.userName}">  		
+					<span class="Validform_checktip"></span>
+				</td>
 				<td align="right">
 					<label class="Validform_label">复审时间：</label>
 				</td>
@@ -180,18 +214,6 @@
 				
 			</tr>
 			
-			<tr>	
-				
-				<td align="right">
-					<label class="Validform_label">申请时间：</label>
-				</td>
-				
-				<td class="value" colspan="3">
-					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="applicationTime" name="applicationTime" 
-					value="<fmt:formatDate value='${View.applicationTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
-				</td>
-				
-			<tr>
 			<tr>
 				<td align="right">
 					<label class="Validform_label">初审被拒绝的原因：</label>
