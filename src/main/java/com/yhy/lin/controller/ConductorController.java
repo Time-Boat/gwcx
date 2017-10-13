@@ -87,7 +87,7 @@ public class ConductorController extends BaseController {
 	public void datagridLines(LineInfoEntity lineInfos, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		String ywlx = request.getParameter("ywlx");
-		
+
 		if(StringUtil.isNotEmpty(ywlx)){
 			if(ywlx.equals("0")){
 				ywlx = " < '2' ";
@@ -95,7 +95,7 @@ public class ConductorController extends BaseController {
 				ywlx = " >= '2' ";
 			}
 		}
-		
+
 		JSONObject jObject = lineInfoService.getDatagrid2(lineInfos, dataGrid, ywlx);
 		responseDatagrid(response, jObject);
 	}
@@ -111,13 +111,13 @@ public class ConductorController extends BaseController {
 	@RequestMapping(params = "datagrid")
 	public void datagrid(ConductorEntity conductors, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
-		
+
 		String username = request.getParameter("username");
 		String cr_bg = request.getParameter("createDate_begin");//创建时间
 		String cr_en = request.getParameter("createDate_end");
 		String lineId = request.getParameter("lineId");
 		JSONObject jObject = conductorService.getDatagrid(dataGrid,conductors,cr_bg,cr_en,lineId,username);
-		
+
 		responseDatagrid(response, jObject);
 	}
 
@@ -191,7 +191,8 @@ public class ConductorController extends BaseController {
 		} else {
 			message = "验票员: " + conductor.getName() + "被添加成功";
 			try {
-				
+				conductor.setApplicationStatus("-1");
+				conductor.setConductStatus("0");
 				conductorService.save(conductor);
 				// -----数据修改日志[类SVN]------------
 				Gson gson = new Gson();
@@ -238,6 +239,30 @@ public class ConductorController extends BaseController {
 	}
 
 	/**
+	 * 查看验票员详情
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "conductordetail")
+	public ModelAndView conductordetail(ConductorEntity conductor,HttpServletRequest req) {
+		if (StringUtil.isNotEmpty(conductor.getId())) {
+			conductor = systemService.getEntity(ConductorEntity.class, conductor.getId());
+			req.setAttribute("conductor", conductor);
+			if(StringUtil.isNotEmpty(conductor.getAuditor())) {
+				TSUser auditor = this.systemService.getEntity(TSUser.class, conductor.getAuditor());
+				req.setAttribute("auditor", auditor);
+			}
+			if(StringUtil.isNotEmpty(conductor.getApplicationUserId())) {
+				TSUser user = this.systemService.getEntity(TSUser.class, conductor.getApplicationUserId());
+				req.setAttribute("user", user);
+			}
+
+		}
+
+		return new ModelAndView("yhy/conductor/conductorDetial");
+	}
+
+	/**
 	 * 批量逻辑删除选中的所有验票员
 	 * 
 	 * @return
@@ -267,7 +292,7 @@ public class ConductorController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
 	 * 检查手机号是否在数据库中已存在
 	 */
@@ -280,26 +305,26 @@ public class ConductorController extends BaseController {
 		try {
 			String phone = request.getParameter("phone");
 			String id = request.getParameter("id");
-			
+
 			long l = conductorService.getCountForJdbcParam("select count(*) from conductor where phoneNumber=? and id <> ? ", new Object[]{phone,id});
-			
+
 			if(l > 0){
 				message = "手机号已存在";
 				success = false;
 			}else{
 				success = true;
 			}
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-		
+
 		j.setSuccess(success);
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
 	 * 获取线路
 	 */
@@ -307,11 +332,11 @@ public class ConductorController extends BaseController {
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		String code="";
 		if(orgCode.length()>6){
-			 code = orgCode.substring(0,6);
+			code = orgCode.substring(0,6);
 		}else{
 			code=orgCode;
 		}
-		
+
 		// 添加了权限
 		String sql ="select l.id,l.name from lineinfo l,t_s_depart t where l.departId=t.ID and l.status='0' and t.org_code like '" + code + "%' ";
 		List<Object> list = this.systemService.findListbySql(sql);
@@ -321,21 +346,147 @@ public class ConductorController extends BaseController {
 				Object[] ob = (Object[]) list.get(i);
 				String id = ob[0]+"";
 				String name = ob[1]+"";
-					json.append("{");
-					json.append("'lineId':'" +id + "',");
-					json.append("'lineName':'"+ name + "'");
-					json.append("},");
-				}
-			}else{
 				json.append("{");
-				json.append("'lineId':'',");
-				json.append("'lineName':''");
+				json.append("'lineId':'" +id + "',");
+				json.append("'lineName':'"+ name + "'");
 				json.append("},");
 			}
+		}else{
+			json.append("{");
+			json.append("'lineId':'',");
+			json.append("'lineName':''");
+			json.append("},");
+		}
 		json.delete(json.length()-1, json.length());
 		json.append("]}");
-		
+
 		return json.toString();
+	}
+
+	/**
+	 * 申请启动
+	 */
+	@RequestMapping(params = "applyEnable")
+	@ResponseBody
+	public AjaxJson applyEnable(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+
+		if(StringUtil.isNotEmpty(id)){
+			ConductorEntity  conductor = this.systemService.getEntity(ConductorEntity.class, id);
+			if(StringUtil.isNotEmpty(conductor)){
+				conductor.setApplicationStatus("0");//待审核
+				if("0".equals(conductor.getConductStatus())){
+					conductor.setApplyContent("0");//申请内容
+				}else{
+					conductor.setApplyContent("1");//申请内容
+				}
+				conductor.setApplicationTime(AppUtil.getDate());
+				conductor.setApplicationUserId(ResourceUtil.getSessionUserName().getId());
+			}
+			try {
+				message = "申请成功！";
+				this.systemService.saveOrUpdate(conductor);
+			} catch (Exception e) {
+				// TODO: handle exception
+				message = "服务器异常！";
+			}
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 审核同意
+	 */
+	@RequestMapping(params = "agree")
+	@ResponseBody
+	public AjaxJson agree(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		if(StringUtil.isNotEmpty(id)){
+			ConductorEntity  conductor = this.systemService.getEntity(ConductorEntity.class, id);
+			if(StringUtil.isNotEmpty(conductor)){
+				conductor.setApplicationStatus("1");
+				if("0".equals(conductor.getConductStatus())){
+					conductor.setConductStatus("1");;//验票员状态
+				}else{
+					conductor.setConductStatus("0");;//验票员状态
+				}
+
+				conductor.setAuditor(ResourceUtil.getSessionUserName().getId());
+				conductor.setAuditTime(AppUtil.getDate());
+			}
+
+			try {
+				message = "申请成功！";
+				this.systemService.saveOrUpdate(conductor);
+			} catch (Exception e) {
+				// TODO: handle exception
+				message = "服务器异常！";
+			}
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 申请拒绝
+	 */
+	@RequestMapping(params = "refuse")
+	@ResponseBody
+	public AjaxJson refuse(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String rejectReason = request.getParameter("rejectReason");
+
+		if (StringUtil.isNotEmpty(id)) {
+			ConductorEntity conductor = this.systemService.getEntity(ConductorEntity.class, id);
+
+			if (StringUtil.isNotEmpty(conductor)) {
+				conductor.setRefusalReason(rejectReason);
+				conductor.setApplicationStatus("2");
+				conductor.setAuditor(ResourceUtil.getSessionUserName().getId());
+				conductor.setAuditTime(AppUtil.getDate());
+			}
+
+			try {
+				message = "拒绝成功！";
+				this.systemService.saveOrUpdate(conductor);
+			} catch (Exception e) {
+				// TODO: handle exception
+				message = "服务器异常！";
+			}
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 获取拒绝原因
+	 */
+	@RequestMapping(params = "getReason")
+	@ResponseBody
+	public AjaxJson getReason(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		if (StringUtil.isNotEmpty(id)) {
+			ConductorEntity conductor = this.systemService.getEntity(ConductorEntity.class, id);
+
+			if (StringUtil.isNotEmpty(conductor)) {
+				message=conductor.getRefusalReason();
+			}
+		}
+
+		j.setMsg(message);
+		return j;
 	}
 
 }

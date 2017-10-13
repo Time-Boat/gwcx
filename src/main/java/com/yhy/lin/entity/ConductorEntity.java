@@ -40,6 +40,22 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	
 	//创建人
 	private String createUserId;
+	//申请状态
+	private String applicationStatus;
+	//拒绝原因
+	private String refusalReason;
+	//申请时间
+	private Date applicationTime;
+	//申请人
+	private String applicationUserId;
+	//申请内容
+	private String applyContent;
+	//审核人
+	private String auditor;
+	//审核时间
+	private Date auditTime;
+	//验票员状态
+	private String conductStatus;
 	
 	@Column(name = "line_ids")
 	public String getLineIds() {
@@ -124,6 +140,62 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	}
 	public void setCreateUserId(String createUserId) {
 		this.createUserId = createUserId;
+	}
+	@Column(name = "application_status")
+	public String getApplicationStatus() {
+		return applicationStatus;
+	}
+	public void setApplicationStatus(String applicationStatus) {
+		this.applicationStatus = applicationStatus;
+	}
+	@Column(name = "refusal_reason")
+	public String getRefusalReason() {
+		return refusalReason;
+	}
+	public void setRefusalReason(String refusalReason) {
+		this.refusalReason = refusalReason;
+	}
+	@Column(name = "application_time")
+	public Date getApplicationTime() {
+		return applicationTime;
+	}
+	public void setApplicationTime(Date applicationTime) {
+		this.applicationTime = applicationTime;
+	}
+	@Column(name = "application_user_id")
+	public String getApplicationUserId() {
+		return applicationUserId;
+	}
+	public void setApplicationUserId(String applicationUserId) {
+		this.applicationUserId = applicationUserId;
+	}
+	@Column(name = "apply_content")
+	public String getApplyContent() {
+		return applyContent;
+	}
+	public void setApplyContent(String applyContent) {
+		this.applyContent = applyContent;
+	}
+	@Column(name = "auditor")
+	public String getAuditor() {
+		return auditor;
+	}
+	public void setAuditor(String auditor) {
+		this.auditor = auditor;
+	}
+	@Column(name = "audit_time")
+	public Date getAuditTime() {
+		return auditTime;
+	}
+	public void setAuditTime(Date auditTime) {
+		this.auditTime = auditTime;
+	}
+	@Column(name = "conduct_status")
+	public String getConductStatus() {
+		return conductStatus;
+	}
+	public void setConductStatus(String conductStatus) {
+		this.conductStatus = conductStatus;
 	}
 	
 }

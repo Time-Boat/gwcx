@@ -72,16 +72,20 @@ public interface AppGlobals {
 	public static final String DEALER_FILE_PATH = "/image/dealer/";
 
 	/** 阿里大鱼服务器url */
-	public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
+	//public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
+	public static final String SERVCR_URL = "dysmsapi.aliyuncs.com";
+	
 
 	/** 阿里大鱼测试url */
 	public static final String TEST_SERVCR_URL = "https://gw.api.tbsandbox.com/router/rest";
 
 	/** 阿里大鱼appKey */
-	public static final String APP_KEY = "23850099"; // 个人23785248
+	//public static final String APP_KEY = "23850099"; // 个人23785248
+	public static final String APP_KEY = "LTAIqLN1Q1cC2LWG"; // 个人23785248
 
 	/** 阿里大鱼appSecret */
-	public static final String APP_SECRET = "5be5a4659944c0ce41129ad3fc2f3fad";// 个人fb8a26bf549a4d68082338d8a6391007
+	//public static final String APP_SECRET = "5be5a4659944c0ce41129ad3fc2f3fad";// 个人fb8a26bf549a4d68082338d8a6391007
+	public static final String APP_SECRET = "3nxySsYhljnlhSX68mKzIxK6XOHGdx";
 
 	/** 手机号验证 */
 	public static final String CHECK_PHONE = "^1[34578]\\d{9}$";
@@ -105,11 +109,13 @@ public interface AppGlobals {
 	public static final String WECHAT_APP_SECRET = "295837c0efff32c1bd73534458f9b45c";
 
 	/** 收款商家商户号 */
-	public static final String MCH_ID = "1481189932";
+//	public static final String MCH_ID = "1481189932";
+	public static final String MCH_ID = "1489142572";
 
 	/** 收款商户后台进行配置，登录微信商户平台–账户设置–安全设置–api安全，设置32位key值 */
-	public static final String WECHAT_KEY = "GZLYXNYYYYXGS20170601jiesongyewu";
-
+//	public static final String WECHAT_KEY = "GZLYXNYYYYXGS20170601jiesongyewu";
+	public static final String WECHAT_KEY = "xiaolongshenzhoukeji2017HONHHUOX";
+	
 	/** 证书路径 */
 	public static final String CERT_PATH_LOCATION = "WEB-INF/cert/apiclient_cert.p12";
 

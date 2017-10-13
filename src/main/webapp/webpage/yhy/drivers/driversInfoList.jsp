@@ -31,8 +31,8 @@
 	<t:dgToolBar operationCode="edit" title="编辑" icon="icon-edit" url="driversInfoController.do?addorupdate" funname="update" height="450"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="250"></t:dgCol>
 	
-	<t:dgFunOpt funname="applyEnable(id,lineStatus)" title="申请启用" operationCode="applyEnable" exp="status#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyEnable(id,lineStatus)" title="申请停用" operationCode="applyDisable" exp="status#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id,status)" title="申请启用" operationCode="applyEnable" exp="status#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id,status)" title="申请停用" operationCode="applyDisable" exp="status#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agree" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuse" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="refusalReason" exp="applicationStatus#eq#2"></t:dgFunOpt>
@@ -86,13 +86,13 @@
 	}
 	
 	//申请启用 
-	function applyEnable(id,lineStatus) {
+	function applyEnable(id,status) {
 		
 		$.dialog.confirm('确定要申请？',function(r){
 		    if (r){
 		    	$.post(
 		    		"driversInfoController.do?applyEnable",	
-					{'id':id,'lineStatus':lineStatus},
+					{'id':id,'status':status},
 					function(data){
 						var obj = eval('(' + data + ')');
 						tip(obj.msg);

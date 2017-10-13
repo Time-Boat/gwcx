@@ -43,6 +43,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
@@ -66,7 +67,7 @@ public class AppInterfaceController extends AppBaseController {
 
 	@Autowired
 	private AppInterfaceService appService;
-
+	
 	@Autowired
 	private SystemService systemService;
 
@@ -96,9 +97,7 @@ public class AppInterfaceController extends AppBaseController {
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
 				if (StringUtil.isNotEmpty(code)) {
-					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone",
-							mobile);
-
+					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
 					if (user != null) {
 						Date date = user.getCodeUpdateTime();
 						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm', "");
@@ -281,9 +280,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 			logger.info("验证码: " + code);
 			// 发送端短消息
-//			boolean b = SendMessageUtil.sendMessage(mobile, new String[] { "code" , "product" }, new String[] { code , "龙游出行" },
-//					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-			boolean b = true;
+			boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+			//boolean b = true;
 			if (b) {
 				
 				// 判断用户是否在数据库中有记录 用接口类方便扩展

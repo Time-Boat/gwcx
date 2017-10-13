@@ -35,9 +35,9 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate,
-			String carType, String status, String businessType, String carAndDriver) {
+			String carType, String status, String businessType, String carAndDriver, String carStatus, String auditStatus) {
 		
-		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, licencePlate, carType, status, businessType);
+		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, licencePlate, carType, status, businessType, carStatus, auditStatus);
 		
 		String sqlCnt = " select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
 				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id,t_s_depart p "
@@ -142,7 +142,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	
 	@BussAnnotation(orgType = {AppGlobals.TECHNICAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " c.create_user_id ", orgTable="t") //, appendSql = " and d.audit_status = '1' "
-	public String getWhere(String lpId, String licencePlate, String userCar, String carType, String status, String businessType) {
+	public String getWhere(String lpId, String licencePlate, String userCar, String carType, String status, String businessType, String carStatus, String auditStatus) {
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -151,6 +151,14 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 			if(StringUtil.isNotEmpty(lpId)){
 				sql.append(" or c.id = '" + lpId + "' ");
 			}
+		}
+		
+		if(StringUtil.isNotEmpty(carStatus)){
+			sql.append(" and c.car_status = '"+carStatus+"' ");
+		}
+		
+		if(StringUtil.isNotEmpty(auditStatus)){
+			sql.append(" and c.audit_status = '"+auditStatus+"' ");
 		}
 		
 		if(StringUtil.isNotEmpty(businessType)){

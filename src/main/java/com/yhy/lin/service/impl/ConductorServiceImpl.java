@@ -69,7 +69,7 @@ public class ConductorServiceImpl extends CommonServiceImpl implements Conductor
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.name,d.phoneNumber,d.jurisdiction,d.age,d.sex,d.create_date,d.status,d.delete_flag,u.username "
+	    sql.append("select d.id,d.name,d.phoneNumber,d.jurisdiction,d.age,d.sex,d.create_date,d.status,d.delete_flag,d.conduct_status,d.application_status,d.apply_content,u.username "
 	    		+ "from conductor d LEFT JOIN t_s_depart t on t.ID= d.departId LEFT JOIN t_s_base_user u on u.ID=d.create_user_id" + queryCondition.toString());
 		
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
@@ -81,6 +81,9 @@ public class ConductorServiceImpl extends CommonServiceImpl implements Conductor
 							,new Db2Page("name", "name")
 							,new Db2Page("age", "age")
 							,new Db2Page("createDate", "create_date")
+							,new Db2Page("conductStatus", "conduct_status")
+							,new Db2Page("applicationStatus", "application_status")
+							,new Db2Page("applyContent", "apply_content")
 							,new Db2Page("username", "username")
 							,new Db2Page("deleteFlag", "delete_flag")
 							,new Db2Page("jurisdiction", "jurisdiction")
