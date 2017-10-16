@@ -547,6 +547,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				// 修改订单状态
 				TransferorderEntity t = getEntity(TransferorderEntity.class, orderIds.get(i));
 				t.setOrderStatus(2);
+				t.setOrderStartime(startTime);
 				tList.add(t);
 				
 				// app端客户消息信息

@@ -32,9 +32,12 @@
 	<t:dgToolBar title="批量分配" icon="icon-redo" url="driversInfoController.do?getAttacheList" operationCode="driverAllotAttache" funname="driverAllot" ></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="250"></t:dgCol>
 	
-	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#2"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="status#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#0&&applicationStatus#eq#-1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#0&&applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#2&&applicationStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#2&&applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="status#eq#1&&applicationStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="status#eq#1&&applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agree" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuse" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="refusalReason" exp="applicationStatus#eq#2"></t:dgFunOpt>

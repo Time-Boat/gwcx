@@ -33,11 +33,11 @@ public class SendMessageUtil {
 	public static final String TEMPLATE_SMS_CODE = "SMS_103040027";//个人SMS_103040027
 	// 验证码信息模板对应签名
 	//public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "登录验证";
-	public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "阿里云短信测试专用";
+	public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "小龙出行";
 
 	//订单提醒
 	//public static final String TEMPLATE_SMS_CODE_SIGN_ORDER = "大鱼测试";
-	public static final String TEMPLATE_SMS_CODE_SIGN_ORDER = "阿里云短信测试专用";
+	public static final String TEMPLATE_SMS_CODE_SIGN_ORDER = "小龙出行";
 	//接送机、接送火车订单提醒信息模板
 	//public static final String TEMPLATE_ARRANGE_ORDER = "SMS_78580203";//SMS_78570092
 	public static final String TEMPLATE_ARRANGE_ORDER = "SMS_102350065";//SMS_102350065
@@ -53,7 +53,7 @@ public class SendMessageUtil {
 	public static final String TEMPLATE_ARRANGE_CAR = "SMS_102500006";//SMS_102500006
 	// 安排车辆信息模板对应签名
 	//public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "变更验证";
-	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "阿里云短信测试专用";
+	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "小龙出行";
 
 	/**
 	 * 发送短信

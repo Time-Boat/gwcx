@@ -33,9 +33,17 @@
 	<t:dgDelOpt title="common.delete" url="conductorController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" exp="conductStatus#eq#0&&applicationStatus#eq#2"/>
 	
 	<t:dgToolBar operationCode="detail" title="查看" icon="icon-search" url="conductorController.do?conductordetail" funname="detail"></t:dgToolBar>
-	<t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#0"></t:dgFunOpt>
+	<%-- <t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请停用" operationCode="applyDisable" exp="conductStatus#eq#1"></t:dgFunOpt>
+	 --%>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#0&&applicationStatus#eq#-1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#0&&applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#2&&applicationStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#2&&applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="conductStatus#eq#1&&applicationStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="conductStatus#eq#1&&applicationStatus#eq#2"></t:dgFunOpt>
+	
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agree" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuse" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="refusalReason" exp="applicationStatus#eq#2"></t:dgFunOpt>

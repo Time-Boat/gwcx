@@ -1,6 +1,5 @@
 package com.yhy.lin.entity;
 
-
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -65,7 +64,7 @@ public class CarInfoEntity implements java.io.Serializable {
 	private String carBrand;
 	/**型号*/
 	private String modelNumber;
-	/**运营状态*/
+	/**运营状态     0：已上架     1：未上架     2：已停用 */
 	private String carStatus;
 	
 	/**申请状态*/

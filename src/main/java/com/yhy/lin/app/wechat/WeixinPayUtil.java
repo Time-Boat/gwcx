@@ -31,6 +31,7 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
+import com.alibaba.druid.support.logging.Log;
 import com.google.gson.JsonObject;
 import com.yhy.lin.app.util.APIHttpClient;
 import com.yhy.lin.app.util.AppGlobals;
@@ -360,8 +361,9 @@ public class WeixinPayUtil {
 		//APIHttpClient网络请求对象
 		APIHttpClient httpClient = new APIHttpClient(url);
 		String str = httpClient.get();
+		logger.info("token_info:" + str);
 		String ac_token = JSONObject.fromObject(str).get("access_token") + "";
-		System.out.println(ac_token);
+		logger.info("ac_token:" + ac_token);
 		return ac_token;
 	}
 	
@@ -406,28 +408,30 @@ public class WeixinPayUtil {
 	
 	public static void main(String[] args) {
 		
-		try {
-			Map map = checkWxOrderPay("ff8080815d644158015d79902a3100f4");
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		getAccessToken();
 		
-		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
-		String sign = "";
-		SortedMap<String, String> storeMap = new TreeMap<String, String>();
-		storeMap.put("trade_type", "NATIVE"); // 交易类型
-		storeMap.put("spbill_create_ip", "127.0.0.1"); // 本机的Ip
-		storeMap.put("body", "test"); // 描述
-		storeMap.put("out_trade_no", "123456"); // 商户 后台的贸易单号
-		storeMap.put("total_fee", "" + 100); // 金额必须为整数 单位为分
-		// 支付成功后，回调地址
-		storeMap.put("notify_url", "http://www.pinxuew.com/wechat");
-		storeMap.put("appid", "wx5e45586116813f60"); // appid
-		storeMap.put("mch_id", "1251135401"); // 商户号
-		storeMap.put("nonce_str", "1add1a30ac87aa2db72f57a2375d8fec"); // 随机数
-		sign = createSign(storeMap);
+//		try {
+//			Map map = checkWxOrderPay("ff8080815d644158015d79902a3100f4");
+//			
+//		} catch (Exception e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+//		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
+//		String sign = "";
+//		SortedMap<String, String> storeMap = new TreeMap<String, String>();
+//		storeMap.put("trade_type", "NATIVE"); // 交易类型
+//		storeMap.put("spbill_create_ip", "127.0.0.1"); // 本机的Ip
+//		storeMap.put("body", "test"); // 描述
+//		storeMap.put("out_trade_no", "123456"); // 商户 后台的贸易单号
+//		storeMap.put("total_fee", "" + 100); // 金额必须为整数 单位为分
+//		// 支付成功后，回调地址
+//		storeMap.put("notify_url", "http://www.pinxuew.com/wechat");
+//		storeMap.put("appid", "wx5e45586116813f60"); // appid
+//		storeMap.put("mch_id", "1251135401"); // 商户号
+//		storeMap.put("nonce_str", "1add1a30ac87aa2db72f57a2375d8fec"); // 随机数
+//		sign = createSign(storeMap);
 		 
 //		 WeixinInfoDTO weixinInfoDTO = new WeixinInfoDTO();
 //		 weixinInfoDTO.setAppid("wx5e45586116813f60");

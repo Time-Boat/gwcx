@@ -324,14 +324,14 @@ public class CarInfoController extends BaseController {
 	public ModelAndView dealerDetail(CarInfoEntity carInfo, HttpServletRequest req) {
 		if (StringUtil.isNotEmpty(carInfo.getId())) {
 			carInfo = systemService.getEntity(CarInfoEntity.class, carInfo.getId());
-			String applyUserId = carInfo.getApplyUserId();
-			if(StringUtil.isNotEmpty(applyUserId)){
-				TSUser user = systemService.getEntity(TSUser.class, applyUserId);
+			
+			if(StringUtil.isNotEmpty(carInfo.getApplyUserId())){
+				TSUser user = systemService.getEntity(TSUser.class, carInfo.getApplyUserId());
 				req.setAttribute("applyUser", user.getUserName());
 			}
-			String auditUserId = carInfo.getApplyUserId();
-			if(StringUtil.isNotEmpty(auditUserId)){
-				TSUser user = systemService.getEntity(TSUser.class, auditUserId);
+			
+			if(StringUtil.isNotEmpty(carInfo.getAuditUserId())){
+				TSUser user = systemService.getEntity(TSUser.class, carInfo.getAuditUserId());
 				req.setAttribute("auditUser", user.getUserName());
 			}
 			
@@ -422,12 +422,12 @@ public class CarInfoController extends BaseController {
 
 			carInfo.setAuditTime(AppUtil.getDate());
 			carInfo.setAuditStatus("1");
-			carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getUserName());
+			carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
 
 			if ("0".equals(apply)) {
 				carInfo.setCarStatus("0");
 			} else {
-				carInfo.setCarStatus("1");
+				carInfo.setCarStatus("2");
 			}
 
 			systemService.saveOrUpdate(carInfo);
@@ -459,7 +459,7 @@ public class CarInfoController extends BaseController {
 
 			dealerInfo.setAuditTime(AppUtil.getDate());
 			dealerInfo.setAuditStatus("2");
-			dealerInfo.setAuditUserId(ResourceUtil.getSessionUserName().getUserName());
+			dealerInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
 			dealerInfo.setRejectReason(rejectReason);
 
 			systemService.saveOrUpdate(dealerInfo);

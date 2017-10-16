@@ -8,9 +8,13 @@ import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.jeecgframework.web.system.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.ConductorEntity;
 import com.yhy.lin.service.ConductorServiceI;
 
@@ -20,23 +24,37 @@ import net.sf.json.JSONObject;
 @Transactional
 public class ConductorServiceImpl extends CommonServiceImpl implements ConductorServiceI {
 
+	@Autowired
+	private UserService userService;
+	
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid, ConductorEntity conductors, String cr_bg,String cr_en,String lineId,String username) {
 		// TODO Auto-generated method stub
 		
-		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
-		String code = "";
-		if(orgCode.length()>6){
-			code= orgCode.substring(0,6);
-		}else{
-			code=orgCode;
-		}
+		TSUser user = ResourceUtil.getSessionUserName();
+		 String orgCode = user.getCurrentDepart().getOrgCode();
+		 String code="";
+		 if(orgCode.length()>6){
+			  code = orgCode.substring(0,6); 
+		 }else{
+			  code = orgCode; 
+		 }
+		 
+		 String roles = userService.getUserRole(user);
 		
 		StringBuffer queryCondition = new StringBuffer(" where d.delete_flag = '0'");
-	    
-		if(StringUtil.isNotEmpty(code)){
-			queryCondition.append(" and t.org_code like '"+code+"%'");
+		
+		 String a[] = roles.split(",");
+		 for (int i = 0; i < a.length; i++) {
+			if(AppGlobals.TECHNICAL_MANAGER.equals(a[i])){
+				queryCondition.append(" and t.org_code like '"+code+"%'");
+				queryCondition.append(" and d.application_status!='-1' ");
+			}
+			if(AppGlobals.TECHNICAL_SPECIALIST.equals(a[i])){
+				queryCondition.append(" and d.create_user_id='"+user.getId()+"'");
+			}
 		}
+		 
 		if(StringUtil.isNotEmpty(username)){
 			queryCondition.append(" and u.username like '%"+username+"%'");
 		}

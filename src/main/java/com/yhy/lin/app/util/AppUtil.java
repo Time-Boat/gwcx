@@ -3,9 +3,6 @@ package com.yhy.lin.app.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -16,11 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.jeecgframework.core.util.DateUtils;
 
-import com.yhy.lin.app.entity.CarCustomerEntity;
-
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import sun.misc.BASE64Decoder;
 
 public class AppUtil {
 	// 将Json对象转String类型输出页面

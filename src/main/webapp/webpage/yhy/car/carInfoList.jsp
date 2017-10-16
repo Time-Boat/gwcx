@@ -194,7 +194,7 @@
    <t:dgCol title="车辆状态" field="status" align="center" query="true" dictionary="carType" width="50"></t:dgCol>
    <t:dgCol title="业务类型" field="businessType" align="center" query="true" dictionary="carBType" width="80"></t:dgCol>
    
-   <t:dgCol title="运营状态" field="carStatus" dictionary="lineStatus" align="center" query="true" width="50"></t:dgCol>
+   <t:dgCol title="运营状态" field="carStatus" dictionary="carOType" align="center" query="true" width="50"></t:dgCol>
    <t:dgCol title="审核状态" field="auditStatus" dictionary="audit_status" query="true" align="center" width="50"></t:dgCol>
    <t:dgCol title="申请内容" field="applyContent" dictionary="apply_type" align="center"  width="50"></t:dgCol>
    
@@ -212,8 +212,12 @@
    <t:dgFunOpt funname="carDisable(id)"  title="申请停用" operationCode="carDisable" exp="carStatus#eq#0&&auditStatus#eq#1"></t:dgFunOpt> 
    <t:dgFunOpt funname="carDisable(id)"  title="申请停用" operationCode="carDisable" exp="carStatus#eq#0&&auditStatus#eq#2"></t:dgFunOpt> 
    
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
    <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#-1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#2"></t:dgFunOpt>
    
   </t:datagrid>
   </div>

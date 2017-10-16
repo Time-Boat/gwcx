@@ -133,7 +133,7 @@
 				</label>
 			</td>
 				<td class="value">					
-					<input readonly="true" class="inputxt" id="licenceDriver" name="licenceDriver" value="${driverPage.name}" datatype="*" >
+					<input readonly="true" class="inputxt" id="licenceDriver" name="licenceDriver" value="${driverPage.name}" >
 					<input id="licenceDriverId" name="driverId" type="hidden" value="${carInfoPage.driverId}" >
 					<span class="Validform_checktip"></span>
 				</td>
