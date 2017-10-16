@@ -10,6 +10,7 @@ import java.util.Map;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
@@ -605,6 +606,52 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 
 		return b;
+	}
+
+	@Override
+	public JSONObject getCarDatagrid(DataGrid dataGrid) {
+		
+		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
+		
+		//过滤到公司这一层
+		orgCode = orgCode.length() <= 6 ? orgCode : orgCode.substring(0, 6);
+		
+		String sqlWhere = " and c.business_type = '1' and c.car_status = '0' and t.org_code like '" + orgCode + "%'";
+		
+		String sqlCnt = " select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
+				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id,t_s_depart p "
+				+ " where c.delete_flag = '0' and (case when LENGTH(t.org_code) < 6 then t.org_code else substring(t.org_code,1,6) END) = p.org_code ";
+		
+		Long iCount = getCountForJdbcParam(sqlCnt + sqlWhere, null);
+		
+		// 取出当前页的数据 
+		StringBuffer sql = new StringBuffer();
+	    sql.append(" select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id ");
+		sql.append(" LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id,t_s_depart p ");
+		sql.append(" where c.delete_flag = '0' and (case when LENGTH(t.org_code) < 6 then t.org_code else substring(t.org_code,1,6) END) = p.org_code ");
+		sql.append(sqlWhere);
+		
+		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
+		// 将结果集转换成页面上对应的数据集
+					Db2Page[] db2Pages = {
+							new Db2Page("id", "id")
+							,new Db2Page("licencePlate", "licence_plate")
+							,new Db2Page("carType", "car_type")
+							,new Db2Page("stopPosition", "stop_position")
+							,new Db2Page("name", "name")
+							,new Db2Page("seat", "seat")
+							,new Db2Page("status", "status")
+							,new Db2Page("drivingLicense", "driving_license")
+							,new Db2Page("businessType", "business_type")
+							
+							,new Db2Page("buyDate", "buy_date")
+							,new Db2Page("carBrand", "car_brand")
+							,new Db2Page("modelNumber", "model_number")
+							
+							,new Db2Page("remark", "remark")
+					}; 
+		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
+		return jObject;
 	}
 
 }

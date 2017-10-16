@@ -348,6 +348,23 @@ public class TransferOrderController extends BaseController {
 	}
 
 	/**
+	 * easyui AJAX请求数据
+	 * 
+	 * @param request
+	 * @param response
+	 * @param dataGrid
+	 * @param user
+	 */
+	@RequestMapping(params = "carDatagrid")
+	public void carDatagrid(CarInfoEntity carInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+		
+		JSONObject jObject = transferService.getCarDatagrid(dataGrid);
+		
+		responseDatagrid(response, jObject);
+		
+	}
+	
+	/**
 	 * 保存接送订单的司机车辆安排
 	 */
 	@RequestMapping(params = "saveCarAndDriver")
@@ -365,13 +382,6 @@ public class TransferOrderController extends BaseController {
 		List<String> orderIds = new ArrayList<>();
 		
 		String lineOrderCode = request.getParameter("lineOrderCode");
-		
-		
-		/*logger.info("ids: " + ids);
-		logger.info("slDate: " + startTime);
-		logger.info("lineOrderCode: " + lineOrderCode);
-		logger.info("driverId: " + driverId);
-		logger.info("lineOrderCode: " + lineOrderCode);*/
 		
 		//通过订单批次的编码来查询所有的订单id
 		if(StringUtil.isNotEmpty(lineOrderCode)){
@@ -479,8 +489,6 @@ public class TransferOrderController extends BaseController {
 		
 		return jsonObj;
 	}
-	
-	
 	
 	/**
 	 * 提醒未处理的订单

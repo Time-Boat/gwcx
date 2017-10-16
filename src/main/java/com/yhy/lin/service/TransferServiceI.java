@@ -25,5 +25,8 @@ public interface TransferServiceI extends CommonService {
 
 	public boolean saveDriverAndDriver(List<String> orderIds, String startTime, String licencePlateId, String driverId,
 			String licencePlateName, List<String[]> contents);
+	
+	//获取安排的司机车辆信息
+	public JSONObject getCarDatagrid(DataGrid dataGrid);
 
 }

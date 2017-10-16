@@ -462,10 +462,10 @@ public class WeixinPayController extends AppBaseController{
 	}
 	
 	@RequestMapping(params = "checkToken")
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {  
+	protected void checkToken(HttpServletRequest request, HttpServletResponse response) throws IOException {  
         String signature = request.getParameter("signature");  
         String timestamp = request.getParameter("timestamp");  
-        String nonce = request.getParameter("nonce");  
+        String nonce = request.getParameter("nonce");
         String echostr = request.getParameter("echostr");  
         logger.info("signature : " + signature);
         logger.info("timestamp : " + timestamp);
