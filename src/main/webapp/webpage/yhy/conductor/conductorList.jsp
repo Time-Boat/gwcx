@@ -17,8 +17,8 @@
 	<t:dgCol title="创建人" field="username"  align="center" width="80" query="true"></t:dgCol>
 	<t:dgCol title="验票线路" field="jurisdiction"  align="center" width="150" ></t:dgCol>
 	<t:dgCol title="业务类型" field="status" dictionary="carBType" query="true" align="center" width="80"></t:dgCol>
-	<t:dgCol title="验票员状态" sortable="true"  dictionary="driver_status" field="conductStatus" align="center" width="80"></t:dgCol>
-	<t:dgCol title="审核状态" sortable="true"  dictionary="audit_status" field="applicationStatus" align="center" width="80"></t:dgCol>
+	<t:dgCol title="验票员状态" sortable="true" query="true" dictionary="driver_status" field="conductStatus" align="center" width="80"></t:dgCol>
+	<t:dgCol title="审核状态" sortable="true" query="true" dictionary="audit_status" field="applicationStatus" align="center" width="80"></t:dgCol>
 	<t:dgCol title="申请内容" sortable="true"  dictionary="apply_type" field="applyContent" align="center" width="80"></t:dgCol>
 	<%--<t:dgCol title="审核人" sortable="true"  field="auditorUserName" align="center" width="80"></t:dgCol>
 	<t:dgCol title="审核时间" sortable="true"  field="auditTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center" width="100"></t:dgCol>
@@ -27,12 +27,14 @@
 	--%>
 	<t:dgToolBar operationCode="add" title="录入" icon="icon-add" url="conductorController.do?addorupdate" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="编辑" icon="icon-edit" url="conductorController.do?addorupdate" funname="update"></t:dgToolBar>
-	<t:dgToolBar title="批量删除" icon="icon-remove" url="conductorController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar>
+	<t:dgToolBar title="批量分配" icon="icon-redo" url="conductorController.do?getAttacheList" operationCode="conductAllotAttache" funname="conductorAllot" ></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="200"></t:dgCol>
-	<t:dgDelOpt title="common.delete" url="conductorController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" exp="conductStatus#eq#0"/>
+	<t:dgDelOpt title="common.delete" url="conductorController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" exp="conductStatus#eq#0&&applicationStatus#eq#-1"/>
+	<t:dgDelOpt title="common.delete" url="conductorController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" exp="conductStatus#eq#0&&applicationStatus#eq#2"/>
 	
 	<t:dgToolBar operationCode="detail" title="查看" icon="icon-search" url="conductorController.do?conductordetail" funname="detail"></t:dgToolBar>
 	<t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请启用" operationCode="applyEnable" exp="conductStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id,conductStatus)" title="申请停用" operationCode="applyDisable" exp="conductStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agree" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuse" exp="applicationStatus#eq#0"></t:dgFunOpt>
@@ -244,6 +246,24 @@
 		rwin += '</div></div></div>';
 		
 		return rwin;
+	}
+	
+	function conductorAllot(title,url,id,width,height){
+		
+		var ids = '';
+		var rows = $("#conductorList").datagrid("getSelections");
+		for(var i=0;i<rows.length;i++){
+			
+			ids+=rows[i].id;
+			ids+=',';
+		}
+		ids = ids.substring(0,ids.length-1);
+		if(ids.length==0){
+			tip('请选择要分配的验票员');
+			return;
+		}
+		url += '&ids='+ids;
+		createwindow(title,url,width,height);
 	}
 	
 </script>

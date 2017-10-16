@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,12 +28,14 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.DriversInfoServiceI;
@@ -425,10 +428,10 @@ public class DriversInfoController extends BaseController {
 			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
 			if(StringUtil.isNotEmpty(driver)){
 				driver.setApplicationStatus("0");//待审核
-				if("0".equals(driver.getStatus())){
-					driver.setApplyContent("0");//申请内容
-				}else{
+				if("1".equals(driver.getStatus())){
 					driver.setApplyContent("1");//申请内容
+				}else{
+					driver.setApplyContent("0");//申请内容
 				}
 				driver.setApplicationTime(AppUtil.getDate());
 				driver.setApplicationUserId(ResourceUtil.getSessionUserName().getId());
@@ -459,10 +462,15 @@ public class DriversInfoController extends BaseController {
 			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
 			if(StringUtil.isNotEmpty(driver)){
 				driver.setApplicationStatus("1");
-				if("0".equals(driver.getStatus())){
-					driver.setStatus("1");;//申请内容
+				/*if("0".equals(driver.getStatus())){
+					driver.setStatus("1");;//司机状态
 				}else{
-					driver.setStatus("0");;//申请内容
+					driver.setStatus("0");;//司机状态
+				}*/
+				if("0".equals(driver.getApplyContent())){
+					driver.setStatus("1");
+				}else{
+					driver.setStatus("2");
 				}
 				
 				driver.setAuditor(ResourceUtil.getSessionUserName().getId());
@@ -533,6 +541,56 @@ public class DriversInfoController extends BaseController {
 			}
 		}
 		
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 专员列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getAttacheList")
+	public ModelAndView getAttacheList(HttpServletRequest req) {
+		String ids = req.getParameter("ids");
+		req.setAttribute("ids", ids);
+		return new ModelAndView("yhy/drivers/driverAttacheList");
+	}
+	
+	/**
+	 * 分配专员
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "driverAllotAttache")
+	@ResponseBody
+	public AjaxJson driverAllotAttache(HttpServletRequest req) {
+		AjaxJson j = new AjaxJson();
+		String message = null;
+
+		String userId = req.getParameter("userId");
+		String ids = req.getParameter("ids");
+
+		List<DriversInfoEntity> driverList = new ArrayList<>();
+
+		try {
+			String[] idArr = ids.split(",");
+			for (int i = 0; i < idArr.length; i++) {
+
+				DriversInfoEntity driverInfo = systemService.getEntity(DriversInfoEntity.class, idArr[i]);
+				TSUserOrg t = systemService.findUniqueByProperty(TSUserOrg.class, "tsUser.id", userId);
+				driverInfo.setCreateUserId(userId);
+				driverInfo.setDepartId(t.getTsDepart().getId());
+				
+				driverList.add(driverInfo);
+			}
+			
+			systemService.saveAllEntitie(driverList);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "分配成功";
 		j.setMsg(message);
 		return j;
 	}

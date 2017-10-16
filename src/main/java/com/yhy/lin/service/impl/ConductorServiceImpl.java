@@ -63,6 +63,13 @@ public class ConductorServiceImpl extends CommonServiceImpl implements Conductor
 			queryCondition.append(" and d.status ='" + conductors.getStatus() +"' ");
 		}
 		
+		if(StringUtil.isNotEmpty(conductors.getApplicationStatus())){
+			queryCondition.append(" and d.application_status ='" + conductors.getApplicationStatus() +"' ");
+		}
+		if(StringUtil.isNotEmpty(conductors.getConductStatus())){
+			queryCondition.append(" and d.conduct_status ='" + conductors.getConductStatus() +"' ");
+		}
+		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from conductor d LEFT JOIN t_s_depart t on t.ID= d.departId LEFT JOIN t_s_base_user u on u.ID=d.create_user_id" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);

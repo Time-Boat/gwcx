@@ -83,7 +83,6 @@ public class WeixinPayUtil {
 			//EntityUtils.consume(response.getEntity());    EntityUtils.toString已经做了关闭流的操作
 			
 			Map<String, Object> dataMap = new HashMap<String, Object>();
-			System.out.println("getPayNo:"+jsonStr);
 			if (jsonStr.indexOf("FAIL") != -1) {
 				return prepay_id;
 			}
@@ -232,7 +231,7 @@ public class WeixinPayUtil {
 				sb.append(k + "=" + v + "&");
 			}
 		}
-		sb.append("key=GZLYXNYYYYXGS20170601jiesongyewu");
+		sb.append("key=" + AppGlobals.WECHAT_KEY);
 		System.out.println(sb.toString());
 		String sign = MD5Util.MD5(sb.toString()).toUpperCase();
 		return sign;
@@ -416,19 +415,19 @@ public class WeixinPayUtil {
 		}
 		
 		String url = WECHAT_REQUEST_QR_URL.replace("%1", getAccessToken());
-//		 String sign = "";
-//		 SortedMap<String, String> storeMap = new TreeMap<String, String>();
-//		 storeMap.put("trade_type", "NATIVE"); // 交易类型
-//		 storeMap.put("spbill_create_ip", "127.0.0.1"); // 本机的Ip
-//		 storeMap.put("body", "test"); // 描述
-//		 storeMap.put("out_trade_no", "123456"); // 商户 后台的贸易单号
-//		 storeMap.put("total_fee", "" + 100); // 金额必须为整数 单位为分
-//		 //支付成功后，回调地址
-//		 storeMap.put("notify_url", "http://www.pinxuew.com/wechat"); 
-//		 storeMap.put("appid", "wx5e45586116813f60"); // appid
-//		 storeMap.put("mch_id", "1251135401"); // 商户号
-//		 storeMap.put("nonce_str", "1add1a30ac87aa2db72f57a2375d8fec"); // 随机数
-//		 sign = createSign(storeMap);
+		String sign = "";
+		SortedMap<String, String> storeMap = new TreeMap<String, String>();
+		storeMap.put("trade_type", "NATIVE"); // 交易类型
+		storeMap.put("spbill_create_ip", "127.0.0.1"); // 本机的Ip
+		storeMap.put("body", "test"); // 描述
+		storeMap.put("out_trade_no", "123456"); // 商户 后台的贸易单号
+		storeMap.put("total_fee", "" + 100); // 金额必须为整数 单位为分
+		// 支付成功后，回调地址
+		storeMap.put("notify_url", "http://www.pinxuew.com/wechat");
+		storeMap.put("appid", "wx5e45586116813f60"); // appid
+		storeMap.put("mch_id", "1251135401"); // 商户号
+		storeMap.put("nonce_str", "1add1a30ac87aa2db72f57a2375d8fec"); // 随机数
+		sign = createSign(storeMap);
 		 
 //		 WeixinInfoDTO weixinInfoDTO = new WeixinInfoDTO();
 //		 weixinInfoDTO.setAppid("wx5e45586116813f60");

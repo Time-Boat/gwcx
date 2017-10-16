@@ -147,7 +147,7 @@ public class WeixinPayController extends AppBaseController{
 			// String nonce_str = "1add1a30ac87aa2db72f57a2375d8fec";
 			String nonce_str = UUID.randomUUID().toString().replaceAll("-", "");
 			// 商品描述
-			String body = "龙游出行";
+			String body = AppGlobals.SP_NAME;
 			// 商户订单号
 			//String out_trade_no = orderId;
 			String out_trade_no = orderPayNumber;
@@ -179,7 +179,7 @@ public class WeixinPayController extends AppBaseController{
 
 			// 这里notify_url是 支付完成后微信发给该链接信息，可以判断会员是否支付成功，改变订单状态等。
 //			String notify_url = baseUrl + "/wx/notifyUrl.do";
-			String notify_url = baseUrl + "/gwcx/wx/notifyUrl.do";
+			String notify_url = baseUrl + "/wx/notifyUrl.do";
 
 			SortedMap<String, String> packageParams = new TreeMap<String, String>();
 			packageParams.put("appid", AppGlobals.WECHAT_ID);
@@ -390,16 +390,22 @@ public class WeixinPayController extends AppBaseController{
 		logger.info("进入toWXPaySuccess回调");
 //		String id = request.getParameter("orderId");
 		String status = request.getParameter("status");
-//		String orderPayNumber = request.getParameter("orderPayNumber");
+		String orderPayNumber = request.getParameter("orderPayNumber");
 //		logger.info("toWXPaySuccess, orderId: " + id);
-//		logger.info("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
+		logger.info("toWXPaySuccess, orderPayNumber: " + orderPayNumber);
 //		try {
 			//用商户单号查询订单状态
-//			Map resultMap = WeixinPayUtil.checkWxOrderPay(orderPayNumber);
-//			logger.info("resultMap:" + resultMap);
-//			String return_code = (String) resultMap.get("return_code");
-//			String result_code = (String) resultMap.get("result_code");
-//			logger.info("return_code:" + return_code + ",result_code:" + result_code);
+			Map resultMap = null;
+			try {
+				resultMap = WeixinPayUtil.checkWxOrderPay(orderPayNumber);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			logger.info("resultMap:" + resultMap);
+			String return_code = (String) resultMap.get("return_code");
+			String result_code = (String) resultMap.get("result_code");
+			logger.info("return_code:" + return_code + ",result_code:" + result_code);
 //			if ("SUCCESS".equals(return_code)) {
 //				if ("SUCCESS".equals(result_code)) {
 //					model.addAttribute("orderId", id);

@@ -129,7 +129,7 @@ public interface AppGlobals {
 	/**
 	 * 商品名称
 	 */
-	public static final String SP_NAME = "龙游出行app支付";
+	public static final String SP_NAME = "小龙出行";
 	
 	/**
 	 * web平台角色权限

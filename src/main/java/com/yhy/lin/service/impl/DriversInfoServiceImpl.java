@@ -37,7 +37,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		if(StringUtil.isNotEmpty(code)){
 			queryCondition.append(" and t.org_code like '"+code+"%'");
 		}
-	    
+		
 		if(StringUtil.isNotEmpty(driversInfo.getSex())){
 			queryCondition.append(" and d.sex = '"+driversInfo.getSex()+"' ");
 		}
@@ -48,6 +48,13 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		if(StringUtil.isNotEmpty(driversInfo.getPhoneNumber())){
 			queryCondition.append(" and d.phoneNumber like '" + driversInfo.getPhoneNumber() +"%' ");
+		}
+		
+		if(StringUtil.isNotEmpty(driversInfo.getApplicationStatus())){
+			queryCondition.append("and d.application_status = '"+driversInfo.getApplicationStatus()+"' ");
+		}
+		if(StringUtil.isNotEmpty(driversInfo.getStatus())){
+			queryCondition.append("and d.status = '"+driversInfo.getStatus()+"' ");
 		}
 		
 		if(StringUtil.isNotEmpty(cityID)){

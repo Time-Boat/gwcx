@@ -35,7 +35,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 
 	@Override
 	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate,
-			String carType, String status, String businessType, String carAndDriver, String carStatus, String auditStatus) {
+			String carType, String status, String businessType, String carStatus, String auditStatus) {
 		
 		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, licencePlate, carType, status, businessType, carStatus, auditStatus);
 		
@@ -163,6 +163,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 		
 		if(StringUtil.isNotEmpty(businessType)){
 			sql.append(" and c.business_type = '"+businessType+"' ");
+			sql.append(" and c.car_status = '0' ");
 		}
 		
 		if(StringUtil.isNotEmpty(licencePlate)){

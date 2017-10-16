@@ -19,6 +19,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
+import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -377,10 +378,10 @@ public class ConductorController extends BaseController {
 			ConductorEntity  conductor = this.systemService.getEntity(ConductorEntity.class, id);
 			if(StringUtil.isNotEmpty(conductor)){
 				conductor.setApplicationStatus("0");//待审核
-				if("0".equals(conductor.getConductStatus())){
-					conductor.setApplyContent("0");//申请内容
-				}else{
+				if("1".equals(conductor.getConductStatus())){
 					conductor.setApplyContent("1");//申请内容
+				}else{
+					conductor.setApplyContent("0");//申请内容
 				}
 				conductor.setApplicationTime(AppUtil.getDate());
 				conductor.setApplicationUserId(ResourceUtil.getSessionUserName().getId());
@@ -411,10 +412,15 @@ public class ConductorController extends BaseController {
 			ConductorEntity  conductor = this.systemService.getEntity(ConductorEntity.class, id);
 			if(StringUtil.isNotEmpty(conductor)){
 				conductor.setApplicationStatus("1");
-				if("0".equals(conductor.getConductStatus())){
+				/*if("0".equals(conductor.getConductStatus())){
 					conductor.setConductStatus("1");;//验票员状态
 				}else{
 					conductor.setConductStatus("0");;//验票员状态
+				}*/
+				if("0".equals(conductor.getApplyContent())){
+					conductor.setConductStatus("1");
+				}else{
+					conductor.setConductStatus("2");
 				}
 
 				conductor.setAuditor(ResourceUtil.getSessionUserName().getId());
@@ -488,5 +494,56 @@ public class ConductorController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
+	
+	/**
+	 * 专员列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getAttacheList")
+	public ModelAndView getAttacheList(HttpServletRequest req) {
+		String ids = req.getParameter("ids");
+		req.setAttribute("ids", ids);
+		return new ModelAndView("yhy/conductor/conductorAttacheList");
+	}
+	
+	/**
+	 * 分配专员
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "conductorAllotAttache")
+	@ResponseBody
+	public AjaxJson conductorAllotAttache(HttpServletRequest req) {
+		AjaxJson j = new AjaxJson();
+		String message = null;
+
+		String userId = req.getParameter("userId");
+		String ids = req.getParameter("ids");
+
+		List<ConductorEntity> conductorList = new ArrayList<>();
+
+		try {
+			String[] idArr = ids.split(",");
+			for (int i = 0; i < idArr.length; i++) {
+
+				ConductorEntity conductor = systemService.getEntity(ConductorEntity.class, idArr[i]);
+				TSUserOrg t = systemService.findUniqueByProperty(TSUserOrg.class, "tsUser.id", userId);
+				conductor.setCreateUserId(userId);
+				conductor.setDepartId(t.getTsDepart().getId());
+				
+				conductorList.add(conductor);
+			}
+			
+			systemService.saveAllEntitie(conductorList);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "分配成功";
+		j.setMsg(message);
+		return j;
+	}
+	
 
 }
