@@ -7,10 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.CarInfoEntity;
-import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
-import com.yhy.lin.service.DealerInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -25,9 +23,7 @@ import java.util.Map;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.web.system.pojo.base.TSDepart;
 
 @Service("carInfoService")
 @Transactional

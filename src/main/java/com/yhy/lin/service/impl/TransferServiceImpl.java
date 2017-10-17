@@ -533,8 +533,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		List<TransferorderEntity> tList = new ArrayList<TransferorderEntity>();
 		List<AppMessageListEntity> mList = new ArrayList<AppMessageListEntity>();
 		
-		StringBuffer userIds = new StringBuffer();
+		startTime += ":00";
 		
+		StringBuffer userIds = new StringBuffer();
 		try {
 			for (int i = 0; i < orderIds.size(); i++) {
 				Order_LineCarDiverEntity order_LineCarDiver = new Order_LineCarDiverEntity();
@@ -648,6 +649,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 							,new Db2Page("buyDate", "buy_date")
 							,new Db2Page("carBrand", "car_brand")
 							,new Db2Page("modelNumber", "model_number")
+							
+							,new Db2Page("driverId", "driver_id")
 							
 							,new Db2Page("remark", "remark")
 					}; 

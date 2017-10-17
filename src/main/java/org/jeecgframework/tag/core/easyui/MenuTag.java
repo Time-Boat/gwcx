@@ -10,6 +10,9 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.jeecgframework.web.system.pojo.base.TSFunction;
 
+import com.yhy.lin.controller.TransferOrderController;
+
+import org.apache.log4j.Logger;
 import org.jeecgframework.core.util.ListtoMenu;
 
 
@@ -28,6 +31,7 @@ public class MenuTag extends TagSupport {
 	protected List<TSFunction> childFun;//二级菜单
 	protected Map<Integer, List<TSFunction>> menuFun;//菜单Map
 	
+	private static final Logger logger = Logger.getLogger(MenuTag.class);
 	
 	public void setParentFun(List<TSFunction> parentFun) {
 		this.parentFun = parentFun;
@@ -62,7 +66,11 @@ public class MenuTag extends TagSupport {
 //			}
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			
+//			e.printStackTrace();
+			//如果已经登录，进入到菜单页中，在重启服务器之后，刷新界面就会报错
+			logger.error("服务器重启引发的错误！！");
+			
 		}finally{
 			try {
 				out.clearBuffer();

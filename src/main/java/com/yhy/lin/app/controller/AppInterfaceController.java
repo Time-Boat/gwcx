@@ -280,9 +280,9 @@ public class AppInterfaceController extends AppBaseController {
 			String code = StringUtil.numRandom(4);
 			logger.info("验证码: " + code);
 			// 发送端短消息
-//			boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-//					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-			boolean b = true;
+			boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+//			boolean b = true;
 			if (b) {
 				
 				// 判断用户是否在数据库中有记录 用接口类方便扩展
@@ -305,7 +305,8 @@ public class AppInterfaceController extends AppBaseController {
 				msg = "获取验证码成功";
 				statusCode = AppGlobals.APP_SUCCESS;
 			} else {
-				msg = "允许每分钟1条，累计每小时7条。每天10条";
+				//msg = "允许每分钟1条，累计每小时7条。每天10条";
+				msg = "您的操作过于频繁，请稍后再试";
 				statusCode = "003";
 			}
 		}

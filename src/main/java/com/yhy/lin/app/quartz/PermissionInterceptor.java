@@ -52,7 +52,7 @@ public class PermissionInterceptor {
 	@Around("execution(* com.yhy.lin.*.*.*(..)) && @annotation(org.springframework.web.bind.annotation.RequestMapping) ")
 	public Object requestMapping(ProceedingJoinPoint pj) throws Throwable {
 		Object object = pj.proceed();
-		System.out.println(pj.getSignature().getName());
+//		System.out.println(pj.getSignature().getName());
 		return object;
 	}
 

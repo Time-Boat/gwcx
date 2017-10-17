@@ -200,7 +200,8 @@
    
    <t:dgCol title="备注" field="remark"  align="center" width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" align="center" width="100"></t:dgCol>
-   <t:dgDelOpt title="删除" url="carInfoController.do?del&id={id}" exp="carStatus#eq#1&&auditStatus#ne#1"/>
+   <t:dgDelOpt title="删除" url="carInfoController.do?del&id={id}" exp="carStatus#eq#1&&auditStatus#ne#0"/>
+   
    <t:dgToolBar title="录入" icon="icon-add" url="carInfoController.do?addorupdate" operationCode="carAdd" funname="add" width="600" height="500"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="carInfoController.do?addorupdate" operationCode="carUpdate" funname="update" height="500" ></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="carInfoController.do?carDetail" funname="detail" height="700" ></t:dgToolBar>
