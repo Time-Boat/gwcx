@@ -53,6 +53,10 @@ public class ConductorServiceImpl extends CommonServiceImpl implements Conductor
 			if(AppGlobals.TECHNICAL_SPECIALIST.equals(a[i])){
 				queryCondition.append(" and d.create_user_id='"+user.getId()+"'");
 			}
+			if(AppGlobals.SUBSIDIARY_ADMIN.equals(a[i])){
+				queryCondition.append(" and t.org_code like '"+code+"%'");
+			}
+			
 		}
 		 
 		if(StringUtil.isNotEmpty(username)){

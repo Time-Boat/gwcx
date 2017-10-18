@@ -461,24 +461,25 @@ public class WeixinPayController extends AppBaseController{
 		return new ModelAndView("yhy/wechat/payResult");
 	}
 	
-	@RequestMapping(params = "checkToken")
-	protected void checkToken(HttpServletRequest request, HttpServletResponse response) throws IOException {  
-        String signature = request.getParameter("signature");  
-        String timestamp = request.getParameter("timestamp");  
-        String nonce = request.getParameter("nonce");
-        String echostr = request.getParameter("echostr");  
-        logger.info("signature : " + signature);
-        logger.info("timestamp : " + timestamp);
-        logger.info("nonce : " + nonce);
-        logger.info("echostr : " + echostr);
-        
-        PrintWriter out = response.getWriter();  
-        if (checkSignature(signature, timestamp, nonce)){  
-        	logger.info("check token : ok");  
-            out.print(echostr);  
-        }
-        out.close();  
-    }  
+	//微信公众号的服务器配置验证
+//	@RequestMapping(params = "eventPush")
+//	protected void eventPush(HttpServletRequest request, HttpServletResponse response) throws IOException {  
+//        String signature = request.getParameter("signature");  
+//        String timestamp = request.getParameter("timestamp");  
+//        String nonce = request.getParameter("nonce");
+//        String echostr = request.getParameter("echostr");  
+//        logger.info("signature : " + signature);
+//        logger.info("timestamp : " + timestamp);
+//        logger.info("nonce : " + nonce);
+//        logger.info("echostr : " + echostr);
+//        
+//        PrintWriter out = response.getWriter();  
+//        if (checkSignature(signature, timestamp, nonce)){  
+//        	logger.info("check token : ok");  
+//            out.print(echostr);  
+//        }
+//        out.close();  
+//    }  
 	
 	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
         String[] arr = new String[] { AppGlobals.SERVER_TOKEN, timestamp, nonce };  
