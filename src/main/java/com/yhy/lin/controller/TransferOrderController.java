@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -398,14 +399,14 @@ public class TransferOrderController extends BaseController {
 		
 		boolean b = transferService.saveDriverAndDriver(orderIds, startTime, licencePlateId, driverId, licencePlateName, contents);
 		
-		if (true) {
+		if (b) {
 			//同一个人下的两条订单被安排了同一个车上，那么会连续发送两条短信，这个会出发流程控制，一分钟之内不允许发送两条消息
 			//可以将发送失败的短信存到数据库，使用quartz定时去循环发送
 			//如果有rides缓存服务器，可以存到缓存中，到时候再定时发送
 			String[] keys = new String[] { "name", "startStation", "terminusStation", "time" };
 			for (int i = 0; i < contents.size(); i++) {
 				String[] p = contents.get(i);
-				//SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
+				SendMessageUtil.sendMessage(p[p.length - 1], keys, contents.get(i), SendMessageUtil.TEMPLATE_ARRANGE_CAR, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
 			}
 			success = true;
 			message = "订单处理成功";

@@ -299,7 +299,13 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
 
 			aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
-			aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
+			
+			String officePhone = AppUtil.Null2Blank(map.get("officePhone") + "");
+			if(StringUtil.isNotEmpty(officePhone)){
+				aod.setDriverPhone(officePhone);
+			}else{
+				aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
+			}
 
 			// 发车时间
 			aod.setStationStartTime(date.substring(date.indexOf(":")-2, date.lastIndexOf(":")));

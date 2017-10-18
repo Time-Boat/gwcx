@@ -154,7 +154,7 @@
 				console.log(rows[i].orderStartime);
 				console.log(new Date(rows[i].orderStartime));
 				console.log(Date.parse(new Date(rows[i].orderStartime))); */
-				slDate = Date.parse(new Date(rows[i].orderStartime)); 
+				slDate = rows[i].orderStartime; 
 			}
 			
 			ids+=rows[i].id;
@@ -167,7 +167,7 @@
 		}
 		//console.log(slDate);
 		
-		url += '&ids='+ids+'&slDate='+(slDate/1000);
+		url += '&ids='+ids+'&slDate='+slDate;
 		//console.log(url);
 		createwindow(title,url,width,height);
 		/* $("#function-transferOrderAdd").panel(
@@ -182,16 +182,18 @@
 	var slDate = '';
 	
 	function better_time(strDateStart,strDateEnd){
-		var date1 = Date.parse(new Date(strDateStart));  
-		var date2 = Date.parse(new Date(strDateEnd));    
-		//console.log(date1);
-		//console.log(date2);
-		var date3 = date2 - date1;  //时间差的毫秒数
+		date1=strDateStart;
+		date2=strDateEnd;
+		date1 = date1.replace(/-/g,"/");//替换字符，变成标准格式 
+    	date2 = date2.replace(/-/g,"/");//替换字符，变成标准格式 
+    	var d1 = Date.parse(new Date(date1)); 
+    	var d2 = Date.parse(new Date(date2)); 
+    	var date3= d2-d1;
 		
 		if(date3 >= 0){
-			slDate = date1;
+			slDate = strDateStart;
 		}else{
-			slDate = date2;
+			slDate = strDateEnd;
 		}
 		
 		date3 = Math.abs(date3);

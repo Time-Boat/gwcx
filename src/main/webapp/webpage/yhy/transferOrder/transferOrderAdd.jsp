@@ -20,9 +20,13 @@
     function checkDepartTime(){
     	var date1 = $('#startDate').val();
     	var date2 = $('#slDate').val();     //选中的订单中最小的时间
-    	date1 = Date.parse(new Date(date1));  
-    	
-    	var date3 = date2 - date1/1000;  //时间差的毫秒数
+    	//date1 = Date.parse(new Date(date1)); 
+    	date1 = date1.replace(/-/g,"/");//替换字符，变成标准格式 
+    	date2 = date2.replace(/-/g,"/");//替换字符，变成标准格式 
+    	var d1 = Date.parse(new Date(date1)); 
+    	var d2 = Date.parse(new Date(date2)); 
+    	var date3= d2-d1;
+    	//var date3 = date2 - date1/1000;  //时间差的毫秒数
     	//console.log('date1:'+date1);
     	//console.log('date2:'+date2);
     	//console.log('date3:'+date3);
@@ -54,9 +58,12 @@
     $(function(){
     	var m = $('#slDate').val();     //选中的订单中最小的时间
     	if(m == '' || m == null) return;
-    	var date = new Date(parseInt(m) * 1000).Format("yyyy-MM-dd hh:mm");
+    	var date =m;
     	console.log(date);
-    	$('#startDate').val(date);
+    	var s = date.length;
+    	//var da = date.substring(0,date.length-3);
+    	var da =new Date(date.replace(/-/g,"/")).Format("yyyy-MM-dd hh:mm")
+    	$('#startDate').val(da);
     });
     
     //格式化日期
