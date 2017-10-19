@@ -17,8 +17,18 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="name" name="name" ignore="ignore"
-							   value="${charteredPackagePage.name}">
+						<input class="inputxt" id="name" name="name" datatype="*" value="${charteredPackagePage.name}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							套餐内容:
+						</label>
+					</td>
+					<td class="value">
+						<input class="inputxt" id="description" name="description" value="${charteredPackagePage.description}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -29,8 +39,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="kilometre" name="kilometre" ignore="ignore"
-							   value="${charteredPackagePage.kilometre}" datatype="n">
+						<input class="inputxt" id="kilometre" name="kilometre" value="${charteredPackagePage.kilometre}" datatype="n1-4">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -41,32 +50,45 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="timeLength" name="timeLength" ignore="ignore"
-							   value="${charteredPackagePage.timeLength}" datatype="n">
+						<input class="inputxt" id="timeLength" name="timeLength" value="${charteredPackagePage.timeLength}" datatype="n1-5">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">所属城市:</label>
+					</td>
+					<td class="value">
+						<select id="cityId" name="cityId" datatype="*" >
+							<option value="">--请选择城市--</option>
+							<c:forEach var="c" items="${cities}">
+								<option value="${c.cityId}" <c:if test="${charteredPackagePage.cityId == c.cityId}" >selected="selected"</c:if> >
+									${c.cityName}
+								</option>
+							</c:forEach>
+						</select> 
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							所属城市:
+							是否上架:
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="cityId" name="cityId" ignore="ignore"
-							   value="${charteredPackagePage.cityId}">
+						<t:dictSelect field="status" typeGroupCode="oprType" hasLabel="false" defaultVal="${charteredPackagePage.status}" datatype="*"></t:dictSelect>	
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							备注（备用字段）:
+							备注:
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="remark" name="remark" ignore="ignore"
-							   value="${charteredPackagePage.remark}">
+						<input class="inputxt" id="remark" name="remark" ignore="ignore" value="${charteredPackagePage.remark}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

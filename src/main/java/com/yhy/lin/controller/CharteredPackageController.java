@@ -1,5 +1,8 @@
 package com.yhy.lin.controller;
 
+import java.util.Date;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,14 +22,19 @@ import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.CharteredPackageEntity;
+import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.CharteredPackageServiceI;
+
+import net.sf.json.JSONObject;
 
 /**   
  * @Title: Controller
  * @Description: 包车套餐设置
- * @author zhangdaihao
+ * @author Timer
  * @date 2017-10-17 17:05:06
  * @version V1.0   
  *
@@ -65,11 +73,10 @@ public class CharteredPackageController extends BaseController {
 
 	@RequestMapping(params = "datagrid")
 	public void datagrid(CharteredPackageEntity charteredPackage,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(CharteredPackageEntity.class, dataGrid);
-		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, charteredPackage, request.getParameterMap());
-		this.charteredPackageService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		
+		JSONObject jObject = charteredPackageService.getDatagrid(dataGrid);
+		
+		responseDatagrid(response, jObject);
 	}
 
 	/**
@@ -103,6 +110,10 @@ public class CharteredPackageController extends BaseController {
 	public AjaxJson save(CharteredPackageEntity charteredPackage, HttpServletRequest request) {
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		
+		Date d = AppUtil.getDate();
+		charteredPackage.setUpdateTime(d);
+		
 		if (StringUtil.isNotEmpty(charteredPackage.getId())) {
 			message = "包车套餐设置更新成功";
 			CharteredPackageEntity t = charteredPackageService.get(CharteredPackageEntity.class, charteredPackage.getId());
@@ -115,6 +126,10 @@ public class CharteredPackageController extends BaseController {
 				message = "包车套餐设置更新失败";
 			}
 		} else {
+			String userId = ResourceUtil.getSessionUserName().getId();
+			charteredPackage.setCreateUserId(userId);
+			charteredPackage.setCreateTime(d);
+			charteredPackage.setDeleteFlag(0);
 			message = "包车套餐设置添加成功";
 			charteredPackageService.save(charteredPackage);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
@@ -134,6 +149,10 @@ public class CharteredPackageController extends BaseController {
 			charteredPackage = charteredPackageService.getEntity(CharteredPackageEntity.class, charteredPackage.getId());
 			req.setAttribute("charteredPackagePage", charteredPackage);
 		}
+		
+		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
+		req.setAttribute("cities", cities);
+		
 		return new ModelAndView("yhy/charteredPackage/charteredPackage");
 	}
 	

@@ -14,6 +14,10 @@ import javax.persistence.Table;
 
 import org.jeecgframework.core.common.entity.IdEntity;
 
+import com.ctc.wstx.util.StringUtil;
+
+import antlr.StringUtils;
+
 /**
  *菜单权限表
  * @author  张代浩
@@ -160,9 +164,11 @@ public class TSFunction extends IdEntity implements java.io.Serializable {
 
 	public boolean hasSubFunction(List<TSFunction> functions) {
 		for (TSFunction f : functions) {
-			if(f.getTSFunction().getId().equals(this.getId())){
-				return true;
-			}
+//			if(org.jeecgframework.core.util.StringUtil.isNotEmpty(f.getTSFunction().getId())){
+				if(f.getTSFunction().getId().equals(this.getId())){
+					return true;
+				}
+//			}
 		}
 		return false;
 	}

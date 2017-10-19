@@ -52,11 +52,23 @@ public class CharteredPackageEntity implements java.io.Serializable {
 	/**备注（备用字段）*/
 	private java.lang.String remark;
 	
+	/**套餐内容*/
+	private java.lang.String description;
+	
+	
+	@Column(name ="DESCRIPTION",nullable=true,length=255)
+	public java.lang.String getDescription() {
+		return description;
+	}
+
+	public void setDescription(java.lang.String description) {
+		this.description = description;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  套餐id
 	 */
-	
 	@Id
 	@GeneratedValue(generator = "paymentableGenerator")
 	@GenericGenerator(name = "paymentableGenerator", strategy = "uuid")
