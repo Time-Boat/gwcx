@@ -70,7 +70,7 @@ public class AppInterfaceController extends AppBaseController {
 	
 	@Autowired
 	private SystemService systemService;
-
+	
 	// 登录接口
 	@RequestMapping(params = "appLogin")
 	public void AppLogin(HttpServletRequest request, HttpServletResponse response) {
@@ -1613,19 +1613,6 @@ public class AppInterfaceController extends AppBaseController {
 		returnJsonObj.put("data", data.toString());
 
 		responseOutWrite(response, returnJsonObj);
-	}
-	
-	/** 验证token是否有效 */
-	public void checkToken(String token) throws ParameterException {
-
-		CarCustomerEntity cc = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
-		if (cc == null)
-			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
-
-		Date date = cc.getTokenUpdateTime();
-		int day = AppUtil.compareDate(date, new Date(), 'd', "");
-		if (day > 30)
-			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 	}
 	
 }

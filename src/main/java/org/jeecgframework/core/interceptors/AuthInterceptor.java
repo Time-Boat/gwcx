@@ -232,17 +232,17 @@ public class AuthInterceptor implements HandlerInterceptor {
 		TSUser currLoginUser = ClientManager.getInstance().getClient(ContextHolderUtils.getSession().getId()).getUser();
         String userid = currLoginUser.getId();
 		//requestPath=requestPath.substring(0, requestPath.indexOf("?")+1);
-		String sql = "SELECT DISTINCT f.id FROM t_s_function f,t_s_role_function  rf,t_s_role_user ru " +
+		String sql = " SELECT DISTINCT f.id FROM t_s_function f,t_s_role_function  rf,t_s_role_user ru " +
 					" WHERE f.id=rf.functionid AND rf.roleid=ru.roleid AND " +
-					"ru.userid='"+userid+"' AND f.functionurl like '"+requestPath+"%'";
+					" ru.userid='"+userid+"' AND f.functionurl like '"+requestPath+"%' ";
 		List list = this.systemService.findListbySql(sql);
 		if(list.size()==0){
 
             String orgId = currLoginUser.getCurrentDepart().getId();
 
-            String functionOfOrgSql = "SELECT DISTINCT f.id from t_s_function f, t_s_role_function rf, t_s_role_org ro  " +
-                    "WHERE f.ID=rf.functionid AND rf.roleid=ro.role_id " +
-                    "AND ro.org_id='" +orgId+ "' AND f.functionurl like '"+requestPath+"%'";
+            String functionOfOrgSql = " ELECT DISTINCT f.id from t_s_function f, t_s_role_function rf, t_s_role_org ro  " +
+                    " WHERE f.ID=rf.functionid AND rf.roleid=ro.role_id " +
+                    " AND ro.org_id='" +orgId+ "' AND f.functionurl like '"+requestPath+"%' ";
             List functionOfOrgList = this.systemService.findListbySql(functionOfOrgSql);
 			return functionOfOrgList.size() > 0;
 

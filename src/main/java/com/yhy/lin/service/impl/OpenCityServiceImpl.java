@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.StringUtil;
 
 @Service("openCityService")
 @Transactional
@@ -60,14 +61,27 @@ public class OpenCityServiceImpl extends CommonServiceImpl implements OpenCitySe
 	private class MyDataExchangerBusiness2Ch implements IMyDataExchanger {
 		@Override
 		public Object exchange(Object value) {
-			if ("0".equals(value)) {
-				return "接送机业务";
-			} else if ("1".equals(value)) {
-				return "接送火车业务";
-			}else if ("0,1".equals(value) || "1,0".equals(value)) {
-				return "接送机业务,接送火车业务";
+			
+			StringBuffer bName = new StringBuffer();
+			
+			if(!StringUtil.isNotEmpty(value)){
+				return "";
 			}
-			return "";
+			String v = value + "";
+			if (v.contains("0")) {
+				bName.append("接送机业务,");
+			} 
+			if (v.contains("1")) {
+				bName.append("接送火车业务,");
+			}
+			if (v.contains("2")) {
+				bName.append("市内包车业务,");
+			}
+			if(bName.length() > 0){
+				return bName.deleteCharAt(bName.length() -1 ).toString();
+			}else{
+				return "";
+			}
 		}
 	}
 	

@@ -132,8 +132,6 @@
 						</label>
 					</td>
 					<td class="value">
-						<%-- <input class="inputxt" id="cityBusiness" name="cityBusiness" ignore="ignore"
-							   value="${openCityPage.cityBusiness}"> --%>
 						<label class="demo--label">
 							<c:choose>
 								<c:when test="${fn:contains(openCityPage.cityBusiness,'0')}">
@@ -155,6 +153,17 @@
 								</c:otherwise>
 							</c:choose>
 							<span class="demo--checkbox demo--radioInput"></span>接送火车 
+						</label> 
+						<label class="demo--label">
+							<c:choose>
+								<c:when test="${fn:contains(openCityPage.cityBusiness,'2')}">
+									<input class="demo--radio" name="cityBusiness" type="checkbox" checked="checked" value="2" />
+								</c:when>
+								<c:otherwise>
+									<input class="demo--radio" name="cityBusiness" type="checkbox" value="2" />
+								</c:otherwise>
+							</c:choose>
+							<span class="demo--checkbox demo--radioInput"></span>市内包车
 						</label> 
 						<span class="Validform_checktip"></span>
 					</td>

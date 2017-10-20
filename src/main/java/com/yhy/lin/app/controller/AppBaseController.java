@@ -28,7 +28,9 @@ import net.sf.json.JSONObject;
  * @date 2017年5月25日 上午11:23:15
  */
 public class AppBaseController extends BaseController {
-
+	
+	private SystemService systemService = super.getService();
+	
 	// 生成token
 	public String generateToken(String customerId, String phone) {
 		return md5(customerId + phone);
@@ -109,6 +111,19 @@ public class AppBaseController extends BaseController {
 				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
 			}
 		}
+	}
+	
+	/** 验证token是否有效 */
+	public void checkToken(String token) throws ParameterException {
+
+		CarCustomerEntity cc = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
+		if (cc == null)
+			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
+
+		Date date = cc.getTokenUpdateTime();
+		int day = AppUtil.compareDate(date, new Date(), 'd', "");
+		if (day > 30)
+			throw new ParameterException(AppGlobals.TOKEN_ERROR_MSG, AppGlobals.TOKEN_ERROR);
 	}
 
 }

@@ -46,6 +46,10 @@ public class BaseController {
 	@Autowired
 	private UserService userService;
 	
+	public SystemService getService(){
+		return this.systemService;
+	}
+	
 	/**
 	 * 将前台传递过来的日期格式的字符串，自动转化为Date类型
 	 * 
@@ -341,4 +345,5 @@ public class BaseController {
 		json.append("]}");
 		return json.toString();
 	}
+
 }
