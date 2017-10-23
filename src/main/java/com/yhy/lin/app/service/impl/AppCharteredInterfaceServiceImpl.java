@@ -11,7 +11,7 @@ import com.yhy.lin.app.service.AppCharteredInterfaceService;
 * @author Administrator
 * @date 2017年10月19日 下午4:10:53
 */
-@Service("AppInterfaceService")
+@Service("AppCharteredInterfaceService")
 @Transactional
 public class AppCharteredInterfaceServiceImpl extends CommonServiceImpl implements AppCharteredInterfaceService {
 

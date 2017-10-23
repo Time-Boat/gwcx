@@ -32,6 +32,7 @@ import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.PasswordUtil;
 import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppGlobals;
@@ -352,6 +353,10 @@ public class DealerInfoController extends BaseController {
 				dealerInfo.setLastAuditDate(AppUtil.getDate());
 				dealerInfo.setLastAuditStatus("1");
 				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
+				
+				//生成渠道商的登录密码
+				String pwd = PasswordUtil.encrypt(dealerInfo.getPhone(), "123456", PasswordUtil.getStaticSalt());
+				dealerInfo.setDealerPassword(pwd);
 			}
 
 			// 如果是复审，则要改变渠道商合作状态
@@ -656,22 +661,50 @@ public class DealerInfoController extends BaseController {
 		try {
 			String creditCode = request.getParameter("creditCode");
 			List<DealerInfoEntity> list = this.systemService
-					.findHql("from DealerInfoEntity where creditCode=? and status !=2 ", creditCode);
+					.findHql("from DealerInfoEntity where creditCode = ? and status !=2 ", creditCode);
 			if (list.size() > 0) {
 				message = "公司社会信用代码已经存在";
 				success = false;
 			} else {
-				message = "添加社会信用代码成功！";
+				message = "添加成功！";
 				success = true;
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 
 		j.setSuccess(success);
 		j.setMsg(message);
 		return j;
 	}
+	
+	/**
+	 * 检查公司社会信用代码是否存在
+	 */
+	@RequestMapping(params = "checkPhone")
+	@ResponseBody
+	public AjaxJson checkPhone(HttpServletRequest request) {
+		String message = "";
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		try {
+			String phone = request.getParameter("phone");
+			List<DealerInfoEntity> list = this.systemService
+					.findHql("from DealerInfoEntity where phone = ? and status !=2 ", phone);
+			if (list.size() > 0) {
+				message = "手机号已经存在";
+				success = false;
+			} else {
+				message = "添加成功！";
+				success = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
+	
 }

@@ -52,8 +52,8 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	private java.lang.String securityCode;
 	/** 更新时间 */
 	private java.util.Date codeUpdateTime;
-	/** 登录类型（保留） */
-	private java.lang.String loginType;
+	/** 登录类型    0：普通用户     1：渠道商用户*/
+	private java.lang.String userType;
 	/** 状态：0.未校验；1.已校验； */
 	private java.lang.String status;
 	
@@ -135,13 +135,13 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 		this.codeUpdateTime = codeUpdateTime;
 	}
 
-	@Column(name = "LOGIN_TYPE", nullable = true, length = 1)
-	public java.lang.String getLoginType() {
-		return loginType;
+	@Column(name = "USER_TYPE", nullable = true, length = 1)
+	public java.lang.String getUserType() {
+		return userType;
 	}
 
-	public void setLoginType(java.lang.String loginType) {
-		this.loginType = loginType;
+	public void setUserType(java.lang.String userType) {
+		this.userType = userType;
 	}
 
 	@Column(name = "STATUS", nullable = true, length = 1)

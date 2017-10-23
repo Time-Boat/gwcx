@@ -88,7 +88,7 @@ public class AppInterfaceController extends AppBaseController {
 			String param = AppUtil.inputToStr(request);
 			
 			System.out.println("appLogin    前端传递参数：" + param);
-//			
+			
 			//验证参数
 			JSONObject jsondata = checkParam(param);
 			
@@ -452,47 +452,6 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	// 获取包车线路信息
-	@RequestMapping(params = "getCharteredInfo")
-	public void getCharteredInfo(HttpServletRequest request, HttpServletResponse response) {
-		AppUtil.responseUTF8(response);
-		JSONObject returnJsonObj = new JSONObject();
-		String msg = "";
-		String statusCode = "";
-		JSONObject data = new JSONObject();
-
-		try {
-			// 2： 接机 3：送机 4：接火车 5：送火车
-			String serveType = request.getParameter("serveType");
-			// 所属城市
-			String cityId = request.getParameter("cityId"); 
-
-			// 验证参数
-			checkParam(new String[] { "serveType", "cityId" }, serveType, cityId);
-
-			List<AppStationInfoEntity> lList = appService.getPTStation(serveType, cityId);
-
-			data.put("PTStation", lList);
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
-		} catch (ParameterException e) {
-			statusCode = e.getCode();
-			msg = e.getErrorMessage();
-			logger.error(e.getErrorMessage());
-		} catch (Exception e) {
-			statusCode = AppGlobals.SYSTEM_ERROR;
-			msg = AppGlobals.SYSTEM_ERROR_MSG;
-			e.printStackTrace();
-		}
-
-		returnJsonObj.put("msg", msg);
-		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", data.toString());
-
-		responseOutWrite(response, returnJsonObj);
-	}
-	
 	// 获取机场站点或者火车站站点信息
 	@RequestMapping(params = "getPTStation")
 	public void getPTStation(HttpServletRequest request, HttpServletResponse response) {
