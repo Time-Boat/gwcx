@@ -66,12 +66,36 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 渠道商绑定用户时间  */
 	private java.util.Date dealerBandingTime;
 	
-	/** 用户登录次数*/
+	/** 用户登录次数 */
 	private int loginCount;
 	
 	/** 用户消息信息状态  0 未读     1已读*/
 	private java.lang.String msgStatus;
 	
+	/** 渠道商密码，只有渠道商用户才有此字段 */
+	private java.lang.String password;
+	
+	/** 渠道商密码，只有渠道商用户才有此字段 */
+	private java.util.Date psdModifyTime;
+	
+	@Column(name = "PSD_MODIFY_TIME", nullable = true)
+	public java.util.Date getPsdModifyTime() {
+		return psdModifyTime;
+	}
+
+	public void setPsdModifyTime(java.util.Date psdModifyTime) {
+		this.psdModifyTime = psdModifyTime;
+	}
+
+	@Column(name = "PASSWORD", nullable = true, length = 100)
+	public java.lang.String getPassword() {
+		return password;
+	}
+
+	public void setPassword(java.lang.String password) {
+		this.password = password;
+	}
+
 	@Column(name = "MSG_STATUS", nullable = true, length = 1)
 	public java.lang.String getMsgStatus() {
 		return msgStatus;

@@ -6,14 +6,12 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-import javax.persistence.SequenceGenerator;
 
 /**   
  * @Title: Entity
@@ -82,20 +80,9 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String lastRejectReason;
 	/**渠道商文件路径*/
 	private String dealerFilePath;
-	/**渠道商密码*/
-	private String dealerPassword;
 	/**渠道商折扣*/
 	private BigDecimal dealerDiscount;
 	
-	@Column(name ="DEALER_PASSWORD",nullable=true,length=100)
-	public String getDealerPassword() {
-		return dealerPassword;
-	}
-
-	public void setDealerPassword(String dealerPassword) {
-		this.dealerPassword = dealerPassword;
-	}
-
 	@Column(name ="DEALER_DISCOUNT",nullable=true,precision=2,scale=1)
 	public BigDecimal getDealerDiscount() {
 		return dealerDiscount;

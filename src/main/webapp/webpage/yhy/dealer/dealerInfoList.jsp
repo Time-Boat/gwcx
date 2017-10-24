@@ -183,6 +183,10 @@
 				tip('审核状态中不能被编辑！');
 				return;
 			}
+			if (rowsData[0].status == 0) {
+				tip('合作状态中不能被编辑！');
+				return;
+			}
 			if (rowsData[0].status == 2) {
 				tip('已终止的渠道商不能进行编辑！');
 				return;
@@ -262,6 +266,7 @@
    <t:dgCol title="推广人数" field="scanCount" align="center" width="60"></t:dgCol>
    <t:dgCol title="联系电话" field="phone" align="center" width="120"></t:dgCol>
    <t:dgCol title="负责人" field="manager" align="center" width="70"></t:dgCol>
+   <t:dgCol title="折扣" field="dealerDiscount" align="center" width="70"></t:dgCol>
    <t:dgCol title="地址" field="position" align="center" width="120"></t:dgCol>
    
    <t:dgCol title="初审状态" field="auditStatus" dictionary="audit_status" query="true" align="center"></t:dgCol>

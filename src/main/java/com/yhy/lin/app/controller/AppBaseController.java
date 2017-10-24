@@ -29,7 +29,8 @@ import net.sf.json.JSONObject;
  */
 public class AppBaseController extends BaseController {
 	
-	private SystemService systemService = super.getService();
+	@Autowired
+	private SystemService systemService;
 	
 	// 生成token
 	public String generateToken(String customerId, String phone) {

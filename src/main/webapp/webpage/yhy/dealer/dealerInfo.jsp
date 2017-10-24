@@ -31,6 +31,7 @@
 	var a = false;
 	//验证手机号是否已经被占用
 	function checkPhone(phone){
+		
 		$.ajax({
           type:"get",
           url:"dealerInfoController.do?checkPhone&phone="+phone,
@@ -67,8 +68,6 @@
  <body style="overflow-y: hidden" scroll="no">
   <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="dealerInfoController.do?save" beforeSubmit="cp()">
 			<input id="id" name="id" type="hidden" value="${dealerInfoPage.id }">
-			<!-- <a href="windows.open(https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=gQF97jwAAAAAAAAAAS5odHRwOi8vd2VpeGluLnFxLmNvbS9xLzAyanBkSWwwWm1jemsxbFZlbDFwMW8AAgRZMlVZAwQgHAAA)" 
-				download >下载</a> -->
 			<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable">
 				<tr>
 					<td align="right">
@@ -77,7 +76,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="account"  name="account" datatype="*" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
+						<input class="inputxt" id="account"  name="account" datatype="*" 
 							   value="${dealerInfoPage.account}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -113,8 +112,24 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="position" name="position" datatype="*" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
+						<input class="inputxt" id="position" name="position" datatype="*" 
 							   value="${dealerInfoPage.position}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							折扣:
+						</label>
+					</td>
+					<td class="value">
+						<select class="select" id="dealerDiscount" name="dealerDiscount" datatype="*" >
+							<option value="10">无折扣</option>
+							<c:forEach begin="1" end="9" varStatus="s">
+								<option value="${s.index}" <c:if test="${dealerInfoPage.dealerDiscount == s.index }">selected="selected"</c:if> >${s.index}折</option>
+							</c:forEach>
+						</select>
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -125,7 +140,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="bankAccount" name="bankAccount" datatype="*" <c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if>
+						<input class="inputxt" id="bankAccount" name="bankAccount" datatype="*" 
 							   value="${dealerInfoPage.bankAccount}">
 						<span class="Validform_checktip"></span>
 					</td>

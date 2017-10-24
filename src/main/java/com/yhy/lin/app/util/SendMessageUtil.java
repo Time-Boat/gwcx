@@ -28,13 +28,16 @@ import com.yhy.lin.app.entity.AppMessageListEntity;
 public class SendMessageUtil {
 
 	private static final Logger logger = Logger.getLogger(SendMessageUtil.class);
-	// 验证码信息模板
+	// 登录验证码信息模板
 	//public static final String TEMPLATE_SMS_CODE = "SMS_66640251";//个人SMS_63766002
 	public static final String TEMPLATE_SMS_CODE = "SMS_103040027";//个人SMS_103040027
 	// 验证码信息模板对应签名
 	//public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "登录验证";
 	public static final String TEMPLATE_SMS_CODE_SIGN_NAME = "小龙出行";
 
+	// 修改密码的验证码信息模板
+	public static final String TEMPLATE_MODIFY_PASSWORD_SMS_CODE = "SMS_105955007";
+	
 	//订单提醒
 	//public static final String TEMPLATE_SMS_CODE_SIGN_ORDER = "大鱼测试";
 	public static final String TEMPLATE_SMS_CODE_SIGN_ORDER = "小龙出行";

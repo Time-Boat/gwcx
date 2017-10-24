@@ -139,6 +139,7 @@ public class AppInterfaceController extends AppBaseController {
 							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
 							data.put("phone", user.getPhone());
 							data.put("isNew", isNew);
+							data.put("userType", user.getUserType());
 							statusCode = AppGlobals.APP_SUCCESS;
 						} else {
 							msg = "验证码不正确！";
@@ -221,6 +222,7 @@ public class AppInterfaceController extends AppBaseController {
 						data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
 						data.put("phone", user.getPhone());
 						data.put("isNew", isNew);
+						data.put("userType", user.getUserType());
 						statusCode = AppGlobals.APP_SUCCESS;
 						//添加登录次数
 						StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count=" + (user.getLoginCount() + 1) + " where token ='"+token+"'");
@@ -268,47 +270,72 @@ public class AppInterfaceController extends AppBaseController {
 		JSONObject data = new JSONObject();
 
 		String mobile = request.getParameter("mobile");
-		logger.info("手机号: " + mobile);
-		if (!StringUtil.isNotEmpty(mobile)) {
-			msg = "手机号不能为空";
-			statusCode = "001";
-		} else if (!mobile.matches(AppGlobals.CHECK_PHONE)) {
-			msg = "手机号格式不正确";
-			statusCode = "002";
-		} else {
-			// 生成4位数的验证码
-			String code = StringUtil.numRandom(4);
-			logger.info("验证码: " + code);
-			// 发送端短消息
-			boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-					SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-//			boolean b = true;
-			if (b) {
-				
-				// 判断用户是否在数据库中有记录 用接口类方便扩展
-				UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-				
-				// 当前时间
-				String curTime = AppUtil.getCurTime();
-				String sql = "";
-				// 存储验证码相关信息
-				if (user == null) {
-					sql = "insert into car_customer set id='" + UUIDGenerator.generate()
-							+ "',phone = ? ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
-					systemService.executeSql(sql, mobile, curTime, curTime, code);
-				} else {
-					sql = "update car_customer set status = '0',code_update_time = ? ,security_code = ? where phone = ? ";
-					systemService.executeSql(sql, curTime, code, mobile);
-				}
-
-				data.put("codemsg", code);
-				msg = "获取验证码成功";
-				statusCode = AppGlobals.APP_SUCCESS;
+		
+		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码 
+		String codeType = request.getParameter("codeType");
+		
+		// 验证参数
+		try {
+			checkParam(new String[] { "codeType", "mobile" }, codeType, mobile);
+					
+			logger.info("手机号: " + mobile);
+			if (!mobile.matches(AppGlobals.CHECK_PHONE)) {
+				msg = "手机号格式不正确";
+				statusCode = "002";
 			} else {
-				//msg = "允许每分钟1条，累计每小时7条。每天10条";
-				msg = "您的操作过于频繁，请稍后再试";
-				statusCode = "003";
+				// 生成4位数的验证码
+				String code = StringUtil.numRandom(4);
+				logger.info("验证码: " + code);
+				
+				String templateCode = "";
+				
+				switch (codeType) {
+				case "0":
+					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
+					break;
+				case "1":
+					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					break;
+				default:
+					break;
+				}
+				
+				// 发送端短消息
+//				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+//						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+				boolean b = true;
+				if (b) {
+					
+					// 判断用户是否在数据库中有记录用接口类方便扩展
+					UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
+					
+					// 当前时间
+					String curTime = AppUtil.getCurTime();
+					String sql = "";
+					// 存储验证码相关信息
+					if (user == null) {
+						sql = "insert into car_customer set id='" + UUIDGenerator.generate()
+								+ "',phone = ? ,user_type = '0' ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
+						systemService.executeSql(sql, mobile, curTime, curTime, code);
+					} else {
+						sql = "update car_customer set status = '0', code_update_time = ? ,security_code = ? where phone = ? ";
+						systemService.executeSql(sql, curTime, code, mobile);
+					}
+	
+					data.put("codemsg", code);
+					msg = "获取验证码成功";
+					statusCode = AppGlobals.APP_SUCCESS;
+				} else {
+					//msg = "允许每分钟1条，累计每小时7条。每天10条";
+					msg = "您的操作过于频繁，请稍后再试";
+					statusCode = "003";
+				}
 			}
+		} catch (ParameterException e) {
+			e.printStackTrace();
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
 		}
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);

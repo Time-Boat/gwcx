@@ -35,6 +35,7 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.PasswordUtil;
 import org.jeecgframework.core.util.ResourceUtil;
 
+import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.HttpUtils;
@@ -356,7 +357,15 @@ public class DealerInfoController extends BaseController {
 				
 				//生成渠道商的登录密码
 				String pwd = PasswordUtil.encrypt(dealerInfo.getPhone(), "123456", PasswordUtil.getStaticSalt());
-				dealerInfo.setDealerPassword(pwd);
+				
+				CarCustomerEntity c = new CarCustomerEntity();
+				c.setPassword(pwd);
+				c.setPhone(dealerInfo.getPhone());
+				c.setCreateTime(AppUtil.getDate());
+				c.setLoginCount(0);
+				c.setUserType("1");
+				c.setRealName(dealerInfo.getAccount());
+				systemService.save(c);
 			}
 
 			// 如果是复审，则要改变渠道商合作状态
@@ -679,7 +688,7 @@ public class DealerInfoController extends BaseController {
 	}
 	
 	/**
-	 * 检查公司社会信用代码是否存在
+	 * 检查手机号是否存在
 	 */
 	@RequestMapping(params = "checkPhone")
 	@ResponseBody
@@ -689,8 +698,9 @@ public class DealerInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		try {
 			String phone = request.getParameter("phone");
+			String id = request.getParameter("id");
 			List<DealerInfoEntity> list = this.systemService
-					.findHql("from DealerInfoEntity where phone = ? and status !=2 ", phone);
+					.findHql("from DealerInfoEntity where phone = ? and status !=2 and id != ?", phone, id);
 			if (list.size() > 0) {
 				message = "手机号已经存在";
 				success = false;

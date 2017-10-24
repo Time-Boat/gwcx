@@ -280,12 +280,12 @@ public class AppUtil {
 		return 0;
 	}
 
-	// 获取当前时间(字符串)
+	/** 获取当前时间(字符串) */
 	public static String getCurTime() {
 		return DateUtils.date2Str(DateUtils.datetimeFormat);
 	}
 
-	// 获取当前时间(Date)
+	/** 获取当前时间(Date) */
 	public static Date getDate() {
 		return DateUtils.getDate();
 	}
