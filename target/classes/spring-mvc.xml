@@ -148,8 +148,8 @@
 						<value>app.do?tokenLogin</value>
 						
 						<!-- 渠道商用户接口 -->
-						<value>charteredApp.do?appDealerLogin</value>
-						<value>charteredApp.do?modifyPassword</value>
+						<value>dealerApp.do?appDealerLogin</value>
+						<value>dealerApp.do?modifyPassword</value>
 						
 						<!-- 微信公众号 -->
 						<!-- 微信支付 -->

@@ -91,6 +91,8 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	private String firstApplicationUser;
 	//复审人
 	private String lastApplicationUser;
+	//是否有渠道商线路
+	private String isDealerLine;
 	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
@@ -324,5 +326,11 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	public void setLastApplicationUser(String lastApplicationUser) {
 		this.lastApplicationUser = lastApplicationUser;
 	}
-	
+	@Column(name = "is_dealer_line")
+	public String getIsDealerLine() {
+		return isDealerLine;
+	}
+	public void setIsDealerLine(String isDealerLine) {
+		this.isDealerLine = isDealerLine;
+	}
 }

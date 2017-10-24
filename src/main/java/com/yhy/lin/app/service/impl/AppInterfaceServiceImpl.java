@@ -28,6 +28,7 @@ import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -158,14 +159,19 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	@Override
 	public void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
 			List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
-			List<AppStationInfoEntity> stationList) {
+			List<AppStationInfoEntity> stationList, String userType, List<CarTSTypeLineEntity> ctlList) {
 
+		StringBuffer sql = new StringBuffer();
+		sql.append(" select lf.id,lf.name,lf.price,lf.lineTimes,lf.dispath ");
+		sql.append(" from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id ");
+		sql.append(" where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ");
+		
+		if(userType.equals("1")){
+			sql.append(" and lf.is_dealer_line=1 ");
+		}
+		
 		// 根据起点id城市查找线路信息
-		List<Map<String, Object>> lineList = findForJdbc(
-				" select lf.id,lf.name,lf.price,lf.lineTimes,lf.dispath "
-						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id "
-						+ " where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ",
-				stationId, cityId, serveType);
+		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), stationId, cityId, serveType);
 
 		if (lineList.size() == 0) {
 			return;
@@ -196,6 +202,12 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 				+ ") and station_type=? and name like '%" + likeStation + "%' ", 0);
 		stationList.addAll(stationList1);
 
+		// 如果是渠道商线路，则存储线路的车辆区间价格
+		if(userType.equals("1")){
+			List<CarTSTypeLineEntity> ctstlList = findHql("from CarTSTypeLineEntity where lineId in (" + sbf.toString() + ")");
+			ctlList.addAll(ctstlList);
+		}
+		
 		// 常用站点列表
 		// List<CustomerCommonAddrEntity> c =
 		// systemService.findHql("from CustomerCommonAddrEntity where

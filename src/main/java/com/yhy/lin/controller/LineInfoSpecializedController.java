@@ -1,5 +1,6 @@
 package com.yhy.lin.controller;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,8 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
+import org.jeecgframework.web.system.pojo.base.TSType;
+import org.jeecgframework.web.system.pojo.base.TSTypegroup;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +24,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.BusStopInfoEntity;
+import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.LineInfoView;
 import com.yhy.lin.entity.OpenCityEntity;
+import com.yhy.lin.service.CarTSTypeLineServiceI;
 import com.yhy.lin.service.LineInfoServiceI;
 
 import net.sf.json.JSONArray;
@@ -46,6 +50,9 @@ public class LineInfoSpecializedController extends BaseController {
 
 	@Autowired
 	private LineInfoServiceI lineInfoService;
+	
+	@Autowired
+	private CarTSTypeLineServiceI carTSTypeLineServiceI;
 
 	/**
 	 * 接送机线路管理跳转页面
@@ -565,6 +572,64 @@ public class LineInfoSpecializedController extends BaseController {
 			message="没有选中要强制下架的线路！";
 		}
 		
+		j.setMsg(message);
+		return j;
+	}
+	/**
+	 * 去线路添加页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "addCarRegion")
+	public ModelAndView addCarRegion(LineInfoEntity lineInfo, HttpServletRequest req) {
+
+		String lineId = req.getParameter("id");
+		
+		List<TSTypegroup> list = systemService.findByProperty(TSTypegroup.class, "typegroupcode", "car_type");
+		for (int i = 0; i < list.size(); i++) {
+			String typeId = list.get(i).getId();
+			List<TSType> typelist = this.systemService.findByProperty(TSType.class, "TSTypegroup.id",typeId);
+			req.setAttribute("typelist", typelist);
+		}
+		
+		if(StringUtil.isNotEmpty(lineId)){
+			req.setAttribute("lineId", lineId);
+			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
+			if(carlist.size()>0){
+				req.setAttribute("carlist", carlist);
+			}
+		}
+		
+		return new ModelAndView("yhy/linesSpecial/addCarRegion");
+	}
+	
+	/**
+	 * 保存价格
+	 */
+	@RequestMapping(params = "savePrice")
+	@ResponseBody
+	public AjaxJson save(HttpServletRequest request, HttpServletResponse respone) {
+		
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		
+		String price[] = request.getParameterValues("price");
+		String lineId = request.getParameter("lineId");
+		String typeid[] = request.getParameterValues("typeid");
+		
+		for (int i = 0; i < price.length; i++) {
+			CarTSTypeLineEntity cartype = new CarTSTypeLineEntity();
+			cartype.setLineId(lineId);
+			cartype.setCarTypeId(typeid[i]);
+			cartype.setCarTypePrice(new BigDecimal(price[i]));
+			try {
+				message="保存成功！";
+				carTSTypeLineServiceI.save(cartype);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+		System.out.println();
 		j.setMsg(message);
 		return j;
 	}

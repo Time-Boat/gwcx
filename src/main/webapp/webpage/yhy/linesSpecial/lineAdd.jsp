@@ -195,6 +195,15 @@
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 是否有渠道商: </label>
+			</td>
+			<td class="value">
+				<t:dictSelect id="isDealerLine" field="isDealerLine" typeGroupCode="is_dealer" hasLabel="false" defaultVal="${lineInfo.isDealerLine}" datatype="*"></t:dictSelect>
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
 		
 		<tr>
 			<td align="right">

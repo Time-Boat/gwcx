@@ -45,6 +45,7 @@ import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -545,8 +546,11 @@ public class AppInterfaceController extends AppBaseController {
 			//模糊查询站点条件
 			String likeStation = request.getParameter("likeStation");
 
+			//用户类型    0：普通用户    1：渠道商用户
+			String userType = request.getParameter("userType");
+			
 			// 验证参数
-			checkParam(new String[] { "serveType", "stationId", "cityId"}, serveType, stationId, cityId);
+			checkParam(new String[] { "serveType", "stationId", "cityId", "userType"}, serveType, stationId, cityId, userType);
 
 			//线路信息
 			List<AppLineStationInfoEntity> lList = new ArrayList<>();
@@ -554,9 +558,13 @@ public class AppInterfaceController extends AppBaseController {
 			List<AppStationInfoEntity> cList = new ArrayList<>();
 			//站点信息
 			List<AppStationInfoEntity> stationList = new ArrayList<>();
-
-			appService.getLinebyStation(serveType, cityId, stationId, userId, likeStation, lList, cList, stationList);
-
+			//车辆座位区间价格
+			List<CarTSTypeLineEntity> ctlList = new ArrayList<>();
+			
+			//如果是渠道商用户，没有开通渠道商线路的，不要返回
+			appService.getLinebyStation(serveType, cityId, stationId, userId, likeStation, lList, cList, stationList, userType, ctlList);
+			
+			data.put("ctlList", ctlList);
 			data.put("addrs", cList);
 			data.put("lineInfo", lList);
 			data.put("stationInfo", stationList);

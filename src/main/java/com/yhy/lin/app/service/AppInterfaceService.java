@@ -10,6 +10,7 @@ import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
+import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -25,10 +26,11 @@ public interface AppInterfaceService extends CommonService{
 	/** 获取机场站点或者火车站站点信息 */
 	List<AppStationInfoEntity> getPTStation(String serveType, String cityId);
 
-	/** 获取线路站点信息 */
+	/** 获取线路站点信息 
+	 * @param userType */
 	void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
 			List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
-			List<AppStationInfoEntity> stationList);
+			List<AppStationInfoEntity> stationList, String userType, List<CarTSTypeLineEntity> ctlList);
 
 	/** 获取用户订单列表 */
 	List<AppUserOrderEntity> getUserOrders(String userId, String orderStatus, String pageNo, String maxPageItem);

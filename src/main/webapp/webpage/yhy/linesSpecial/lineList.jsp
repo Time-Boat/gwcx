@@ -9,6 +9,7 @@
 <t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" checkbox="true">
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
+	<t:dgCol title="是否有渠道商" field="isDealerLine" hidden="true"></t:dgCol>
 	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
@@ -32,7 +33,7 @@
 	 <%--<t:dgCol title="线路备注" field="remark"  align="center" width="50"></t:dgCol>--%>
 	<t:dgCol title="操作" field="opt" width="230"></t:dgCol>
 
-	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500"></t:dgToolBar>
+	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
@@ -54,6 +55,7 @@
 	<t:dgFunOpt funname="lookRejectReason(id)" title="初审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#6"></t:dgFunOpt> 
 	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
+	<t:dgToolBar funname="addCarRegion(id)" icon="icon-edit" title="编辑座位区间价格" ></t:dgToolBar>
 </t:datagrid> </div>
 <div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
     data-options="modal:true" closed="true" >
@@ -370,6 +372,23 @@
 		}
 	    url += '&load=detail&id='+rowsData[0].id;
 		createdetailwindow(title,url,700,670);
+	}
+	
+	function addCarRegion(id) {
+		var rows = $("#lineList2").datagrid("getSelections");
+		if(rows.length==0){
+			tip('请选择一条要添加区间价格的线路');
+			return;
+		}
+		if(rows.length>1){
+			tip('只能添加一条线路的区间价格');
+			return;
+		}
+		if(rows[0].isDealerLine!='1'){
+			tip('该线路没有渠道商，不能添加区间价格');
+			return;
+		}
+		add("添加座位区间价格", "lineInfoSpecializedController.do?addCarRegion&id=" + rows[0].id,"500px","470px");
 	}
 	
 </script>
