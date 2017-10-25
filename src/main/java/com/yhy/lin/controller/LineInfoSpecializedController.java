@@ -617,19 +617,32 @@ public class LineInfoSpecializedController extends BaseController {
 		String lineId = request.getParameter("lineId");
 		String typeid[] = request.getParameterValues("typeid");
 		
-		for (int i = 0; i < price.length; i++) {
-			CarTSTypeLineEntity cartype = new CarTSTypeLineEntity();
-			cartype.setLineId(lineId);
-			cartype.setCarTypeId(typeid[i]);
-			cartype.setCarTypePrice(new BigDecimal(price[i]));
-			try {
-				message="保存成功！";
-				carTSTypeLineServiceI.save(cartype);
-			} catch (Exception e) {
-				// TODO: handle exception
+		if(StringUtil.isNotEmpty(lineId)){
+			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
+			
+			if(carlist.size()>0){
+				for (int i = 0; i < carlist.size(); i++) {
+					CarTSTypeLineEntity cartype =carlist.get(i);
+					cartype.setCarTypePrice(new BigDecimal(price[i]));
+					message="修改价格成功！";
+					carTSTypeLineServiceI.saveOrUpdate(cartype);
+				}
+			}else{
+				for (int i = 0; i < price.length; i++) {
+					CarTSTypeLineEntity cartype = new CarTSTypeLineEntity();
+					cartype.setLineId(lineId);
+					cartype.setCarTypeId(typeid[i]);
+					cartype.setCarTypePrice(new BigDecimal(price[i]));
+					try {
+						message="保存价格成功！";
+						carTSTypeLineServiceI.save(cartype);
+					} catch (Exception e) {
+						// TODO: handle exception
+					}
+				}
 			}
 		}
-		System.out.println();
+		
 		j.setMsg(message);
 		return j;
 	}

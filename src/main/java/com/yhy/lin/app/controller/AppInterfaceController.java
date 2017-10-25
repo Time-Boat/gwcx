@@ -1,5 +1,6 @@
 package com.yhy.lin.app.controller;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +23,7 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.apache.batik.extension.svg.LineInfo;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -303,7 +305,7 @@ public class AppInterfaceController extends AppBaseController {
 				
 				// 发送端短消息
 //				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-//						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+//						templateCode , SendMessageUtil.TE MPLATE_SMS_CODE_SIGN_NAME);
 				boolean b = true;
 				if (b) {
 					
@@ -405,6 +407,12 @@ public class AppInterfaceController extends AppBaseController {
 				success = false;
 			} else {
 				
+				//确保价格不被前端修改
+				LineInfoEntity l = appService.get(LineInfoEntity.class, t.getLineId());
+				t.setOrderUnitprice(l.getPrice());
+				BigDecimal tp = l.getPrice().multiply(new BigDecimal(t.getOrderNumbers()));
+				t.setOrderTotalPrice(tp);
+				
 				String orderId = "";
 				
 				//如果是未支付的订单，进行修改之后，判断这个id是不是存在的如果是存在的，直接修改内容
@@ -494,14 +502,16 @@ public class AppInterfaceController extends AppBaseController {
 			String serveType = request.getParameter("serveType");
 			// 所属城市
 			String cityId = request.getParameter("cityId");
-
+			//用户类型    0：普通用户    1：渠道商用户
+			String userType = request.getParameter("userType");
+						
 			// 验证参数
-			checkParam(new String[] { "serveType", "cityId" }, serveType, cityId);
-
-			List<AppStationInfoEntity> lList = appService.getPTStation(serveType, cityId);
-
+			checkParam(new String[] { "serveType", "cityId", "userType" }, serveType, cityId, userType);
+			
+			List<AppStationInfoEntity> lList = appService.getPTStation(serveType, cityId, userType);
+			
 			data.put("PTStation", lList);
-
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
@@ -540,7 +550,7 @@ public class AppInterfaceController extends AppBaseController {
 			String cityId = request.getParameter("cityId");
 			// token
 			// String token = request.getParameter("token");
-
+			
 			String userId = request.getParameter("userId");
 			
 			//模糊查询站点条件
@@ -558,13 +568,9 @@ public class AppInterfaceController extends AppBaseController {
 			List<AppStationInfoEntity> cList = new ArrayList<>();
 			//站点信息
 			List<AppStationInfoEntity> stationList = new ArrayList<>();
-			//车辆座位区间价格
-			List<CarTSTypeLineEntity> ctlList = new ArrayList<>();
-			
 			//如果是渠道商用户，没有开通渠道商线路的，不要返回
-			appService.getLinebyStation(serveType, cityId, stationId, userId, likeStation, lList, cList, stationList, userType, ctlList);
+			appService.getLinebyStation(serveType, cityId, stationId, userId, likeStation, lList, cList, stationList, userType);
 			
-			data.put("ctlList", ctlList);
 			data.put("addrs", cList);
 			data.put("lineInfo", lList);
 			data.put("stationInfo", stationList);
@@ -586,7 +592,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
-
+	
 	/** 获取开通业务城市列表 */
 	@RequestMapping(params = "getCitys")
 	public void getCitys(HttpServletRequest request, HttpServletResponse response) {
@@ -620,6 +626,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
+	
 	/**
 	 * 删除订单
 	 */

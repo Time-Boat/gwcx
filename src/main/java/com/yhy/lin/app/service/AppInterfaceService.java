@@ -24,13 +24,13 @@ public interface AppInterfaceService extends CommonService{
 	String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId);
 
 	/** 获取机场站点或者火车站站点信息 */
-	List<AppStationInfoEntity> getPTStation(String serveType, String cityId);
+	List<AppStationInfoEntity> getPTStation(String serveType, String cityId, String userType);
 
 	/** 获取线路站点信息 
 	 * @param userType */
 	void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
 			List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
-			List<AppStationInfoEntity> stationList, String userType, List<CarTSTypeLineEntity> ctlList);
+			List<AppStationInfoEntity> stationList, String userType);
 
 	/** 获取用户订单列表 */
 	List<AppUserOrderEntity> getUserOrders(String userId, String orderStatus, String pageNo, String maxPageItem);

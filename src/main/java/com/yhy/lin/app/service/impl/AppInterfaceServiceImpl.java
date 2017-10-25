@@ -129,16 +129,21 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	}
 
 	@Override
-	public List<AppStationInfoEntity> getPTStation(String serveType, String cityId) {
+	public List<AppStationInfoEntity> getPTStation(String serveType, String cityId, String userType) {
 
 		List<AppStationInfoEntity> lList = new ArrayList<>();
-
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append(" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y ");
+		sql.append(" from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId ");
+		sql.append(" where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 and lf.status=0 ");
+		if(userType.equals("1")){
+			sql.append(" and lf.is_dealer_line=1 ");
+		}
+		sql.append(" group by lb.busStopsId ");
+		
 		// 查找指定类型的线路
-		List<Map<String, Object>> lineList = findForJdbc(
-				" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y "
-						+ " from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId "
-						+ " where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 and lf.status=0 group by lb.busStopsId ",
-				cityId, serveType, AppUtil.getStationType(serveType));
+		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), cityId, serveType, AppUtil.getStationType(serveType));
 
 		for (Map<String, Object> a : lineList) {
 			AppStationInfoEntity asi = new AppStationInfoEntity();
@@ -159,7 +164,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	@Override
 	public void getLinebyStation(String serveType, String cityId, String stationId, String userId, String likeStation,
 			List<AppLineStationInfoEntity> lList, List<AppStationInfoEntity> cList,
-			List<AppStationInfoEntity> stationList, String userType, List<CarTSTypeLineEntity> ctlList) {
+			List<AppStationInfoEntity> stationList, String userType) {
 
 		StringBuffer sql = new StringBuffer();
 		sql.append(" select lf.id,lf.name,lf.price,lf.lineTimes,lf.dispath ");
@@ -197,17 +202,15 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		if (sbf.length() > 0)
 			sbf.deleteCharAt(sbf.length() - 1);
 
-		// 查询指定id线路中的所有普通站点
-		List<AppStationInfoEntity> stationList1 = findHql("from AppStationInfoEntity where lineId in (" + sbf.toString()
-				+ ") and station_type=? and name like '%" + likeStation + "%' ", 0);
-		stationList.addAll(stationList1);
-
-		// 如果是渠道商线路，则存储线路的车辆区间价格
-		if(userType.equals("1")){
-			List<CarTSTypeLineEntity> ctstlList = findHql("from CarTSTypeLineEntity where lineId in (" + sbf.toString() + ")");
-			ctlList.addAll(ctstlList);
+		String ssql = "from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ";
+		if(StringUtil.isNotEmpty(likeStation)){
+			ssql += " and name like '%" + likeStation + "%' ";
 		}
 		
+		// 查询指定id线路中的所有普通站点
+		List<AppStationInfoEntity> stationList1 = findHql(ssql, 0);
+		stationList.addAll(stationList1);
+
 		// 常用站点列表
 		// List<CustomerCommonAddrEntity> c =
 		// systemService.findHql("from CustomerCommonAddrEntity where

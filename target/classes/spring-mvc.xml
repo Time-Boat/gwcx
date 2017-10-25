@@ -150,6 +150,7 @@
 						<!-- 渠道商用户接口 -->
 						<value>dealerApp.do?appDealerLogin</value>
 						<value>dealerApp.do?modifyPassword</value>
+						<value>dealerApp.do?getPeoplesPrice</value>
 						
 						<!-- 微信公众号 -->
 						<!-- 微信支付 -->

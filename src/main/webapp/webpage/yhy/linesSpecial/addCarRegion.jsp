@@ -24,7 +24,7 @@ $(function() {
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoSpecializedController.do?savePrice" >
 	<input id="lineId" name="lineId" type="hidden" value="${lineId}">
-		<table style="width: 500px;" cellpadding="0" cellspacing="1" class="formtable" id="formtableId">
+		<table style="width: 100%;" cellpadding="0" cellspacing="1" class="formtable" id="formtableId">
 			
 			<c:forEach var="c" items="${typelist}">
 				<tr>

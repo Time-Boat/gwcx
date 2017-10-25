@@ -1,5 +1,8 @@
 package com.yhy.lin.app.controller;
 
+import java.util.List;
+import java.util.Map;
+
 /**
 * Description : 渠道商接口
 * @author Timer
@@ -69,8 +72,8 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
 				if (StringUtil.isNotEmpty(password)) {
 					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-					if(user.getUserType().equals("1")){
-						if (user != null && user.getPassword().equals(PasswordUtil.encrypt(mobile, password, PasswordUtil.getStaticSalt()))) {
+					if (user != null && user.getPassword().equals(PasswordUtil.encrypt(mobile, password, PasswordUtil.getStaticSalt()))) {
+						if("1".equals(user.getUserType())){
 							String sql = "";
 							String curTime = AppUtil.getCurTime();
 							String token = "";
@@ -104,12 +107,12 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 							data.put("userType", user.getUserType());
 							statusCode = AppGlobals.APP_SUCCESS;
 						} else {
-							msg = "用户名或密码不正确！";
-							statusCode = "005";
+							msg = "只限渠道商账号登录！";
+							statusCode = "006";
 						}
 					} else {
-						msg = "只限渠道商账号登录！";
-						statusCode = "006";
+						msg = "用户名或密码不正确！";
+						statusCode = "005";
 					}
 				} else {
 					msg = "密码不能为空！";
@@ -197,32 +200,66 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 	
-	// 获取包车线路信息
-	@RequestMapping(params = "getCharteredInfo")
-	public void getCharteredInfo(HttpServletRequest request, HttpServletResponse response) {
+	/** 根据人数确定总价 */
+	@RequestMapping(params = "getPeoplesPrice")
+	public void getPeoplesPrice(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
+
+		JSONObject data = new JSONObject();
+		
 		String msg = "";
 		String statusCode = "";
-		
-		JSONObject data = new JSONObject();
-
+		String param = "";
 		try {
-			// 2： 接机 3：送机 4：接火车 5：送火车
-			String serveType = request.getParameter("serveType");
-			// 所属城市
-			String cityId = request.getParameter("cityId"); 
+
+			param = AppUtil.inputToStr(request);
+			System.out.println("getOrderStation     前端传递参数：" + param);
 
 			// 验证参数
-			checkParam(new String[] { "serveType", "cityId" }, serveType, cityId);
+			JSONObject jsondata = checkParam(param);
 
-//				List<AppStationInfoEntity> lList = appCharteredService.getPTStation(serveType, cityId);
-
-//				data.put("PTStation", lList);
+			String token = jsondata.getString("token");
+			// 验证token
+//			checkToken(token);
+			
+			String sumPeople = jsondata.getString("sumPeople");
+			String lineId = jsondata.getString("lineId");
+			
+			List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
+					+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? ", lineId);
+			
+			String tPrice = "";
+			
+			for(Map<String,Object> map : lm){
+				String p = AppUtil.Null2Blank(map.get("car_type_price") + "");
+				
+				if(StringUtil.isNotEmpty(p))
+					continue;
+				
+				//切字符串做比较
+				int start = p.indexOf("-");
+				int end = p.lastIndexOf("座");
+				if(-1 == start){
+					start = 0;
+				}else{
+					start += 1;
+				}
+				String maxNum = p.substring(start, end);
+				
+				int sp = Integer.parseInt(sumPeople);
+				int mn = Integer.parseInt(maxNum);
+				
+				if(sp < mn){
+					tPrice = map.get("car_type_price") + "";
+				}
+				
+			}
+			
+			data.put("tPrice", tPrice);
 
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
-			
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
