@@ -1,5 +1,6 @@
 package com.yhy.lin.app.controller;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -66,9 +67,9 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			String password = jsondata.getString("password");
 			System.out.println("用户登录信息>>手机号【" + mobile + "】密码【" + password + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
-				List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and mobile = ? ", mobile);
+				List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", mobile);
 				CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-				if (user != null && dealer.size() <= 0 && StringUtil.isNotEmpty(user.getPassword()) 
+				if (user != null && dealer.size() > 0 && StringUtil.isNotEmpty(user.getPassword()) 
 						&& user.getPassword().equals(PasswordUtil.encrypt(mobile, password, PasswordUtil.getStaticSalt()))) {
 					if("1".equals(user.getUserType())){
 						String sql = "";
@@ -147,7 +148,6 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		JSONObject returnJsonObj = new JSONObject();
 		String msg = "";
 		String statusCode = "";
-		boolean success = false;
 		
 		JSONObject data = new JSONObject();
 		
@@ -159,33 +159,43 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			//验证参数
 			JSONObject jsondata = checkParam(param);
 			
-			String token = jsondata.getString("token");
+			String phone = jsondata.getString("phone");
 			String password = jsondata.getString("password");
 			String code = jsondata.getString("code");
 			
-			CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
-			
-			if (user.getSecurityCode().equals(code)) {
-				String pwd = PasswordUtil.encrypt(user.getPhone(), password, PasswordUtil.getStaticSalt());
-				logger.info("时间：" + AppUtil.getCurTime());
-				logger.info("密码修改为：" + pwd);
-				user.setPassword(pwd);
+			int pwdLength = password.trim().length();
+			if(pwdLength <= 18 && pwdLength >= 6){
 				
-				statusCode = "000";
-				msg = "密码修改成功";
-				success = true;
+				CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", phone);
+				
+				if (user.getSecurityCode().equals(code)) {
+					String pwd = PasswordUtil.encrypt(user.getPhone(), password, PasswordUtil.getStaticSalt());
+					logger.info("时间：" + AppUtil.getCurTime());
+					logger.info("密码修改为：" + pwd);
+					user.setPassword(pwd);
+					systemService.save(user);
+					
+					statusCode = "000";
+					msg = "密码修改成功";
+				}else{
+					statusCode = "766";
+					msg = "无效的修改";
+				}
 			}else{
-				statusCode = "766";
-				msg = "无效的修改";
+				statusCode = "601";
+				msg = "密码超出范围限制";
 			}
-			
-		} catch (Exception e) {
+		}
+		catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		}
+		catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
-		
-		data.put("success", success);
 		
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
@@ -218,41 +228,56 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			
 			String sumPeople = jsondata.getString("sumPeople");
 			String lineId = jsondata.getString("lineId");
+			String phone = jsondata.getString("phone");
 			
-			List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
-					+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? ", lineId);
-			
-			String tPrice = "";
-			
-			for(Map<String,Object> map : lm){
-				String p = AppUtil.Null2Blank(map.get("typename") + "");
+			List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", phone);
+			if(dealer.size() > 0){
+					
+				BigDecimal discount = dealer.get(0).getDealerDiscount();
 				
-				if(!StringUtil.isNotEmpty(p))
-					continue;
+				List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
+						+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? ", lineId);
 				
-				//切字符串做比较
-				int start = p.indexOf("-");
-				int end = p.lastIndexOf("座");
-				if(-1 == start){
-					start = 0;
-				}else{
-					start += 1;
+				String tPrice = "";
+				
+				for(Map<String,Object> map : lm){
+					String p = AppUtil.Null2Blank(map.get("typename") + "");
+					
+					if(!StringUtil.isNotEmpty(p))
+						continue;
+					
+					//切字符串做比较
+					int start = p.indexOf("-");
+					int end = p.lastIndexOf("座");
+					if(-1 == start){
+						start = 0;
+					}else{
+						start += 1;
+					}
+					String maxNum = p.substring(start, end);
+					
+					int sp = Integer.parseInt(sumPeople);
+					int mn = Integer.parseInt(maxNum) - 1;
+					
+					if(sp < mn){
+						tPrice = map.get("car_type_price") + "";
+						double dis = discount.doubleValue();
+						dis = dis/10;
+						double tp = Double.parseDouble(tPrice);
+						tPrice = String.valueOf(tp * dis);
+//						tPrice = discount.divide(new BigDecimal("10"), 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(tPrice)).toString();
+						break;
+					}
 				}
-				String maxNum = p.substring(start, end);
 				
-				int sp = Integer.parseInt(sumPeople);
-				int mn = Integer.parseInt(maxNum) - 1;
-				
-				if(sp < mn){
-					tPrice = map.get("car_type_price") + "";
-					break;
-				}
+				data.put("tPrice", tPrice);
+	
+				statusCode = AppGlobals.APP_SUCCESS;
+				msg = AppGlobals.APP_SUCCESS_MSG;
+			}else{
+				statusCode = "501";
+				msg = "此账号不是渠道商账号,请联系管理员";
 			}
-			
-			data.put("tPrice", tPrice);
-
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();

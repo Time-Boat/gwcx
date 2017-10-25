@@ -79,6 +79,17 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String orderHistory;//历史订单（就是该订单绑定的运营专员已经被注销了）   0：否    1：是
 	
+	private String remark;//订单备注
+	
+	@Column(name = "remark")
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	@Column(name = "order_history")
 	public String getOrderHistory() {
 		return orderHistory;

@@ -83,7 +83,7 @@ public class DealerInfoEntity implements java.io.Serializable {
 	/**渠道商折扣*/
 	private BigDecimal dealerDiscount;
 	
-	@Column(name ="DEALER_DISCOUNT",nullable=true,precision=2,scale=1)
+	@Column(name ="DEALER_DISCOUNT",nullable=true,precision=3,scale=1)
 	public BigDecimal getDealerDiscount() {
 		return dealerDiscount;
 	}

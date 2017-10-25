@@ -46,6 +46,7 @@ import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -84,7 +85,7 @@ public class AppInterfaceController extends AppBaseController {
 		
 		//是否是新用户，用于渠道商的绑定
 		String isNew = "";
-
+		
 		try {
 			String param = AppUtil.inputToStr(request);
 			
@@ -97,62 +98,67 @@ public class AppInterfaceController extends AppBaseController {
 			String code = jsondata.getString("code");
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
-				if (StringUtil.isNotEmpty(code)) {
-					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-					if (user != null) {
-						Date date = user.getCodeUpdateTime();
-						int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm', "");
-						// 30分钟的有效期验证
-						if (m < 30 && user.getStatus().equals("0") && code.equals(user.getSecurityCode())) {
-							// if (m > 30 && user.getStatus().equals("1") &&
-							// code.equals(user.getSecurityCode())) { // 测试
-							String sql = "";
-							String curTime = AppUtil.getCurTime();
-							String token = "";
-							
-							// 修改登录状态
-							if (StringUtil.isNotEmpty(user.getToken())) {
-								token = user.getToken();
-								sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
-								systemService.executeSql(sql, curTime, mobile);
-							} else {
-								// 生成token
-								token = generateToken(user.getId(), user.getPhone());
-								sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
-								systemService.executeSql(sql, curTime, token, mobile);
-								// 新注册用户 标识
-								if(user.getTokenUpdateTime() == null){
-									isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
+				List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", mobile);
+				if(dealer.size() <= 0){
+					if (StringUtil.isNotEmpty(code)) {
+						CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
+						if (user != null) {
+							Date date = user.getCodeUpdateTime();
+							int m = AppUtil.compareDate(DateUtils.getDate(), date, 'm', "");
+							// 30分钟的有效期验证
+							if (m < 30 && user.getStatus().equals("0") && code.equals(user.getSecurityCode())) {
+								// if (m > 30 && user.getStatus().equals("1") &&
+								// code.equals(user.getSecurityCode())) { // 测试
+								String sql = "";
+								String curTime = AppUtil.getCurTime();
+								String token = "";
+								
+								// 修改登录状态
+								if (StringUtil.isNotEmpty(user.getToken())) {
+									token = user.getToken();
+									sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
+									systemService.executeSql(sql, curTime, mobile);
+								} else {
+									// 生成token
+									token = generateToken(user.getId(), user.getPhone());
+									sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
+									systemService.executeSql(sql, curTime, token, mobile);
+									// 新注册用户 标识
+									if(user.getTokenUpdateTime() == null){
+										isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
+									}
 								}
+								// 添加登陆日志
+								// String message = "app手机用户: " + user.getUserName()
+								// + "[" + user.getPhone() + "]" + "登录成功";
+								String message = "app手机用户: " + user.getPhone() + "登录成功";
+								systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
+	
+								msg = "登录成功!";
+								data.put("token", token);
+								data.put("userId", user.getUserId());
+								// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+								data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+								data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+								data.put("phone", user.getPhone());
+								data.put("isNew", isNew);
+								data.put("userType", user.getUserType());
+								statusCode = AppGlobals.APP_SUCCESS;
+							} else {
+								msg = "验证码不正确！";
+								statusCode = "003";
 							}
-
-							// 添加登陆日志
-							// String message = "app手机用户: " + user.getUserName()
-							// + "[" + user.getPhone() + "]" + "登录成功";
-							String message = "app手机用户: " + user.getPhone() + "登录成功";
-							systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
-
-							msg = "登录成功!";
-							data.put("token", token);
-							data.put("userId", user.getUserId());
-							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
-							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
-							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
-							data.put("phone", user.getPhone());
-							data.put("isNew", isNew);
-							data.put("userType", user.getUserType());
-							statusCode = AppGlobals.APP_SUCCESS;
 						} else {
-							msg = "验证码不正确！";
-							statusCode = "003";
+							msg = "请先获得验证码！";
+							statusCode = "005";
 						}
 					} else {
-						msg = "请先获得验证码！";
-						statusCode = "005";
+						msg = "验证码不能为空！";
+						statusCode = "002";
 					}
 				} else {
-					msg = "验证码不能为空！";
-					statusCode = "002";
+					msg = "请从渠道商入口登录";
+					statusCode = "010";
 				}
 			} else {
 				msg = "手机号不能为空！";
@@ -272,17 +278,25 @@ public class AppInterfaceController extends AppBaseController {
 
 		String mobile = request.getParameter("mobile");
 		
-		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码 
+		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码
 		String codeType = request.getParameter("codeType");
 		
 		// 验证参数
 		try {
 			checkParam(new String[] { "codeType", "mobile" }, codeType, mobile);
-					
+			
+			List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", mobile);
+			
 			logger.info("手机号: " + mobile);
 			if (!mobile.matches(AppGlobals.CHECK_PHONE)) {
 				msg = "手机号格式不正确";
 				statusCode = "002";
+			} else if(("1".equals(codeType) || "2".equals(codeType)) && dealer.size() <= 0){
+				msg = "用户不存在";
+				statusCode = "011";
+			} else if ("0".equals(codeType) && dealer.size() > 0) {
+				msg = "请从渠道商入口登录";
+				statusCode = "010";
 			} else {
 				// 生成4位数的验证码
 				String code = StringUtil.numRandom(4);
@@ -295,6 +309,9 @@ public class AppInterfaceController extends AppBaseController {
 					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
 					break;
 				case "1":
+					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					break;
+				case "2":
 					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
 					break;
 				default:
@@ -324,7 +341,7 @@ public class AppInterfaceController extends AppBaseController {
 					}
 	
 					data.put("codemsg", code);
-					msg = "获取验证码成功";
+					msg = "短信发送成功";
 					statusCode = AppGlobals.APP_SUCCESS;
 				} else {
 					//msg = "允许每分钟1条，累计每小时7条。每天10条";
