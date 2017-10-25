@@ -45,7 +45,7 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private java.lang.String position;
 	/**银行账户*/
 	private java.lang.String bankAccount;
-	/**状态（备用字段）*/
+	/**状态      0：合作中    1：未合作    2：已终止 */
 	private String status;
 	/**备注（备用字段）*/
 	private String remark;

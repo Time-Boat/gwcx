@@ -23,7 +23,6 @@ import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.apache.batik.extension.svg.LineInfo;
 import org.apache.log4j.Logger;
 
 import com.google.gson.Gson;
@@ -47,7 +46,6 @@ import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
-import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -407,7 +405,7 @@ public class AppInterfaceController extends AppBaseController {
 				success = false;
 			} else {
 				
-				//确保价格不被前端修改
+				//确保价格不被前端修改         使用微信平台的浏览器应该不会被修改数据，还是为了保险起见
 				LineInfoEntity l = appService.get(LineInfoEntity.class, t.getLineId());
 				t.setOrderUnitprice(l.getPrice());
 				BigDecimal tp = l.getPrice().multiply(new BigDecimal(t.getOrderNumbers()));

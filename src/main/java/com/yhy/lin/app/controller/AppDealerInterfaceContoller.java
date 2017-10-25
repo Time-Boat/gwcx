@@ -3,11 +3,6 @@ package com.yhy.lin.app.controller;
 import java.util.List;
 import java.util.Map;
 
-/**
-* Description : 渠道商接口
-* @author Timer
-* @date 2017年10月24日 上午9:59:07
-*/
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -25,11 +20,12 @@ import com.yhy.lin.app.exception.ParameterException;
 import com.yhy.lin.app.service.AppCharteredInterfaceService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.entity.DealerInfoEntity;
 
 import net.sf.json.JSONObject;
 
 /**
-* Description : app包车接口
+* Description : 渠道商接口
 * @author Timer
 * @date 2017年10月19日 下午4:08:28
 */
@@ -70,53 +66,50 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			String password = jsondata.getString("password");
 			System.out.println("用户登录信息>>手机号【" + mobile + "】密码【" + password + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
-				if (StringUtil.isNotEmpty(password)) {
-					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-					if (user != null && user.getPassword().equals(PasswordUtil.encrypt(mobile, password, PasswordUtil.getStaticSalt()))) {
-						if("1".equals(user.getUserType())){
-							String sql = "";
-							String curTime = AppUtil.getCurTime();
-							String token = "";
-							
-							// 修改登录状态
-							if (StringUtil.isNotEmpty(user.getToken())) {
-								token = user.getToken();
-								sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
-								systemService.executeSql(sql, curTime, mobile);
-							} else {
-								// 生成token
-								token = generateToken(user.getId(), user.getPhone());
-								sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
-								systemService.executeSql(sql, curTime, token, mobile);
-	//							// 新注册用户 标识
-	//							if(user.getTokenUpdateTime() == null){
-	//								isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
-	//							}
-							}
-	
-							String message = "app渠道商用户: " + user.getPhone() + "登录成功";
-							systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
-	
-							msg = "登录成功!";
-							data.put("token", token);
-							data.put("userId", user.getUserId());
-							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
-							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
-							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
-							data.put("phone", user.getPhone());
-							data.put("userType", user.getUserType());
-							statusCode = AppGlobals.APP_SUCCESS;
+				List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and mobile = ? ", mobile);
+				CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
+				if (user != null && dealer.size() <= 0 && StringUtil.isNotEmpty(user.getPassword()) 
+						&& user.getPassword().equals(PasswordUtil.encrypt(mobile, password, PasswordUtil.getStaticSalt()))) {
+					if("1".equals(user.getUserType())){
+						String sql = "";
+						String curTime = AppUtil.getCurTime();
+						String token = "";
+						
+						// 修改登录状态
+						if (StringUtil.isNotEmpty(user.getToken())) {
+							token = user.getToken();
+							sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
+							systemService.executeSql(sql, curTime, mobile);
 						} else {
-							msg = "只限渠道商账号登录！";
-							statusCode = "006";
+							// 生成token
+							token = generateToken(user.getId(), user.getPhone());
+							sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
+							systemService.executeSql(sql, curTime, token, mobile);
+//							// 新注册用户 标识
+//							if(user.getTokenUpdateTime() == null){
+//								isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
+//							}
 						}
+
+						String message = "app渠道商用户: " + user.getPhone() + "登录成功";
+						systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
+
+						msg = "登录成功!";
+						data.put("token", token);
+						data.put("userId", user.getUserId());
+						// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+						data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+						data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+						data.put("phone", user.getPhone());
+						data.put("userType", user.getUserType());
+						statusCode = AppGlobals.APP_SUCCESS;
 					} else {
-						msg = "用户名或密码不正确！";
-						statusCode = "005";
+						msg = "只限渠道商账号登录！";
+						statusCode = "006";
 					}
 				} else {
-					msg = "密码不能为空！";
-					statusCode = "002";
+					msg = "用户名或密码不正确！";
+					statusCode = "005";
 				}
 			} else {
 				msg = "手机号不能为空！";
@@ -200,7 +193,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 	
-	/** 根据人数确定总价 */
+	/** 订票人数确定总价 */
 	@RequestMapping(params = "getPeoplesPrice")
 	public void getPeoplesPrice(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -219,7 +212,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			// 验证参数
 			JSONObject jsondata = checkParam(param);
 
-			String token = jsondata.getString("token");
+//			String token = jsondata.getString("token");
 			// 验证token
 //			checkToken(token);
 			
@@ -232,9 +225,9 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			String tPrice = "";
 			
 			for(Map<String,Object> map : lm){
-				String p = AppUtil.Null2Blank(map.get("car_type_price") + "");
+				String p = AppUtil.Null2Blank(map.get("typename") + "");
 				
-				if(StringUtil.isNotEmpty(p))
+				if(!StringUtil.isNotEmpty(p))
 					continue;
 				
 				//切字符串做比较
@@ -248,12 +241,12 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 				String maxNum = p.substring(start, end);
 				
 				int sp = Integer.parseInt(sumPeople);
-				int mn = Integer.parseInt(maxNum);
+				int mn = Integer.parseInt(maxNum) - 1;
 				
 				if(sp < mn){
 					tPrice = map.get("car_type_price") + "";
+					break;
 				}
-				
 			}
 			
 			data.put("tPrice", tPrice);
