@@ -208,8 +208,6 @@ public class AppInterfaceController extends AppBaseController {
 			JSONObject jsondata = checkParam(param);
 			
 			String token = jsondata.getString("token");
-			//用户类型    0：普通用户    1：渠道商     
-			String userType = jsondata.getString("userType");
 			
 			try {
 				
@@ -217,10 +215,6 @@ public class AppInterfaceController extends AppBaseController {
 				
 				if(StringUtil.isNotEmpty(token)){
 					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
-					
-//					if(){
-//						
-//					}
 					
 					if(user!=null){
 						// 添加登陆日志

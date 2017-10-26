@@ -9,7 +9,7 @@
 <t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" checkbox="true">
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-	<t:dgCol title="是否有渠道商" field="isDealerLine" hidden="true"></t:dgCol>
+	<t:dgCol title="是否有渠道商" field="isDealerLine" dictionary="is_dealer" align="center"></t:dgCol>
 	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
@@ -22,10 +22,10 @@
 	<t:dgCol title="创建时间" field="createTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss"   align="center" width="120"></t:dgCol>--%>
 	<t:dgCol title="创建人" field="username"  query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="所属公司" field="departname"  query="true" align="center" width="100"></t:dgCol>
-	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="50"></t:dgCol>
-	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status" query="true" align="center" width="50"></t:dgCol>
+	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="70"></t:dgCol>
+	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status" query="true" align="center" width="70"></t:dgCol>
 	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="50"></t:dgCol>
-	
+	<t:dgCol title="申请时间" field="applicationTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center" width="120"></t:dgCol>
 	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="50"></t:dgCol>
 	 
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="50"></t:dgCol>
@@ -39,15 +39,15 @@
 	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
 	<t:dgToolBar funname="coerceShelves(id)" title="强制下架" icon="icon-put" url="lineInfoSpecializedController.do?coerceShelves" operationCode="coerceShelves" ></t:dgToolBar>
 	
-	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#6"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#6"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,lineStatus)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
+	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#6"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#6"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="firstagree" exp="applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agrees" exp="applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="firstrefuse" exp="applicationStatus#eq#1"></t:dgFunOpt>
@@ -56,6 +56,8 @@
 	<t:dgFunOpt funname="lookRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#6"></t:dgFunOpt> 
 	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
 	<t:dgToolBar funname="addCarRegion(id)" icon="icon-edit" title="编辑座位区间价格" ></t:dgToolBar>
+	<t:dgToolBar funname="detailCarRegion(id)" icon="icon-search" title="查看座位区间价格" ></t:dgToolBar>
+	
 </t:datagrid> </div>
 <div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
     data-options="modal:true" closed="true" >
@@ -160,16 +162,24 @@
 	}
 	
 	//申请上、下架
-	function applyShelves(id,lineStatus) {
+	function applyShelves(id,status,isDealerLine) {
+		var b = true;
 		
 		$.dialog.confirm('确定要申请？',function(r){
 		    if (r){
 		    	$.post(
 		    		"lineInfoSpecializedController.do?applyShelves",	
-					{'id':id,'lineStatus':lineStatus},
+					{'id':id,'status':status,'isDealerLine':isDealerLine},
 					function(data){
 						var obj = eval('(' + data + ')');
-						tip(obj.msg);
+						b=obj.success;
+						if(!b){
+		           			tip("渠道商区间价格未填写，请填写区间价格再申请上架！");
+		           			return;
+		           		}else{
+		           			tip(obj.msg);
+		           		}
+						
 						$('#lineList2').datagrid('reload');
 					}
 				);		
@@ -177,7 +187,7 @@
 		});
 	}
 	
-	//申请下架 
+	//强制下架
 	function coerceShelves(id) {
 		
 		var ids = '';
@@ -377,18 +387,39 @@
 	function addCarRegion(id) {
 		var rows = $("#lineList2").datagrid("getSelections");
 		if(rows.length==0){
-			tip('请选择一条要添加区间价格的线路');
+			tip('请选择一条要编辑区间价格的线路');
 			return;
 		}
 		if(rows.length>1){
-			tip('只能添加一条线路的区间价格');
+			tip('只能编辑一条线路的区间价格');
 			return;
 		}
 		if(rows[0].isDealerLine!='1'){
-			tip('该线路没有渠道商，不能添加区间价格');
+			tip('该线路没有渠道商，不能编辑区间价格');
 			return;
 		}
-		add("添加座位区间价格", "lineInfoSpecializedController.do?addCarRegion&id=" + rows[0].id,"500px","470px");
+		if(rows[0].status=='0'){
+			tip('该线路已上架，不能编辑区间价格');
+			return;
+		}
+		if(rows[0].status=='1'){
+			if(rows[0].applicationStatus=='1'){
+				tip('该线路初审，不能编辑区间价格');
+				return;
+			}
+			if(rows[0].applicationStatus=='2'){
+				tip('该线路复审，不能编辑区间价格');
+				return;
+			}
+		}
+		add("编辑座位区间价格", "lineInfoSpecializedController.do?addCarRegion&id=" + rows[0].id,"500px","470px");
+	}
+	
+	function detailCarRegion(id){
+		var rows = $("#lineList2").datagrid("getSelections");
+		var url="lineInfoSpecializedController.do?addCarRegion"
+		url += '&load=detail&id='+rows[0].id;
+		createdetailwindow("查看座位区间价格",url,500,470);
 	}
 	
 </script>

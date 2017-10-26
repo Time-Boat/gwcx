@@ -25,7 +25,6 @@ $(function() {
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoSpecializedController.do?savePrice" >
 	<input id="lineId" name="lineId" type="hidden" value="${lineId}">
 		<table style="width: 100%;" cellpadding="0" cellspacing="1" class="formtable" id="formtableId">
-			
 			<c:forEach var="c" items="${typelist}">
 				<tr>
 				<td align="right">
@@ -33,13 +32,11 @@ $(function() {
 				</td>
 				<td class="value">
 					<input id="typeid" name="typeid" type="hidden" value="${c.id}">				  
-					<input  class="inputxt" id="${c.id}" name="price" required="required" >&nbsp;&nbsp;元  
+					<input  class="inputxt" id="${c.id}" name="price" datatype="*" nullmsg="请输入座位区间价格" >&nbsp;&nbsp;元  
 					<span class="Validform_checktip"></span>
 				</td>
 				</tr>
-					
 			</c:forEach>
-			
 		</table>
 	</t:formvalid>
 </body>

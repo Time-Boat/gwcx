@@ -149,6 +149,8 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		String msg = "";
 		String statusCode = "";
 		
+		String token = "";
+		
 		JSONObject data = new JSONObject();
 		
 		try {
@@ -169,10 +171,15 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 				CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", phone);
 				
 				if (user.getSecurityCode().equals(code)) {
+					//修改密码要重新生成token
+					token = generateToken(user.getId(), user.getPhone());
+					
 					String pwd = PasswordUtil.encrypt(user.getPhone(), password, PasswordUtil.getStaticSalt());
 					logger.info("时间：" + AppUtil.getCurTime());
 					logger.info("密码修改为：" + pwd);
 					user.setPassword(pwd);
+					user.setToken(token);
+					user.setTokenUpdateTime(AppUtil.getDate());
 					systemService.save(user);
 					
 					statusCode = "000";
@@ -197,6 +204,8 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			e.printStackTrace();
 		}
 		
+		data.put("token", AppUtil.Null2Blank(token));
+		
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data.toString());
@@ -215,13 +224,13 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		String statusCode = "";
 		String param = "";
 		try {
-
+			
 			param = AppUtil.inputToStr(request);
 			System.out.println("getOrderStation     前端传递参数：" + param);
-
+			
 			// 验证参数
 			JSONObject jsondata = checkParam(param);
-
+			
 //			String token = jsondata.getString("token");
 			// 验证token
 //			checkToken(token);

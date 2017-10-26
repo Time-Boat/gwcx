@@ -34,7 +34,7 @@ public class AppBaseController extends BaseController {
 	
 	// 生成token
 	public String generateToken(String customerId, String phone) {
-		return md5(customerId + phone);
+		return md5(customerId + phone + System.currentTimeMillis());
 	}
 
 	// jdk自带的md5加密

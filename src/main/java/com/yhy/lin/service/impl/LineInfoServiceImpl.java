@@ -46,7 +46,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		// 取出当前页的数据 
 		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username, "
 		 		+ " a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content, "
-		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status,a.is_dealer_line,p.departname ");
+		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status,a.is_dealer_line,a.application_time,p.departname ");
 		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id= "
 		 		+ " a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when "
 		 		+ " LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
@@ -82,6 +82,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("cityId", "cityId", null)
 				,new Db2Page("dispath", "dispath", null)
 				,new Db2Page("applicationStatus", "application_status", null)
+				,new Db2Page("applicationTime", "application_time", null)
 				,new Db2Page("isDealerLine", "is_dealer_line", null)
 				
 				

@@ -81,6 +81,17 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String remark;//订单备注
 	
+	private String orderUserType;//用户订单类型    0：普通用户订单     1：渠道商用户订单
+	
+	@Column(name = "order_user_type")
+	public String getOrderUserType() {
+		return orderUserType;
+	}
+
+	public void setOrderUserType(String orderUserType) {
+		this.orderUserType = orderUserType;
+	}
+
 	@Column(name = "remark")
 	public String getRemark() {
 		return remark;

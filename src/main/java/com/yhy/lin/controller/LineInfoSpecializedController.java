@@ -398,9 +398,24 @@ public class LineInfoSpecializedController extends BaseController {
 	@ResponseBody
 	public AjaxJson applyShelves(HttpServletRequest request) {
 		String message = null;
+		boolean success = false;
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
-		//String lineStatus= request.getParameter("id");
+		String lineStatus= request.getParameter("status");
+		String isDealerLine = request.getParameter("isDealerLine");
+		if("1".equals(lineStatus)){
+			if("1".equals(isDealerLine)){
+				if(StringUtil.isNotEmpty(id)){
+					List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", id);
+					if(carlist.size()>0){
+						success=true;
+					}else{
+						j.setSuccess(success);
+						return j;
+					}
+			}
+		}
+		}
 		
 		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
 		if(StringUtil.isNotEmpty(line)){
@@ -416,12 +431,13 @@ public class LineInfoSpecializedController extends BaseController {
 		}
 		try {
 			message = "申请成功！";
+			success=true;
 			this.systemService.saveOrUpdate(line);
 		} catch (Exception e) {
 			// TODO: handle exception
 			message = "服务器异常！";
 		}
-
+		j.setSuccess(success);
 		j.setMsg(message);
 		return j;
 	}
@@ -608,7 +624,7 @@ public class LineInfoSpecializedController extends BaseController {
 	 */
 	@RequestMapping(params = "savePrice")
 	@ResponseBody
-	public AjaxJson save(HttpServletRequest request, HttpServletResponse respone) {
+	public AjaxJson savePrice(HttpServletRequest request, HttpServletResponse respone) {
 		
 		String message = null;
 		AjaxJson j = new AjaxJson();
@@ -644,6 +660,27 @@ public class LineInfoSpecializedController extends BaseController {
 		}
 		
 		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 验证渠道商是否已添加车辆类型区间价格
+	 */
+	@RequestMapping(params = "checkCarRegion")
+	@ResponseBody
+	public AjaxJson checkCarRegion(HttpServletRequest request) {
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		
+		String lineId = request.getParameter("id");
+		if(StringUtil.isNotEmpty(lineId)){
+			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
+			if(carlist.size()>0){
+				success=true;
+			}
+		}
+			
+		j.setSuccess(success);
 		return j;
 	}
 }

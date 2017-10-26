@@ -139,7 +139,7 @@ public class CharteredPriceController extends BaseController {
 		} else {
 			message = "包车定价设置添加成功";
 			charteredPrice.setStatus("0");
-			charteredPrice.setAuditStatus("-1");
+			charteredPrice.setAuditStatus("0");
 			charteredPrice.setCreateUserId(userId);
 			charteredPrice.setCreateTime(AppUtil.getDate());
 			charteredPriceService.save(charteredPrice);
@@ -190,8 +190,146 @@ public class CharteredPriceController extends BaseController {
 		List<CharteredAppendServiceEntity> charteredAppendService = systemService.findByProperty(CharteredAppendServiceEntity.class, "status","1");
 		req.setAttribute("charteredAppendService", charteredAppendService);
 		
-		
 		return new ModelAndView("yhy/charteredPrice/charteredPrice");
+	}
+	
+	/**
+	 * 申请上架、申请下架
+	 */
+	@RequestMapping(params = "applyShelves")
+	@ResponseBody
+	public AjaxJson applyShelves(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		
+		CharteredPriceEntity  charteredPrice = this.systemService.getEntity(CharteredPriceEntity.class, id);
+		if(StringUtil.isNotEmpty(charteredPrice)){
+			charteredPrice.setAuditStatus("1");//待审核
+			if("0".equals(charteredPrice.getStatus())){
+				charteredPrice.setApplyType("0");//申请启用
+			}else{
+				charteredPrice.setApplyType("1");//申请停用
+			}
+			charteredPrice.setAuditDate(AppUtil.getDate());
+			charteredPrice.setApplyUser(ResourceUtil.getSessionUserName().getId());
+		}
+		try {
+			message = "申请成功！";
+			this.systemService.saveOrUpdate(charteredPrice);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常！";
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 获取拒绝原因
+	 */
+	@RequestMapping(params = "getReason")
+	@ResponseBody
+	public AjaxJson getReason(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		CharteredPriceEntity chartered= this.systemService.getEntity(CharteredPriceEntity.class, id);
+
+		if (StringUtil.isNotEmpty(chartered)) {
+			if (StringUtil.isNotEmpty(chartered.getLastRejectReason())) {
+				message = chartered.getLastRejectReason();// 复审拒绝原因
+			} else {
+				message = chartered.getRejectReason();// 初审拒绝原因
+			}
+		}
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 申请同意
+	 */
+	@RequestMapping(params = "agree")
+	@ResponseBody
+	public AjaxJson agree(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		CharteredPriceEntity  chartered = this.systemService.getEntity(CharteredPriceEntity.class, id);
+		
+		if(StringUtil.isNotEmpty(chartered)){
+			if("1".equals(chartered.getAuditStatus())){
+				chartered.setAuditStatus("2");//初审
+				chartered.setApplyUser(ResourceUtil.getSessionUserName().getId());
+				chartered.setAuditDate(AppUtil.getDate());
+			}else if("2".equals(chartered.getAuditStatus())){
+				if("1".equals(chartered.getStatus())){
+					chartered.setAuditStatus("4");//复审
+					chartered.setStatus("2");//已上架
+				}else if("0".equals(chartered.getStatus())){
+					chartered.setAuditStatus("3");//复审
+					chartered.setStatus("1");//已下架
+				}
+				chartered.setLastAuditDate(AppUtil.getDate());
+				chartered.setLastAuditUser((ResourceUtil.getSessionUserName().getId()));
+			}
+		}
+		try {
+			message = "申请成功！";
+			this.systemService.saveOrUpdate(chartered);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常！";
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+
+	/**
+	 * 申请拒绝
+	 */
+	@RequestMapping(params = "refuse")
+	@ResponseBody
+	public AjaxJson refuse(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String rejectReason = request.getParameter("rejectReason");
+		CharteredPriceEntity chartered = this.systemService.getEntity(CharteredPriceEntity.class, id);
+
+		if (StringUtil.isNotEmpty(chartered)) {
+
+			if ("1".equals(chartered.getAuditStatus())) {
+				chartered.setRejectReason(rejectReason);
+			}
+			if ("2".equals(chartered.getAuditStatus())) {
+				chartered.setLastRejectReason(rejectReason);
+			}
+			if ("1".equals(chartered.getAuditStatus())) {
+				chartered.setAuditStatus("5");// 初审拒绝
+				chartered.setAuditUser(ResourceUtil.getSessionUserName().getId());
+				chartered.setAuditDate(AppUtil.getDate());
+			} else if ("2".equals(chartered.getAuditStatus())) {
+				chartered.setAuditStatus("6");// 复审拒绝
+				chartered.setLastAuditUser(ResourceUtil.getSessionUserName().getId());
+				chartered.setLastAuditDate(AppUtil.getDate());
+			}
+		}
+
+		try {
+			message = "拒绝成功！";
+			this.systemService.saveOrUpdate(chartered);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常！";
+		}
+
+		j.setMsg(message);
+		j.setMsg(message);
+		return j;
 	}
 	
 }
