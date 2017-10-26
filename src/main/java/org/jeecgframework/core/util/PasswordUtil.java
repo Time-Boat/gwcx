@@ -190,7 +190,7 @@ public class PasswordUtil {
 		System.out.print(-1%2==0);
 		String str = "bc000f9da35481f290f25d832bac0168";
 		String password = "c6088e76c13ab964b3832d3d7161ecc4";
-
+		
 		org.jeecgframework.core.util.LogUtil.info("明文:" + str);
 		org.jeecgframework.core.util.LogUtil.info("密码:" + password);
 

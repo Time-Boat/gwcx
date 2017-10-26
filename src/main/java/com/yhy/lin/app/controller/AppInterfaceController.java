@@ -208,12 +208,20 @@ public class AppInterfaceController extends AppBaseController {
 			JSONObject jsondata = checkParam(param);
 			
 			String token = jsondata.getString("token");
+			//用户类型    0：普通用户    1：渠道商     
+			String userType = jsondata.getString("userType");
+			
 			try {
 				
 				checkToken(token);//验证token
 				
 				if(StringUtil.isNotEmpty(token)){
 					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
+					
+//					if(){
+//						
+//					}
+					
 					if(user!=null){
 						// 添加登陆日志
 						// String message = "app手机用户: " + user.getUserName()
@@ -233,7 +241,7 @@ public class AppInterfaceController extends AppBaseController {
 						statusCode = AppGlobals.APP_SUCCESS;
 						//添加登录次数
 						StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count=" + (user.getLoginCount() + 1) + " where token ='"+token+"'");
-					      
+					    
 					    this.systemService.updateBySqlString(updateSql.toString());
 					}
 				}
