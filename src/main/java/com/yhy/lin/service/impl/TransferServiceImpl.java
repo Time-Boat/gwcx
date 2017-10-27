@@ -7,17 +7,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
-import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
-import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -39,15 +35,10 @@ import net.sf.json.JSONObject;
 @Service("TransferServiceI")
 @Transactional
 public class TransferServiceImpl extends CommonServiceImpl implements TransferServiceI {
-	@Autowired
-	private JdbcDao jdbcDao;
 	
 	@Autowired
 	private SystemService systemService;
 	
-	@Autowired
-	private UserService userService;
-
 	// app客户消息信息
 	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
 
@@ -143,7 +134,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append(
 				"select a.city_name,a.city_id,t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_name,a.order_terminus_station_name,");
 		sql.append(
-				"a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
+				"a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,a.remark,a.order_user_type,l.createUserId,");
 		sql.append(
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
@@ -182,7 +173,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("lineName", "line_name", null),
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("userId", "user_id", null),
-				new Db2Page("custphone", "phone", null)
+				new Db2Page("custphone", "phone", null),
+				new Db2Page("orderUserType", "orderUserType", null),
+				new Db2Page("createUserId", "createUserId", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -198,9 +191,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		
 		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
-
+		
 		StringBuffer sql = new StringBuffer();
-
+		
 		StringBuffer sqlCnt = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
@@ -211,7 +204,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt.toString(), null);
 		sql.append("select a.city_name,a.city_id,t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_name,a.order_terminus_station_name,");
-		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
+		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,a.remark,a.order_user_type,l.createUserId,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
 						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer "
@@ -221,10 +214,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
-		Db2Page[] db2Pages = { 
-				new Db2Page("id"), 
+		Db2Page[] db2Pages = {
+				new Db2Page("id"),
 				new Db2Page("orderId", "order_id", null),
-				new Db2Page("orderType", "order_type", null), 
+				new Db2Page("orderType", "order_type", null),
 				new Db2Page("orderStatus", "order_status", null),
 				new Db2Page("orderFlightnumber", "order_flightnumber", null),
 				new Db2Page("orderStartingstation", "order_starting_station_name", null),
@@ -232,7 +225,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("orderStartime", "order_startime", null),
 				new Db2Page("orderExpectedarrival", "order_expectedarrival", null),
 				new Db2Page("orderUnitprice", "order_unitprice", null),
-				new Db2Page("orderNumbers", "order_numbers", null), 
+				new Db2Page("orderNumbers", "order_numbers", null),
 				new Db2Page("orderPaytype", "order_paytype", null),
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
@@ -247,7 +240,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("lineName", "line_name", null),
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("userId", "user_id", null),
-				new Db2Page("custphone", "phone", null)
+				new Db2Page("custphone", "phone", null),
+				new Db2Page("orderUserType", "orderUserType", null),
+				new Db2Page("createUserId", "createUserId", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -269,6 +264,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		List list = this.systemService.findListbySql(sqlCnt);
 		Long iCount = (long) list.size();
+		
 		sql.append("select a.lineOrderCode,l.name as lineName,l.type,SUM(case when a.order_status='2' then a.order_numbers else 0 end) as alreadyarranged,SUM(case when a.order_status='1' then a.order_numbers else 0 end) as notarranged,a.city_name,"
 				+ "a.city_id,SUM(a.order_numbers) as orderNumber from transferorder a left join order_linecardiver b on a.id = "
 				+ "b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join "
@@ -451,7 +447,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_Name,a.order_terminus_station_Name,");
 		sql.append(" a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,");
 		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime, ");
-		sql.append(" a.city_id,a.city_name,cu.phone ");
+		sql.append(" a.city_id,a.city_name,cu.phone,a.remark ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 				+ "left join driversinfo d on b.driverId =d.id LEFT JOIN car_customer cu on a.user_id=cu.id");
 
@@ -466,9 +462,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				transferorderView.setOrderId(String.valueOf(obj[1]));
 				transferorderView.setOrderType(String.valueOf(obj[2]));
 				transferorderView.setOrderStatus(String.valueOf(obj[3]));
-				if (obj[4] != null) {
-					transferorderView.setOrderFlightnumber(String.valueOf(obj[4]));
-				}
+				transferorderView.setOrderFlightnumber(AppUtil.Null2Blank(String.valueOf(obj[4])));
 				
 				transferorderView.setOrderStartingstationName(String.valueOf(obj[5]));
 				transferorderView.setOrderTerminusstationName(String.valueOf(obj[6]));
@@ -485,18 +479,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				transferorderView.setOrderContactsname(String.valueOf(obj[12]));
 				transferorderView.setOrderContactsmobile(String.valueOf(obj[13]));
 				transferorderView.setOrderPaystatus(String.valueOf(obj[14]));
-				if (obj[15] != null) {
-					transferorderView.setOrderTrainnumber(String.valueOf(obj[15]));
-				}
+				transferorderView.setOrderTrainnumber(AppUtil.Null2Blank(String.valueOf(obj[15])	));
 				transferorderView.setOrderTotalPrice(String.valueOf(obj[16]));
-				if (obj[17] != null) {
-					transferorderView.setDriverName(String.valueOf(obj[17]));
-				}
-				if (obj[18] != null) {
-					transferorderView.setDriverMobile(String.valueOf(obj[18]));
-				}
-				transferorderView.setLicencePlate(String.valueOf(obj[19]));
-				transferorderView.setCarStatus(String.valueOf(obj[20]));
+				transferorderView.setDriverName(AppUtil.Null2Blank(String.valueOf(obj[17])));
+				transferorderView.setDriverMobile(AppUtil.Null2Blank(String.valueOf(obj[18])));
+				transferorderView.setLicencePlate(AppUtil.Null2Blank(String.valueOf(obj[19])));
+				transferorderView.setCarStatus(AppUtil.Null2Blank(String.valueOf(obj[20])));
 				if (obj[21] != null) {
 					transferorderView.setApplicationTime(sdf.parse(obj[21].toString()));
 				}
@@ -504,7 +492,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				transferorderView.setCityName(String.valueOf(obj[23]));
 				transferorderView.setCustomerPhone(String.valueOf(obj[24]));
 				
+				transferorderView.setRemark(AppUtil.Null2Blank(String.valueOf(obj[25])));
+				
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		return transferorderView;

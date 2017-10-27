@@ -8,9 +8,13 @@
 	<t:datagrid name="transferOrderList" title="接送机订单处理" autoLoadData="true" actionUrl="transferOrderController.do?airdatagrid&lineOrderCode=${lineOrderCode}&orderTypes=${orderType}" fitColumns="true"
 			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
+		<t:dgCol title="createUserId" field="createUserId" hidden="true"></t:dgCol>
+		
 		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
+		
+		<t:dgCol title="订单用户类型" field="orderUserType" align="center"></t:dgCol>
 		
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
@@ -26,6 +30,8 @@
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		
+		
+		
 		<%--<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
 		
@@ -36,7 +42,7 @@
 		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>--%>
 		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
-		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgToolBar>
+		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
 	</t:datagrid>
 </div>
@@ -134,6 +140,18 @@
 				tip('已完成订单不能安排司机车辆');
 				return;
 			}
+			
+			//判断当前订单用户是否已经被注销了
+			$.get(
+				"transferOrderList.do?checkUser&userId="+rows[i].createUserId,
+				function(data){
+					console.log(data);
+					if(!data.success){
+						
+						return;
+					}
+				}
+			);
 			
 			//判断选中的订单是不是在同一条线路上
 			if(lineId == rows[i].lineId){

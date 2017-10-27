@@ -209,14 +209,17 @@ public class AppInterfaceController extends AppBaseController {
 			
 			String token = jsondata.getString("token");
 			
+			String userType = jsondata.getString("userType");
+			
 			try {
 				
 				checkToken(token);//验证token
 				
 				if(StringUtil.isNotEmpty(token)){
-					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "token", token);
+					List<CarCustomerEntity> userList = systemService.findByQueryString("from CarCustomerEntity where token='" + token + "' and userType='" + userType + "'");
 					
-					if(user!=null){
+					if(userList.size() > 0){
+						CarCustomerEntity user = userList.get(0);
 						// 添加登陆日志
 						// String message = "app手机用户: " + user.getUserName()
 						// + "[" + user.getPhone() + "]" + "登录成功";

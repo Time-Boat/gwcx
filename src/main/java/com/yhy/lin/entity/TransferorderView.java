@@ -2,9 +2,10 @@ package com.yhy.lin.entity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-
 public class TransferorderView implements java.io.Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	private String id;//主键
 	private String  orderId;//订单id
 	private String orderType;//订单类型 0:接机  1:送机  2:接火车 3:送火车
@@ -40,6 +41,16 @@ public class TransferorderView implements java.io.Serializable {
 	private String cityId; //城市id
 	private String customerPhone; //购票人手机号
 	
+	private String remark; //用户订单备注
+	
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	public String getCityName() {
 		return cityName;
 	}

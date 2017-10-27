@@ -12,6 +12,8 @@
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
 		
+		<t:dgCol title="订单用户类型" field="orderUserType" align="center"></t:dgCol>
+		
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
 		<t:dgCol title="车票数量" field="orderNumbers" align="center"></t:dgCol>
@@ -36,7 +38,7 @@
 		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>--%>
 		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%--<t:dgCol title="操作" field="opt"  align="center"></t:dgCol>--%>
-		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgToolBar>
+		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
 		<%-- <t:dgFunOpt operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgFunOpt> --%>
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
 	</t:datagrid>

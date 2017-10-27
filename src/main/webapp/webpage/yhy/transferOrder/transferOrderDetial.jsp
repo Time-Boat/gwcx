@@ -174,15 +174,23 @@
 					<label class="Validform_label">车牌号：</label>
 				</td>
 				<td class="value">						  
-					<input  class="inputxt" id="licencePlate" name="licencePlate" value="${tView.licencePlate}">  
+					<input  class="inputxt" id="licencePlate" name="licencePlate" value="${tView.licencePlate}">
 					<span class="Validform_checktip"></span>
 				</td>
 				<td align="right">
 					<label class="Validform_label">车辆状态：</label>
 				</td>
 				<td class="value">
-					<input  class="inputxt" id="carStatus" name="carStatus" value="${tView.carStatus}">  		
+					<input  class="inputxt" id="carStatus" name="carStatus" value="${tView.carStatus}">
 					<span class="Validform_checktip"></span>
+				</td>
+			<tr>
+			<tr>
+				<td align="right">
+					<label class="Validform_label">用户订单备注：</label>
+				</td>
+				<td class="value" colspan="3">						  
+					<textarea cols="80" rows="8" id="remark" name="remark">${tView.remark}</textarea>
 				</td>
 			<tr>
 			<%-- <tr>

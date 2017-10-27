@@ -285,7 +285,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		// 为了通用这个详情页，把几个订单详情页的属性都拿出来了
 		list = findForJdbc(
 				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name,a.order_expectedarrival, "
-						+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile, "
+						+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile,a.remark, "
 						+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes,u.mobilePhone,u.officePhone "
 						+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
 						+ " left join driversinfo d on b.driverId = d.id left join lineInfo l on a.line_id = l.id LEFT JOIN t_s_user u on l.createUserId=u.ID where a.id=? ",
@@ -314,6 +314,8 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
 			
 			aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
+			
+			aod.setDriver(AppUtil.Null2Blank(map.get("remark") + ""));
 			
 			String officePhone = AppUtil.Null2Blank(map.get("officePhone") + "");
 			if(StringUtil.isNotEmpty(officePhone)){

@@ -33,6 +33,18 @@ public class AppUserOrderDetailEntity extends AppBaseOrderEntity {
 	private String stationStartTime;   //出发时间
 	private String stationEndTime;     //到达时间
 	
+	private String remark;     //用户订单备注
+	
+	
+	
+	public String getRemark() {
+		return remark;
+	}
+
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
 	public String getStationStartTime() {
 		return stationStartTime;
 	}

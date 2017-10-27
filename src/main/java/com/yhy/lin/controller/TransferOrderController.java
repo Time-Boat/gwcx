@@ -15,6 +15,7 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.web.system.pojo.base.TSBaseUser;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
@@ -575,6 +576,31 @@ public class TransferOrderController extends BaseController {
 			jsonObj2.put("ordtrs", ordtrs);
 		}
 		return jsonObj2;
+	}
+	
+	/**
+	 * 检查用户是否被锁定
+	 */
+	@RequestMapping(params = "checkUser")
+	@ResponseBody
+	public JSONObject checkUser(HttpServletRequest request){
+		JSONObject jsonObj = new JSONObject();
+		
+		//是否能对订单进行车辆的安排
+		boolean b = false;
+		
+		String userId = request.getParameter("userId");
+		
+		TSBaseUser user = systemService.get(TSBaseUser.class, userId);
+		
+		//条件只对运营经理生效
+		if(checkRole(AppGlobals.OPERATION_MANAGER) && user != null && "0".equals(user.getStatus())){
+			b = true;
+		}
+		
+		jsonObj.put("success", b);
+		
+		return jsonObj;
 	}
 	
 }
