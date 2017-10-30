@@ -6,11 +6,11 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
-<t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
+<t:datagrid name="applyEditList" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" checkbox="true">
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="是否有渠道商" field="isDealerLine" dictionary="is_dealer" align="center"></t:dgCol>
-	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
+	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="80"></t:dgCol>
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
 	
@@ -23,39 +23,30 @@
 	<t:dgCol title="创建人" field="username"  query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="所属公司" field="departname"  query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="线路状态" field="status" dictionary="lineStatus" query="true" align="center" width="70"></t:dgCol>
-	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="50"></t:dgCol>
-	<t:dgCol title="申请状态" field="applicationStatus" dictionary="line_apply_status" query="true" align="center" width="70"></t:dgCol>
-	<t:dgCol title="申请时间" field="applicationTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center" width="120"></t:dgCol>
+	<t:dgCol title="申请内容" field="applyContent" dictionary="apply_type"  align="center" width="70"></t:dgCol>
+	<t:dgCol title="申请修改状态" field="applicationEditStatus" dictionary="apply_edit_status" query="true" align="center" width="70"></t:dgCol>
+	<t:dgCol title="申请修改时间" field="applicationEditTime" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" align="center" width="120"></t:dgCol>
 	 <t:dgCol title="线路时长（分）" field="lineTimes"  align="center" width="50"></t:dgCol>
 	 
 	 <t:dgCol title="线路定价(元/人)" field="price"  align="center" width="50"></t:dgCol>
 	<t:dgCol title="所在城市" field="city"  align="center" width="60"></t:dgCol>
 	 <%--<t:dgCol title="线路备注" field="remark"  align="center" width="50"></t:dgCol>--%>
-	<t:dgCol title="操作" field="opt" width="230"></t:dgCol>
+	<t:dgCol title="操作" field="opt" width="150"></t:dgCol>
 
-	<t:dgToolBar operationCode="addLine" title="添加线路" icon="icon-add" url="lineInfoSpecializedController.do?addorupdate" funname="add" height="500" ></t:dgToolBar>
-	<t:dgToolBar operationCode="editLine" title="修改线路" icon="icon-edit" url="lineInfoSpecializedController.do?addorupdate" funname="update" height="500" ></t:dgToolBar>
-	<t:dgToolBar operationCode="allot" title="批量分配" icon="icon-edit" url="lineInfoSpecializedController.do?lineAllot" funname="lineAllot" height="500" ></t:dgToolBar>
 	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
-	<t:dgToolBar funname="coerceShelves(id)" title="强制下架" icon="icon-put" url="lineInfoSpecializedController.do?coerceShelves" operationCode="coerceShelves" ></t:dgToolBar>
 	
-	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#6"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#6"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#3"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEdit(id,status,isDealerLine)" title="申请修改" operationCode="applyEdit" exp="status#eq#0&&applicationEditStatus#eq#0"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEdit(id,status,isDealerLine)" title="申请修改" operationCode="applyEdit" exp="status#eq#0&&applicationEditStatus#eq#3"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEdit(id,status,isDealerLine)" title="申请修改" operationCode="applyEdit" exp="status#eq#0&&applicationEditStatus#eq#4"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEdit(id,status,isDealerLine)" title="申请修改" operationCode="applyEdit" exp="status#eq#0&&applicationEditStatus#eq#5"></t:dgFunOpt>
 	
-	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="firstagree" exp="applicationStatus#eq#1"></t:dgFunOpt>
-	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agrees" exp="applicationStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="agreeEdit(id)" title="同意" operationCode="firstagreeEdit" exp="applicationEditStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="agreeEdit(id)" title="同意" operationCode="agreeEdit" exp="applicationEditStatus#eq#2"></t:dgFunOpt>
+	<t:dgFunOpt funname="refuseEdit(id)" title="拒绝" operationCode="firstrefuseEdit" exp="applicationEditStatus#eq#1"></t:dgFunOpt>
+	<t:dgFunOpt funname="refuseEdit(id)" title="拒绝" operationCode="refuseEdit" exp="applicationEditStatus#eq#2"></t:dgFunOpt>
 	
-	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="firstrefuse" exp="applicationStatus#eq#1"></t:dgFunOpt>
-	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuses" exp="applicationStatus#eq#2"></t:dgFunOpt>
-	<t:dgFunOpt funname="lookRejectReason(id)" title="初审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt>
-	<t:dgFunOpt funname="lookRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#6"></t:dgFunOpt> 
+	<t:dgFunOpt funname="lookEditRejectReason(id)" title="初审拒绝原因" operationCode="fristrejectReason" exp="applicationEditStatus#eq#4"></t:dgFunOpt>
+	<t:dgFunOpt funname="lookEditRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationEditStatus#eq#5"></t:dgFunOpt> 
 	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
 	<t:dgToolBar funname="addCarRegion(id)" icon="icon-edit" title="编辑座位区间价格" ></t:dgToolBar>
 	<t:dgToolBar funname="detailCarRegion(id)" icon="icon-search" title="查看座位区间价格" ></t:dgToolBar>
@@ -75,15 +66,15 @@
 <script type="text/javascript">
 
 	$(function() {
-		$('#lineList2').datagrid({   
+		$('#applyEditList').datagrid({   
 	    	rowStyler:function(index,row){
-	    		if (row.applicationStatus=="0"){   
+	    		if (row.applicationEditStatus=="0"){   
 	            	return 'color:red';   
 	        	}
-	        	if (row.applicationStatus=="1"){   
+	        	if (row.applicationEditStatus=="1"){   
 	            	return 'color:#29B6F6';   
 	        	}
-	        	if (row.applicationStatus=="2"){   
+	        	if (row.applicationEditStatus=="2"){   
 	            	return 'color:#5400FF';   
 	        	}
 	    	}   
@@ -99,28 +90,7 @@
 		$("input[name='lendTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='lendTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 	});
-	function addBusStop(id,name,status,applicationStatus) {
-		
-		if(applicationStatus==1){
-			tip('初审不能进行站点管理');
-			return;
-		}
-		if(applicationStatus==2){
-			tip('复审不能进行站点管理');
-			return;
-		}
-		if(status==0){
-			tip('已上架线路不能进行站点管理');
-			return;
-		}
-		
-		$("#function-panelAddBusStop").panel(
-			{
-				title :'线路名称：'+name,
-				href:"lineInfoController.do?addBusStop&lineInfoId="+id+"&lineType=2"   //lineType=2为接送机跳转到的站点挂接界面
-			}
-		);
-	}
+	
 	$(function() {
 		//添加城市条件
 		var json = $("#citylie").val();
@@ -136,110 +106,12 @@
 			}
 		}
 		var a4 = '</select></span>';
-		$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);//....
-		
-		/* //添加所属公司条件
-		var json1 = $("#companyList").val();
-		console.log(json);
-		var obj1 = "";
-		var ss = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
-		ss += 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属公司">选择公司：</span>';
-		ss += '<select name="company" style="width: 150px">';
-		ss += '<option value="">选择公司</option>';
-		
-		if(json1.indexOf("dCode")>0){
-			var obj1 = eval('(' + json1 + ')');
-			for (var i = 0; i < obj1.data.length; i++) {
-				ss += '<option value="'+obj1.data[i].dCode+'">' + obj1.data[i].dName + '</option>';
-			}
-		}
-		
-		ss += '</select></span>'; 
-		$("#lineList2Form").append(ss);//....*/
+		$("#applyEditListForm").append(a1 + a2 + a3 + c1 + a4);//....
 		
 	});
 	
 	function lookLine(id, name) {
 		createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id=" + id,"1200px","800px");
-	}
-	
-	//申请上、下架
-	function applyShelves(id,status,isDealerLine) {
-		var b = true;
-		
-		$.dialog.confirm('确定要申请？',function(r){
-		    if (r){
-		    	$.post(
-		    		"lineInfoSpecializedController.do?applyShelves",	
-					{'id':id,'status':status,'isDealerLine':isDealerLine},
-					function(data){
-						var obj = eval('(' + data + ')');
-						b=obj.success;
-						if(!b){
-		           			tip("渠道商区间价格未填写，请填写区间价格再申请上架！");
-		           			return;
-		           		}else{
-		           			tip(obj.msg);
-		           		}
-						
-						$('#lineList2').datagrid('reload');
-					}
-				);		
-		    }
-		});
-	}
-	
-	//强制下架
-	function coerceShelves(id) {
-		
-		var ids = '';
-		var rows = $("#lineList2").datagrid("getSelections");
-		for(var i=0;i<rows.length;i++){
-			ids+=rows[i].id;
-			ids+=',';
-		}
-		ids = ids.substring(0,ids.length-1);
-		if(ids.length==0){
-			tip('请选择强制下架的线路');
-			return;
-		}
-		if(rows[0].status=='1'){
-			tip('未上架线路不能下架！');
-			return;
-		}
-		//url += '&ids='+ids;
-		
-		$.dialog.confirm('确定要强制下架？',function(r){
-		    if (r){
-		    	$.post(
-		    		"lineInfoSpecializedController.do?coerceShelves",	
-					{'id':ids},
-					function(data){
-						var obj = eval('(' + data + ')');
-						tip(obj.msg);
-						$('#lineList2').datagrid('reload');
-					}
-				);		
-		    }
-		});
-	}
-	
-	//同意
-	function agree(id) {
-		
-		$.dialog.confirm('确定同意？',function(r){
-		    if (r){
-		    	$.post(
-		    		"lineInfoSpecializedController.do?agree",	
-					{'id':id},
-					function(data){
-						var obj = eval('(' + data + ')');
-						tip(obj.msg);
-						$('#lineList2').datagrid('reload');
-					}
-				);		
-		    }
-		});
 	}
 	
 	function commitReason(){
@@ -250,7 +122,7 @@
 			return;
 		}	
 		$.ajax({
-			url : "lineInfoSpecializedController.do?refuse&id="+id+"&rejectReason="+rejectReason,
+			url : "lineInfoSpecializedController.do?refuseEdit&id="+id+"&rejectReason="+rejectReason,
 			type : "get",
 			success : function(data) {
 				//console.log(data);
@@ -284,7 +156,7 @@
 	}
 	
 	//拒绝
-	function refuse(id) {
+	function refuseEdit(id) {
 		$('#dealerWin').empty().append(rejectWindow());
 		$('#dealerWin').window('open'); // open a window
 		$('#rejectReason').attr("readonly",false);
@@ -293,15 +165,16 @@
 		$('#dialog_order_id').val(id);
 	}
 	
-	function lookRejectReason(id){
+	//查看拒绝原因
+	function lookEditRejectReason(id){
 		$('#dealerWin').window('open');
 		$('#sub').hide();
 		$.ajax({
             type:"get",
-            url:"lineInfoSpecializedController.do?getReason&id="+id,
+            url:"lineInfoSpecializedController.do?getEditReason&id="+id,
             dataType:'json',
             success:function(d){
-           		//var obj = eval('('+d.msg+')');
+            	
            		$('#dealerWin').empty().append(lookRejectReasonWindow());
            		$('#rejectReason').val(d.msg);
            		$('#rejectReason').attr("readonly",true);
@@ -325,52 +198,6 @@
 		return rwin;
 	}
 	
-	function lineAllot(title,url,id,width,height){
-		
-		var ids = '';
-		var rows = $("#lineList2").datagrid("getSelections");
-		for(var i=0;i<rows.length;i++){
-			ids+=rows[i].id;
-			ids+=',';
-		}
-		ids = ids.substring(0,ids.length-1);
-		if(ids.length==0){
-			tip('请选择要分配的线路');
-			return;
-		}
-		url += '&ids='+ids;
-		createwindow(title,url,width,height);
-	}
-	
-	function update(title,url,id,width,height){
-		var rows = $("#lineList2").datagrid("getSelections");
-		if(rows.length==0){
-			tip('请选择一条要修改的线路');
-			return;
-		}
-		if(rows[0].applicationStatus==1){
-			tip('初审不能修改线路');
-			return;
-		}
-		if(rows[0].applicationStatus==2){
-			tip('复审不能修改线路');
-			return;
-		}
-		if(rows[0].status==0){
-			tip('已上架线路不能修改');
-			return;
-		}
-		if(rows.length>1){
-			tip('只能修改一条线路');
-			return;
-		}
-		
-		url=url+"&id="+rows[0].id;
-		
-		createwindow(title,url,width,height);
-		
-	}
-	
 	function detail(title,url, id,width,height) {
 		var rowsData = $('#'+id).datagrid('getSelections');
 		
@@ -387,7 +214,7 @@
 	}
 	
 	function addCarRegion(id) {
-		var rows = $("#lineList2").datagrid("getSelections");
+		var rows = $("#applyEditList").datagrid("getSelections");
 		if(rows.length==0){
 			tip('请选择一条要编辑区间价格的线路');
 			return;
@@ -418,10 +245,32 @@
 	}
 	
 	function detailCarRegion(id){
-		var rows = $("#lineList2").datagrid("getSelections");
+		var rows = $("#applyEditList").datagrid("getSelections");
 		var url="lineInfoSpecializedController.do?addCarRegion"
 		url += '&load=detail&id='+rows[0].id;
 		createdetailwindow("查看座位区间价格",url,500,470);
+	}
+	
+	function applyEdit(id,status,isDealerLine){
+		add("修改座位区间价格", "lineInfoSpecializedController.do?applyEdit&id="+id,"500px","470px");
+	}
+	
+	//同意
+	function agreeEdit(id) {
+		
+		$.dialog.confirm('确定同意？',function(r){
+		    if (r){
+		    	$.post(
+		    		"lineInfoSpecializedController.do?agreeEdit",	
+					{'id':id},
+					function(data){
+						var obj = eval('(' + data + ')');
+						tip(obj.msg);
+						$('#applyEditList').datagrid('reload');
+					}
+				);		
+		    }
+		});
 	}
 	
 </script>

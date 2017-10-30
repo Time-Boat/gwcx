@@ -14,7 +14,7 @@
 		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
 		
-		<t:dgCol title="订单用户类型" field="orderUserType" align="center"></t:dgCol>
+		<t:dgCol title="订单用户类型" field="orderUserType" dictionary="userType" align="center"></t:dgCol>
 		
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
@@ -128,6 +128,9 @@
 		var rows = $("#transferOrderList").datagrid("getSelections");
 		var lineId = rows[0].lineId;
 		var ds = rows[0].orderStartime;
+		
+		var userIds = '';
+		
 		for(var i=0;i<rows.length;i++){
 			
 			//判断订单状态，如果是未支付就提示不让安排司机车辆
@@ -140,18 +143,6 @@
 				tip('已完成订单不能安排司机车辆');
 				return;
 			}
-			
-			//判断当前订单用户是否已经被注销了
-			$.get(
-				"transferOrderList.do?checkUser&userId="+rows[i].createUserId,
-				function(data){
-					console.log(data);
-					if(!data.success){
-						
-						return;
-					}
-				}
-			);
 			
 			//判断选中的订单是不是在同一条线路上
 			if(lineId == rows[i].lineId){
@@ -167,33 +158,43 @@
 					return;
 				}
 			}else{
-				/* console.log(rows[i].orderStartime);
-				console.log(rows[i].orderStartime);
-				console.log(new Date(rows[i].orderStartime));
-				console.log(Date.parse(new Date(rows[i].orderStartime))); */
+				//console.log(rows[i].orderStartime);
+				//console.log(rows[i].orderStartime);
+				//console.log(new Date(rows[i].orderStartime));
+				//console.log(Date.parse(new Date(rows[i].orderStartime)));
 				slDate = rows[i].orderStartime; 
 			}
+			
+			userIds+=rows[i].createUserId;
+			userIds+=',';
 			
 			ids+=rows[i].id;
 			ids+=',';
 		}
+		
 		ids = ids.substring(0,ids.length-1);
 		if(ids.length==0){
 			tip('请选择项目');
 			return;
 		}
-		//console.log(slDate);
 		
-		url += '&ids='+ids+'&slDate='+slDate;
-		//console.log(url);
-		createwindow(title,url,width,height);
-		/* $("#function-transferOrderAdd").panel(
-			{
-				title :'司机车辆信息',
-				href: url
+		//判断当前订单用户是否已经被注销了
+		$.get(
+			"transferOrderController.do?checkUser&userIds="+userIds,
+			function(data){
+				console.log(data);
+				var obj = eval('(' + data + ')');
+				if(obj.success){
+					url += '&ids='+ids+'&slDate='+slDate;
+					createwindow(title,url,width,height);
+				}else{
+					tip('该条记录已有运营专员管理');
+					return;
+				}
 			}
-		); */
-	}
+		);
+		
+	} 
 	
 	//把最小的时间发到后台，在新增填写发车时间的时候和这个最小时间进行比较
 	var slDate = '';

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.exception.ParameterException;
 import com.yhy.lin.app.service.AppCharteredInterfaceService;
+import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
@@ -40,7 +41,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
 
 	@Autowired
-	private AppCharteredInterfaceService appCharteredService;
+	private AppInterfaceService appService;
 	
 	@Autowired
 	private SystemService systemService;
@@ -231,53 +232,20 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			// 验证参数
 			JSONObject jsondata = checkParam(param);
 			
-//			String token = jsondata.getString("token");
+			String token = jsondata.getString("token");
 			// 验证token
-//			checkToken(token);
+			checkToken(token);
 			
 			String sumPeople = jsondata.getString("sumPeople");
 			String lineId = jsondata.getString("lineId");
 			String phone = jsondata.getString("phone");
 			
+			
 			List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", phone);
 			if(dealer.size() > 0){
-					
-				BigDecimal discount = dealer.get(0).getDealerDiscount();
+				String tPrice = appService.getCarTypePrice(sumPeople, lineId, phone, dealer.get(0).getDealerDiscount());
 				
-				List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
-						+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? ", lineId);
-				
-				String tPrice = "";
-				
-				for(Map<String,Object> map : lm){
-					String p = AppUtil.Null2Blank(map.get("typename") + "");
-					
-					if(!StringUtil.isNotEmpty(p))
-						continue;
-					
-					//切字符串做比较
-					int start = p.indexOf("-");
-					int end = p.lastIndexOf("座");
-					if(-1 == start){
-						start = 0;
-					}else{
-						start += 1;
-					}
-					String maxNum = p.substring(start, end);
-					
-					int sp = Integer.parseInt(sumPeople);
-					int mn = Integer.parseInt(maxNum) - 1;
-					
-					if(sp < mn){
-						tPrice = map.get("car_type_price") + "";
-						double dis = discount.doubleValue();
-						dis = dis/10;
-						double tp = Double.parseDouble(tPrice);
-						tPrice = String.valueOf(tp * dis);
-//						tPrice = discount.divide(new BigDecimal("10"), 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(tPrice)).toString();
-						break;
-					}
-				}
+				logger.info("总价为：" + tPrice);
 				
 				data.put("tPrice", tPrice);
 	

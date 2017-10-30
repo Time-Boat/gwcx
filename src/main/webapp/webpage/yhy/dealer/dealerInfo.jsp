@@ -7,13 +7,24 @@
   <t:base type="jquery,easyui,tools,DatePicker"></t:base>
   <script type="text/javascript">
   
-	
+	$(function(){
+		console.log(1);
+		var id = $('#id').val();
+		if(id != ''){
+			checkPhone($('#phone').val());
+			checkCreditCode($('#creditCode').val());
+		}
+	});
+  
 	var b = false;
 	//验证信用代码和手机号是否已经被占用
 	function checkCreditCode(creditCode){
+		
+		var id = $('#id').val();
+		
 		$.ajax({
           type:"get",
-          url:"dealerInfoController.do?checkCreditCode&creditCode="+creditCode,
+          url:"dealerInfoController.do?checkCreditCode&creditCode="+creditCode+"&id="+id,
           dataType:'json',
           success:function(d){
 	       		var obj = eval('('+d.jsonStr+')');
@@ -32,9 +43,11 @@
 	//验证手机号是否已经被占用
 	function checkPhone(phone){
 		
+		var id = $('#id').val();
+		
 		$.ajax({
           type:"get",
-          url:"dealerInfoController.do?checkPhone&phone="+phone,
+          url:"dealerInfoController.do?checkPhone&phone="+phone+"&id="+id,
           dataType:'json',
           success:function(d){
 	       		var obj = eval('('+d.jsonStr+')');
@@ -63,6 +76,7 @@
 		}
   		return true;
   	}
+	
   </script>
  </head>
  <body style="overflow-y: hidden" scroll="no">

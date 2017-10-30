@@ -179,7 +179,7 @@
 				tip('请选择一条记录再编辑！');
 				return;
 			}
-			if (rowsData[0].auditStatus == 0 || rowsData[0].lastAuditStatus == 0) {
+			if (rowsData[0].auditStatus == '0' || rowsData[0].lastAuditStatus == '0') {
 				tip('审核状态中不能被编辑！');
 				return;
 			}

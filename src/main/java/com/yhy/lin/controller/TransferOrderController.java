@@ -587,15 +587,21 @@ public class TransferOrderController extends BaseController {
 		JSONObject jsonObj = new JSONObject();
 		
 		//是否能对订单进行车辆的安排
-		boolean b = false;
+		boolean b = true;
 		
-		String userId = request.getParameter("userId");
+		String userIds = request.getParameter("userIds");
 		
-		TSBaseUser user = systemService.get(TSBaseUser.class, userId);
+		String[] ids = userIds.split(",");
 		
 		//条件只对运营经理生效
-		if(checkRole(AppGlobals.OPERATION_MANAGER) && user != null && "0".equals(user.getStatus())){
-			b = true;
+		if(checkRole(AppGlobals.OPERATION_MANAGER)){
+			for(String id : ids){
+				TSBaseUser user = systemService.get(TSBaseUser.class, id);
+				if(user == null || 1 == user.getStatus()){
+					b = false;
+					break;
+				}
+			}
 		}
 		
 		jsonObj.put("success", b);

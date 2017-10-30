@@ -338,7 +338,7 @@ public class AppInterfaceController extends AppBaseController {
 					// 存储验证码相关信息
 					if (user == null) {
 						sql = "insert into car_customer set id='" + UUIDGenerator.generate()
-								+ "',phone = ? ,user_type = '0' ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
+								+ "',user_type = '0' ,phone = ? ,user_type = '0' ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
 						systemService.executeSql(sql, mobile, curTime, curTime, code);
 					} else {
 						sql = "update car_customer set status = '0', code_update_time = ? ,security_code = ? where phone = ? ";
@@ -398,6 +398,8 @@ public class AppInterfaceController extends AppBaseController {
 			// 验证token
 			checkToken(token);
 
+			String userPhone = jsondata.getString("userPhone");
+			
 			//在linux服务器中日期转换要指定格式
 			Gson g = new GsonBuilder()  	
 					  .setDateFormat("yyyy-MM-dd HH:mm:ss")  
@@ -427,11 +429,18 @@ public class AppInterfaceController extends AppBaseController {
 				success = false;
 			} else {
 				
+				String userType = t.getOrderUserType();
 				//确保价格不被前端修改         使用微信平台的浏览器应该不会被修改数据，还是为了保险起见
-				LineInfoEntity l = appService.get(LineInfoEntity.class, t.getLineId());
-				t.setOrderUnitprice(l.getPrice());
-				BigDecimal tp = l.getPrice().multiply(new BigDecimal(t.getOrderNumbers()));
-				t.setOrderTotalPrice(tp);
+				if("0".equals(userType)){
+					LineInfoEntity l = appService.get(LineInfoEntity.class, t.getLineId());
+					t.setOrderUnitprice(l.getPrice());
+					BigDecimal tp = l.getPrice().multiply(new BigDecimal(t.getOrderNumbers()));
+					t.setOrderTotalPrice(tp);
+				} else if ("1".equals(userType)){
+					List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", userPhone);
+					String tPrice = appService.getCarTypePrice(t.getOrderNumbers(), t.getLineId(), userPhone, dealer.get(0).getDealerDiscount());
+					t.setOrderTotalPrice(new BigDecimal(tPrice));
+				}
 				
 				String orderId = "";
 				
@@ -550,7 +559,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
-
+	
 	// 获取线路站点信息
 	@RequestMapping(params = "getStationList")
 	public void getStationList(HttpServletRequest request, HttpServletResponse response) {

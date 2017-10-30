@@ -93,6 +93,24 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	private String lastApplicationUser;
 	//是否有渠道商线路
 	private String isDealerLine;
+	//申请修改状态
+	private String applicationEditStatus;
+	//初审修改拒绝原因
+	private String trialEditReason;
+	//复审修改拒绝原因
+	private String reviewEditReason;
+	//申请修改时间
+	private Date applicationEditTime;
+	//申请修改人
+	private String applicationEditUserId;
+	//初审修改时间
+	private Date firstApplicationEditTime;
+	//复审修改时间
+	private Date lastApplicationEditTime;
+	//初审修改人
+	private String firstApplicationEditUserId;
+	//复审修改人
+	private String lastApplicationEditUserId;
 	
 	@Column(name = "price")
 	public BigDecimal getPrice() {
@@ -333,4 +351,77 @@ public class LineInfoEntity extends IdEntity implements java.io.Serializable{
 	public void setIsDealerLine(String isDealerLine) {
 		this.isDealerLine = isDealerLine;
 	}
+	
+	@Column(name = "application_edit_status")
+	public String getApplicationEditStatus() {
+		return applicationEditStatus;
+	}
+	public void setApplicationEditStatus(String applicationEditStatus) {
+		this.applicationEditStatus = applicationEditStatus;
+	}
+	
+	@Column(name = "trial_edit_reason")
+	public String getTrialEditReason() {
+		return trialEditReason;
+	}
+	public void setTrialEditReason(String trialEditReason) {
+		this.trialEditReason = trialEditReason;
+	}
+	
+	@Column(name = "review_edit_reason")
+	public String getReviewEditReason() {
+		return reviewEditReason;
+	}
+	public void setReviewEditReason(String reviewEditReason) {
+		this.reviewEditReason = reviewEditReason;
+	}
+	
+	@Column(name = "application_edit_time")
+	public Date getApplicationEditTime() {
+		return applicationEditTime;
+	}
+	public void setApplicationEditTime(Date applicationEditTime) {
+		this.applicationEditTime = applicationEditTime;
+	}
+	
+	@Column(name = "application_edit_user_id")
+	public String getApplicationEditUserId() {
+		return applicationEditUserId;
+	}
+	public void setApplicationEditUserId(String applicationEditUserId) {
+		this.applicationEditUserId = applicationEditUserId;
+	}
+	
+	@Column(name = "first_application_edit_time")
+	public Date getFirstApplicationEditTime() {
+		return firstApplicationEditTime;
+	}
+	public void setFirstApplicationEditTime(Date firstApplicationEditTime) {
+		this.firstApplicationEditTime = firstApplicationEditTime;
+	}
+	
+	@Column(name = "last_application_edit_time")
+	public Date getLastApplicationEditTime() {
+		return lastApplicationEditTime;
+	}
+	public void setLastApplicationEditTime(Date lastApplicationEditTime) {
+		this.lastApplicationEditTime = lastApplicationEditTime;
+	}
+	
+	@Column(name = "first_application_edit_user_id")
+	public String getFirstApplicationEditUserId() {
+		return firstApplicationEditUserId;
+	}
+	public void setFirstApplicationEditUserId(String firstApplicationEditUserId) {
+		this.firstApplicationEditUserId = firstApplicationEditUserId;
+	}
+	
+	@Column(name = "last_application_edit_user_id")
+	public String getLastApplicationEditUserId() {
+		return lastApplicationEditUserId;
+	}
+	public void setLastApplicationEditUserId(String lastApplicationEditUserId) {
+		this.lastApplicationEditUserId = lastApplicationEditUserId;
+	}
+	
 }

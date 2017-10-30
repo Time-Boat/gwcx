@@ -50,7 +50,7 @@ public class LineInfoSpecializedController extends BaseController {
 
 	@Autowired
 	private LineInfoServiceI lineInfoService;
-	
+
 	@Autowired
 	private CarTSTypeLineServiceI carTSTypeLineServiceI;
 
@@ -73,6 +73,15 @@ public class LineInfoSpecializedController extends BaseController {
 		return new ModelAndView("yhy/linesSpecial/lineList");
 	}
 
+	/**
+	 * 接送机线路管理跳转页面
+	 */
+	@RequestMapping(params = "applyEditList")
+	public ModelAndView applyEditList(HttpServletRequest request) {
+		request.setAttribute("cityList", getOpencity());
+
+		return new ModelAndView("yhy/linesSpecial/applyEditList");
+	}
 	/**
 	 * 获得子公司
 	 * 
@@ -122,7 +131,7 @@ public class LineInfoSpecializedController extends BaseController {
 		String lendTime_begin = request.getParameter("lendTime_begin");
 		String lendTime_end = request.getParameter("lendTime_end");
 
-//		String company = request.getParameter("company");
+		//		String company = request.getParameter("company");
 
 		// 因为调用的方法一样，所以在外层来处理... 忘记是啥意思了。。。
 		linetype = " >='" + linetype + "' ";
@@ -413,10 +422,10 @@ public class LineInfoSpecializedController extends BaseController {
 						j.setSuccess(success);
 						return j;
 					}
+				}
 			}
 		}
-		}
-		
+
 		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
 		if(StringUtil.isNotEmpty(line)){
 			line.setApplicationStatus("1");//待审核
@@ -425,7 +434,7 @@ public class LineInfoSpecializedController extends BaseController {
 			}else{
 				line.setApplyContent("0");//申请内容
 			}
-			
+
 			line.setApplicationTime(AppUtil.getDate());
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 		}
@@ -474,7 +483,7 @@ public class LineInfoSpecializedController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
 		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
-		
+
 		if(StringUtil.isNotEmpty(line)){
 			if("1".equals(line.getApplicationStatus())){
 				line.setApplicationStatus("2");//初审
@@ -484,9 +493,24 @@ public class LineInfoSpecializedController extends BaseController {
 				if("0".equals(line.getStatus())){
 					line.setApplicationStatus("4");//复审
 					line.setStatus("1");//已上架
+					if(StringUtil.isNotEmpty(line.getId())){
+						List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", line.getId());
+						for (int i = 0; i < carlist.size(); i++) {
+							CarTSTypeLineEntity ca = carlist.get(i);
+							ca.setApplyStatus("0");
+							carTSTypeLineServiceI.saveOrUpdate(ca);
+						}
+					}
+
 				}else if("1".equals(line.getStatus())){
 					line.setApplicationStatus("3");//复审
 					line.setStatus("0");//已下架
+					List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", line.getId());
+					for (int i = 0; i < carlist.size(); i++) {
+						CarTSTypeLineEntity ca = carlist.get(i);
+						ca.setApplyStatus("1");
+						carTSTypeLineServiceI.saveOrUpdate(ca);
+					}
 				}
 				line.setLastApplicationTime(AppUtil.getDate());
 				line.setLastApplicationUser(ResourceUtil.getSessionUserName().getId());
@@ -550,7 +574,7 @@ public class LineInfoSpecializedController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
 	 * 强制下架
 	 * @param request
@@ -583,11 +607,11 @@ public class LineInfoSpecializedController extends BaseController {
 					message = "服务器异常！";
 				}
 			}
-			
+
 		}else{
 			message="没有选中要强制下架的线路！";
 		}
-		
+
 		j.setMsg(message);
 		return j;
 	}
@@ -600,42 +624,48 @@ public class LineInfoSpecializedController extends BaseController {
 	public ModelAndView addCarRegion(LineInfoEntity lineInfo, HttpServletRequest req) {
 
 		String lineId = req.getParameter("id");
-		
+
 		List<TSTypegroup> list = systemService.findByProperty(TSTypegroup.class, "typegroupcode", "car_type");
 		for (int i = 0; i < list.size(); i++) {
 			String typeId = list.get(i).getId();
 			List<TSType> typelist = this.systemService.findByProperty(TSType.class, "TSTypegroup.id",typeId);
 			req.setAttribute("typelist", typelist);
 		}
-		
+
 		if(StringUtil.isNotEmpty(lineId)){
 			req.setAttribute("lineId", lineId);
-			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
+			List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+lineId+"' ORDER BY c.version desc");
+			Object ca = calist.get(0);
+			if(!StringUtil.isNotEmpty(ca)){
+				ca=0;
+			}
+			List<CarTSTypeLineEntity> carlist = systemService.findHql(
+					"from CarTSTypeLineEntity where lineId=? and applyStatus=? and version=? ",lineId,"1",ca);
 			if(carlist.size()>0){
-				req.setAttribute("carlist", carlist);
+				req.setAttribute("carlist", carlist);//获取最高版本的已通过审核的车辆类型区间价格
 			}
 		}
-		
+
 		return new ModelAndView("yhy/linesSpecial/addCarRegion");
 	}
-	
+
 	/**
 	 * 保存价格
 	 */
 	@RequestMapping(params = "savePrice")
 	@ResponseBody
 	public AjaxJson savePrice(HttpServletRequest request, HttpServletResponse respone) {
-		
+
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		
+
 		String price[] = request.getParameterValues("price");
 		String lineId = request.getParameter("lineId");
 		String typeid[] = request.getParameterValues("typeid");
-		
+
 		if(StringUtil.isNotEmpty(lineId)){
 			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
-			
+
 			if(carlist.size()>0){
 				for (int i = 0; i < carlist.size(); i++) {
 					CarTSTypeLineEntity cartype =carlist.get(i);
@@ -649,6 +679,8 @@ public class LineInfoSpecializedController extends BaseController {
 					cartype.setLineId(lineId);
 					cartype.setCarTypeId(typeid[i]);
 					cartype.setCarTypePrice(new BigDecimal(price[i]));
+					cartype.setApplyStatus("0");
+					cartype.setVersion("1");
 					try {
 						message="保存价格成功！";
 						carTSTypeLineServiceI.save(cartype);
@@ -658,11 +690,11 @@ public class LineInfoSpecializedController extends BaseController {
 				}
 			}
 		}
-		
+
 		j.setMsg(message);
 		return j;
 	}
-	
+
 	/**
 	 * 验证渠道商是否已添加车辆类型区间价格
 	 */
@@ -671,7 +703,7 @@ public class LineInfoSpecializedController extends BaseController {
 	public AjaxJson checkCarRegion(HttpServletRequest request) {
 		boolean success = false;
 		AjaxJson j = new AjaxJson();
-		
+
 		String lineId = request.getParameter("id");
 		if(StringUtil.isNotEmpty(lineId)){
 			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
@@ -679,8 +711,200 @@ public class LineInfoSpecializedController extends BaseController {
 				success=true;
 			}
 		}
-			
+
 		j.setSuccess(success);
+		return j;
+	}
+
+	/**
+	 * 修改区间价格
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "applyEdit")
+	public ModelAndView applyEdit(LineInfoEntity lineInfo, HttpServletRequest req) {
+
+		String lineId = req.getParameter("id");
+
+		List<TSTypegroup> list = systemService.findByProperty(TSTypegroup.class, "typegroupcode", "car_type");
+		for (int i = 0; i < list.size(); i++) {
+			String typeId = list.get(i).getId();
+			List<TSType> typelist = this.systemService.findByProperty(TSType.class, "TSTypegroup.id",typeId);
+			req.setAttribute("typelist", typelist);
+		}
+
+		if(StringUtil.isNotEmpty(lineId)){
+			req.setAttribute("lineId", lineId);
+			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
+			if(carlist.size()>0){
+				req.setAttribute("carlist", carlist);
+			}
+		}
+
+		return new ModelAndView("yhy/linesSpecial/applyEdit");
+	}
+
+	/**
+	 * 保存申请修改的价格
+	 */
+	@RequestMapping(params = "saveEditPrice")
+	@ResponseBody
+	public AjaxJson saveEditPrice(HttpServletRequest request, HttpServletResponse respone) {
+
+		String message = null;
+		AjaxJson j = new AjaxJson();
+
+		String price[] = request.getParameterValues("price");
+		String lineId = request.getParameter("lineId");
+		String typeid[] = request.getParameterValues("typeid");
+
+		if(StringUtil.isNotEmpty(lineId)){
+
+			LineInfoEntity lnfo = this.systemService.getEntity(LineInfoEntity.class, lineId);
+			lnfo.setApplicationEditStatus("1");
+			lnfo.setApplyContent("2");
+			lnfo.setApplicationEditTime(AppUtil.getDate());
+			lnfo.setApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
+
+			try {
+				List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+lineId+"' ORDER BY c.version desc");
+				Object ca = calist.get(0);
+				if(!StringUtil.isNotEmpty(ca)){
+					ca=0;
+				}
+				for (int i = 0; i < price.length; i++) {
+					CarTSTypeLineEntity cartype = new CarTSTypeLineEntity();
+
+					cartype.setLineId(lineId);
+					cartype.setCarTypeId(typeid[i]);
+					cartype.setCarTypePrice(new BigDecimal(price[i]));
+					cartype.setApplyStatus("0");
+					cartype.setVersion(Integer.parseInt(ca.toString())+1+"");
+
+					message="保存价格成功！";
+
+					carTSTypeLineServiceI.save(cartype);
+
+				}
+				this.lineInfoService.saveOrUpdate(lnfo);
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请同意
+	 */
+	@RequestMapping(params = "agreeEdit")
+	@ResponseBody
+	public AjaxJson agreeEdit(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
+		try {
+		if(StringUtil.isNotEmpty(line)){
+			if("1".equals(line.getApplicationEditStatus())){
+				line.setApplicationEditStatus("2");//初审
+				line.setFirstApplicationEditTime(AppUtil.getDate());
+				line.setFirstApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
+				line.setFirstApplicationUser(ResourceUtil.getSessionUserName().getId());
+			}else if("2".equals(line.getApplicationEditStatus())){
+				line.setApplicationEditStatus("3");
+				line.setLastApplicationEditTime(AppUtil.getDate());
+				line.setLastApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
+				
+				List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+line.getId()+"' ORDER BY c.version desc");
+				Object ca = calist.get(0);
+				if(!StringUtil.isNotEmpty(ca)){
+					ca=0;
+				}
+				List<CarTSTypeLineEntity> carlist = systemService.findHql(
+						"from CarTSTypeLineEntity where lineId=? and version=? ",line.getId(),ca);
+				if(carlist.size()>0){
+					for (int i = 0; i < carlist.size(); i++) {
+						CarTSTypeLineEntity cats = carlist.get(i);
+						cats.setApplyStatus("1");
+						this.systemService.saveOrUpdate(cats);
+					}
+				}
+			}
+		}
+			message = "申请成功！";
+			this.systemService.saveOrUpdate(line);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常！";
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
+	 * 申请拒绝
+	 */
+	@RequestMapping(params = "refuseEdit")
+	@ResponseBody
+	public AjaxJson refuseEdit(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		String rejectReason = request.getParameter("rejectReason");
+		LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, id);
+
+		if (StringUtil.isNotEmpty(line)) {
+
+			if ("1".equals(line.getApplicationEditStatus())) {
+				line.setTrialEditReason(rejectReason);
+				line.setApplicationEditStatus("4"); //初审拒绝
+				line.setFirstApplicationEditTime(AppUtil.getDate());
+				line.setFirstApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
+			}
+			if ("2".equals(line.getApplicationEditStatus())) {
+				line.setReviewEditReason(rejectReason);
+				line.setApplicationEditStatus("5");// 复审拒绝
+				line.setLastApplicationEditTime(AppUtil.getDate());
+				line.setLastApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
+			}
+		}
+
+		try {
+			message = "拒绝成功！";
+			this.systemService.saveOrUpdate(line);
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常！";
+		}
+
+		j.setMsg(message);
+		return j;
+	}
+	
+	
+	/**
+	 * 获取拒绝原因
+	 */
+	@RequestMapping(params = "getEditReason")
+	@ResponseBody
+	public AjaxJson getEditReason(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");
+		LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, id);
+
+		if (StringUtil.isNotEmpty(line)) {
+			if (StringUtil.isNotEmpty(line.getReviewEditReason())) {
+				message = line.getReviewEditReason();// 复审拒绝原因
+			} else {
+				message = line.getTrialEditReason();// 初审拒绝原因
+			}
+		}
+		j.setMsg(message);
 		return j;
 	}
 }

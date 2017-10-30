@@ -347,6 +347,7 @@ public class LineInfoController extends BaseController {
 				}
 				lineInfo.setStatus("1");
 				lineInfo.setApplicationStatus("0");
+				lineInfo.setApplicationEditStatus("0");
 
 				StartOrEndEntity st = new StartOrEndEntity();
 				if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {

@@ -1,5 +1,6 @@
 package com.yhy.lin.app.service.impl;
 
+import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -315,7 +316,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			
 			aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
 			
-			aod.setDriver(AppUtil.Null2Blank(map.get("remark") + ""));
+			aod.setRemark(AppUtil.Null2Blank(map.get("remark") + ""));
 			
 			String officePhone = AppUtil.Null2Blank(map.get("officePhone") + "");
 			if(StringUtil.isNotEmpty(officePhone)){
@@ -414,6 +415,46 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		// executeSql(sql, userId);
 
 		return mList;
+	}
+
+	@Override
+	public String getCarTypePrice(String sumPeople, String lineId, String phone, BigDecimal discount) {
+		
+		String tPrice = "";
+		
+		List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
+				+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? ", lineId);
+		
+		for(Map<String,Object> map : lm){
+			String p = AppUtil.Null2Blank(map.get("typename") + "");
+			
+			if(!StringUtil.isNotEmpty(p))
+				continue;
+			
+			//切字符串做比较
+			int start = p.indexOf("-");
+			int end = p.lastIndexOf("座");
+			if(-1 == start){
+				start = 0;
+			}else{
+				start += 1;
+			}
+			String maxNum = p.substring(start, end);
+			
+			int sp = Integer.parseInt(sumPeople);
+			int mn = Integer.parseInt(maxNum) - 1;
+			
+			if(sp < mn){
+				tPrice = map.get("car_type_price") + "";
+				double dis = discount.doubleValue();
+				dis = dis/10;
+				double tp = Double.parseDouble(tPrice);
+				tPrice = String.valueOf(tp * dis);
+//				tPrice = discount.divide(new BigDecimal("10"), 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(tPrice)).toString();
+				break;
+			}
+		}
+		return tPrice;
 	}
 
 }

@@ -174,7 +174,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("userId", "user_id", null),
 				new Db2Page("custphone", "phone", null),
-				new Db2Page("orderUserType", "orderUserType", null),
+				new Db2Page("orderUserType", "order_user_type", null),
 				new Db2Page("createUserId", "createUserId", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
@@ -241,7 +241,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				new Db2Page("cityName", "city_name", null),
 				new Db2Page("userId", "user_id", null),
 				new Db2Page("custphone", "phone", null),
-				new Db2Page("orderUserType", "orderUserType", null),
+				new Db2Page("orderUserType", "order_user_type", null),
 				new Db2Page("createUserId", "createUserId", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

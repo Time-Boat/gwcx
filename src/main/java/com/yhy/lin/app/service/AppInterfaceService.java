@@ -1,5 +1,6 @@
 package com.yhy.lin.app.service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.jeecgframework.core.common.service.CommonService;
@@ -43,6 +44,10 @@ public interface AppInterfaceService extends CommonService{
 
 	/** 获取消息通知列表 */
 	List<AppMessageListEntity> getMessageListById(String userId, String pageNo, String maxPageItem);
+
+	/** 根据人数计算总价 
+	 * @param discount */
+	String getCarTypePrice(String sumPeople, String lineId, String phone, BigDecimal discount);
 
 	
 	

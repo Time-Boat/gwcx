@@ -31,6 +31,11 @@ public class CarTSTypeLineEntity extends IdEntity implements java.io.Serializabl
 	private java.lang.String lineId;
 	/**车辆类型区间价格*/
 	private BigDecimal carTypePrice;
+	//版本号
+	private String version;
+	//申请状态
+	private String applyStatus;
+	
 	
 	/**
 	 *方法: 取得java.lang.String
@@ -79,5 +84,22 @@ public class CarTSTypeLineEntity extends IdEntity implements java.io.Serializabl
 	 */
 	public void setCarTypePrice(BigDecimal carTypePrice){
 		this.carTypePrice = carTypePrice;
+	}
+	@Column(name ="version")
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
+
+	@Column(name ="apply_status")
+	public String getApplyStatus() {
+		return applyStatus;
+	}
+
+	public void setApplyStatus(String applyStatus) {
+		this.applyStatus = applyStatus;
 	}
 }
