@@ -635,15 +635,18 @@ public class LineInfoSpecializedController extends BaseController {
 		if(StringUtil.isNotEmpty(lineId)){
 			req.setAttribute("lineId", lineId);
 			List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+lineId+"' ORDER BY c.version desc");
-			Object ca = calist.get(0);
-			if(!StringUtil.isNotEmpty(ca)){
-				ca=0;
+			if(calist.size()>0){
+				Object ca = calist.get(0);
+				if(!StringUtil.isNotEmpty(ca)){
+					ca=0;
+				}
+				List<CarTSTypeLineEntity> carlist = systemService.findHql(
+						"from CarTSTypeLineEntity where lineId=? and applyStatus=? and version=? ",lineId,"1",ca);
+				if(carlist.size()>0){
+					req.setAttribute("carlist", carlist);//获取最高版本的已通过审核的车辆类型区间价格
+				}
 			}
-			List<CarTSTypeLineEntity> carlist = systemService.findHql(
-					"from CarTSTypeLineEntity where lineId=? and applyStatus=? and version=? ",lineId,"1",ca);
-			if(carlist.size()>0){
-				req.setAttribute("carlist", carlist);//获取最高版本的已通过审核的车辆类型区间价格
-			}
+			
 		}
 
 		return new ModelAndView("yhy/linesSpecial/addCarRegion");
@@ -768,7 +771,11 @@ public class LineInfoSpecializedController extends BaseController {
 
 			try {
 				List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+lineId+"' ORDER BY c.version desc");
-				Object ca = calist.get(0);
+				Object ca = null;
+				if(calist.size()>0){
+					 ca = calist.get(0);
+				}
+				
 				if(!StringUtil.isNotEmpty(ca)){
 					ca=0;
 				}
@@ -819,7 +826,10 @@ public class LineInfoSpecializedController extends BaseController {
 				line.setLastApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
 				
 				List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+line.getId()+"' ORDER BY c.version desc");
-				Object ca = calist.get(0);
+				Object ca = null;
+				if(calist.size()>0){
+					ca = calist.get(0);
+				}
 				if(!StringUtil.isNotEmpty(ca)){
 					ca=0;
 				}
