@@ -42,27 +42,6 @@ public class DealerApplyEntity implements java.io.Serializable {
 	/**申请人*/
 	private java.lang.String applyPeople;
 	
-	/** 验证码 */
-	private java.lang.String securityCode;
-	/** 更新时间 */
-	private java.util.Date codeUpdateTime;
-	
-	@Column(name = "SECURITY_CODE", nullable = true, length = 4)
-	public java.lang.String getSecurityCode() {
-		return securityCode;
-	}
-	public void setSecurityCode(java.lang.String securityCode) {
-		this.securityCode = securityCode;
-	}
-
-	@Column(name = "CODE_UPDATE_TIME", nullable = true)
-	public java.util.Date getCodeUpdateTime() {
-		return codeUpdateTime;
-	}
-	public void setCodeUpdateTime(java.util.Date codeUpdateTime) {
-		this.codeUpdateTime = codeUpdateTime;
-	}
-	
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  id

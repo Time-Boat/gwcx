@@ -37,6 +37,7 @@ import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
+import com.yhy.lin.app.entity.MessageCodeEntity;
 import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.exception.ParameterException;
 import com.yhy.lin.app.service.AppInterfaceService;
@@ -347,6 +348,77 @@ public class AppInterfaceController extends AppBaseController {
 	
 					data.put("codemsg", code);
 					msg = "短信发送成功";
+					statusCode = AppGlobals.APP_SUCCESS;
+				} else {
+					//msg = "允许每分钟1条，累计每小时7条。每天10条";
+					msg = "您的操作过于频繁，请稍后再试";
+					statusCode = "003";
+				}
+			}
+		} catch (ParameterException e) {
+			e.printStackTrace();
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		}
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+
+	}
+	
+	//短信验证码接口  （新）
+	@RequestMapping(params = "getMsgCode")
+	public void getMsgCode(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+
+		String phone = request.getParameter("phone");
+		
+		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码    3:申请渠道商验证码接口
+		String codeType = request.getParameter("codeType");
+		
+		// 验证参数
+		try {
+			checkParam(new String[] { "codeType", "mobile" }, codeType, phone);
+			
+			logger.info("手机号: " + phone);
+			if (!phone.matches(AppGlobals.CHECK_PHONE)) {
+				msg = "手机号格式不正确";
+				statusCode = "002";
+			} else {
+				// 生成4位数的验证码
+				String code = StringUtil.numRandom(4);
+				logger.info("验证码: " + code);
+				
+				String templateCode = "";
+				
+				templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+				
+				// 发送端短消息
+//				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+//						templateCode , SendMessageUtil.TE MPLATE_SMS_CODE_SIGN_NAME);
+				boolean b = true;
+				if (b) {
+					
+					MessageCodeEntity mc = new MessageCodeEntity();
+					mc.setCodeType(codeType);
+					mc.setCreateTime(AppUtil.getDate());
+					mc.setIsUsed("0");
+					mc.setMsgCode(code);
+					mc.setPhone(phone);
+					
+					systemService.save(mc);
+					
+					data.put("codemsg", code);
+					
+					msg = "短信发送成功"; 
 					statusCode = AppGlobals.APP_SUCCESS;
 				} else {
 					//msg = "允许每分钟1条，累计每小时7条。每天10条";

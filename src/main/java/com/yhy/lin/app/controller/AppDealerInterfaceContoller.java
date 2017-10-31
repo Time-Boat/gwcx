@@ -1,8 +1,6 @@
 package com.yhy.lin.app.controller;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.exception.ParameterException;
-import com.yhy.lin.app.service.AppCharteredInterfaceService;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
@@ -273,7 +270,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
-	/** 订票人数确定总价 */
+	/** 申请成为渠道商 */
 	@RequestMapping(params = "applyDealer")
 	public void applyDealer(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -298,17 +295,25 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			String applyPeople = jsondata.getString("applyPeople");
 			String code = jsondata.getString("code");
 			
-			DealerApplyEntity da = new DealerApplyEntity();
-			da.setCreateTime(AppUtil.getDate());
-			da.setAddress(address);
-			da.setApplyPeople(applyPeople);
-			da.setCompanyName(companyName);
-			da.setPhone(phone);
+			String codeId = checkMsgCode(phone, code);
+			if(StringUtil.isNotEmpty(codeId)){
+				DealerApplyEntity da = new DealerApplyEntity();
+				da.setCreateTime(AppUtil.getDate());
+				da.setAddress(address);
+				da.setApplyPeople(applyPeople);
+				da.setCompanyName(companyName);
+				da.setPhone(phone);
+				appService.save(da);
+				
+				systemService.executeSql(" update message_code set is_used = '1' where id = ? ", codeId);
+				
+				statusCode = AppGlobals.APP_SUCCESS;
+				msg = "申请成功";
+			}else{
+				statusCode = AppGlobals.PARAMETER_MSG_CODE_INVALID;
+				msg = AppGlobals.PARAMETER_MSG_CODE_INVALID_MSG;
+			}
 			
-			appService.save(da);
-			
-			statusCode = AppGlobals.APP_SUCCESS;
-			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();

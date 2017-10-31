@@ -39,7 +39,18 @@ public class MessageCodeEntity implements java.io.Serializable {
 	private java.lang.String msgCode;
 	/**是否已被使用  0: 未使用  1：已使用*/
 	private java.lang.String isUsed;
+	/**验证码类型*/
+	private java.lang.String codeType;
 	
+	@Column(name ="CODE_TYPE",nullable=true,length=2)
+	public java.lang.String getCodeType() {
+		return codeType;
+	}
+
+	public void setCodeType(java.lang.String codeType) {
+		this.codeType = codeType;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  id

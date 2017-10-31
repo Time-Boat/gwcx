@@ -32,7 +32,13 @@ public interface AppGlobals {
 
 	/** 参数为空 */
 	public static final String PARAMETER_EMPTY_ERROR = "996";
-
+	
+	/** 验证码无效 */
+	public static final String PARAMETER_MSG_CODE_INVALID = "995";
+	
+	/** 验证码无效 */
+	public static final String PARAMETER_MSG_CODE_INVALID_MSG = "验证码无效";
+	
 	/** 参数为空 */
 	public static final String PARAMETER_EMPTY_ERROR_MSG = "参数为空";
 

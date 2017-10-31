@@ -122,6 +122,9 @@
 						<value>cgFormDataController.do?updateFormInfo</value>
 						
 						<!-- app接口 -->
+						
+						<value>app.do?getMsgCode</value>
+						
 						<value>app.do?getSmscode</value>
 						<value>app.do?appLogin</value>
 						<value>app.do?createOrder</value>
@@ -151,6 +154,7 @@
 						<value>dealerApp.do?appDealerLogin</value>
 						<value>dealerApp.do?modifyPassword</value>
 						<value>dealerApp.do?getPeoplesPrice</value>
+						<value>dealerApp.do?applyDealer</value>
 						
 						<!-- 微信公众号 -->
 						<!-- 微信支付 -->
