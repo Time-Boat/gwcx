@@ -22,6 +22,7 @@ import com.yhy.lin.app.service.AppCharteredInterfaceService;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.entity.DealerApplyEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
 
 import net.sf.json.JSONObject;
@@ -272,4 +273,57 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
+	/** 订票人数确定总价 */
+	@RequestMapping(params = "applyDealer")
+	public void applyDealer(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		JSONObject data = new JSONObject();
+		
+		String msg = "";
+		String statusCode = "";
+		String param = "";
+		try {
+			
+			param = AppUtil.inputToStr(request);
+			System.out.println("getOrderStation     前端传递参数：" + param);
+			
+			// 验证参数
+			JSONObject jsondata = checkParam(param);
+			
+			String companyName = jsondata.getString("companyName");
+			String address = jsondata.getString("address");
+			String phone = jsondata.getString("phone");
+			String applyPeople = jsondata.getString("applyPeople");
+			String code = jsondata.getString("code");
+			
+			DealerApplyEntity da = new DealerApplyEntity();
+			da.setCreateTime(AppUtil.getDate());
+			da.setAddress(address);
+			da.setApplyPeople(applyPeople);
+			da.setCompanyName(companyName);
+			da.setPhone(phone);
+			
+			appService.save(da);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
 }

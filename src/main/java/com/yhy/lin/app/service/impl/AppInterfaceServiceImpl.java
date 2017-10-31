@@ -444,7 +444,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			int sp = Integer.parseInt(sumPeople);
 			int mn = Integer.parseInt(maxNum) - 1;
 			
-			if(sp < mn){
+			if(sp <= mn){
 				tPrice = map.get("car_type_price") + "";
 				double dis = discount.doubleValue();
 				dis = dis/10;

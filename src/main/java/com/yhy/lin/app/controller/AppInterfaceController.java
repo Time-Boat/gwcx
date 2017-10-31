@@ -338,7 +338,7 @@ public class AppInterfaceController extends AppBaseController {
 					// 存储验证码相关信息
 					if (user == null) {
 						sql = "insert into car_customer set id='" + UUIDGenerator.generate()
-								+ "',user_type = '0' ,phone = ? ,user_type = '0' ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
+								+ "',user_type = '0' ,phone = ? ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
 						systemService.executeSql(sql, mobile, curTime, curTime, code);
 					} else {
 						sql = "update car_customer set status = '0', code_update_time = ? ,security_code = ? where phone = ? ";

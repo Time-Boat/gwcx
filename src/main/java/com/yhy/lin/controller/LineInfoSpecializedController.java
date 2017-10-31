@@ -641,7 +641,7 @@ public class LineInfoSpecializedController extends BaseController {
 					ca=0;
 				}
 				List<CarTSTypeLineEntity> carlist = systemService.findHql(
-						"from CarTSTypeLineEntity where lineId=? and applyStatus=? and version=? ",lineId,"1",ca);
+						"from CarTSTypeLineEntity where lineId=? and version=? ",lineId,ca);
 				if(carlist.size()>0){
 					req.setAttribute("carlist", carlist);//获取最高版本的已通过审核的车辆类型区间价格
 				}
