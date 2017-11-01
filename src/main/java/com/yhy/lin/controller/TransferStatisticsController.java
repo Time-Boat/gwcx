@@ -201,14 +201,11 @@ public class TransferStatisticsController extends BaseController {
 		String lineName = request.getParameter("lineName");
 		String departname = request.getParameter("departname");
 		StringBuffer resql = new StringBuffer();
-		resql.append(
-				"select  SUM(a.order_numbers),SUM(a.refund_price ) from transferorder a LEFT JOIN order_linecardiver b "
+		resql.append("select SUM(a.order_numbers),SUM(a.refund_price) from transferorder a LEFT JOIN order_linecardiver b "
 						+ "on a.id=b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left "
 						+ "join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
-		if (!transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName, orderType,departname)
-				.isEmpty()) {
-			resql.append(transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName,
-					orderType,departname));
+		if (!transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName, orderType,departname).isEmpty()) {
+			resql.append(transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName,orderType,departname));
 		}
 		List<Object> mlist = systemService.findListbySql(resql.toString());
 		int sumorder;
@@ -219,7 +216,7 @@ public class TransferStatisticsController extends BaseController {
 				String obnum = ob[0] + "";
 				sumorder = Integer.parseInt(obnum.substring(0, obnum.indexOf(".")));
 				BigDecimal bsum = (BigDecimal) ob[1];
-				sumPrice=sumPrice.add(bsum);
+				sumPrice = sumPrice.add(bsum);
 			} else {
 				sumorder = 0;
 			}

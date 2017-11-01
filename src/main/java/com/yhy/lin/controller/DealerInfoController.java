@@ -136,13 +136,9 @@ public class DealerInfoController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 
-		String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
-		String userId = ResourceUtil.getSessionUserName().getId();
-		dealerInfo.setCreateUserId(userId);
-		dealerInfo.setDepartId(departId);
-
 		if (StringUtil.isNotEmpty(dealerInfo.getId())) {
 			message = "渠道商信息更新成功";
+			
 			DealerInfoEntity t = dealerInfoService.get(DealerInfoEntity.class, dealerInfo.getId());
 			try {
 				MyBeanUtils.copyBeanNotNull2Bean(dealerInfo, t);
@@ -154,6 +150,12 @@ public class DealerInfoController extends BaseController {
 			}
 		} else {
 			message = "渠道商信息添加成功";
+			
+			String departId = ResourceUtil.getSessionUserName().getCurrentDepart().getId();
+			String userId = ResourceUtil.getSessionUserName().getId();
+			dealerInfo.setCreateUserId(userId);
+			dealerInfo.setDepartId(departId);
+			
 			dealerInfo.setCreateDate(AppUtil.getDate());
 			dealerInfo.setScanCount(0);
 			dealerInfo.setStatus("1");
