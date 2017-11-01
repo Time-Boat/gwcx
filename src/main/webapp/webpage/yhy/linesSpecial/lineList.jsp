@@ -160,7 +160,8 @@
 	});
 	
 	function lookLine(id, name) {
-		createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id=" + id,"1200px","800px");
+		console.log(id + '------' + name);
+		//createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id=" + id,"1200px","800px");
 	}
 	
 	//申请上、下架

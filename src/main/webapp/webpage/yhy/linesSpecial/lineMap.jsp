@@ -124,6 +124,19 @@
     		var stations = $('#stations').val();
     		var obj = eval('(' + stations + ')');
         	
+    		console.log(obj.length);
+    		
+    		if(obj.length == 0){
+    			map = new AMap.Map('container',{	
+                    resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
+                    zoom: 1,						//地图显示的缩放级别
+                    center: ['116.397428', '39.90923'],  			//地图中心点
+                	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
+                });
+    			tip('该线路没有站点');
+    			return;
+    		}
+    		
         	map = new AMap.Map('container',{	
                 resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
                 zoom: 12,						//地图显示的缩放级别
