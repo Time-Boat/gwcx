@@ -43,7 +43,7 @@
 		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
 		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
-		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver"></t:dgToolBar>
+		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver" operationCode="airEditCD"></t:dgToolBar>
 	</t:datagrid>
 </div>
 </div>

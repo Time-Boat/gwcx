@@ -41,7 +41,7 @@
 		<t:dgFunOpt exp="orderStatus#eq#3" funname="rejectRefund(id)" title="拒绝" ></t:dgFunOpt>
 		<t:dgFunOpt exp="orderStatus#eq#5" funname="lookRejectReason(id)" title="查看原因" ></t:dgFunOpt> --%>
 		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgToolBar>
-		<t:dgToolBar title="批量同意" icon="icon-edit" url="orderRefundController.do?doAgreeALLSelect" funname="AgreeALLSelect"></t:dgToolBar>
+		<t:dgToolBar title="批量同意" icon="icon-edit" url="orderRefundController.do?doAgreeALLSelect" funname="AgreeALLSelect" operationCode="agreeRefund" ></t:dgToolBar>
 		<%-- <t:dgToolBar title="批量拒绝" icon="icon-edit" url="" funname="RefuseALLSelect"></t:dgToolBar> --%>
 	</t:datagrid>
 </div>
