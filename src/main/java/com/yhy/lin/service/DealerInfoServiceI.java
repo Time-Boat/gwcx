@@ -12,4 +12,7 @@ public interface DealerInfoServiceI extends CommonService{
 	JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo,String username, String departname);
 
 	String getWhere(DealerInfoEntity dealerInfo,String username, String departname);
+
+	//同意审核之后的操作
+	void agreeAudit(String id);
 }

@@ -36,36 +36,6 @@ public class AppBaseController extends BaseController {
 	@Autowired
 	private SystemService systemService;
 
-	// 生成token
-	public String generateToken(String customerId, String phone) {
-		return md5(customerId + phone + System.currentTimeMillis());
-	}
-
-	// jdk自带的md5加密
-	private String md5(String str) {
-		MessageDigest md;
-		StringBuffer sb = new StringBuffer();
-		try {
-			// 生成一个MD5加密计算摘要
-			md = MessageDigest.getInstance("MD5");
-			// 计算md5函数
-			md.update(str.getBytes());
-			byte[] data = md.digest();
-			int index;
-			for (byte b : data) {
-				index = b;
-				if (index < 0)
-					index += 256;
-				if (index < 16)
-					sb.append("0");
-				sb.append(Integer.toHexString(index));
-			}
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		return sb.toString();
-	}
-
 	// app
 	public void responseOutWrite(HttpServletResponse response, JSONObject jObject) {
 		response.setHeader("Pragma", "no-cache");
@@ -134,7 +104,7 @@ public class AppBaseController extends BaseController {
 		Set<String> set = param.keySet();
 		for (String p : set) {
 			// System.out.println(param.get(p));
-			if (!StringUtil.isNotEmpty(param.get(p) + "") && !"orderFlightnumber".equals(p)
+			if (!StringUtil.isNotEmpty(param.get(p) + "") && !"orderFlightnumber".equals(p) && !"orderUnitprice".equals(p)
 					&& !"orderTrainnumber".equals(p) && !"remark".equals(p) && !"likeStation".equals(p)
 					&& !"header".equals(p) && !"imgName".equals(p) && !"idCard".equals(p) && !"refundPrice".equals(p)) {
 				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);

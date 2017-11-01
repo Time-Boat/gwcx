@@ -3,13 +3,13 @@
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
 <div class="easyui-layout" fit="true">
   <div region="center" style="padding:0px;border:0px">
-  <t:datagrid name="dealerApplyList" title="渠道商申请模块" actionUrl="dealerApplyController.do?datagrid" idField="id" fit="true">
+  <t:datagrid name="dealerApplyList" title="渠道商申请模块" actionUrl="dealerApplyController.do?datagrid" idField="id" fit="true" queryMode="group" >
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-   <t:dgCol title="申请时间" field="createTime" formatter="yyyy-MM-dd hh:mm:ss"  width="120"></t:dgCol>
-   <t:dgCol title="公司名称" field="companyName"   width="120"></t:dgCol>
-   <t:dgCol title="地址" field="address"   width="120"></t:dgCol>
-   <t:dgCol title="手机号" field="phone"   width="120"></t:dgCol>
-   <t:dgCol title="申请人" field="applyPeople"   width="120"></t:dgCol>
+   <t:dgCol title="申请时间" field="createTime" formatter="yyyy-MM-dd hh:mm:ss" align="center" width="120"></t:dgCol>
+   <t:dgCol title="公司名称" field="companyName" query="true" width="120"></t:dgCol>
+   <t:dgCol title="地址" field="address" align="center" width="120"></t:dgCol>
+   <t:dgCol title="手机号" field="phone" align="center" query="true" width="120"></t:dgCol>
+   <t:dgCol title="申请人" field="applyPeople" align="center" query="true" width="120"></t:dgCol>
    <t:dgCol title="操作" field="opt" width="100"></t:dgCol>
    <t:dgDelOpt title="删除" url="dealerApplyController.do?del&id={id}" />
    <%-- <t:dgToolBar title="录入" icon="icon-add" url="dealerApplyController.do?addorupdate" funname="add"></t:dgToolBar>

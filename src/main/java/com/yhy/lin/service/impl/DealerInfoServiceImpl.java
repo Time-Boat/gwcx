@@ -2,10 +2,14 @@ package com.yhy.lin.service.impl;
 
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
 
@@ -16,6 +20,8 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
+import org.jeecgframework.core.util.PasswordUtil;
+import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 
 @Service("DealerInfoService")
@@ -143,6 +149,76 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 //		}
 		
 		return sql.toString();
+	}
+	
+	/**
+	 * 1.添加事务注解 使用propagation 指定事务的传播行为，即当前的事务方法被另外一个事务方法调用时如何使用事务。
+	 * 默认取值为REQUIRED，即使用调用方法的事务 REQUIRES_NEW：使用自己的事务，调用的事务方法的事务被挂起。
+	 * 
+	 * 2.使用isolation 指定事务的隔离级别，最常用的取值为READ_COMMITTED 3.默认情况下 Spring
+	 * 的声明式事务对所有的运行时异常进行回滚，也可以通过对应的属性进行设置。通常情况下，默认值即可。 4.使用readOnly 指定事务是否为只读。
+	 * 表示这个事务只读取数据但不更新数据，这样可以帮助数据库引擎优化事务。若真的是一个只读取数据库值得方法，应设置readOnly=true
+	 * 5.使用timeOut 指定强制回滚之前事务可以占用的时间。
+	 */
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED
+	// noRollbackFor={UserAccountException.class},
+	// readOnly=true//, timeout=30 //timeout 允许在执行第一条sql之后保持连接30秒
+	)
+	@Override
+	public void agreeAudit(String id) {
+		
+		DealerInfoEntity dealerInfo = getEntity(DealerInfoEntity.class, id);
+		String apply = dealerInfo.getApplyType();
+		String status = dealerInfo.getAuditStatus();
+		String recheck = dealerInfo.getLastAuditStatus();
+
+		if ("0".equals(status)) { // 如果初审状态是待审核状态，则进行初审
+			dealerInfo.setAuditDate(AppUtil.getDate());
+			dealerInfo.setAuditStatus("1");
+			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			dealerInfo.setLastAuditStatus("0");
+		} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
+			dealerInfo.setLastAuditDate(AppUtil.getDate());
+			dealerInfo.setLastAuditStatus("1");
+			dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
+			
+			//如果这个手机号已经是普通用户了，则将其直接转为渠道商用户，并删除未支付订单
+			CarCustomerEntity customer = findUniqueByProperty(CarCustomerEntity.class, "phone", dealerInfo.getPhone());
+			
+			//如果是申请启用，则创建渠道商账号
+			if ("0".equals(apply)) {
+				//生成渠道商的登录密码
+				String pwd = PasswordUtil.encrypt(dealerInfo.getPhone(), "123456", PasswordUtil.getStaticSalt());
+				
+				if(customer == null){
+					customer = new CarCustomerEntity();
+					customer.setPhone(dealerInfo.getPhone());
+					customer.setCreateTime(AppUtil.getDate());
+					customer.setLoginCount(0);
+					customer.setRealName(dealerInfo.getAccount());
+				}
+				
+				customer.setPassword(pwd);
+				customer.setUserType("1");
+				
+				dealerInfo.setStatus("0");
+			} else {//如果是申请停用，则将渠道商账号转为普通用户
+				if(customer != null){
+					customer.setPassword("");
+					customer.setUserType("0");
+				}
+				dealerInfo.setStatus("2");
+			}
+			
+			customer.setToken(AppUtil.generateToken(customer.getId(), customer.getPhone()));
+			customer.setTokenUpdateTime(AppUtil.getDate());
+			
+			save(customer);
+			//删除所有未付款订单
+			executeSql(" delete from transferorder where user_id = ? and order_status = '6' and order_paystatus = '3' ", customer.getId());
+		}
+		
+		saveOrUpdate(dealerInfo);
 	}
 	
 }

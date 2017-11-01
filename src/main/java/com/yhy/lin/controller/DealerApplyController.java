@@ -44,8 +44,6 @@ public class DealerApplyController extends BaseController {
 	@Autowired
 	private SystemService systemService;
 	
-
-
 	/**
 	 * 渠道商申请模块列表 页面跳转
 	 * 
@@ -92,7 +90,6 @@ public class DealerApplyController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-
 
 	/**
 	 * 添加渠道商申请模块

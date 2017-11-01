@@ -3,6 +3,8 @@ package com.yhy.lin.app.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
@@ -17,6 +19,37 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 public class AppUtil {
+	
+	// 生成token
+	public static String generateToken(String customerId, String phone) {
+		return md5(customerId + phone + System.currentTimeMillis());
+	}
+
+	// jdk自带的md5加密
+	private static String md5(String str) {
+		MessageDigest md;
+		StringBuffer sb = new StringBuffer();
+		try {
+			// 生成一个MD5加密计算摘要
+			md = MessageDigest.getInstance("MD5");
+			// 计算md5函数
+			md.update(str.getBytes());
+			byte[] data = md.digest();
+			int index;
+			for (byte b : data) {
+				index = b;
+				if (index < 0)
+					index += 256;
+				if (index < 16)
+					sb.append("0");
+				sb.append(Integer.toHexString(index));
+			}
+		} catch (NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return sb.toString();
+	}
+	
 	// 将Json对象转String类型输出页面
 	public static void convertStringToJSON(HttpServletResponse response, JSONObject jsonObj) {
 		PrintWriter out;

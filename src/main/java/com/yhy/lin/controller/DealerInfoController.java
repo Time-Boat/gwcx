@@ -325,6 +325,7 @@ public class DealerInfoController extends BaseController {
 		return j;
 	}
 
+
 	/**
 	 * 同意审核
 	 * 
@@ -338,46 +339,10 @@ public class DealerInfoController extends BaseController {
 
 		String id = req.getParameter("id");
 
-		DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
-
 		try {
-			String apply = dealerInfo.getApplyType();
-			String status = dealerInfo.getAuditStatus();
-			String recheck = dealerInfo.getLastAuditStatus();
-
-			if ("0".equals(status)) { // 如果初审状态是待审核状态，则进行初审
-				dealerInfo.setAuditDate(AppUtil.getDate());
-				dealerInfo.setAuditStatus("1");
-				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
-				dealerInfo.setLastAuditStatus("0");
-			} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
-				dealerInfo.setLastAuditDate(AppUtil.getDate());
-				dealerInfo.setLastAuditStatus("1");
-				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
-				
-				//生成渠道商的登录密码
-				String pwd = PasswordUtil.encrypt(dealerInfo.getPhone(), "123456", PasswordUtil.getStaticSalt());
-				
-				CarCustomerEntity c = new CarCustomerEntity();
-				c.setPassword(pwd);
-				c.setPhone(dealerInfo.getPhone());
-				c.setCreateTime(AppUtil.getDate());
-				c.setLoginCount(0);
-				c.setUserType("1");
-				c.setRealName(dealerInfo.getAccount());
-				systemService.save(c);
-			}
-
-			// 如果是复审，则要改变渠道商合作状态
-			if ("0".equals(recheck)) {
-				if ("0".equals(apply)) {
-					dealerInfo.setStatus("0");
-				} else {
-					dealerInfo.setStatus("2");
-				}
-			}
-
-			dealerInfoService.saveOrUpdate(dealerInfo);
+			
+			dealerInfoService.agreeAudit(id);
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -386,7 +351,7 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-
+	
 	/**
 	 * 拒绝审核
 	 * 

@@ -82,7 +82,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 							systemService.executeSql(sql, curTime, mobile);
 						} else {
 							// 生成token
-							token = generateToken(user.getId(), user.getPhone());
+							token = AppUtil.generateToken(user.getId(), user.getPhone());
 							sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
 							systemService.executeSql(sql, curTime, token, mobile);
 //							// 新注册用户 标识
@@ -171,7 +171,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 				
 				if (user.getSecurityCode().equals(code)) {
 					//修改密码要重新生成token
-					token = generateToken(user.getId(), user.getPhone());
+					token = AppUtil.generateToken(user.getId(), user.getPhone());
 					
 					String pwd = PasswordUtil.encrypt(user.getPhone(), password, PasswordUtil.getStaticSalt());
 					logger.info("时间：" + AppUtil.getCurTime());
