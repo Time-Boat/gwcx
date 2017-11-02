@@ -304,7 +304,8 @@ public class UserController extends BaseController {
 			boolean hasPermission = checkRole(user, AppGlobals.OPERATION_SPECIALIST);
 			if(hasPermission){
 				//将所有关联这个用户的订单状态(order_history)改为1  (历史订单)
-				int c = userService.executeSql("update Transferorder set order_history='1' where line_id in (select id from lineinfo where createUserId=?)", id);
+				int c = userService.executeSql(" update Transferorder set order_history='1' where order_status not in('1','2','6') and "
+						+ " line_id in (select id from lineinfo where createUserId=?) ", id);
 				logger.info("锁定用户成功，将" + c + "条订单状态改变为历史订单数据");
 			}
 			

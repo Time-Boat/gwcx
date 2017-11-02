@@ -10,17 +10,21 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jeecgframework.core.common.controller.BaseController;
+import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.poi.excel.entity.ExportParams;
+import org.jeecgframework.poi.excel.entity.vo.NormalExcelConstants;
 import org.jeecgframework.web.system.pojo.base.TSBaseUser;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,6 +33,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
+import com.yhy.lin.entity.ExportTransferorderEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 import com.yhy.lin.service.TransferServiceI;
@@ -607,6 +612,51 @@ public class TransferOrderController extends BaseController {
 		jsonObj.put("success", b);
 		
 		return jsonObj;
+	}
+	
+	/**
+	 * 导出excel
+	 * 
+	 * @param request
+	 * @param response
+	 */
+	@RequestMapping(params = "exportXls")
+	public String exportXls(TransferorderEntity tranfer,HttpServletRequest request,HttpServletResponse response
+			, DataGrid dataGrid,ModelMap modelMap) {
+//		CriteriaQuery cq = new CriteriaQuery(ExportTransferorderEntity.class, dataGrid);
+//		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, tranfer);
+//		List<ExportTransferorderEntity> tranfers = this.transferService.getListByCriteriaQuery(cq,false);
+		
+		String orderStartingstation = request.getParameter("orderStartingstation");
+		String orderTerminusstation = request.getParameter("orderTerminusstation");
+		String lineId = request.getParameter("lineId");
+		String driverId = request.getParameter("driverId");
+		String lineOrderCode= request.getParameter("lineOrderCode");
+		String driverName ="";
+		if (StringUtil.isNotEmpty(driverId)) {
+			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
+			 driverName = dr.getName();
+		}
+		String plate ="";
+		String carId = request.getParameter("carId");
+		if (StringUtil.isNotEmpty(carId)) {
+			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
+			 plate = dr.getLicencePlate();
+		}
+		
+		String fc_begin = request.getParameter("orderStartime_begin");
+		String fc_end = request.getParameter("orderStartime_end");
+		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
+		String ddTime_end = request.getParameter("orderExpectedarrival_end");
+		
+		List<ExportTransferorderEntity> tranfers = transferService.getListforExcel(tranfer, dataGrid,orderStartingstation,lineOrderCode, orderTerminusstation
+				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
+		
+		modelMap.put(NormalExcelConstants.FILE_NAME,"订单列表");
+		modelMap.put(NormalExcelConstants.CLASS,ExportTransferorderEntity.class);
+		modelMap.put(NormalExcelConstants.PARAMS,new ExportParams("订单详情列表", "导出人:"+ResourceUtil.getSessionUserName().getRealName(), "订单列表"));
+		modelMap.put(NormalExcelConstants.DATA_LIST,tranfers);
+		return NormalExcelConstants.JEECG_EXCEL_VIEW;
 	}
 	
 }

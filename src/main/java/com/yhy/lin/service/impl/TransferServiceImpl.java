@@ -25,6 +25,7 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.DriversInfoEntity;
+import com.yhy.lin.entity.ExportTransferorderEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
@@ -647,6 +648,105 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 					}; 
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
+	}
+
+	@Override
+	public List<ExportTransferorderEntity> getListforExcel(TransferorderEntity transferorder, DataGrid dataGrid,
+			String lineOrderCode, String orderStartingstation, String orderTerminusstation, String lineId,
+			String driverId, String carId, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
+		String sqlWhere = getWhere1(transferorder,orderStartingstation,lineOrderCode,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+
+		StringBuffer sql = new StringBuffer();
+
+		sql.append(" from ExportTransferorderEntity ");
+		if (!sqlWhere.isEmpty()) {
+			sql.append(sqlWhere);
+		}
+		List<ExportTransferorderEntity> ts = findHql(sql.toString());
+		return ts;
+	}
+	
+	public String getWhere1(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
+			String ddTime_end) {
+		StringBuffer sql = new StringBuffer();// 不需要显示退款状态的订单
+		
+		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
+		String orgCode = depart.getOrgCode();
+		String orgType = depart.getOrgType();
+		String userId = ResourceUtil.getSessionUserName().getId();
+		
+		sql.append(" where orgCode like '" + orgCode + "%' ");
+		
+		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
+		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
+			sql.append(" and createUserId = '" + userId + "' ");
+			sql.append(" and orderHistory = '0' ");
+		}
+		
+		// 发车时间
+		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
+			sql.append(" and orderStartime between '" + fc_begin + "' and '" + fc_end + "'");
+		}
+		// 预计到达时间
+		if (StringUtil.isNotEmpty(ddTime_begin) && StringUtil.isNotEmpty(ddTime_end)) {
+			sql.append(" and orderExpectedarrival between '" + ddTime_begin + "' and '" + ddTime_end + "'");
+		}
+		// 订单编号
+		if (StringUtil.isNotEmpty(transferorder.getOrderId())) {
+			sql.append(" and  orderId like '%" + transferorder.getOrderId() + "%'");
+		}
+		// 线路名称
+		if (StringUtil.isNotEmpty(lineId)) {
+			sql.append(" and  lineId = '" + lineId + "'");
+		}
+		//司机
+		if (StringUtil.isNotEmpty(driverId)) {
+			sql.append(" and  driverName like '%" + driverId + "%'");
+		}
+				
+		//车牌号
+		if (StringUtil.isNotEmpty(carId)) {
+			sql.append(" and  licencePlate = '" + carId + "'");
+		}
+		
+		// 订单类型
+		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
+			sql.append(" and  orderType ='" + transferorder.getOrderType() + "'");
+		}
+		// 订单状态
+		if (StringUtil.isNotEmpty(transferorder.getOrderStatus())) {
+			sql.append(" and  orderStatus ='" + transferorder.getOrderStatus() + "'");
+		}
+		// 起点站id
+		if (StringUtil.isNotEmpty(orderStartingstation)) {
+			sql.append(" and  orderStartingStationName like '%" +orderStartingstation+ "%'");
+		}
+		// 终点站id
+		if (StringUtil.isNotEmpty(orderTerminusstation)) {
+			sql.append(" and  orderTerminusStationName like '%" + orderTerminusstation + "%'");
+		}
+
+		// 申请人
+		if (StringUtil.isNotEmpty(transferorder.getOrderContactsname())) {
+			sql.append(" and  orderContactsname like '%" + transferorder.getOrderContactsname() + "%'");
+		}
+		// 订单编号
+		if (StringUtil.isNotEmpty(lineOrderCode)) {
+			sql.append(" and  lineOrderCode= '" + lineOrderCode+ "'");
+		}
+		// 不需要显示退款状态的订单
+		
+		
+		//如果是从接送司机安排页面跳转过来的则不显示未付款订单
+		if(StringUtil.isNotEmpty(lineOrderCode)){
+			sql.append(" and orderStatus in('1', '2') ");
+		}else{
+			sql.append(" and orderStatus in('1', '2', '6', '0') ");
+		}
+		
+		sql.append(" ORDER BY FIELD(orderStatus,1,2,3,4,5,6,7,0),siteOrder,orderStartime desc");
+		
+		return sql.toString();
 	}
 
 }

@@ -30,8 +30,6 @@
 		<t:dgCol title="总价(元)" field="orderTotalPrice" align="center"></t:dgCol>
 		<t:dgCol title="所属城市" field="cityName" align="center"></t:dgCol>
 		
-		
-		
 		<%--<t:dgCol title="航班号" field="orderFlightnumber" align="center"></t:dgCol>
 		<t:dgCol title="车牌号" field="licencePlate" align="center"></t:dgCol>
 		
@@ -44,6 +42,8 @@
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
 		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver" operationCode="airEditCD"></t:dgToolBar>
+		<t:dgToolBar title="导出excel" icon="icon-search" funname="ariExportXls" ></t:dgToolBar>
+		
 	</t:datagrid>
 </div>
 </div>
@@ -51,6 +51,12 @@
 <input type="hidden" value="${driverList}" id="driverNames" />
 <input type="hidden" value="${lineNameList}" id="lineNames" />
 <script type="text/javascript">
+
+	function ariExportXls(){
+		JeecgExcelExport("transferOrderController.do?exportXls","transferOrderList");
+	}
+
+
 	//进入触发 
 	$(function() {
 		$('#transferOrderList').datagrid({   

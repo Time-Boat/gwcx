@@ -6,6 +6,7 @@ import java.util.Map;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.CommonService;
 
+import com.yhy.lin.entity.ExportTransferorderEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
 
@@ -19,7 +20,10 @@ public interface TransferServiceI extends CommonService {
 	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
 			String fc_end,String ddTime_begin, String ddTime_end);
 	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String cityid,String lineId,String lineOrderCode,String lineType);
-
+	//导出excel查询条件
+	public List<ExportTransferorderEntity> getListforExcel(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
+			String fc_end,String ddTime_begin, String ddTime_end);
+	
 	// 根据id查询接送机的详细信息
 	public TransferorderView getDetail(String id);
 

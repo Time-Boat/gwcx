@@ -325,9 +325,9 @@ public class AppInterfaceController extends AppBaseController {
 				}
 				
 				// 发送端短消息
-//				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-//						templateCode , SendMessageUtil.TE MPLATE_SMS_CODE_SIGN_NAME);
-				boolean b = true;
+				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+//				boolean b = true;
 				if (b) {
 					
 					// 判断用户是否在数据库中有记录用接口类方便扩展
@@ -402,9 +402,9 @@ public class AppInterfaceController extends AppBaseController {
 				templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
 				
 				// 发送端短消息
-//				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-//						templateCode , SendMessageUtil.TE MPLATE_SMS_CODE_SIGN_NAME);
-				boolean b = true;
+				boolean b = SendMessageUtil.sendMessage(phone, new String[] {"code"}, new String[] {code},
+						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+//				boolean b = true;
 				if (b) {
 					
 					MessageCodeEntity mc = new MessageCodeEntity();
