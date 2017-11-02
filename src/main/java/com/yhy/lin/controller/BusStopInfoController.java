@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
@@ -17,7 +16,6 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.oConvertUtils;
-import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineInfoEntity;
@@ -119,16 +118,15 @@ public class BusStopInfoController extends BaseController {
 			 * 通过deleteFlag来区别逻辑删除和物理删除
 			 * 1：逻辑删除     2 ：物理删除
 			 */
-			/*busStopInfo = systemService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
+			busStopInfo = systemService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
 			if("1".equals(del)){
 				busStopInfo.setDeleteFlag((short)1);
 				message = "站点下架成功(逻辑删除)";
 				busStopInfoService.saveOrUpdate(busStopInfo);
 			}else{
-				
-			}*/
-			message = "删除成功";
-			busStopInfoService.delete(busStopInfo);
+				busStopInfoService.delete(busStopInfo);
+			}
+			message = "下架成功";
 		}catch (Exception e) {
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
@@ -348,5 +346,29 @@ public class BusStopInfoController extends BaseController {
 	        j.setMsg(message);
         return j;
     }
+    
+    /**
+	 * 检查用户是否被锁定
+	 */
+	@RequestMapping(params = "checkStation")
+	@ResponseBody
+	public JSONObject checkStation(HttpServletRequest request){
+		JSONObject jsonObj = new JSONObject();
+		
+		//是否能对订单进行车辆的安排
+		boolean b = false;
+		
+		String sId = request.getParameter("sId");
+		
+		long count = systemService.getCountForJdbc("select count(*) from line_busstop where busStopsId = '" + sId + "'");
+		
+		if(count == 0){
+			b = true;
+		}
+		
+		jsonObj.put("success", b);
+		
+		return jsonObj;
+	}
     
 }

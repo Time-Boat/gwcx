@@ -19,7 +19,7 @@
 	<t:dgToolBar operationCode="add" title="添加站点" icon="icon-add" url="busStopInfoController.do?addorupdate" height="800" width="1200" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="修改站点" icon="icon-edit" url="busStopInfoController.do?addorupdate" width="1200" height="800" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" align="center" width="50"></t:dgCol>
-	<t:dgDelOpt title="下架" url="busStopInfoController.do?del&id={id}&deleteFlag=1" urlStyle="align:center" />
+	<t:dgFunOpt funname="stopStation(id)" title="下架" urlStyle="align:center" ></t:dgFunOpt>
 	<%-- <t:dgToolBar title="批量下架" icon="icon-remove" url="busStopInfoController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar> --%>
 	<t:dgToolBar operationCode="detail" title="站点信息查看" icon="icon-search" url="busStopInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
 </t:datagrid>
@@ -49,4 +49,73 @@
 		var a4 = '</select></span>';
 		$("#busStopInfoListForm").append(a1 + a2 + a3 + c1 + a4);
 	});
+	
+	function stopStation(id){
+		$.get(
+			"busStopInfoController.do?checkStation&sId="+id,
+			function(data){
+				console.log(data);
+				var obj = eval('(' + data + ')');
+				if(obj.success){
+					alertConfirm(id);
+				}else{
+					tip('已在线路中挂机过的站点不能被删除');
+					return;
+				}
+			}
+		);
+	}
+	
+	function alertConfirm(id){
+		$.dialog.confirm('确定要下架吗？',function(r){
+		    if (r){
+		    	$.post(
+		    		"busStopInfoController.do?del&id="+id+"&deleteFlag=1",	
+					function(data){
+						//console.log(data);
+						var obj = eval('(' + data + ')');
+						//alert(obj.msg);
+						tip(obj.msg);
+						$('#busStopInfoList').datagrid('reload');
+					}
+				);
+		    }
+		});
+	}
+	
+	function update(title,url,id,width,height,isRestful) {
+		gridname=id;
+		var rowsData = $('#'+id).datagrid('getSelections');
+		if (!rowsData || rowsData.length==0) {
+			tip('请选择编辑项目！');
+			return;
+		}
+		if (rowsData.length > 1) {
+			tip('请选择一条记录再编辑！');
+			return;
+		}
+		if(isRestful!='undefined'&&isRestful){
+			url += '/'+rowsData[0].id;
+		}else{
+			if(rowsData[0].id==null){
+				rowsData[0].id = '';
+			}
+			url += '&id='+rowsData[0].id;
+		}
+		
+		//检测站点是否已挂接过线路
+		$.get(
+			"busStopInfoController.do?checkStation&sId="+rowsData[0].id,
+			function(data){
+				console.log(data);
+				var obj = eval('(' + data + ')');
+				if(obj.success){
+					createwindow(title,url,width,height);
+				}else{
+					tip('已在线路中挂机过的站点不能被删除');
+					return;
+				}
+			}
+		);
+	}
 </script>

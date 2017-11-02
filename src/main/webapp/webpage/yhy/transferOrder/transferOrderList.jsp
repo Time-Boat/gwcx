@@ -50,7 +50,7 @@
 <input type="hidden" value="${lineNameList}" id="lineNames" />
 <script type="text/javascript">
 
-	function ariExportXls(){
+	function trainExportXls(){
 		JeecgExcelExport("transferOrderController.do?exportXls&taOrderType=4,5","transferOrderList");
 	}
 
@@ -131,6 +131,9 @@
 		var rows = $("#transferOrderList").datagrid("getSelections");
 		var lineId = rows[0].lineId;
 		var ds = rows[0].orderStartime;
+		
+		var userIds = '';
+		
 		for(var i=0;i<rows.length;i++){
 			
 			//判断订单状态，如果是未支付就提示不让安排司机车辆
@@ -165,25 +168,35 @@
 				slDate = rows[i].orderStartime; 
 			}
 			
+			userIds+=rows[i].createUserId;
+			userIds+=',';
+			
 			ids+=rows[i].id;
 			ids+=',';
 		}
+		
 		ids = ids.substring(0,ids.length-1);
 		if(ids.length==0){
 			tip('请选择项目');
 			return;
 		}
-		//console.log(slDate);
 		
-		url += '&ids='+ids+'&slDate='+slDate;
-		//console.log(url);
-		createwindow(title,url,width,height);
-		/* $("#function-transferOrderAdd").panel(
-			{
-				title :'司机车辆信息',
-				href: url
+		//判断当前订单用户是否已经被注销了
+		$.get(
+			"transferOrderController.do?checkUser&userIds="+userIds,
+			function(data){
+				console.log(data);
+				var obj = eval('(' + data + ')');
+				if(obj.success){
+					url += '&ids='+ids+'&slDate='+slDate;
+					createwindow(title,url,width,height);
+				}else{
+					tip('该条记录已有运营专员管理');
+					return;
+				}
 			}
-		); */
+		); 
+		
 	}
 	
 	//把最小的时间发到后台，在新增填写发车时间的时候和这个最小时间进行比较

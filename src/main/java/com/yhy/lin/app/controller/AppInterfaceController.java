@@ -485,23 +485,39 @@ public class AppInterfaceController extends AppBaseController {
 			Date departTime = DateUtils.str2Date(startTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(curDate, departTime, 'm', "abs");
 			
-			//暂时先判断23:00-5：00之间，以后可能会根据线路的运营时间来判断
+			//暂时先判断24:00-5:30之间，以后可能会根据线路的运营时间来判断
 			Calendar calendar = new GregorianCalendar();
 			calendar.setTime(departTime);
+			
 			int hour = calendar.get(Calendar.HOUR_OF_DAY);
+			int minute = calendar.get(Calendar.MINUTE);
+			
+			int h = hour * 60 + minute;
+			
+			int maxMinute = 0;
+
+			String msgHour = "";
+			
+			String userType = t.getOrderUserType();
+			if("0".equals(userType)){
+				maxMinute = 720;
+				msgHour = "12";
+			}else{
+				maxMinute = 720 * 2;
+				msgHour = "24";
+			}
 			
 			// if (m > 240) { //测试
-			if (m < 720) {
-				msg = "必须提前12个小时才能下订单";
+			if (m < maxMinute) {
+				msg = "必须提前" + msgHour + "个小时才能下订单";
 				statusCode = "888";
 				success = false;
-			} else if(hour > 23 || hour < 5){
-				msg = "出发时间不能为23点到凌晨5点之间";
+			} else if(h != 0 && h < 330){
+				msg = "出发时间不能为24点到凌晨5点半之间";
 				statusCode = "888";
 				success = false;
 			} else {
 				
-				String userType = t.getOrderUserType();
 				//确保价格不被前端修改         使用微信平台的浏览器应该不会被修改数据，还是为了保险起见
 				if("0".equals(userType)){
 					LineInfoEntity l = appService.get(LineInfoEntity.class, t.getLineId());
@@ -895,20 +911,20 @@ public class AppInterfaceController extends AppBaseController {
 	public void getOrderStation(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		JSONObject data = new JSONObject();
 		
 		String msg = "";
 		String statusCode = "";
 		String param = "";
 		try {
-
+			
 			param = AppUtil.inputToStr(request);
 			System.out.println("getOrderStation     前端传递参数：" + param);
-
+			
 			// 验证参数
 			JSONObject jsondata = checkParam(param);
-
+			
 			String token = jsondata.getString("token");
 			// 验证token
 			checkToken(token);
