@@ -106,14 +106,14 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
-			String ddTime_begin, String ddTime_end) {
+	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation
+			,String orderTerminusstation,String lineId, String driverName,String plate, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
 		
 		//订单类型
 		if (StringUtil.isNotEmpty(orderTypes)) {
 			transferorder.setOrderType(Integer.parseInt(orderTypes));
 		}
-		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation, orderTerminusstation,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -183,7 +183,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
+	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverName,String plate, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
 		
 		//订单类型
@@ -191,7 +191,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			transferorder.setOrderType(Integer.parseInt(orderTypes));
 		}
 		
-		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin, ddTime_end);
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -305,8 +305,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			}
 		}
 	
-	public String getWhere(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
-			String ddTime_end) {
+	public String getWhere(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,
+			String driverName,String plate ,String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
 		StringBuffer sql = new StringBuffer();// 不需要显示退款状态的订单
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
@@ -338,14 +338,14 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		if (StringUtil.isNotEmpty(lineId)) {
 			sql.append(" and  a.line_id = '" + lineId + "'");
 		}
-		//司机
-		if (StringUtil.isNotEmpty(driverId)) {
-			sql.append(" and  d.name like '%" + driverId + "%'");
+		// 司机
+		if (StringUtil.isNotEmpty(driverName)) {
+			sql.append(" and  d.name like '%" + driverName + "%'");
 		}
 				
-		//车牌号
-		if (StringUtil.isNotEmpty(carId)) {
-			sql.append(" and  c.licence_plate = '" + carId + "'");
+		// 车牌号
+		if (StringUtil.isNotEmpty(plate)) {
+			sql.append(" and  c.licence_plate like '%" + plate + "%'");
 		}
 		
 		// 订单类型

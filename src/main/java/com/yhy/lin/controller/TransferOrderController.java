@@ -71,11 +71,19 @@ public class TransferOrderController extends BaseController {
 	public ModelAndView getOrderdetail(HttpServletRequest request, HttpServletResponse response) {
 		String orderType = request.getParameter("lineType");
 		String lineOrderCode = request.getParameter("lineOrderCode");
+		
+		boolean b = false;
+		//权限判断，只有运营专员和运营经理能看到安排司机车辆按钮
+		if(checkRole(AppGlobals.OPERATION_SPECIALIST) || checkRole(AppGlobals.OPERATION_MANAGER) || checkRole(AppGlobals.XM_ADMIN)){
+			request.setAttribute("permission", "1");
+			b = true;
+		}
+		
 		if("2".equals(orderType) || "3".equals(orderType)){
-			return transferOrderAirList(request, response,lineOrderCode,orderType);
+			return transferOrderAirList(request, response,lineOrderCode,orderType,b);
 		}
 		if("4".equals(orderType) || "5".equals(orderType)){
-			return transferOrderList(request, response,lineOrderCode,orderType);
+			return transferOrderList(request, response,lineOrderCode,orderType,b);
 		}
 		
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
@@ -83,7 +91,13 @@ public class TransferOrderController extends BaseController {
 
 	// 接送火车订单处理
 	@RequestMapping(params = "transferOrderList")
-	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType) {
+	public ModelAndView transferOrderList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType, boolean b) {
+		
+		if(!b){
+			if(checkRole(AppGlobals.OPERATION_SPECIALIST) || checkRole(AppGlobals.OPERATION_MANAGER) || checkRole(AppGlobals.XM_ADMIN)){
+				request.setAttribute("permission", "1");
+			}
+		}
 		
 		request.setAttribute("orderType",orderType);
 		request.setAttribute("lineOrderCode",lineOrderCode);	
@@ -95,8 +109,14 @@ public class TransferOrderController extends BaseController {
 	
 	// 接送机订单处理
 	@RequestMapping(params = "transferOrderAirList")
-	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType) {
+	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType,boolean b) {
 			
+		if(!b){
+			if(checkRole(AppGlobals.OPERATION_SPECIALIST) || checkRole(AppGlobals.OPERATION_MANAGER) || checkRole(AppGlobals.XM_ADMIN)){
+				request.setAttribute("permission", "1");
+			}
+		}
+		
 		request.setAttribute("orderType",orderType);
 		request.setAttribute("lineOrderCode",lineOrderCode);
 		request.setAttribute("carplateList",getCarPlate());	
@@ -257,18 +277,8 @@ public class TransferOrderController extends BaseController {
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
-		String driverId = request.getParameter("driverId");
-		String driverName ="";
-		if (StringUtil.isNotEmpty(driverId)) {
-			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
-			 driverName = dr.getName();
-		}
-		String plate ="";
-		String carId = request.getParameter("carId");
-		if (StringUtil.isNotEmpty(carId)) {
-			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
-			 plate = dr.getLicencePlate();
-		}
+		String driverName = request.getParameter("aDriverName");
+		String plate = request.getParameter("aPlate");
 		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
@@ -289,18 +299,8 @@ public class TransferOrderController extends BaseController {
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
-		String driverId = request.getParameter("driverId");
-		String driverName ="";
-		if (StringUtil.isNotEmpty(driverId)) {
-			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
-			 driverName = dr.getName();
-		}
-		String plate ="";
-		String carId = request.getParameter("carId");
-		if (StringUtil.isNotEmpty(carId)) {
-			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
-			 plate = dr.getLicencePlate();
-		}
+		String driverName = request.getParameter("driverName");
+		String plate = request.getParameter("plate");
 		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");

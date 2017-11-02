@@ -40,8 +40,10 @@
 		<t:dgCol title="预计到达时间" field="orderExpectedarrival" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center"></t:dgCol>--%>
 		<%-- <t:dgCol title="人数" field="orderNumberPeople" align="center"></t:dgCol> --%>
 		<%-- <t:dgCol title="操作" field="opt"  align="center"></t:dgCol> --%> 
-		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
-		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver" operationCode="airEditCD"></t:dgToolBar>
+		<t:dgToolBar title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
+		<c:if test="${permission == 1}">
+			<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver" ></t:dgToolBar>
+		</c:if>
 		<t:dgToolBar title="导出excel" icon="icon-search" funname="ariExportXls" ></t:dgToolBar>
 		
 	</t:datagrid>
@@ -89,7 +91,7 @@
 		
 		var a4 = '</select></span>';
 		
-		var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		/*var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
 		var aa3 = '<select name="driverId" style="width: 150px">';
 		var cc1 = '<option value="">选择司机</option>';
@@ -101,9 +103,9 @@
 			}
 		}
 		
-		var aa4 = '</select></span>';
+		var aa4 = '</select></span>'; */
 		
-		var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		/*var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var aaa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车票号">车牌号：</span>';
 		var aaa3 = '<select name="carId" style="width: 150px">';
 		var ccc1 = '<option value="">选择车牌号</option>';
@@ -114,9 +116,18 @@
 				ccc1 += '<option value="'+obj1.data[i].carId+'">' + obj1.data[i].licencePlate+ '</option>';
 			}
 		}
-		var aaa4 = '</select></span>';
+		var aaa4 = '</select></span>'; */
 		
-		$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2 + aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
+		
+		var d1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+ 		var d2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
+		var d3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="aDriverName" class="inuptxt" style="width: 100px"></span>';
+		
+		var car1 = '<span style="display:-moz-inline-box;display:inline-block"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+ 		var car2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车票号">车牌号：</span>';
+		var car3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="aPlate" class="inuptxt" style="width: 100px"></span>';
+		
+		$("#transferOrderAirListForm").append(a1 + a2 + a3 + c1 + a4 + d1 + d2 + d3 + car1 + car2 +car3);
 	});
 
 	$(document).ready(function(){
