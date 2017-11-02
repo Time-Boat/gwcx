@@ -623,9 +623,6 @@ public class TransferOrderController extends BaseController {
 	@RequestMapping(params = "exportXls")
 	public String exportXls(TransferorderEntity tranfer,HttpServletRequest request,HttpServletResponse response
 			, DataGrid dataGrid,ModelMap modelMap) {
-//		CriteriaQuery cq = new CriteriaQuery(ExportTransferorderEntity.class, dataGrid);
-//		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, tranfer);
-//		List<ExportTransferorderEntity> tranfers = this.transferService.getListByCriteriaQuery(cq,false);
 		
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
@@ -649,10 +646,14 @@ public class TransferOrderController extends BaseController {
 		String ddTime_begin = request.getParameter("orderExpectedarrival_begin");
 		String ddTime_end = request.getParameter("orderExpectedarrival_end");
 		
-		List<ExportTransferorderEntity> tranfers = transferService.getListforExcel(tranfer, dataGrid,orderStartingstation,lineOrderCode, orderTerminusstation
-				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end);
+		//接送机模块导出和接送火车模块导出的区分字段
+		String taOrderType = request.getParameter("taOrderType");
 		
-		modelMap.put(NormalExcelConstants.FILE_NAME,"订单列表");
+		List<ExportTransferorderEntity> tranfers = transferService.getListforExcel(tranfer, dataGrid,orderStartingstation,lineOrderCode, orderTerminusstation
+				,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin,ddTime_end,taOrderType);
+		
+		
+		modelMap.put(NormalExcelConstants.FILE_NAME, taOrderType.contains("2") ? "接送机订单列表" : "接送火车订单列表");
 		modelMap.put(NormalExcelConstants.CLASS,ExportTransferorderEntity.class);
 		modelMap.put(NormalExcelConstants.PARAMS,new ExportParams("订单详情列表", "导出人:"+ResourceUtil.getSessionUserName().getRealName(), "订单列表"));
 		modelMap.put(NormalExcelConstants.DATA_LIST,tranfers);

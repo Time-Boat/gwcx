@@ -41,6 +41,7 @@
 		<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail" height="600" ></t:dgToolBar>
 		<%-- <t:dgFunOpt operationCode="detail" title="查看详情" icon="icon-search" url="transferOrderController.do?addorupdate" funname="detail"></t:dgFunOpt> --%>
 		<t:dgToolBar title="司机车辆安排" icon="icon-edit" url="transferOrderController.do?editCarAndDriver" funname="editCarAndDriver" operationCode="trainEditCD" ></t:dgToolBar>
+		<t:dgToolBar title="导出excel" icon="icon-search" funname="trainExportXls" ></t:dgToolBar>
 	</t:datagrid>
 </div>
 </div>
@@ -48,6 +49,11 @@
 <input type="hidden" value="${driverList}" id="driverNames" />
 <input type="hidden" value="${lineNameList}" id="lineNames" />
 <script type="text/javascript">
+
+	function ariExportXls(){
+		JeecgExcelExport("transferOrderController.do?exportXls&taOrderType=4,5","transferOrderList");
+	}
+
 	//进入触发 
 	$(function() {
 		$('#transferOrderList').datagrid({   
@@ -109,7 +115,7 @@
 			
 			var aaa4 = '</select></span>';
 			
-			$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2+aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
+			$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2 + aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
 	});
 
 	$(document).ready(function(){

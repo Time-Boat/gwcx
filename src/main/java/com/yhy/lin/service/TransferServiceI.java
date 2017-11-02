@@ -22,7 +22,7 @@ public interface TransferServiceI extends CommonService {
 	public JSONObject getDatagrid3(TransferorderEntity transferorder, DataGrid dataGrid,String cityid,String lineId,String lineOrderCode,String lineType);
 	//导出excel查询条件
 	public List<ExportTransferorderEntity> getListforExcel(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId, String driverId,String carId,String fc_begin,
-			String fc_end,String ddTime_begin, String ddTime_end);
+			String fc_end,String ddTime_begin, String ddTime_end, String taOrderType);
 	
 	// 根据id查询接送机的详细信息
 	public TransferorderView getDetail(String id);

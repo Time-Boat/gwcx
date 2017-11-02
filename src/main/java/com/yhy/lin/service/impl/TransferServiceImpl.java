@@ -653,8 +653,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Override
 	public List<ExportTransferorderEntity> getListforExcel(TransferorderEntity transferorder, DataGrid dataGrid,
 			String lineOrderCode, String orderStartingstation, String orderTerminusstation, String lineId,
-			String driverId, String carId, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere1(transferorder,orderStartingstation,lineOrderCode,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
+			String driverId, String carId, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end, String taOrderType) {
+		String sqlWhere = getWhere1(transferorder,orderStartingstation,lineOrderCode,orderTerminusstation,
+				lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end, taOrderType);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -666,8 +667,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		return ts;
 	}
 	
-	public String getWhere1(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin,
-			String ddTime_end) {
+	public String getWhere1(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId
+			,String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin, String ddTime_end, String taOrderType) {
 		StringBuffer sql = new StringBuffer();// 不需要显示退款状态的订单
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
@@ -712,7 +713,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		// 订单类型
 		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
 			sql.append(" and  orderType ='" + transferorder.getOrderType() + "'");
+		}else{
+			String[] str = taOrderType.split(",");
+			sql.append(" and  orderType in ('" + str[0] + "','" + str[1] + "')");
 		}
+		
+		
 		// 订单状态
 		if (StringUtil.isNotEmpty(transferorder.getOrderStatus())) {
 			sql.append(" and  orderStatus ='" + transferorder.getOrderStatus() + "'");

@@ -5,7 +5,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
-	<t:datagrid name="transferOrderList" title="接送机订单处理" autoLoadData="true" actionUrl="transferOrderController.do?airdatagrid&lineOrderCode=${lineOrderCode}&orderTypes=${orderType}" fitColumns="true"
+	<t:datagrid name="transferOrderAirList" title="接送机订单处理" autoLoadData="true" actionUrl="transferOrderController.do?airdatagrid&lineOrderCode=${lineOrderCode}&orderTypes=${orderType}" fitColumns="true"
 			    idField="id" fit="true" queryMode="group" checkbox="true"  >
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="createUserId" field="createUserId" hidden="true"></t:dgCol>
@@ -53,13 +53,12 @@
 <script type="text/javascript">
 
 	function ariExportXls(){
-		JeecgExcelExport("transferOrderController.do?exportXls","transferOrderList");
+		JeecgExcelExport("transferOrderController.do?exportXls&taOrderType=2,3","transferOrderAirList");
 	}
-
 
 	//进入触发 
 	$(function() {
-		$('#transferOrderList').datagrid({   
+		$('#transferOrderAirList').datagrid({   
 		    rowStyler:function(index,row){
 		    	if (row.orderStatus=="0"){   
 		            return 'color:#999';   
@@ -118,7 +117,7 @@
 			}
 			var aaa4 = '</select></span>';
 			
-			$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2+aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
+			$("#transferOrderListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2 + aa3 + cc1 + a4 +aaa1 + aaa2+ aaa3 + ccc1 + aaa4);
 	});
 
 	$(document).ready(function(){
@@ -131,7 +130,7 @@
 	//安排车辆司机 
 	function editCarAndDriver(title,url,id,width,height){
 		var ids = '';
-		var rows = $("#transferOrderList").datagrid("getSelections");
+		var rows = $("#transferOrderAirList").datagrid("getSelections");
 		var lineId = rows[0].lineId;
 		var ds = rows[0].orderStartime;
 		
