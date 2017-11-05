@@ -21,7 +21,7 @@
 	<t:dgCol title="操作" field="opt" align="center" width="50"></t:dgCol>
 	<t:dgFunOpt funname="stopStation(id)" title="下架" urlStyle="align:center" ></t:dgFunOpt>
 	<%-- <t:dgToolBar title="批量下架" icon="icon-remove" url="busStopInfoController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar> --%>
-	<t:dgToolBar operationCode="detail" title="站点信息查看" icon="icon-search" url="busStopInfoController.do?addorupdate" funname="detail"></t:dgToolBar>
+	<t:dgToolBar operationCode="detail" title="站点信息查看" icon="icon-search" url="busStopInfoController.do?addorupdate" height="800" width="1200" funname="detail"></t:dgToolBar>
 </t:datagrid>
 </div>
 </div>
@@ -31,7 +31,6 @@
 		$("input[name='createTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='createTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='birthday']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
-	
 	});
 	
 	$(function() {

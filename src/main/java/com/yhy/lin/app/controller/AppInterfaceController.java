@@ -330,6 +330,16 @@ public class AppInterfaceController extends AppBaseController {
 //				boolean b = true;
 				if (b) {
 					
+					//保存消息信息
+					MessageCodeEntity mc = new MessageCodeEntity();
+					mc.setCodeType(codeType);
+					mc.setCreateTime(AppUtil.getDate());
+					mc.setIsUsed("0");
+					mc.setMsgCode(code);
+					mc.setPhone(mobile);
+					
+					systemService.save(mc);
+					
 					// 判断用户是否在数据库中有记录用接口类方便扩展
 					UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
 					
