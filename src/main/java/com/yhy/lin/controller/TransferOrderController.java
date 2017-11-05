@@ -110,7 +110,7 @@ public class TransferOrderController extends BaseController {
 	// 接送机订单处理
 	@RequestMapping(params = "transferOrderAirList")
 	public ModelAndView transferOrderAirList(HttpServletRequest request, HttpServletResponse response,String lineOrderCode,String orderType,boolean b) {
-			
+		
 		if(!b){
 			if(checkRole(AppGlobals.OPERATION_SPECIALIST) || checkRole(AppGlobals.OPERATION_MANAGER) || checkRole(AppGlobals.XM_ADMIN)){
 				request.setAttribute("permission", "1");
