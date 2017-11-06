@@ -57,6 +57,15 @@ public class AppBaseController extends BaseController {
 		}
 	}
 
+	/** 获取验证码信息 */
+	public MessageCodeEntity getMsgCodeInfo(String phone) {
+		
+		List<MessageCodeEntity> mscodeList = systemService.findHql(
+				" from MessageCodeEntity where phone=? and isUsed='0' and where create_time = (select max(createTime) from messageCode)", phone);
+		
+		return mscodeList.get(0);
+	}
+	
 	/** 验证短信验证码是否有效 */
 	public String checkMsgCode(String phone, String code) {
 

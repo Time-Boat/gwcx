@@ -74,7 +74,7 @@ public class AppInterfaceController extends AppBaseController {
 	@Autowired
 	private SystemService systemService;
 	
-	// 登录接口
+	/*// 登录接口
 	@RequestMapping(params = "appLogin")
 	public void AppLogin(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -186,6 +186,124 @@ public class AppInterfaceController extends AppBaseController {
 		}
 
 		responseOutWrite(response, returnJsonObj);
+	}*/
+	
+	// 登录接口
+	@RequestMapping(params = "appLogin")
+	public void AppLogin(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+		
+		//是否是新用户，用于渠道商的绑定
+		String isNew = "";
+		
+		try {
+			String param = AppUtil.inputToStr(request);
+			
+			System.out.println("appLogin    前端传递参数：" + param);
+			
+			//验证参数
+			JSONObject jsondata = checkParam(param);
+			
+			String mobile = jsondata.getString("mobile");
+			String code = jsondata.getString("code");
+			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
+			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
+				List<MessageCodeEntity> mscodeList = systemService.findHql(
+						" from MessageCodeEntity where phone=? and isUsed='0' and createTime = (select max(createTime) from MessageCodeEntity) ", mobile);
+				if(mscodeList.size() > 0){
+					MessageCodeEntity mscode = mscodeList.get(0);
+					if("0".equals(mscode.getCodeType())){
+						Date cDate = mscode.getCreateTime();
+						int m = AppUtil.compareDate(DateUtils.getDate(), cDate, 'm', "");
+						// 30分钟的有效期验证
+						if (m < 30 && code.equals(mscode.getMsgCode())) {
+							String token = "";
+							Date date = AppUtil.getDate();
+							
+							CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
+							//是否是已注册用户
+							if (user == null) {
+								
+								user = new CarCustomerEntity();
+								user.setId(UUIDGenerator.generate());
+								user.setUserType("0");
+								user.setPhone(mobile);
+								user.setCreateTime(date);
+								user.setLoginCount(0);
+								
+								// 生成token
+								token = AppUtil.generateToken(user.getId(), user.getPhone());
+								
+								user.setToken(token);
+								user.setTokenUpdateTime(date);
+								
+								// 新注册用户 标识
+								isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
+								
+							} else {
+								token = user.getToken();
+								user.setTokenUpdateTime(date);
+								user.setLoginCount(user.getLoginCount() + 1);
+							}
+							
+							systemService.save(user);
+							
+							// 添加登陆日志
+							String message = "app手机用户: " + user.getPhone() + "登录成功";
+							systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
+
+							msg = "登录成功!";
+							data.put("token", token);
+							data.put("userId", user.getUserId());
+							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+							data.put("phone", user.getPhone());
+							data.put("isNew", isNew);
+							data.put("userType", user.getUserType());
+							statusCode = AppGlobals.APP_SUCCESS;
+						} else {
+							msg = "用户不存在";
+							statusCode = "011";
+						}
+					} else {
+						msg = "请从渠道商入口登录";
+						statusCode = "010";
+					}
+				} else {
+					msg = "验证码无效！";
+					statusCode = "003";
+				}
+			} else {
+				msg = "手机号不能为空！";
+				statusCode = "001";
+			}
+		}
+		catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			msg = "登陆异常";
+			statusCode = AppGlobals.SYSTEM_ERROR;
+		}
+
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("msg", msg);
+		if (data.size() == 0) {
+			returnJsonObj.put("data", "");
+		} else {
+			returnJsonObj.put("data", data.toString());
+		}
+
+		responseOutWrite(response, returnJsonObj);
 	}
 	
 	// token登录接口
@@ -199,19 +317,15 @@ public class AppInterfaceController extends AppBaseController {
 		JSONObject data = new JSONObject();
 		
 		String isNew = "";
-
+		
 		try {
-			
 			String param = AppUtil.inputToStr(request);
 			System.out.println("tokenLogin    前端传递参数：" + param);
 			
 			//验证参数
 			JSONObject jsondata = checkParam(param);
-			
 			String token = jsondata.getString("token");
-			
 			String userType = jsondata.getString("userType");
-			
 			try {
 				
 				checkToken(token);//验证token
@@ -272,7 +386,7 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 	
-	// 短信发送接口
+	/*// 短信发送接口
 	@RequestMapping(params = "getSmscode")
 	public void getSmscode(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -284,7 +398,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		String mobile = request.getParameter("mobile");
 		
-		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码
+		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码    3:申请渠道商验证码接口
 		String codeType = request.getParameter("codeType");
 		
 		// 验证参数
@@ -330,16 +444,6 @@ public class AppInterfaceController extends AppBaseController {
 //				boolean b = true;
 				if (b) {
 					
-					//保存消息信息
-					MessageCodeEntity mc = new MessageCodeEntity();
-					mc.setCodeType(codeType);
-					mc.setCreateTime(AppUtil.getDate());
-					mc.setIsUsed("0");
-					mc.setMsgCode(code);
-					mc.setPhone(mobile);
-					
-					systemService.save(mc);
-					
 					// 判断用户是否在数据库中有记录用接口类方便扩展
 					UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
 					
@@ -377,9 +481,107 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 
-	}
+	}*/
 	
-	//短信验证码接口  （新）
+	// 短信发送接口
+	@RequestMapping(params = "getSmscode")
+	public void getSmscode(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		JSONObject data = new JSONObject();
+
+		String param = "";
+		try {
+			param = AppUtil.inputToStr(request);
+			
+			System.out.println("getSmscode   前端传递参数：" + param);
+			// 验证参数
+			JSONObject jsondata = checkParam(param);
+			
+			String mobile = jsondata.getString("mobile");
+			
+			//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码    3:申请渠道商验证码接口
+			String codeType = jsondata.getString("codeType");
+		
+			List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", mobile);
+			
+			logger.info("手机号: " + mobile);
+			if (!mobile.matches(AppGlobals.CHECK_PHONE)) {
+				msg = "手机号格式不正确";
+				statusCode = "002";
+			} else if(("1".equals(codeType) || "2".equals(codeType)) && dealer.size() <= 0){
+				msg = "用户不存在";
+				statusCode = "011";
+			} else if ("0".equals(codeType) && dealer.size() > 0) {
+				msg = "请从渠道商入口登录";
+				statusCode = "010";
+			} else {
+				// 生成4位数的验证码
+				String code = StringUtil.numRandom(4);
+				logger.info("验证码: " + code);
+				
+				String templateCode = "";
+				
+				switch (codeType) {
+				case "0":
+					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
+					break;
+				case "1":
+					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					break;
+				case "2":
+					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					break;
+				default:
+					break;
+				}
+				
+				// 发送端短消息
+				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+				if (b) {
+					
+					// 存储验证码相关信息
+					MessageCodeEntity mc = new MessageCodeEntity();
+					mc.setCodeType(codeType);
+					mc.setCreateTime(AppUtil.getDate());
+					mc.setIsUsed("0");
+					mc.setMsgCode(code);
+					mc.setPhone(mobile);
+					
+					systemService.save(mc);
+	
+					data.put("codemsg", code);
+					msg = "短信发送成功";
+					statusCode = AppGlobals.APP_SUCCESS;
+				} else {
+					//msg = "允许每分钟1条，累计每小时7条。每天10条";
+					msg = "您的操作过于频繁，请稍后再试";
+					statusCode = "003";
+				}
+			}
+		} catch (ParameterException e) {
+			e.printStackTrace();
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+
+	}
+		
+	//短信验证码接口  (废弃)
 	@RequestMapping(params = "getMsgCode")
 	public void getMsgCode(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -414,7 +616,6 @@ public class AppInterfaceController extends AppBaseController {
 				// 发送端短消息
 				boolean b = SendMessageUtil.sendMessage(phone, new String[] {"code"}, new String[] {code},
 						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-//				boolean b = true;
 				if (b) {
 					
 					MessageCodeEntity mc = new MessageCodeEntity();

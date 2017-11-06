@@ -132,6 +132,11 @@ public class SendMessageUtil {
 	public static boolean sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
 
 		boolean b = false;
+		
+		if(1 == 1){
+			return true;
+		}
+		
 		final String product = "Dysmsapi";//短信API产品名称（短信产品名固定，无需修改）
 		final String domain = "dysmsapi.aliyuncs.com";//短信API产品域名（接口地址固定，无需修改）
 

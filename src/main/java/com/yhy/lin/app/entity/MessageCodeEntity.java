@@ -39,7 +39,7 @@ public class MessageCodeEntity implements java.io.Serializable {
 	private java.lang.String msgCode;
 	/**是否已被使用  0: 未使用  1：已使用*/
 	private java.lang.String isUsed;
-	/**验证码类型*/
+	/**验证码类型      0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码    3:申请渠道商验证码接口*/
 	private java.lang.String codeType;
 	
 	@Column(name ="CODE_TYPE",nullable=true,length=2)
