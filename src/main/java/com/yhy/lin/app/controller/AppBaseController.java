@@ -59,7 +59,7 @@ public class AppBaseController extends BaseController {
 
 	/** 获取验证码信息 */
 	public MessageCodeEntity getMsgCodeInfo(String phone) {
-		
+		//获取日期最近的一条验证码信息
 		List<MessageCodeEntity> mscodeList = systemService.findHql(
 				" from MessageCodeEntity where phone=? and isUsed='0' and where create_time = (select max(createTime) from messageCode)", phone);
 		

@@ -333,10 +333,9 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 			int pwdLength = password.trim().length();
 			if(pwdLength <= 18 && pwdLength >= 6){
 				
-				List<MessageCodeEntity> mscodeList = systemService.findHql(
-						" from MessageCodeEntity where phone=? and isUsed='0' and create_time = (select max(createTime) from MessageCodeEntity)", phone);
+				MessageCodeEntity mscode = getMsgCodeInfo(phone);
 				
-				if (mscodeList.size() > 0 && mscodeList.get(0).getMsgCode().equals(code)) {
+				if (mscode != null && mscode.getMsgCode().equals(code)) {
 					
 					CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", phone);
 					

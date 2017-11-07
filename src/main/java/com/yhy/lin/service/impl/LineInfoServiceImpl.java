@@ -347,7 +347,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("realname", "realname", null)
 				,new Db2Page("departname", "departname", null)
 				,new Db2Page("rolename", "rolename", null)
-						
 		};
 				
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

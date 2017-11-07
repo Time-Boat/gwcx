@@ -74,8 +74,32 @@
 			$('#checkCreditCode').text('');
 			return b;
 		}
-  		return true;
+		
+  		return checkDealerDiscount();
   	}
+	
+	function checkDealerDiscount(){
+		var dd = $('#dealerDiscount').val();
+/* 		if(dd == ''){
+			tip('折扣不能为空');
+			return false;
+		}
+		if(dd.length > 4){
+			tip('长度必须小于4位');
+			return false;
+		}
+		var ndd = Number(dd);
+		if(isNaN(ndd)){
+			tip('只能输入数字');
+			return false;
+		} */
+		var ndd = Number(dd);
+		if(ndd > 10 || ndd <= 0){
+			tip('折扣范围只能在0和10之间，不能为0');
+			return false;
+		}
+		return true;
+	}
 	
   </script>
  </head>

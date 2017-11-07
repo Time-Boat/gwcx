@@ -214,10 +214,8 @@ public class AppInterfaceController extends AppBaseController {
 			String code = jsondata.getString("code");
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
-				List<MessageCodeEntity> mscodeList = systemService.findHql(
-						" from MessageCodeEntity where phone=? and isUsed='0' and createTime = (select max(createTime) from MessageCodeEntity) ", mobile);
-				if(mscodeList.size() > 0){
-					MessageCodeEntity mscode = mscodeList.get(0);
+				MessageCodeEntity mscode = getMsgCodeInfo(mobile);
+				if(mobile != null){
 					if("0".equals(mscode.getCodeType())){
 						Date cDate = mscode.getCreateTime();
 						int m = AppUtil.compareDate(DateUtils.getDate(), cDate, 'm', "");

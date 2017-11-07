@@ -1,5 +1,8 @@
 package com.yhy.lin.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -17,11 +20,16 @@ import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.tag.core.easyui.TagUtil;
+import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DealerApplyEntity;
+import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.impl.DealerApplyServiceI;
+
+import net.sf.json.JSONObject;
 
 /**   
  * @Title: Controller
@@ -51,6 +59,10 @@ public class DealerApplyController extends BaseController {
 	 */
 	@RequestMapping(params = "list")
 	public ModelAndView list(HttpServletRequest request) {
+		boolean isAdmin  = checkRole(AppGlobals.XM_ADMIN);
+		if(isAdmin){
+			request.setAttribute("del", "1");
+		}
 		return new ModelAndView("yhy/dealerApply/dealerApplyList");
 	}
 
@@ -62,14 +74,16 @@ public class DealerApplyController extends BaseController {
 	 * @param dataGrid
 	 * @param user
 	 */
-
 	@RequestMapping(params = "datagrid")
 	public void datagrid(DealerApplyEntity dealerApply,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(DealerApplyEntity.class, dataGrid);
-		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, dealerApply, request.getParameterMap());
-		this.dealerApplyService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+		
+		String companyName = request.getParameter("companyName");
+		String phone = request.getParameter("phone");
+		String applyPeople = request.getParameter("applyPeople");
+		JSONObject jObject = dealerApplyService.getDatagrid(dataGrid, companyName, phone, applyPeople);
+		
+		responseDatagrid(response, jObject);
+		
 	}
 
 	/**
@@ -134,6 +148,74 @@ public class DealerApplyController extends BaseController {
 			req.setAttribute("dealerApplyPage", dealerApply);
 		}
 		return new ModelAndView("yhy/dealerApply/dealerApply");
+	}
+	
+	/**
+	 * 专员列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getAttacheList")
+	public ModelAndView getAttacheList(HttpServletRequest req) {
+		String ids = req.getParameter("ids");
+		req.setAttribute("ids", ids);
+		return new ModelAndView("yhy/dealerApply/applyDealerAttacheList");
+	}
+	
+	/**
+	 * 获取专员列表
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getAttacheDatagrid")
+	public void getAttacheDatagrid(HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+		
+		boolean isAdmin  = checkRole(AppGlobals.XM_ADMIN);
+		
+		String role = "";
+		if(isAdmin){
+			role = AppGlobals.COMMERCIAL_MANAGER;
+		}else{
+			role = AppGlobals.COMMERCIAL_SPECIALIST;
+		}
+		JSONObject jObject = dealerApplyService.getAttacheDatagrid(dataGrid, role);
+		
+		responseDatagrid(response, jObject);
+	}
+	
+	/**
+	 * 分配专员
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "allotAttache")
+	@ResponseBody
+	public AjaxJson allotAttache(HttpServletRequest req) {
+		AjaxJson j = new AjaxJson();
+		String message = null;
+
+		String userId = req.getParameter("userId");
+		String ids = req.getParameter("ids");
+
+		List<DealerApplyEntity> list = new ArrayList<>();
+
+		try {
+			String[] idArr = ids.split(",");
+			for (int i = 0; i < idArr.length; i++) {
+
+				DealerApplyEntity dealerInfo = dealerApplyService.getEntity(DealerApplyEntity.class, idArr[i]);
+				dealerInfo.setResponsibleUserId(userId);
+				list.add(dealerInfo);
+			}
+			
+			dealerApplyService.saveAllEntitie(list);
+		} catch (Exception e) {
+			message = "服务器异常";
+			e.printStackTrace();
+		}
+		message = "分配成功";
+		j.setMsg(message);
+		return j;
 	}
 	
 }
