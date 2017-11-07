@@ -51,14 +51,14 @@
 				</td>
 				<td class="value">
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="applicationTime" name="applicationTime" ignore="ignore"
-					value="<fmt:formatDate value='${tView.applicationTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
+					value="<fmt:formatDate value='${tView.applicationTime}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> <span class="Validform_checktip"></span>
 				</td>
 				<td align="right">
 					<label class="Validform_label">发车时间：</label>
 				</td>
 				<td class="value">
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="orderStartime" name="orderStartime" ignore="ignore"
-					value="<fmt:formatDate value='${tView.orderStartime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
+					value="<fmt:formatDate value='${tView.orderStartime}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> <span class="Validform_checktip"></span>
 				</td>
 			<tr>
 			<tr>
@@ -145,7 +145,7 @@
 				</td>
 				<td class="value">
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="orderExpectedarrival" name="orderExpectedarrival" ignore="ignore"
-					value="<fmt:formatDate value='${tView.orderExpectedarrival}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>"> <span class="Validform_checktip"></span>
+					value="<fmt:formatDate value='${tView.orderExpectedarrival}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> <span class="Validform_checktip"></span>
 				</td>
 			</tr>
 			<tr>

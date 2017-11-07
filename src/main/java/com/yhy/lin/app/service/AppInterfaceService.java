@@ -37,7 +37,7 @@ public interface AppInterfaceService extends CommonService{
 	List<AppUserOrderEntity> getUserOrders(String userId, String orderStatus, String pageNo, String maxPageItem);
 
 	/** 获取用户订单详情页 */
-	AppUserOrderDetailEntity getOrderDetailById(String orderId);
+	AppUserOrderDetailEntity getOrderDetailById(String orderId, String userType);
 
 	/** 获取验票列表页数据 */
 	List<AppCheckTicket> getTicketListById(String userId, String pageNo, String maxPageItem);

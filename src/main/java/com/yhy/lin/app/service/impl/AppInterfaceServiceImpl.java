@@ -278,7 +278,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	}
 
 	@Override
-	public AppUserOrderDetailEntity getOrderDetailById(String orderId) {
+	public AppUserOrderDetailEntity getOrderDetailById(String orderId, String userType) {
 
 		List<Map<String, Object>> list = null;
 		AppUserOrderDetailEntity aod = new AppUserOrderDetailEntity();
@@ -319,12 +319,17 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setRemark(AppUtil.Null2Blank(map.get("remark") + ""));
 			
 			String officePhone = AppUtil.Null2Blank(map.get("officePhone") + "");
-			if(StringUtil.isNotEmpty(officePhone)){
-				aod.setDriverPhone(officePhone);
+			
+			if(StringUtil.isNotEmpty(userType) && userType.equals("1")){
+				aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
 			}else{
-				aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
+				if(StringUtil.isNotEmpty(officePhone)){
+					aod.setDriverPhone(officePhone);
+				}else{
+					aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
+				}
 			}
-
+			
 			// 发车时间
 			aod.setStationStartTime(date.substring(date.indexOf(":")-2, date.lastIndexOf(":")));
 

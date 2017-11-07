@@ -47,6 +47,7 @@ import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.DealerApplyEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
@@ -488,11 +489,11 @@ public class AppInterfaceController extends AppBaseController {
 	public void getSmscode(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
 		JSONObject data = new JSONObject();
-
+		
 		String param = "";
 		try {
 			param = AppUtil.inputToStr(request);
@@ -505,7 +506,7 @@ public class AppInterfaceController extends AppBaseController {
 			
 			//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码    3:申请渠道商验证码接口
 			String codeType = jsondata.getString("codeType");
-		
+			
 			List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", mobile);
 			
 			logger.info("手机号: " + mobile);
@@ -525,6 +526,8 @@ public class AppInterfaceController extends AppBaseController {
 				
 				String templateCode = "";
 				
+				boolean isApply = false;
+				
 				switch (codeType) {
 				case "0":
 					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
@@ -535,32 +538,51 @@ public class AppInterfaceController extends AppBaseController {
 				case "2":
 					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
 					break;
+				case "3":
+					//验证手机号是否重复
+					DealerApplyEntity da = systemService.findUniqueByProperty(DealerApplyEntity.class, "phone", mobile);
+					if(da != null){
+						msg = "该手机号已申请，请勿重复提交";
+						statusCode = "301";
+						isApply = true;
+					} else {
+						long l = systemService.getCountForJdbcParam("select count(*) from dealer_info where phone=? and status='0' ", new Object[]{mobile});
+						if(l > 0){
+							msg = "该手机号已是渠道商，是否直接登录？";
+							statusCode = "302";
+							isApply = true;
+						}
+					}
+					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					break;
 				default:
 					break;
 				}
 				
-				// 发送端短消息
-				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-				if (b) {
-					
-					// 存储验证码相关信息
-					MessageCodeEntity mc = new MessageCodeEntity();
-					mc.setCodeType(codeType);
-					mc.setCreateTime(AppUtil.getDate());
-					mc.setIsUsed("0");
-					mc.setMsgCode(code);
-					mc.setPhone(mobile);
-					
-					systemService.save(mc);
-	
-					data.put("codemsg", code);
-					msg = "短信发送成功";
-					statusCode = AppGlobals.APP_SUCCESS;
-				} else {
-					//msg = "允许每分钟1条，累计每小时7条。每天10条";
-					msg = "您的操作过于频繁，请稍后再试";
-					statusCode = "003";
+				//...
+				if(!isApply){
+					// 发送端短消息
+					boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
+							templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+					if (b) {
+						// 存储验证码相关信息
+						MessageCodeEntity mc = new MessageCodeEntity();
+						mc.setCodeType(codeType);
+						mc.setCreateTime(AppUtil.getDate());
+						mc.setIsUsed("0");
+						mc.setMsgCode(code);
+						mc.setPhone(mobile);
+						
+						systemService.save(mc);
+		
+						data.put("codemsg", code);
+						msg = "短信发送成功";
+						statusCode = AppGlobals.APP_SUCCESS;
+					} else {
+						//msg = "允许每分钟1条，累计每小时7条。每天10条";
+						msg = "您的操作过于频繁，请稍后再试";
+						statusCode = "003";
+					}
 				}
 			}
 		} catch (ParameterException e) {
@@ -581,7 +603,7 @@ public class AppInterfaceController extends AppBaseController {
 
 	}
 		
-	//短信验证码接口  (废弃)
+	/*//短信验证码接口  (废弃)
 	@RequestMapping(params = "getMsgCode")
 	public void getMsgCode(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
@@ -649,7 +671,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 
-	}
+	}*/
 
 	// 订单支付
 	@RequestMapping(params = "createOrder")
@@ -1077,7 +1099,8 @@ public class AppInterfaceController extends AppBaseController {
 
 		String token = request.getParameter("token");
 		String orderId = request.getParameter("orderId");
-
+		String userType = request.getParameter("userType");
+		
 		AppUserOrderDetailEntity aod = null;
 
 		try {
@@ -1096,8 +1119,8 @@ public class AppInterfaceController extends AppBaseController {
 				systemService.executeSql(sql, messageId);
 			}
 			
-			aod = appService.getOrderDetailById(orderId);
-
+			aod = appService.getOrderDetailById(orderId, userType);
+			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
 		} catch (ParameterException e) {

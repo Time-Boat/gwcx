@@ -138,13 +138,9 @@
 						</label>
 					</td>
 					<td class="value">
-						<select class="select" id="dealerDiscount" name="dealerDiscount" datatype="*" >
-							<option value="10">无折扣</option>
-							<c:forEach begin="1" end="9" varStatus="s">
-								<option value="${s.index}" <c:if test="${dealerInfoPage.dealerDiscount == s.index }">selected="selected"</c:if> >${s.index}折</option>
-							</c:forEach>
-						</select>
-						<span class="Validform_checktip"></span>
+						<input class="inputxt" id="dealerDiscount" name="dealerDiscount" datatype="/^-?[1-9]+(\.\d+)?$|^-?0(\.\d+)?$|^-?[1-9]+[0-9]*(\.\d+)?$/,s1-4" 
+							   nullmsg="不能为空" errormsg="必须为数字,最长为4" value="${dealerInfoPage.dealerDiscount}">
+						<span class="Validform_checktip">折</span>
 					</td>
 				</tr>
 				<tr>

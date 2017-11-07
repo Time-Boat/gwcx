@@ -42,6 +42,18 @@ public class DealerApplyEntity implements java.io.Serializable {
 	/**申请人*/
 	private java.lang.String applyPeople;
 	
+	/**负责人id*/
+	private java.lang.String responsibleUserId;
+	
+	@Column(name ="RESPONSIBLE_USER_ID",nullable=true,length=32)
+	public java.lang.String getResponsibleUserId() {
+		return responsibleUserId;
+	}
+
+	public void setResponsibleUserId(java.lang.String responsibleUserId) {
+		this.responsibleUserId = responsibleUserId;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  id

@@ -490,6 +490,12 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 				da.setApplyPeople(applyPeople);
 				da.setCompanyName(companyName);
 				da.setPhone(phone);
+				
+				//默认给项目管理员
+				List<Map<String,Object>> mapList = systemService.findForJdbc(
+						"select id from t_s_base_user where tb.username=?", AppGlobals.XM_ADMIN);
+				
+				da.setResponsibleUserId(String.valueOf(mapList.get(0).get("id")));
 				appService.save(da);
 				
 				systemService.executeSql(" update message_code set is_used = '1' where id = ? ", codeId);
