@@ -126,8 +126,8 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="phone" name="phone" datatype="m" errormsg="手机号非法" onchange="checkPhone(this.value)" 
-							   value="${dealerInfoPage.phone}">
+						<input class="inputxt" id="phone" name="phone" datatype="/^(\b17[0-9]{9}\b)|(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/" 
+							errormsg="手机号非法" onchange="checkPhone(this.value)" value="${dealerInfoPage.phone}">
 						<span id="checkPhone" class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -162,7 +162,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="dealerDiscount" name="dealerDiscount" datatype="/^-?[1-9]+(\.\d+)?$|^-?0(\.\d+)?$|^-?[1-9]+[0-9]*(\.\d+)?$/,s1-4" 
+						<input class="inputxt" id="dealerDiscount" name="dealerDiscount" datatype="/^-?[1-9]+(\.\d{1})?$|^-?0(\.\d{1})?$|^-?[1-9]+[0-9]*(\.\d{1})?$/,s1-4" 
 							   nullmsg="不能为空" errormsg="必须为数字,最长为4" value="${dealerInfoPage.dealerDiscount}">
 						<span class="Validform_checktip">折</span>
 					</td>
@@ -174,7 +174,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="bankAccount" name="bankAccount" datatype="*" 
+						<input class="inputxt" id="bankAccount" name="bankAccount" datatype="*"
 							   value="${dealerInfoPage.bankAccount}">
 						<span class="Validform_checktip"></span>
 					</td>
@@ -188,7 +188,7 @@
 					<td class="value">
 						<input class="inputxt" id="creditCode" name="creditCode" datatype="*" onchange="checkCreditCode(this.value)" 
 							<c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if> value="${dealerInfoPage.creditCode}">
-						<span id="checkCreditCode" class="Validform_checktip"></span>
+						<span id="checkCreditCode" class="Validform_checktip"></span>e3  
 					</td>
 				</tr>
 			</table>

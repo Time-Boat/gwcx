@@ -116,7 +116,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	}
 
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_REFUND_AUDIT, AppGlobals.ORG_JOB_TYPE}, 
-			objTableUserId = " l.createUserId ", orgTable="t", sqlByRole = {" and a.first_audit_status = '1' ", "", "", ""})
+			objTableUserId = " l.createUserId ", orgTable="t", auditSql = " and a.first_audit_status = '1'" )
 	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end,String orderStartingstation,
 			String orderTerminusstation, String departname) {
 

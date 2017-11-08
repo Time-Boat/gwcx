@@ -30,10 +30,12 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.gson.Gson;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.entity.ConductorEntity;
+import com.yhy.lin.entity.ConductorLineInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.service.ConductorServiceI;
 import com.yhy.lin.service.LineInfoServiceI;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -173,8 +175,8 @@ public class ConductorController extends BaseController {
 		conductor.setDeleteFlag((short) 0);// 默认都是为做逻辑删除的数据、
 		conductor.setCreateUserId(user.getId());
 		conductor.setCreateDate(AppUtil.getDate());
+		
 		//验票员线路没有添加对应的线路id
-		//System.out.println(lineInfos);
 		if (StringUtil.isNotEmpty(conductor.getId())) {
 			message = "验票员: " + conductor.getName() + "被更新成功";
 			ConductorEntity t = conductorService.get(ConductorEntity.class, conductor.getId());
@@ -206,6 +208,24 @@ public class ConductorController extends BaseController {
 				// e.printStackTrace();
 			}
 		}
+		
+		String cid = conductor.getId();
+		
+		systemService.executeSql("delete from conductor_line_info where conductor_id = ? ", cid);
+		
+		String lineIds = request.getParameter("lineIds");
+		String[] lineArr = lineIds.split(",");
+		
+		List<ConductorLineInfoEntity> clList = new ArrayList<>();
+		
+		for(String lineId : lineArr){
+			ConductorLineInfoEntity cl = new ConductorLineInfoEntity();
+			cl.setConductorId(cid);
+			cl.setLineId(lineId);
+			clList.add(cl);
+		}
+		conductorService.saveAllEntitie(clList);
+		
 		j.setMsg(message);
 		return j;
 	}
@@ -217,23 +237,30 @@ public class ConductorController extends BaseController {
 	 */
 	@RequestMapping(params = "addorupdate")
 	public ModelAndView addorupdate(ConductorEntity conductor, HttpServletRequest req) {
-		// 获取部门信息
-		List<TSDepart> departList = systemService.getList(TSDepart.class);
-		req.setAttribute("departList", departList);
-
-		Map<Integer,String> sexMap = new HashMap<>();
-		sexMap.put(0, "男");
-		sexMap.put(1, "女");
-		req.setAttribute("sexMap", sexMap);
 
 		if (StringUtil.isNotEmpty(conductor.getId())) {
 			conductor = conductorService.getEntity(ConductorEntity.class, conductor.getId());
 			req.setAttribute("conductor", conductor);
-		}
-
-		List<LineInfoEntity> listLine = systemService.findByProperty(LineInfoEntity.class, "deleteFlag", (short) 0);
-		if (listLine.size() > 0) {
-			req.setAttribute("listLine", listLine);
+			
+			//获取验票员管理线路信息
+			List<Map<String, Object>> listLine = systemService.findForJdbc(
+					" select l.id,l.name from conductor d LEFT JOIN conductor_line_info cl on d.id=cl.conductor_id "
+					+ " LEFT JOIN lineInfo l on l.id = cl.line_id where cl.conductor_id = ? ", conductor.getId());
+			if (listLine.size() > 0) {
+				StringBuffer ids = new StringBuffer();
+				StringBuffer names = new StringBuffer();
+				
+				for(Map<String, Object> map : listLine){
+					ids.append(map.get("id"));
+					ids.append(",");
+					names.append(map.get("name"));
+					names.append(",");
+				}
+				
+				
+				req.setAttribute("lineIds", ids.deleteCharAt(ids.length()-1).toString());
+				req.setAttribute("lineNames", names.deleteCharAt(names.length()-1).toString());
+			}
 		}
 
 		return new ModelAndView("yhy/conductor/conductorAdd");

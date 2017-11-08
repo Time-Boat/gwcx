@@ -94,7 +94,8 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	}
 
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_LINE_AUDIT, AppGlobals.OPERATION_MANAGER , AppGlobals.ORG_JOB_TYPE}, objTableUserId = " a.createUserId ", orgTable="b"
-			, sqlByRole = {" and  CASE WHEN a.status ='0' then a.application_status in('1','2','3','4','5','6') when a.status='1' then a.application_status in('2','3','4','6') END ", " and a.application_status in('1','2','3','4','5','6') ", "", ""})
+			, auditSql = " and  CASE WHEN a.status ='0' then a.application_status in('1','2','3','4','5','6') when a.status='1' then a.application_status in('2','3','4','6') END "
+			, operationSql = " and a.application_status in('1','2','3','4','5','6') ")
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company){
@@ -448,7 +449,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			}
 			}
 		
-		// TODO Auto-generated method stub
 		return lineInfoView;
 	}
 	

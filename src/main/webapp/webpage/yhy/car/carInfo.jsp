@@ -18,7 +18,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" id="licencePlate" name="licencePlate" datatype="*" value="${carInfoPage.licencePlate}"
-						<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
+						<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0' or carInfoPage.carStatus == '2'}">disabled="disabled"</c:if>>
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
@@ -30,7 +30,7 @@
 				</td>
 				<td class="value">
 					<c:choose>
-						<c:when test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">
+						<c:when test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0' or carInfoPage.carStatus == '2'}">
 							<t:dictSelect field="carBrand" typeGroupCode="carBrand" hasLabel="false" readonly="readonly" defaultVal="${carInfoPage.carBrand}" datatype="*"></t:dictSelect>
 						</c:when>
 						<c:otherwise>
@@ -48,7 +48,7 @@
 				</td>
 				<td class="value">
 				    <input class="inputxt" id="modelNumber" name="modelNumber" datatype="*" value="${carInfoPage.modelNumber}"
-				    	<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
+				    	<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0' or carInfoPage.carStatus == '2'}">disabled="disabled"</c:if>>
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
@@ -60,7 +60,7 @@
 				</td>
 				<td class="value">
 					<c:choose>
-						<c:when test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">
+						<c:when test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0' or carInfoPage.carStatus == '2'}">
 							<t:dictSelect field="carType" typeGroupCode="car_Type" hasLabel="false" readonly="readonly" defaultVal="${carInfoPage.carType}" datatype="*"></t:dictSelect>
 						</c:when>
 						<c:otherwise>
@@ -81,7 +81,7 @@
 				</td>
 				<td class="value">
 				    <input class="inputxt" id="seat" name="seat" datatype="n" value="${carInfoPage.seat}"
-				    	<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
+				    	<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0' or carInfoPage.carStatus == '2'}">disabled="disabled"</c:if>>
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
@@ -107,7 +107,7 @@
 					<%-- <input class="inputxt" id="buyDate" name="buyDate" value="${carInfoPage.buyDate}"> --%>
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd'})" style="width: 150px" datatype="*" 
 						value="<fmt:formatDate value='${carInfoPage.buyDate}' type="date" pattern="yyyy-MM-dd"/>"
-					 	id="buyDate" name="buyDate" <c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
+					 	id="buyDate" name="buyDate" <c:if test="${carInfoPage.carStatus == '0' or carInfoPage.carStatus == '2' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
 						
 					<span class="Validform_checktip"></span>
 				</td>
@@ -148,7 +148,7 @@
 				</td>
 				<td class="value">
 					<c:choose>
-						<c:when test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">
+						<c:when test="${carInfoPage.carStatus == '0' or carInfoPage.carStatus == '2' or carInfoPage.auditStatus == '0'}">
 							<t:dictSelect field="status" typeGroupCode="carType" hasLabel="false" defaultVal="${carInfoPage.status}" readonly="readonly" datatype="*"></t:dictSelect>	
 						</c:when>
 						<c:otherwise>
@@ -177,7 +177,7 @@
 				</td>
 				<td class="value">
 					<input class="inputxt" id="remark" name="remark" ignore="ignore" value="${carInfoPage.remark}"
-						<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
+						<c:if test="${carInfoPage.carStatus == '0' or carInfoPage.carStatus == '2' or carInfoPage.auditStatus == '0'}">disabled="disabled"</c:if>>
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>

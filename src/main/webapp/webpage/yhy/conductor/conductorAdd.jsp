@@ -22,7 +22,6 @@
 		}
 	 	
 	 	function callbackSelect() {
-	 		
 	 		var ids ="";
 	 		var names ="";
 	 		var iframe = this.iframe.contentWindow;
@@ -37,7 +36,7 @@
 	 			names +=rows[i].name;
 	 			names +=",";
 	 		}
-	 		$("#jurisdiction").val(names);
+	 		$("#lineNames").val(names);
 	 		$("#lineIds").val(ids);
 		}
 	 	
@@ -84,13 +83,13 @@
 </head>
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="conductorController.do?save" beforeSubmit="cp()" >
-	<input id="id" name="id" type="hidden" value="${conductor.id }">
-	<input id="lineIds" name="lineIds" type="hidden" value="${conductor.lineIds }">
+	<input id="id" name="id" type="hidden" value="${conductor.id}">
+	<input id="lineIds" name="lineIds" type="hidden" value="${lineIds}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 		<tr>
 			<td align="right" width="15%" nowrap><label class="Validform_label"> 用户名: </label></td>
 			<td class="value">
-				<input id="name" name="name" value="${conductor.name }" type="text" style="width: 150px" class="inputxt" datatype="*"/>
+				<input id="name" name="name" value="${conductor.name}" type="text" style="width: 150px" class="inputxt" datatype="*"/>
 				<span class="Validform_checktip"></span> 
 			</td>
 				<%-- <td class="value" width="85%"><c:if test="${conductor.id!=null }">
@@ -123,27 +122,11 @@
 		<tr>
 			<td align="right"><label class="Validform_label"> 验票线路: </label></td>
 			<td class="value" align="center">
-				<textarea  id="jurisdiction" name="jurisdiction" cols="60" style="margin: 0px; width: 416px; height: 66px;" readonly="readonly" datatype="*" rows="2">${conductor.jurisdiction}</textarea>
+				<textarea  id="lineNames" name="lineNames" cols="60" style="margin: 0px; width: 416px; height: 66px;" readonly="readonly" datatype="*" rows="2">${lineNames}</textarea>
 				<a href="#" class="easyui-linkbutton" plain="true" icon="icon-search" id="departSearch" onclick="openDepartmentSelect()">选择线路</a>
-				
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
-		<%-- <tr>
-			<td align="right"><label class="Validform_label"> 验票线路: </label></td>
-			<td class="value">
-				<select id="lineInfos" name="lineInfos" class="easyui-combobox" data-options="multiple:true, editable: false">
-						<option value="">--请选择线路--</option>
-						<c:forEach var="lineInfo" items="${listLine}">
-							<option value="${lineInfo.id}">
-								${lineInfo.name}
-							</option>
-						</c:forEach>
-				</select> 
-				<input id="lineInfoIds" name="lineInfoIds" type="hidden" value="${lineInfoIds}">
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr> --%>
 	</table>
 </t:formvalid>
 <t:authFilter name="formtableId"></t:authFilter>

@@ -415,6 +415,38 @@ public class DriversInfoController extends BaseController {
 	}
 	
 	/**
+	 * 检查身份证是否在已存在
+	 */
+	@RequestMapping(params = "checkCard")
+	@ResponseBody
+	public AjaxJson checkCard(HttpServletRequest request) {
+		String message = "";
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		try {
+			String card = request.getParameter("card");
+			String id = request.getParameter("id");
+			
+			long l = driversInfoService.getCountForJdbcParam("select count(*) from driversinfo where idCard=? and id <> ? ", new Object[]{card,id});
+			
+			if(l > 0){
+				message = "身份证号已存在";
+				success = false;
+			}else{
+				success = true;
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
+		
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
+	
+	/**
 	 * 申请启动
 	 */
 	@RequestMapping(params = "applyEnable")

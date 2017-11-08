@@ -23,6 +23,7 @@ import org.jeecgframework.core.util.IpUtil;
 import org.jeecgframework.core.util.ListtoMenu;
 import org.jeecgframework.core.util.NumberComparator;
 import org.jeecgframework.core.util.ResourceUtil;
+import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.SysThemesUtil;
 import org.jeecgframework.core.util.oConvertUtils;
 import org.jeecgframework.web.system.manager.ClientManager;
@@ -97,13 +98,13 @@ public class LoginController extends BaseController{
 		//验证码
 		String randCode = req.getParameter("randCode");
 		//注释掉验证码，方便调试
-		/*if (StringUtil.isEmpty(randCode)) {
+		if (StringUtil.isEmpty(randCode)) {
 			j.setMsg(mutiLangService.getLang("common.enter.verifycode"));
 			j.setSuccess(false);
 		} else if (!randCode.equalsIgnoreCase(String.valueOf(session.getAttribute("randCode")))) {
 			j.setMsg(mutiLangService.getLang("common.verifycode.error"));
 			j.setSuccess(false);
-		} else  {*/
+		} else  {
 			//用户登录验证逻辑
 			TSUser u = userService.checkUserExits(user);
 			if (u == null) {
@@ -136,7 +137,7 @@ public class LoginController extends BaseController{
 
 				j.setSuccess(false);
 			}
-		//}
+		}
 		return j;
 	}
 	

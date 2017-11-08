@@ -57,6 +57,37 @@
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
 <script type="text/javascript">
+
+	function update(title,url,id,width,height,isRestful) {
+		gridname=id;
+		var rowsData = $('#'+id).datagrid('getSelections');
+		if (!rowsData || rowsData.length==0) {
+			tip('请选择编辑项目！');
+			return;
+		}
+		if (rowsData.length > 1) {
+			tip('请选择一条记录再编辑！');
+			return;
+		}
+		if (rowsData[0].status == 2 || rowsData[0].status == 1) {
+			tip('停止和启用状态不能编辑！');
+			return;
+		}
+		if (rowsData[0].applicationStatus == 0 ) {
+			tip('审核状态中不能被编辑！');
+			return;
+		}
+		if(isRestful!='undefined'&&isRestful){
+			url += '/'+rowsData[0].id;
+		}else{
+			if(rowsData[0].id==null){
+				rowsData[0].id = '';
+			}
+			url += '&id='+rowsData[0].id;
+		}
+		createwindow(title,url,width,height);
+	}
+
 	$(function() {
 		var json = $("#citylie").val();
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';

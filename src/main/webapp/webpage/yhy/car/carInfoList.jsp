@@ -133,18 +133,14 @@
 				tip('请选择一条记录再编辑！');
 				return;
 			}
-			if (rowsData[0].carStatus == 2) {
+			/* if (rowsData[0].carStatus == 2) {
 				tip('已停止状态不能编辑！');
 				return;
-			}
-			if (rowsData[0].auditStatus == 0 || rowsData[0].lastAuditStatus == 0) {
+			} */
+			if (rowsData[0].auditStatus == 0) {
 				tip('审核状态中不能被编辑！');
 				return;
 			}
-			/* if (rowsData[0].status == 2) {
-				tip('已终止的渠道商不能进行编辑！');
-				return;
-			} */
 			if(isRestful!='undefined'&&isRestful){
 				url += '/'+rowsData[0].id;
 			}else{
@@ -163,7 +159,7 @@
 			var rows = $("#carInfoList").datagrid("getSelections");
 			for(var i=0;i<rows.length;i++){
 				/* if(ap != '1'){
-					if(rows[i].status != '0' || rows[i].auditStatus == '0' || rows[i].lastAuditStatus == '0'){
+					if(rows[i].status != '0' || rows[i].auditStatus == '0'){
 						tip('只有合作中的渠道商，并且不是待审核状态才能被分配！');
 						return;
 					}

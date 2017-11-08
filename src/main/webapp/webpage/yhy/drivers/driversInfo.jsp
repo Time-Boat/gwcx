@@ -37,13 +37,14 @@
   		}
   	}
   	
-  	var pat = /^(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
+  	var pat = /^(\b17[0-9]{9}\b)|(\b13[0-9]{9}\b)|(\b14[7-7]\d{8}\b)|(\b15[0-9]\d{8}\b)|(\b18[0-9]\d{8}\b)|\b1[1-9]{2,4}\b$/;
+  	var cardPat = /^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/
   	
   	var driverb = false;
-  	
+  	//如果验证过，提交的时候也需要验证
   	var drivera = false;
   	
-  //验证手机号是否已经被占用
+  	//验证手机号是否已经被占用
   	function driverCheckPhone(phone){
 		if(!pat.test(phone)){
 			return;
@@ -66,13 +67,45 @@
         });
 	}
   
-  //提交前验证手机号
+  	var driverc = false;
+  	//如果验证过，提交的时候也需要验证
+  	var driverd = false;
+  	
+  	//验证手机号是否已经被占用
+  	function CheckIDCard(card){
+  		if(!cardPat.test(card)){
+			return;
+		}
+  		
+		$.ajax({
+            type:"get",
+            url:"driversInfoController.do?checkCard&card="+card+"&id="+$("#id").val(),
+            dataType:'json',
+            success:function(d){
+           		var obj = eval('('+d.jsonStr+')');
+           		driverc = obj.success;
+           		driverd = true;
+           		if(!driverb){
+           			tip(obj.msg);
+           			$('#dcheck_card').text(obj.msg).css({color:"red"});
+           		}else{
+           			$('#dcheck_card').text('通过信息验证！').css({color:"#71b83d"});
+           		}
+            }
+        });
+	}
+  
+  	//提交前验证手机号
   	function dcp(){
-	  	if(drivera){
+	  	if(drivera && driverd){
 	  		if(!driverb){
 	  			$('#dcheck_phone').text("手机号已存在").css({color:"red"});
+	  			return driverb;
 	  		}
-	  		return driverb;
+	  		if(!driverc){
+	  			$('#dcheck_card').text("身份证号已存在").css({color:"red"});
+	  			return driverc;
+	  		}
 	  	}
   		return true;
   	}
@@ -92,8 +125,7 @@
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="name" name="name" datatype="*" <c:if test="${driversInfoPage.name != null}">disabled="disabled"</c:if>
-							   value="${driversInfoPage.name}">
+						<input class="inputxt" id="name" name="name" datatype="*" value="${driversInfoPage.name}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -105,7 +137,7 @@
 					</td>
 					<td class="value">
 						<input class="inputxt" id="phoneNumber" name="phoneNumber" datatype="m" errormsg="手机号非法"
-							   value="${driversInfoPage.phoneNumber}" onchange="driverCheckPhone(this.value);" >
+							   value="${driversInfoPage.phoneNumber}" onchange="driverCheckPhone(this.value)" >
 						<span id="dcheck_phone" class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -117,8 +149,8 @@
 					</td>
 					<td class="value">
 						<input class="inputxt" id="idCard" name="idCard" datatype="/^[1-9][0-9]{5}(19[0-9]{2}|200[0-9]|2010)(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[0-9]{3}[0-9xX]$/" 
-							   errormsg="身份证号非法" <c:if test="${driversInfoPage.idCard != null}">disabled="disabled"</c:if> value="${driversInfoPage.idCard}" onblur="getAge()">
-						<span class="Validform_checktip"></span>
+							   errormsg="身份证号非法" onchange="CheckIDCard(this.value)" value="${driversInfoPage.idCard}" onblur="getAge()">
+						<span id="dcheck_card" class="Validform_checktip"></span>
 					</td>
 				</tr>
 				<tr>

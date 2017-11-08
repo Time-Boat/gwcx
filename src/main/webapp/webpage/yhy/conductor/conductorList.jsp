@@ -15,7 +15,6 @@
 	<t:dgCol title="电话号码" sortable="false" field="phoneNumber" query="true" align="center"  width="60"></t:dgCol>
 	<t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" query="true" queryMode="group" align="center" width="120"></t:dgCol>
 	<t:dgCol title="创建人" field="username"  align="center" width="80" query="true"></t:dgCol>
-	<t:dgCol title="验票线路" field="jurisdiction"  align="center" width="150" ></t:dgCol>
 	<t:dgCol title="业务类型" field="status" dictionary="carBType" query="true" align="center" width="80"></t:dgCol>
 	<t:dgCol title="验票员状态" sortable="true" query="true" dictionary="driver_status" field="conductStatus" align="center" width="80"></t:dgCol>
 	<t:dgCol title="审核状态" sortable="true" query="true" dictionary="audit_status" field="applicationStatus" align="center" width="80"></t:dgCol>

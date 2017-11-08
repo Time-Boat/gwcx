@@ -25,9 +25,8 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	private int age;
 	/**电话*/
 	private String phoneNumber;
-	/**验票员权限*/
-	private String jurisdiction;
-	/**验票员业务类型*/
+	
+	/**验票员业务类型    1:接送机业务    2:包车业务*/
 	private String status;
 	/**创建时间*/
 	private Date createDate;
@@ -35,8 +34,6 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	private Short deleteFlag;// 状态: 0:不删除  1：删除
 	//所属部门
 	private String departId;
-	
-	private String lineIds;
 	
 	//创建人
 	private String createUserId;
@@ -57,13 +54,6 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	//验票员状态
 	private String conductStatus;
 	
-	@Column(name = "line_ids")
-	public String getLineIds() {
-		return lineIds;
-	}
-	public void setLineIds(String lineIds) {
-		this.lineIds = lineIds;
-	}
 	@Column(name = "delete_flag")
 	public Short getDeleteFlag() {
 		return deleteFlag;
@@ -110,14 +100,6 @@ public class ConductorEntity extends IdEntity implements java.io.Serializable  {
 	}
 	public void setPhoneNumber(String phoneNumber) {
 		this.phoneNumber = phoneNumber;
-	}
-	
-	@Column(name ="jurisdiction",nullable=true)
-	public String getJurisdiction() {
-		return jurisdiction;
-	}
-	public void setJurisdiction(String jurisdiction) {
-		this.jurisdiction = jurisdiction;
 	}
 	
 	@Column(name ="status",nullable=true)

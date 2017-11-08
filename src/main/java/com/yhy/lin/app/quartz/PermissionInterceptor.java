@@ -85,9 +85,6 @@ public class PermissionInterceptor {
 		// 审核员责任公司
 		String oc = user.getOrgCompany();
 
-		
-		String[] roleSql = buss.sqlByRole();
-		
 		String[] ps = buss.orgType();
 		for (String p : ps) {
 			switch (p) {
@@ -115,7 +112,7 @@ public class PermissionInterceptor {
 						}
 						
 						sql.append(")");
-						sql.append(roleSql[0]);
+						sql.append(buss.auditSql());
 					} else {
 						sql.append(" and " + buss.orgTable() + ".org_code like '" + orgCode + "%'");
 					}
@@ -123,19 +120,19 @@ public class PermissionInterceptor {
 				case AppGlobals.OPERATION_MANAGER:
 					// 运营经理的角色
 					if(checkRole(AppGlobals.OPERATION_MANAGER)){
-						sql.append(roleSql[1]);
+						sql.append(buss.operationSql());
 					}
 					break;
 				case AppGlobals.COMMERCIAL_MANAGER:
 					// 商务经理的角色
 					if (checkRole(AppGlobals.COMMERCIAL_MANAGER)) {
-						sql.append(roleSql[2]);
+						sql.append(buss.commercialSql());
 					}
 					break;
 				case AppGlobals.TECHNICAL_MANAGER:
 					// 技术经理的角色
 					if(checkRole(AppGlobals.TECHNICAL_MANAGER)){
-						sql.append(roleSql[3]);
+						sql.append(buss.technicalSql());
 					}
 					break;
 	//			case AppGlobals.XM_ADMIN:

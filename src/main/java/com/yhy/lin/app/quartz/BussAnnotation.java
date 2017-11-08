@@ -51,8 +51,23 @@ public @interface BussAnnotation {
     String orgTable();
     
     /**
-     * 角色对应需要添加的sql     平台审核员       运营经理       商务经理       技术经理     如果没有用空字符串标识
+     * 平台审核员需要添加的sql
      */
-    String[] sqlByRole() default {"", "", "", ""};
+    String auditSql() default "";
+    
+    /**
+     * 运营经理需要添加的sql
+     */
+    String operationSql() default "";
+    
+    /**
+     * 商务经理需要添加的sql
+     */
+    String commercialSql() default "";
+    
+    /**
+     * 技术经理需要添加的sql
+     */
+    String technicalSql() default "";
     
 }  
