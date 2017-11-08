@@ -41,11 +41,6 @@ public @interface BussAnnotation {
     String[] orgType() default "";  
     
     /**
-     * 根据模块来附加的sql
-     */
-    String appendSql() default "";  
-    
-    /**
      * 当前对象表的userId    如:d.create_user_id
      */
     String objTableUserId();
@@ -54,4 +49,10 @@ public @interface BussAnnotation {
      * 组织机构表别名
      */
     String orgTable();
+    
+    /**
+     * 角色对应需要添加的sql     平台审核员       运营经理       商务经理       技术经理     如果没有用空字符串标识
+     */
+    String[] sqlByRole() default {"", "", "", ""};
+    
 }  

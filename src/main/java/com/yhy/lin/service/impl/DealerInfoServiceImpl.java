@@ -86,7 +86,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 	}
 	
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_DEALER_AUDIT, AppGlobals.COMMERCIAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
-			objTableUserId = " d.create_user_id ", orgTable="b", appendSql = " and d.audit_status = '1' ")
+			objTableUserId = " d.create_user_id ", orgTable="b", sqlByRole = {" and d.audit_status = '1' ", "", " and (d.audit_status != '-1' or d.status = '2') ", ""})
 	public String getWhere(DealerInfoEntity dealerInfo,String username, String departname) {
 		
 		StringBuffer sql = new StringBuffer();

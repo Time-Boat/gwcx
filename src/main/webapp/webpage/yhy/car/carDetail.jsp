@@ -87,7 +87,7 @@
 					</label>
 				</td>
 				<td class="value" colspan="3" >
-					<input class="inputxt" style="width: 150px" value="<fmt:formatDate value='${carInfoPage.buyDate}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>" >
+					<input class="inputxt" style="width: 150px" value="<fmt:formatDate value='${carInfoPage.buyDate}' type="date" pattern="yyyy-MM-dd"/>" >
 					<span class="Validform_checktip"></span>
 				</td>
 			</tr>

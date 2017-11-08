@@ -137,7 +137,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	}
 	
 	@BussAnnotation(orgType = {AppGlobals.TECHNICAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
-			objTableUserId = " c.create_user_id ", orgTable="t") //, appendSql = " and d.audit_status = '1' "
+			objTableUserId = " c.create_user_id ", orgTable="t", sqlByRole = {"", "", "", " and c.audit_status != '-1' "})
 	public String getWhere(String lpId, String licencePlate, String userCar, String carType, String status, String businessType, String carStatus, String auditStatus) {
 		
 		StringBuffer sql = new StringBuffer();
