@@ -215,7 +215,7 @@ public class AppInterfaceController extends AppBaseController {
 			System.out.println("用户登录信息>>手机号【" + mobile + "】验证码【" + code + "】");
 			if (StringUtil.isNotEmpty(mobile) && mobile.matches(AppGlobals.CHECK_PHONE)) {
 				MessageCodeEntity mscode = getMsgCodeInfo(mobile);
-				if(mobile != null){
+				if(mscode != null){
 					if("0".equals(mscode.getCodeType())){
 						Date cDate = mscode.getCreateTime();
 						int m = AppUtil.compareDate(DateUtils.getDate(), cDate, 'm', "");

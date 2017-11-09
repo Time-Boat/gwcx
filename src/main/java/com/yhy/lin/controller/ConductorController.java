@@ -347,7 +347,7 @@ public class ConductorController extends BaseController {
 			String phone = request.getParameter("phone");
 			String id = request.getParameter("id");
 
-			long l = conductorService.getCountForJdbcParam("select count(*) from conductor where phoneNumber=? and id <> ? ", new Object[]{phone,id});
+			long l = conductorService.getCountForJdbcParam("select count(*) from conductor where phoneNumber=? and delete_flag ='0' and id <> ? ", new Object[]{phone,id});
 
 			if(l > 0){
 				message = "手机号已存在";

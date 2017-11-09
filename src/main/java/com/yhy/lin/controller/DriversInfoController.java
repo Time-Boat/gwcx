@@ -604,7 +604,7 @@ public class DriversInfoController extends BaseController {
 		String ids = req.getParameter("ids");
 
 		List<DriversInfoEntity> driverList = new ArrayList<>();
-
+		
 		try {
 			String[] idArr = ids.split(",");
 			for (int i = 0; i < idArr.length; i++) {
@@ -615,6 +615,11 @@ public class DriversInfoController extends BaseController {
 				driverInfo.setDepartId(t.getTsDepart().getId());
 				
 				driverList.add(driverInfo);
+				
+				String sql = " update car_info set create_user_id = ?, departId = ? where driver_id = ? ";
+				
+				long l = systemService.executeSql(sql, userId, t.getTsDepart().getId(), idArr[i]);
+				System.out.println("成功执行" + l + "条");
 			}
 			
 			systemService.saveAllEntitie(driverList);
