@@ -101,10 +101,9 @@
 			<tr>
 				<td align="right"><label class="Validform_label"> 验票线路:
 				</label></td>
-				<td class="value" align="left" colspan="3"><textarea id="jurisdiction"
-						name="jurisdiction" 
+				<td class="value" align="left" colspan="3"><textarea 
 						style=" width: 500px; height: 66px;"
-						readonly="readonly" rows="2">${conductor.jurisdiction}</textarea>
+						readonly="readonly" rows="2">${lineNames}</textarea>
 					<span class="Validform_checktip"></span></td>
 			</tr>
 

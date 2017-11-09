@@ -492,7 +492,7 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 				
 				//默认给项目管理员
 				List<Map<String,Object>> mapList = systemService.findForJdbc(
-						"select id from t_s_base_user where tb.username=?", AppGlobals.XM_ADMIN);
+						"select id from t_s_base_user where username=?", AppGlobals.XM_ADMIN_NAME);
 				
 				da.setResponsibleUserId(String.valueOf(mapList.get(0).get("id")));
 				appService.save(da);

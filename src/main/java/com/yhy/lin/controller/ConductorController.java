@@ -152,6 +152,7 @@ public class ConductorController extends BaseController {
 				conductorService.delete(conductor);
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 		j.setMsg(message);
@@ -284,9 +285,21 @@ public class ConductorController extends BaseController {
 				TSUser user = this.systemService.getEntity(TSUser.class, conductor.getApplicationUserId());
 				req.setAttribute("user", user);
 			}
-
+			
+			//获取验票员管理线路信息
+			List<Map<String, Object>> listLine = systemService.findForJdbc(
+					" select l.id,l.name from conductor d LEFT JOIN conductor_line_info cl on d.id=cl.conductor_id "
+					+ " LEFT JOIN lineInfo l on l.id = cl.line_id where cl.conductor_id = ? ", conductor.getId());
+			if (listLine.size() > 0) {
+				StringBuffer names = new StringBuffer();
+				
+				for(Map<String, Object> map : listLine){
+					names.append(map.get("name"));
+					names.append(",");
+				}
+				req.setAttribute("lineNames", names.deleteCharAt(names.length()-1).toString());
+			}
 		}
-
 		return new ModelAndView("yhy/conductor/conductorDetial");
 	}
 

@@ -137,6 +137,10 @@ public interface AppGlobals {
 	 */
 	public static final String SP_NAME = "小龙出行";
 	
+	
+	/** 项目管理员名称（开发） */
+	public static final String XM_ADMIN_NAME = "admin1";
+	
 	/**
 	 * web平台角色权限
 	 */
