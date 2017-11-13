@@ -198,7 +198,7 @@
    <t:dgCol title="审核状态" field="auditStatus" dictionary="audit_status" query="true" align="center" width="50"></t:dgCol>
    <t:dgCol title="申请内容" field="applyContent" dictionary="apply_type" align="center"  width="50"></t:dgCol>
    
-   <t:dgCol title="备注" field="remark"  align="center" width="120"></t:dgCol>
+   <%-- <t:dgCol title="备注" field="remark"  align="center" width="120"></t:dgCol> --%>
    <t:dgCol title="操作" field="opt" align="center" width="100"></t:dgCol>
    <t:dgDelOpt title="删除" url="carInfoController.do?del&id={id}" exp="carStatus#eq#1&&auditStatus#ne#0"/>
    
