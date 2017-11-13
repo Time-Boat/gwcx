@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -684,5 +686,4 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
 }

@@ -15,9 +15,10 @@
 	<t:dgCol title="所在城市" sortable="true" field="cityName" align="center" width="60"></t:dgCol>
 	<t:dgCol title="年龄" sortable="true" editor="numberbox" field="age" align="center" width="50"></t:dgCol>
 	<t:dgCol title="电话" sortable="true" query="true" field="phoneNumber" align="center" width="80"></t:dgCol>
-	<t:dgCol title="身份证" field="idCard" align="center" width="120"></t:dgCol>
+	<%-- <t:dgCol title="身份证" field="idCard" align="center" width="120"></t:dgCol> --%>
 	<t:dgCol title="创建人" field="username" align="center" width="60"></t:dgCol>
 	<t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="100"></t:dgCol>
+	<t:dgCol title="使用状态" sortable="true"  dictionary="driver_use" field="useStatus" align="center" width="80"></t:dgCol>
 	<t:dgCol title="司机状态" sortable="true"  query="true" dictionary="driver_status" field="status" align="center" width="80"></t:dgCol>
 	<t:dgCol title="审核状态" sortable="true"  query="true" dictionary="audit_status" field="applicationStatus" align="center" width="80"></t:dgCol>
 	<t:dgCol title="申请内容" sortable="true"  dictionary="apply_type" field="applyContent" align="center" width="80"></t:dgCol>
@@ -32,12 +33,16 @@
 	<t:dgToolBar title="批量分配" icon="icon-redo" url="driversInfoController.do?getAttacheList" operationCode="driverAllotAttache" funname="driverAllot" ></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" width="250"></t:dgCol>
 	
+	<%-- <t:dgFunOpt funname="applyEnable(id)" title="申请启用" ></t:dgFunOpt>
+	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" ></t:dgFunOpt> --%>
+	
 	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#0&&applicationStatus#eq#-1"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#0&&applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#2&&applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id)" title="申请启用" operationCode="applyEnable" exp="status#eq#2&&applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="status#eq#1&&applicationStatus#eq#1"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyEnable(id)" title="申请停用" operationCode="applyDisable" exp="status#eq#1&&applicationStatus#eq#2"></t:dgFunOpt>
+	
 	<t:dgFunOpt funname="agree(id)" title="同意" operationCode="agree" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuse" exp="applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="拒绝原因" operationCode="refusalReason" exp="applicationStatus#eq#2"></t:dgFunOpt>
@@ -69,14 +74,14 @@
 			tip('请选择一条记录再编辑！');
 			return;
 		}
-		if (rowsData[0].status == 2 || rowsData[0].status == 1) {
+		/* if (rowsData[0].status == 2 || rowsData[0].status == 1) {
 			tip('停止和启用状态不能编辑！');
 			return;
 		}
 		if (rowsData[0].applicationStatus == 0 ) {
 			tip('审核状态中不能被编辑！');
 			return;
-		}
+		} */
 		if(isRestful!='undefined'&&isRestful){
 			url += '/'+rowsData[0].id;
 		}else{

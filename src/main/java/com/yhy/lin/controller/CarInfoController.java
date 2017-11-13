@@ -178,14 +178,14 @@ public class CarInfoController extends BaseController {
 		//修改司机状态--被使用
 		if(StringUtil.isNotEmpty(carInfo.getDriverId())){
 			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, carInfo.getDriverId());
-			driver.setStatus("1");
+			driver.setUseStatus("1");
 			systemService.save(driver);
 		}
 		
-		//被替换的司机要把状态改为0   beforeDriverId
+		//被替换的司机要把状态改为0    新建一个字段    beforeDriverId       
 		if(StringUtil.isNotEmpty(beforeDriverId) && !beforeDriverId.equals(carInfo.getDriverId())){
 			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, beforeDriverId);
-			driver.setStatus("0");
+			driver.setUseStatus("0");
 			systemService.save(driver);
 		}
 		

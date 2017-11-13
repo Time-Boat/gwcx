@@ -97,7 +97,7 @@ public class DriversInfoController extends BaseController {
 	}
 	
 	/**
-	 * easyui AJAX请求数据
+	 * 这个是从车辆页面请求过来的数据，应该将这个方法放在carController中的
 	 * 
 	 * @param request
 	 * @param response
@@ -197,6 +197,7 @@ public class DriversInfoController extends BaseController {
 			driversInfo.setCreateDate(new Date(System.currentTimeMillis()));
 			driversInfo.setDeleteFlag(0);
 			driversInfo.setStatus("0");
+			driversInfo.setUseStatus("0");
 			driversInfo.setApplicationStatus("-1");
 			driversInfoService.save(driversInfo);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
@@ -491,31 +492,30 @@ public class DriversInfoController extends BaseController {
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
 		if(StringUtil.isNotEmpty(id)){
-			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
+			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, id);
 			if(StringUtil.isNotEmpty(driver)){
-				driver.setApplicationStatus("1");
-				/*if("0".equals(driver.getStatus())){
-					driver.setStatus("1");;//司机状态
-				}else{
-					driver.setStatus("0");;//司机状态
-				}*/
-				if("0".equals(driver.getApplyContent())){
-					driver.setStatus("1");
-				}else{
-					driver.setStatus("2");
+				try {
+					driver.setApplicationStatus("1");
+					/*if("0".equals(driver.getStatus())){
+						driver.setStatus("1");;//司机状态
+					}else{
+						driver.setStatus("0");;//司机状态
+					}*/
+					if("0".equals(driver.getApplyContent())){
+						driver.setStatus("1");
+					}else{
+						driver.setStatus("2");
+					}
+					
+					driver.setAuditor(ResourceUtil.getSessionUserName().getId());
+					driver.setAuditTime(AppUtil.getDate());
+					message = "申请成功！";
+					systemService.saveOrUpdate(driver);
+				} catch (Exception e) {
+					message = "服务器异常！";
 				}
-				
-				driver.setAuditor(ResourceUtil.getSessionUserName().getId());
-				driver.setAuditTime(AppUtil.getDate());
 			}
 		
-		try {
-			message = "申请成功！";
-			this.systemService.saveOrUpdate(driver);
-		} catch (Exception e) {
-			// TODO: handle exception
-			message = "服务器异常！";
-		}
 		}
 
 		j.setMsg(message);
@@ -619,7 +619,6 @@ public class DriversInfoController extends BaseController {
 				String sql = " update car_info set create_user_id = ?, departId = ? where driver_id = ? ";
 				
 				long l = systemService.executeSql(sql, userId, t.getTsDepart().getId(), idArr[i]);
-				System.out.println("成功执行" + l + "条");
 			}
 			
 			systemService.saveAllEntitie(driverList);

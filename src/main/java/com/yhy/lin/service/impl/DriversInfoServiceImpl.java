@@ -42,7 +42,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.status,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl"
+	    sql.append("select d.id,d.use_status,d.sex,d.phoneNumber,d.name,d.age,d.status,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl"
 	    		+ ",d.idCardImgUrl,d.cityId,c.city,d.create_user_id,d.application_status,d.refusal_reason,d.application_time,d.application_user_id"
 	    		+ ",d.apply_content,u.username,bu.username as applicationUserName,d.auditor,d.audit_time,tb.username as auditorUserName from driversinfo "
 	    		+ "d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID LEFT JOIN t_s_base_user u on u.ID="
@@ -80,6 +80,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("drivingLicenseImgUrl", "drivingLicenseImgUrl")
 							,new Db2Page("driverImgUrl", "idCardImgUrl")
+							,new Db2Page("useStatus", "use_status")
 					};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
@@ -87,7 +88,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	
 	@Override
 	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status,String cityID, String fromPage) {
-		StringBuffer queryCondition = new StringBuffer(" where d.id not in (select ci.driver_id from car_info ci ) ");
+		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag='0' and d.id not in (select ci.driver_id from car_info ci ) ");
 	    
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
@@ -115,14 +116,18 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 				queryCondition.append(" and d.status ='" + status +"' ");
 			}
 		}
-				
+		
+		//新增条件     use_status   司机是否被车辆使用      0：未使用      1：已使用
+		queryCondition.append(" and d.use_status = '0' ");
+		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString();
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append("select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString());
+	    sql.append(" select d.id,d.sex,d.phoneNumber,d.name,d.age,d.idCard,d.createDate,d.remark,d.driving_license,d.drivingLicenseImgUrl,d.cityId,c.city "
+	    		+ " from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID " + queryCondition.toString());
 		
 		System.out.println(sql.toString());
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());

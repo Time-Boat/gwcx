@@ -698,7 +698,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		// 线路名称
 		if (StringUtil.isNotEmpty(lineId)) {
-			sql.append(" and  lineId = '" + lineId + "'");
+			sql.append(" and  line_id = '" + lineId + "'");
 		}
 		//司机
 		if (StringUtil.isNotEmpty(driverId)) {

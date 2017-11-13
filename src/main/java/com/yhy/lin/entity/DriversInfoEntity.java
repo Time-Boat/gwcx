@@ -71,6 +71,16 @@ public class DriversInfoEntity implements java.io.Serializable {
 	//审核时间
 	private Date auditTime;
 	
+	//司机使用状态      0：未使用      1：已使用
+	private String useStatus;
+	
+	@Column(name="use_status",nullable=true,length=1)
+	public String getUseStatus() {
+		return useStatus;
+	}
+	public void setUseStatus(String useStatus) {
+		this.useStatus = useStatus;
+	}
 	/**
 	 * 所在城市
 	 * @return
