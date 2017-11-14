@@ -7,29 +7,31 @@ package com.yhy.lin.app.util;
  * @date 2017年5月4日 上午9:34:30
  */
 public interface AppGlobals {
-
+	
 	/** 服务器地址 */
 	public static final String SERVER_BASE_URL = "www.youngloong.com";
+	
+	public static final boolean IS_TEST_ENVIRONMENT = true;
 	
 	/** app 返回状态 */
 	/** 返回成功 */
 	public static final String APP_SUCCESS = "000";
 	/** 请求成功消息 */
 	public static final String APP_SUCCESS_MSG = "请求成功";
-
+	
 	/** 系统异常 */
 	public static final String SYSTEM_ERROR = "999";
 	/** 系统异常消息 */
 	public static final String SYSTEM_ERROR_MSG = "系统异常！";
-
+	
 	/** token异常 */
 	public static final String TOKEN_ERROR = "998";
 	/** token异常消息 */
 	public static final String TOKEN_ERROR_MSG = "token无效！";
-
+	
 	/** 参数异常 */
 	public static final String PARAMETER_ERROR = "997";
-
+	
 	/** 参数为空 */
 	public static final String PARAMETER_EMPTY_ERROR = "996";
 	

@@ -18,11 +18,14 @@ import org.jeecgframework.core.common.entity.IdEntity;
 @Entity
 @Table(name="order_linecardiver")
 public class Order_LineCarDiverEntity  implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
 	private String id;//id即为订单id
 	private String departureTime;//发车时刻
 	private String startTime;//开始时间
 	private String endTime;//结束时间
-    private String driverId;//司机id
+    private String driverId;//当订单是已完成状态的时候从这个字段中取值，其他状态还是使用车辆绑定的司机id去取值
 	private String licencePlateId;//车牌id
     private String lineId;//线路id 
     //private String orderId;//订单id

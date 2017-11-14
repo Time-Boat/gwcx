@@ -268,6 +268,7 @@ public class TransferOrderController extends BaseController {
 		return new ModelAndView("yhy/transferOrder/transferOrderSearchList");
 	}
 
+	//获取接送机数据
 	@RequestMapping(params = "airdatagrid")
 	public void airdatagrid(TransferorderEntity transferorder, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {

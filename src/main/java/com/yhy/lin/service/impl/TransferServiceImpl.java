@@ -41,19 +41,19 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	private SystemService systemService;
 	
 	// app客户消息信息
-	private static final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
-
+	private final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
+	
 	@Override
-	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
-			String ddTime_begin, String ddTime_end) {
-		String sqlWhere = getWhere(transferorder,orderStartingstation,lineOrderCode,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
-
+	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation
+			,String lineId,String driverId,String carId, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
+		String sqlWhere = getWhere(transferorder,orderStartingstation,lineOrderCode,orderTerminusstation,lineId,driverId,carId,fc_begin,fc_end,ddTime_begin,ddTime_end);
+		
 		StringBuffer sql = new StringBuffer();
 		StringBuffer sqlCnt = new StringBuffer();
 
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
-				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
+				+ "driversinfo d on c.driver_id =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
 				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where 1=1");
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
@@ -66,7 +66,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append(
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
-				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
+				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on c.driver_id =d.id"
 						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where 1=1");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -119,9 +119,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
 		StringBuffer sqlCnt = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
-				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
-				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3') ");
+		sqlCnt.append(" select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
+				+ " driversinfo d on c.driver_id = d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
+				+ " on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3') ");
 		/*if (StringUtil.isNotEmpty(orderTypes)) {
 			sqlCnt.append(" and  a.order_type= '" + orderTypes + "'");
 		}*/
@@ -139,7 +139,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append(
 				"a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
 		sql.append(
-				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
+				" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId = c.id left join driversinfo d on c.driver_id =d.id"
 						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer cu on "
 						+ "a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('2', '3')");
 		
@@ -198,7 +198,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		StringBuffer sqlCnt = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		sqlCnt.append("select count(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join "
-				+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
+				+ "driversinfo d on c.driver_id =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
 				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('4','5')");
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt.append(sqlWhere);
@@ -207,7 +207,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append("select a.city_name,a.city_id,t.org_code,a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_name,a.order_terminus_station_name,");
 		sql.append("a.order_startime,a.order_expectedarrival,a.order_unitprice,a.order_numbers,a.order_paytype,a.order_contactsname,a.remark,a.order_user_type,l.createUserId,");
 		sql.append("a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,a.applicationTime,a.line_id,a.line_name,a.user_id,cu.phone");
-		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id"
+		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on c.driver_id =d.id"
 						+ " left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur on l.createUserId=ur.ID left join car_customer "
 						+ " cu on a.user_id=cu.id LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where a.order_type in('4','5')");
 		if (!sqlWhere.isEmpty()) {
@@ -257,7 +257,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select COUNT(*) from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on "
-				+ "b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id "
+				+ "b.licencePlateId =c.id left join driversinfo d on c.driver_id =d.id left join lineinfo l on l.id = a.line_id "
 				+ "left join t_s_depart t on t.id = l.departId ";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += sqlWhere;
@@ -268,7 +268,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		sql.append("select a.lineOrderCode,l.name as lineName,l.type,SUM(case when a.order_status='2' then a.order_numbers else 0 end) as alreadyarranged,SUM(case when a.order_status='1' then a.order_numbers else 0 end) as notarranged,a.city_name,"
 				+ "a.city_id,SUM(a.order_numbers) as orderNumber from transferorder a left join order_linecardiver b on a.id = "
-				+ "b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left join "
+				+ "b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on c.driver_id =d.id left join "
 				+ "lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
@@ -442,7 +442,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		 * ); sql.append(
 		 * "a.order_contactsmobile as orderContactsmobile,a.order_paystatus as orderPaystatus,a.order_trainnumber as orderTrainnumber,a.order_totalPrice as orderTotalPrice,d.name as driverName,d.phoneNumber as driverMobile,c.licence_plate as licencePlate,c.status as CarStatus,a.applicationTime "
 		 * ); sql.append(
-		 * " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id "
+		 * " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id left join driversinfo d on c.driver_id =d.id "
 		 * );
 		 */
 		sql.append("select a.id,a.order_id,a.order_type,a.order_status,a.order_flightnumber,a.order_starting_station_Name,a.order_terminus_station_Name,");
@@ -450,7 +450,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_trainnumber,a.order_totalPrice,d.name,d.phoneNumber,c.licence_plate,c.status,a.applicationTime, ");
 		sql.append(" a.city_id,a.city_name,cu.phone,a.remark ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
-				+ "left join driversinfo d on b.driverId =d.id LEFT JOIN car_customer cu on a.user_id=cu.id");
+				+ "left join driversinfo d on c.driver_id =d.id LEFT JOIN car_customer cu on a.user_id=cu.id");
 
 		sql.append(" where a.id='" + id + "'");
 		List<Object[]> list = findListbySql(sql.toString());
@@ -534,7 +534,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				order_LineCarDiver.setId(orderIds.get(i));
 				order_LineCarDiver.setStartTime(startTime);
 				order_LineCarDiver.setLicencePlateId(licencePlateId);
-				order_LineCarDiver.setDriverId(driverId);
+				order_LineCarDiver.setDriverId(driverId);    //完成订单才会使用这个字段去查询司机数据
 				list.add(order_LineCarDiver);
 
 				// 修改订单状态
@@ -601,7 +601,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 
 		return b;
 	}
-
+	
 	@Override
 	public JSONObject getCarDatagrid(DataGrid dataGrid) {
 		
@@ -620,7 +620,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-	    sql.append(" select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id = d.id ");
+	    sql.append(" select c.*,d.name,d.driving_license,d.id as driverId,u.username from car_info c left join driversinfo d on c.driver_id =d.id ");
 		sql.append(" LEFT JOIN t_s_depart t on c.departId=t.ID LEFT JOIN t_s_base_user u on c.create_user_id = u.id,t_s_depart p ");
 		sql.append(" where c.delete_flag = '0' and (case when LENGTH(t.org_code) < 6 then t.org_code else substring(t.org_code,1,6) END) = p.org_code ");
 		sql.append(sqlWhere);
@@ -637,13 +637,10 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 							,new Db2Page("status", "status")
 							,new Db2Page("drivingLicense", "driving_license")
 							,new Db2Page("businessType", "business_type")
-							
 							,new Db2Page("buyDate", "buy_date")
 							,new Db2Page("carBrand", "car_brand")
 							,new Db2Page("modelNumber", "model_number")
-							
 							,new Db2Page("driverId", "driver_id")
-							
 							,new Db2Page("remark", "remark")
 					}; 
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

@@ -192,7 +192,7 @@
 	});
 
 	function lookLine(id, name) {
-		createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id="
+		createdetailwindow(name, "lineInfoSpecializedController.do?historyLineMap&id="
 				+ id, "1200px", "800px");
 	}
 

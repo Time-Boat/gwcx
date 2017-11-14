@@ -429,6 +429,34 @@ public class LineInfoSpecializedController extends BaseController {
 	}
 
 	/**
+	 * 去线路添加页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "historyLineMap")
+	public ModelAndView historyLineMap(LineInfoEntity lineInfo, HttpServletRequest req) {
+		// 获取部门信息
+
+		String lineId = req.getParameter("id");
+
+		// List<Line_busStopEntity> lbs = systemService.findListbySql(
+		// "select b.* from line_busstop lb join busstopinfo b on b.id =
+		// lb.busStopsId "
+		// + "where lineId = '2c9a500d5cd3ee4a015cd3f80c130010'");
+		// + "where lineId = '" + lineId + "'");
+
+		List<Map<String, Object>> lbs = systemService.findForJdbc(
+				"select b.name,b.x,b.y,b.stopLocation,lb.siteOrder from line_busstop_history lb join busstopinfo b on b.id = lb.busStopsId "
+						+ "where lineId = '" + lineId + "' order by siteOrder ");
+
+		String json = JSONArray.fromObject(lbs).toString().replaceAll("\"", "'");
+
+		req.setAttribute("stations", json);
+
+		return new ModelAndView("yhy/linesSpecial/lineMap");
+	}
+	
+	/**
 	 * 申请上架、申请下架
 	 */
 	@RequestMapping(params = "applyShelves")
