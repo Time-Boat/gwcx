@@ -20,7 +20,7 @@
 		url += '&ids='+ids;
 		createwindow(title,url,width,height);
 	}
-  
+
   </script>
   <t:datagrid name="dealerApplyList" title="渠道商申请模块" actionUrl="dealerApplyController.do?datagrid" idField="id" fit="true" queryMode="group" checkbox="true" >
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
@@ -34,7 +34,7 @@
    	<t:dgCol title="操作" field="opt" width="100"></t:dgCol>
    	<t:dgDelOpt title="删除" url="dealerApplyController.do?del&id={id}" />
    </c:if>
-   <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerApplyController.do?getAttacheList" funname="applyDealerAllot" ></t:dgToolBar> 
+   <t:dgToolBar title="批量分配" icon="icon-redo" url="dealerApplyController.do?getAttacheList" funname="applyDealerAllot" operationCode="applyDealerAllot" ></t:dgToolBar> 
    <%-- <t:dgToolBar title="录入" icon="icon-add" url="dealerApplyController.do?addorupdate" funname="add"></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerApplyController.do?addorupdate" funname="update"></t:dgToolBar>
    <t:dgToolBar title="查看" icon="icon-search" url="dealerApplyController.do?addorupdate" funname="detail"></t:dgToolBar> --%>

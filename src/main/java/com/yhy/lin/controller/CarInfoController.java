@@ -490,4 +490,27 @@ public class CarInfoController extends BaseController {
 		return j;
 	}
 	
+	// 获取拒绝原因
+	@RequestMapping(params = "checkDriver")
+	@ResponseBody
+	public AjaxJson checkDriver(HttpServletRequest request) {
+		
+		AjaxJson j = new AjaxJson();
+		
+		boolean b = false;
+		String msg = "该车辆挂接的司机未启用，请切换司机后再申请启用车辆";
+		
+		String driverId = request.getParameter("driverId");// id
+		
+		DriversInfoEntity t = systemService.getEntity(DriversInfoEntity.class, driverId);
+		if(t != null && t.getStatus().equals("1")){
+			b = true;
+			msg = "";
+		}
+		
+		j.setSuccess(b);
+		j.setMsg(msg);
+		return j;
+	}
+	
 }

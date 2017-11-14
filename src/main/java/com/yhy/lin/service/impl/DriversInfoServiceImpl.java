@@ -88,7 +88,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	
 	@Override
 	public JSONObject getDatagrid1(DataGrid dataGrid, String sex, String name, String phoneNumber,String status,String cityID, String fromPage) {
-		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag='0' and d.id not in (select ci.driver_id from car_info ci ) ");
+		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag='0' "); //and d.id not in (select ci.driver_id from car_info ci )
 	    
 		String  orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
@@ -118,7 +118,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		}
 		
 		//新增条件     use_status   司机是否被车辆使用      0：未使用      1：已使用
-		queryCondition.append(" and d.use_status = '0' ");
+		//queryCondition.append(" and d.use_status = '0' ");
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID" + queryCondition.toString();

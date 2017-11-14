@@ -18,7 +18,7 @@
 	<%-- <t:dgCol title="身份证" field="idCard" align="center" width="120"></t:dgCol> --%>
 	<t:dgCol title="创建人" field="username" align="center" width="60"></t:dgCol>
 	<t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="100"></t:dgCol>
-	<t:dgCol title="使用状态" sortable="true"  dictionary="driver_use" field="useStatus" align="center" width="80"></t:dgCol>
+	<%-- <t:dgCol title="使用状态" sortable="true"  dictionary="driver_use" field="useStatus" align="center" width="80"></t:dgCol> --%>
 	<t:dgCol title="司机状态" sortable="true"  query="true" dictionary="driver_status" field="status" align="center" width="80"></t:dgCol>
 	<t:dgCol title="审核状态" sortable="true"  query="true" dictionary="audit_status" field="applicationStatus" align="center" width="80"></t:dgCol>
 	<t:dgCol title="申请内容" sortable="true"  dictionary="apply_type" field="applyContent" align="center" width="80"></t:dgCol>
@@ -140,7 +140,7 @@
 						tip(obj.msg);
 						$('#driversInfoList').datagrid('reload');
 					}
-				);		
+				);
 		    }
 		});
 	}

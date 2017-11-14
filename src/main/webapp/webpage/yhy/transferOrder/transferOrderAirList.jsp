@@ -121,11 +121,11 @@
 		
 		var d1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var d2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
-		var d3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="aDriverName" class="inuptxt" style="width: 100px"></span>';
+		var d3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="driverName" class="inuptxt" style="width: 100px"></span>';
 		
 		var car1 = '<span style="display:-moz-inline-box;display:inline-block"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
- 		var car2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车票号">车牌号：</span>';
-		var car3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="aPlate" class="inuptxt" style="width: 100px"></span>';
+ 		var car2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车牌号">车牌号：</span>';
+		var car3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="plate" class="inuptxt" style="width: 100px"></span>';
 		
 		$("#transferOrderAirListForm").append(a1 + a2 + a3 + c1 + a4 + d1 + d2 + d3 + car1 + car2 +car3);
 	});

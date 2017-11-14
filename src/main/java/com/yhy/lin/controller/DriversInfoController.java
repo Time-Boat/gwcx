@@ -463,7 +463,7 @@ public class DriversInfoController extends BaseController {
 			
 				if("1".equals(driver.getStatus())){
 					driver.setApplyContent("1");//申请内容
-					j=checkStatus(id);
+					j = checkStatus(id);
 					if(j.isSuccess()==false){
 						return j;
 					}
@@ -478,7 +478,6 @@ public class DriversInfoController extends BaseController {
 				message = "申请成功！";
 				this.systemService.saveOrUpdate(driver);
 			} catch (Exception e) {
-				// TODO: handle exception
 				message = "服务器异常！";
 			}
 		}
@@ -490,15 +489,15 @@ public class DriversInfoController extends BaseController {
 	public AjaxJson checkStatus(String id){
 		String message = null;
 		AjaxJson j = new AjaxJson();
-		boolean success=false;
+		boolean success = false;
 		if(StringUtil.isNotEmpty(id)){
 			List<CarInfoEntity> carelist = systemService.findHql(
-					"from CarInfoEntity where driverId=? and carStatus=? ",id,"0");
+					"from CarInfoEntity where driverId=? and carStatus=? ", id, "0");
 			if(carelist.size()>0){
-				message="司机已挂接已上架车辆，不能申请停用!";
-				success=false;
+				message = "司机已挂接已上架车辆，不能申请停用!";
+				success = false;
 			}else{
-				success=true;
+				success = true;
 			}
 		}
 		j.setSuccess(success);

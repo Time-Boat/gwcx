@@ -87,7 +87,24 @@
 			});
 		}
 		
-		function carApply(id){
+		function carApply(id,driverId){
+			
+			//检测司机状态...
+			$.ajax({
+				url : "carInfoController.do?checkDriver&driverId="+driverId,
+				type : "get",
+				success : function(data) {
+					var d = $.parseJSON(data);
+					if(d.success){
+						submitApply(id);
+					}else{
+						tip(d.msg);
+					}
+				}
+			});
+		}
+		
+		function submitApply(id){
 			$.dialog.confirm("确定要提交申请吗?", function(r) {
 				if(r){
 					$.ajax({
@@ -179,6 +196,8 @@
   </script>
   <t:datagrid name="carInfoList" title="车辆信息" autoLoadData="true" actionUrl="carInfoController.do?datagrid" checkbox="true" idField="id" fitColumns="true" queryMode="group" fit="true">
    <t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
+   <t:dgCol title="司机id" field="driverId" hidden="true"></t:dgCol>
+   
    <t:dgCol title="车牌号" field="licencePlate" query="true" align="center" width="80"></t:dgCol>
    <t:dgCol title="车辆类型" field="carType" dictionary="car_Type" align="center" query="true" width="50"></t:dgCol>
    <t:dgCol title="座位数" field="seat" align="center" width="50"></t:dgCol>
@@ -213,12 +232,12 @@
    <t:dgFunOpt funname="carDisable(id)"  title="申请停用" operationCode="carDisable" exp="carStatus#eq#0&&auditStatus#eq#1"></t:dgFunOpt> 
    <t:dgFunOpt funname="carDisable(id)"  title="申请停用" operationCode="carDisable" exp="carStatus#eq#0&&auditStatus#eq#2"></t:dgFunOpt> 
    
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#1"></t:dgFunOpt>
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#-1"></t:dgFunOpt>
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#1"></t:dgFunOpt>
-   <t:dgFunOpt funname="carApply(id)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#2"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id,driverId)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#-1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id,driverId)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id,driverId)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#1&&auditStatus#eq#2"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id,driverId)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#-1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id,driverId)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#1"></t:dgFunOpt>
+   <t:dgFunOpt funname="carApply(id,driverId)"  title="提交申请" operationCode="carApply" exp="carStatus#eq#2&&auditStatus#eq#2"></t:dgFunOpt>
    
   </t:datagrid>
   </div>

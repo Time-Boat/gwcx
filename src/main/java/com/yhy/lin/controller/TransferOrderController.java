@@ -278,8 +278,8 @@ public class TransferOrderController extends BaseController {
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
-		String driverName = request.getParameter("aDriverName");
-		String plate = request.getParameter("aPlate");
+		String driverName = request.getParameter("driverName");
+		String plate = request.getParameter("plate");
 		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
@@ -628,19 +628,10 @@ public class TransferOrderController extends BaseController {
 		String orderStartingstation = request.getParameter("orderStartingstation");
 		String orderTerminusstation = request.getParameter("orderTerminusstation");
 		String lineId = request.getParameter("lineId");
-		String driverId = request.getParameter("driverId");
 		String lineOrderCode= request.getParameter("lineOrderCode");
-		String driverName ="";
-		if (StringUtil.isNotEmpty(driverId)) {
-			DriversInfoEntity dr = this.systemService.getEntity(DriversInfoEntity.class, driverId);
-			 driverName = dr.getName();
-		}
-		String plate ="";
-		String carId = request.getParameter("carId");
-		if (StringUtil.isNotEmpty(carId)) {
-			CarInfoEntity dr = this.systemService.getEntity(CarInfoEntity.class, carId);
-			 plate = dr.getLicencePlate();
-		}
+		
+		String driverName = request.getParameter("driverName");
+		String plate = request.getParameter("plate");
 		
 		String fc_begin = request.getParameter("orderStartime_begin");
 		String fc_end = request.getParameter("orderStartime_end");
