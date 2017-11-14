@@ -5,7 +5,7 @@
 <script src="plug-in/tools/popup/departSelect.js"></script>
 <div class="easyui-layout" fit="true">
 <div region="center"  style="padding:0px;border:0px">
-	<t:datagrid name="busStopInfoList" title="站点信息查询" autoLoadData="true" actionUrl="lineInfoController.do?nullTobusStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}"  
+	<t:datagrid name="busStopInfoList" title="站点信息查询" autoLoadData="true" actionUrl="lineInfoController.do?nullTobusStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}&history=${history}"  
 		fitColumns="true" idField="id" fit="true" queryMode="group" checkbox="true" >
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="站点名称" field="name"  frozenColumn="true" query="true" align="center" width="120"></t:dgCol>
@@ -17,7 +17,7 @@
 </div>
 </div>
 <div style="display: none">
-    <t:formvalid formid="formobj" layout="div" dialog="true" action="busStopInfoController.do?addSave&lineInfoId=${lineInfoId}&lineType=${lineType}" beforeSubmit="setIds">
+    <t:formvalid formid="formobj" layout="div" dialog="true" action="busStopInfoController.do?addSave&lineInfoId=${lineInfoId}&lineType=${lineType}&history=${history}" beforeSubmit="setIds">
          <input id="ids" name="ids"> 
     </t:formvalid>
 </div>

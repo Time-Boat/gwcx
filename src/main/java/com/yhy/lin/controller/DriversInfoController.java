@@ -460,12 +460,17 @@ public class DriversInfoController extends BaseController {
 		if(StringUtil.isNotEmpty(id)){
 			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
 			if(StringUtil.isNotEmpty(driver)){
-				driver.setApplicationStatus("0");//待审核
+			
 				if("1".equals(driver.getStatus())){
 					driver.setApplyContent("1");//申请内容
+					j=checkStatus(id);
+					if(j.isSuccess()==false){
+						return j;
+					}
 				}else{
 					driver.setApplyContent("0");//申请内容
 				}
+				driver.setApplicationStatus("0");//待审核
 				driver.setApplicationTime(AppUtil.getDate());
 				driver.setApplicationUserId(ResourceUtil.getSessionUserName().getId());
 			}
@@ -480,6 +485,26 @@ public class DriversInfoController extends BaseController {
 		
 		j.setMsg(message);
 		return j;
+	}
+	
+	public AjaxJson checkStatus(String id){
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		boolean success=false;
+		if(StringUtil.isNotEmpty(id)){
+			List<CarInfoEntity> carelist = systemService.findHql(
+					"from CarInfoEntity where driverId=? and carStatus=? ",id,"0");
+			if(carelist.size()>0){
+				message="司机已挂接已上架车辆，不能申请停用!";
+				success=false;
+			}else{
+				success=true;
+			}
+		}
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+		
 	}
 	
 	/**
@@ -515,6 +540,7 @@ public class DriversInfoController extends BaseController {
 					message = "服务器异常！";
 				}
 			}
+
 		
 		}
 

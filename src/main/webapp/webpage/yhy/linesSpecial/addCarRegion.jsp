@@ -32,7 +32,7 @@ $(function() {
 				</td>
 				<td class="value">
 					<input id="typeid" name="typeid" type="hidden" value="${c.id}">				  
-					<input  class="inputxt" id="${c.id}" name="price" datatype="*" nullmsg="请输入座位区间价格" >&nbsp;&nbsp;元  
+					<input  class="inputxt" id="${c.id}" name="price" datatype="s1-6" nullmsg="请输入座位区间价格" >&nbsp;&nbsp;元  
 					<span class="Validform_checktip"></span>
 				</td>
 				</tr>

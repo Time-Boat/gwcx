@@ -32,6 +32,10 @@ public class StartOrEndEntity implements java.io.Serializable {
 	private java.lang.String endid;
 	/**线路类型*/
 	private java.lang.String linetype;
+	//状态
+	private String stationStatus;
+	//线路id
+	private String lineId;
 	
 	/**
 	 *方法: 取得java.lang.String
@@ -101,4 +105,23 @@ public class StartOrEndEntity implements java.io.Serializable {
 	public void setLinetype(java.lang.String linetype){
 		this.linetype = linetype;
 	}
+	
+	@Column(name ="station_status")
+	public String getStationStatus() {
+		return stationStatus;
+	}
+
+	public void setStationStatus(String stationStatus) {
+		this.stationStatus = stationStatus;
+	}
+	
+	@Column(name ="line_id")
+	public String getLineId() {
+		return lineId;
+	}
+
+	public void setLineId(String lineId) {
+		this.lineId = lineId;
+	}
+	
 }

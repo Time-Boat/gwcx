@@ -4,12 +4,12 @@
 <script src="plug-in/tools/popup/userSelect.js"></script>
 <link href="plug-in/tools/css/rejectReason.css" type="text/css" rel="stylesheet"/>
 <script src="plug-in/tools/popup/departSelect.js"></script>
-<div class="easyui-layout" fit="true">
+<div id="main_typegroup_list" class="easyui-layout" fit="true">
 <div region="center" style="padding:0px;border:0px">
 <t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" checkbox="true">
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-	<t:dgCol title="是否有渠道商" field="isDealerLine" dictionary="is_dealer" align="center"></t:dgCol>
+	<t:dgCol title="渠道商" field="isDealerLine" query="true" dictionary="is_dealer" align="center"></t:dgCol>
 	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
@@ -39,11 +39,18 @@
 	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
 	<t:dgToolBar funname="coerceShelves(id)" title="强制下架" icon="icon-put" url="lineInfoSpecializedController.do?coerceShelves" operationCode="coerceShelves" ></t:dgToolBar>
 	
+	<t:dgFunOpt title="删除" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#0"/>
+	<t:dgFunOpt title="删除" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#5"/>
+	<t:dgFunOpt title="删除" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#6"/>
 	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#6"></t:dgFunOpt>
-	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#4"></t:dgFunOpt>
+	
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#2&&applicationStatus#eq#5"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#2&&applicationStatus#eq#6"></t:dgFunOpt>
+	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#2&&applicationStatus#eq#4"></t:dgFunOpt>
+	
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请下架" operationCode="applicationShelf" exp="status#eq#0&&applicationStatus#eq#6"></t:dgFunOpt>
@@ -67,9 +74,26 @@
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
 <%-- <input type="hidden" value="${companyList}" id="companyList" /> --%>
-<div region="east" style="width: 490px;" split="true">
-<div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" id="function-panelAddBusStop"></div>
+<!-- <div region="east" style="width: 490px;" split="true">
+<div tools="#tt" class="easyui-panel" title="站点管理" style="padding: 10px;" fit="true" border="false" collapsible="true" id="function-panelAddBusStop"></div>
+</div> -->
+
+<div data-options="region:'east',
+	title:'站点名称',
+	collapsed:true,
+	split:true,
+	border:false,
+	onExpand : function(){
+		li_east = 1;
+	},
+	onCollapse : function() {
+	    li_east = 0;
+	}"
+     style="width: 490px; overflow: hidden;" id="eastPanel">
+    <div class="easyui-panel" style="padding:0px;border:0px" fit="true" border="false" id="function-panelAddBusStop"></div>
 </div>
+
+
 <div id="tt"></div>
 
 <script type="text/javascript">
@@ -99,6 +123,11 @@
 		$("input[name='lendTime_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='lendTime_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 	});
+	
+	$(function() {
+        var li_east = 0;
+    });
+	
 	function addBusStop(id,name,status,applicationStatus) {
 		
 		if(applicationStatus==1){
@@ -113,13 +142,14 @@
 			tip('已上架线路不能进行站点管理');
 			return;
 		}
+		var title = '<t:mutiLang langKey="站点名称"/>: ' + name;
+        if(li_east == 0){
+            $('#main_typegroup_list').layout('expand','east');
+        }
+        $('#main_typegroup_list').layout('panel','east').panel('setTitle', title);
 		
-		$("#function-panelAddBusStop").panel(
-			{
-				title :'线路名称：'+name,
-				href:"lineInfoController.do?addBusStop&lineInfoId="+id+"&lineType=2"   //lineType=2为接送机跳转到的站点挂接界面
-			}
-		);
+		$("#function-panelAddBusStop").panel("refresh","lineInfoController.do?addBusStop&lineInfoId="+id+"&lineType=2");
+				
 	}
 	$(function() {
 		//添加城市条件
@@ -177,7 +207,7 @@
 						var obj = eval('(' + data + ')');
 						b=obj.success;
 						if(!b){
-		           			tip("渠道商区间价格未填写，请填写区间价格再申请上架！");
+							tip(obj.msg);
 		           			return;
 		           		}else{
 		           			tip(obj.msg);
@@ -423,6 +453,25 @@
 		var url="lineInfoSpecializedController.do?addCarRegion"
 		url += '&load=detail&id='+rows[0].id;
 		createdetailwindow("查看座位区间价格",url,500,470);
+	}
+	
+
+	function delLine(id){
+		
+		$.dialog.confirm('确定要删除该记录吗？',function(r){
+		    if (r){
+		    	$.post(
+		    		"lineInfoSpecializedController.do?delLine",	
+					{'id':id},
+					function(data){
+						var obj = eval('(' + data + ')');
+						tip(obj.msg);
+						$('#lineList2').datagrid('reload');
+					}
+				);		
+		    }
+		});
+		
 	}
 	
 </script>

@@ -9,6 +9,7 @@
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?saveBusStopOrder">
 	<input id="id" name="id" hidden="true" value="${id}">
+	<input id="history" name="history" hidden="true" value="${history}">
 	<table style="width: 600px;" cellpadding="0" cellspacing="1" class="formtable" id = "formtableId">
 		<tr>
 			<td align="right" width="15%" nowrap>

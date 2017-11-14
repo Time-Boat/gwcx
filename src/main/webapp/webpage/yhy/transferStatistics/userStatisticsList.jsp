@@ -12,6 +12,7 @@
 				formatter="yyyy-MM-dd hh:mm:ss" query="true" width="120" queryMode="group"
 				align="center"></t:dgCol>
 			<t:dgCol title="用户名" field="realName" width="80" align="center"></t:dgCol>
+			<t:dgCol title="用户类型" field="userType" dictionary="userType" width="80" align="center"></t:dgCol>
 			<t:dgCol title="手机号" field="phone" width="80" align="center"></t:dgCol>
 			<t:dgCol title="身份证号" field="cardNumber" width="120" align="center"></t:dgCol>
 			<t:dgCol title="居住地" field="address" width="120" align="center"></t:dgCol>

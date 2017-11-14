@@ -84,6 +84,28 @@ public class LineInfoView implements Serializable {
 	private String lastApplicationUser;
 	//复审时间
 	private Date lastAuditDate;
+	//是否有渠道商
+	private String isDealerLine;
+	//版本号
+	private String version;
+	//申请修改状态
+	private String applicationEditStatus;
+	//初审修改拒绝原因
+	private String trialEditReason;
+	//复审拒绝修改原因
+	private String reviewEditReason;
+	//申请修改时间
+	private Date applicationEditTime;
+	//申请修改人
+	private String applicationEditUserId;
+	//初审修改时间
+	private Date firstApplicationEditTime;
+	//复审修改时间
+	private Date lastApplicationEditTime;
+	//初审修改人
+	private String firstApplicationEditUserId;
+	//复审修改人
+	private String lastApplicationEditUserId;
 	
 	public String getName() {
 		return name;
@@ -301,5 +323,71 @@ public class LineInfoView implements Serializable {
 	}
 	public void setLastApplicationUser(String lastApplicationUser) {
 		this.lastApplicationUser = lastApplicationUser;
+	}
+	public String getIsDealerLine() {
+		return isDealerLine;
+	}
+	public void setIsDealerLine(String isDealerLine) {
+		this.isDealerLine = isDealerLine;
+	}
+	public String getVersion() {
+		return version;
+	}
+	public void setVersion(String version) {
+		this.version = version;
+	}
+	public String getApplicationEditStatus() {
+		return applicationEditStatus;
+	}
+	public void setApplicationEditStatus(String applicationEditStatus) {
+		this.applicationEditStatus = applicationEditStatus;
+	}
+	public String getTrialEditReason() {
+		return trialEditReason;
+	}
+	public void setTrialEditReason(String trialEditReason) {
+		this.trialEditReason = trialEditReason;
+	}
+	public String getReviewEditReason() {
+		return reviewEditReason;
+	}
+	public void setReviewEditReason(String reviewEditReason) {
+		this.reviewEditReason = reviewEditReason;
+	}
+	public Date getApplicationEditTime() {
+		return applicationEditTime;
+	}
+	public void setApplicationEditTime(Date applicationEditTime) {
+		this.applicationEditTime = applicationEditTime;
+	}
+	public String getApplicationEditUserId() {
+		return applicationEditUserId;
+	}
+	public void setApplicationEditUserId(String applicationEditUserId) {
+		this.applicationEditUserId = applicationEditUserId;
+	}
+	public Date getFirstApplicationEditTime() {
+		return firstApplicationEditTime;
+	}
+	public void setFirstApplicationEditTime(Date firstApplicationEditTime) {
+		this.firstApplicationEditTime = firstApplicationEditTime;
+	}
+	public Date getLastApplicationEditTime() {
+		return lastApplicationEditTime;
+	}
+	public void setLastApplicationEditTime(Date lastApplicationEditTime) {
+		this.lastApplicationEditTime = lastApplicationEditTime;
+	}
+	public String getFirstApplicationEditUserId() {
+		return firstApplicationEditUserId;
+	}
+	public void setFirstApplicationEditUserId(String firstApplicationEditUserId) {
+		this.firstApplicationEditUserId = firstApplicationEditUserId;
+	}
+	public String getLastApplicationEditUserId() {
+		return lastApplicationEditUserId;
+	}
+	public void setLastApplicationEditUserId(String lastApplicationEditUserId) {
+		this.lastApplicationEditUserId = lastApplicationEditUserId;
 	}
 }

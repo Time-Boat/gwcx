@@ -43,7 +43,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		
 		Long iCount = (long) list.size();
 
-		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,f.account"
+		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,s.user_type,f.account"
 				+ " from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on"
 				+ " f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id  "
 				+ "LEFT JOIN t_s_depart t on l.departId=t.ID");
@@ -77,6 +77,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				new Db2Page("cardNumber", "card_number", null),
 				new Db2Page("address", "address", null),
 				new Db2Page("commonAddr", "common_addr", null),
+				new Db2Page("userType", "user_type", null),
 				new Db2Page("loginCount", "login_count", null),
 				new Db2Page("account", "account", null)
 
@@ -102,7 +103,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append(
-				"select a.id,a.applicationTime,a.order_id,l.name as line_name,l.type,a.order_startime,w.real_name,a.order_contactsname,p.departname,"
+				"select a.id,a.applicationTime,a.order_id,l.name as line_name,l.type,a.order_startime,w.real_name,w.user_type,a.order_contactsname,p.departname,"
 						+ "a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_status,a.order_numbers,a.order_totalPrice,fi.account from "
 						+ "transferorder a LEFT JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
 						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id "
@@ -146,6 +147,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
 				new Db2Page("departname", "departname", null), 
+				new Db2Page("userType", "user_type", null), 
 				new Db2Page("driverName", "driver_name", null), 
 				new Db2Page("licencePlate", "licence_plate", null),
 				new Db2Page("orderStatus", "order_status", null),
@@ -177,7 +179,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 
 		sql.append(
-				"select a.refund_completed_time,a.id,a.order_id,l.name as line_name,l.type,a.refund_time,w.real_name,p.departname,"
+				"select a.refund_completed_time,a.id,a.order_id,l.name as line_name,l.type,a.refund_time,w.real_name,w.user_type,p.departname,"
 						+ " a.order_contactsname,a.order_contactsmobile,d.name as driver_name,c.licence_plate,a.order_numbers,a.refund_price "
 						+ " from transferorder a LEFT JOIN order_linecardiver b on a.id=b.id left join car_info c on b.licencePlateId "
 						+ " =c.id left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w"
@@ -218,6 +220,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				new Db2Page("orderContactsname", "order_contactsname", null),
 				new Db2Page("orderContactsmobile", "order_contactsmobile", null),
 				new Db2Page("driverName", "driver_name", null),
+				new Db2Page("userType", "user_type", null), 
 				new Db2Page("departname", "departname", null),
 				new Db2Page("licencePlate", "licence_plate", null),
 				new Db2Page("orderNumbers", "order_numbers", null),

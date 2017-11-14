@@ -6,7 +6,7 @@
 
 <div class="easyui-layout" fit="true">
 <div region="center"  style="padding:0px;border:0px">
- <t:datagrid name="driversInfoList" title="司机信息管理" autoLoadData="true" actionUrl="driversInfoController.do?driverdatagrid&status=0&fromPage=${fromPage}"  fitColumns="true"
+ <t:datagrid name="driversInfoList" title="司机信息管理" autoLoadData="true" actionUrl="driversInfoController.do?driverdatagrid&status=1&fromPage=${fromPage}"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" >
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="司机姓名" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>

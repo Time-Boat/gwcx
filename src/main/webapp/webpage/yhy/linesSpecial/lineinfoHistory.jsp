@@ -77,18 +77,10 @@
     	});
     }
     
-  	//删除特殊字符
-    function delSpace(val){
-  		//console.log(val);
-  		if(val.indexOf(' ') != -1 || val.indexOf('\'') != -1 ){
-	    	$('#name').val(val.replace(' ','').replace('\'',''));
-  		}
-    }
-  	
 </script>
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?save">
+<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineinfoHistoryController.do?save">
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
 	<input id="ends" name="endLocations" type="hidden" value="${lineInfo.endLocation}">
 	<input id="starts" name="startLocations" type="hidden" value="${lineInfo.startLocation}">
@@ -101,9 +93,10 @@
 				<label class="Validform_label"> 线路名称: </label>
 			</td>
 			<td class="value" width="85%">
-                <input id="name" name="name" <c:if test="${lineInfo.name!=null }"> disabled="disabled" </c:if> value="${lineInfo.name}" 
-                	type="text" style="width: 60%" class="inputxt" onkeyup="delSpace(this.value)" onkeydown="delSpace(this.value)" datatype="*" /> 
-				<span class="Validform_checktip">不能输入空格</span> 
+				
+                    <input id="name" name="name" <c:if test="${lineInfo.name!=null }"> readonly='readonly' </c:if> value="${lineInfo.name}" type="text" style="width: 60%" class="inputxt"  datatype="*" /> 
+					<span class="Validform_checktip"></span> 
+			
 			</td>
 		</tr>
 		
@@ -112,7 +105,7 @@
 				<label class="Validform_label"> 选择线路城市: </label>
 			</td>
 			<td class="value">
-				<select id="city" name="city" datatype="*" onchange="getStartLocation()" <c:if test="${lineInfo.cityId!=null }"> disabled="disabled" </c:if>>
+				<select id="city" name="city" datatype="*" onchange="getStartLocation()" <c:if test="${lineInfo.cityId!=null }">  disabled="disabled" </c:if>>
 						<option value="">--请选择城市--</option>
 						<c:forEach var="c" items="${cities}">
 							<option value="${c.cityId}" <c:if test="${lineInfo.cityId == c.cityId}" >selected="selected"</c:if>>

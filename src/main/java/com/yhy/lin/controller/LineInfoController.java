@@ -29,8 +29,10 @@ import org.springframework.web.servlet.ModelAndView;
 import com.google.gson.Gson;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
+import com.yhy.lin.entity.LineBusstopHistoryEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
+import com.yhy.lin.entity.LineinfoHistoryEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
@@ -174,18 +176,17 @@ public class LineInfoController extends BaseController {
 							}
 						}
 					}
-
+					
 					// 删除起点和终点关联表
 					if ("2".equals(lin.getType()) || "4".equals(lin.getType())) {
 						List<StartOrEndEntity> list = systemService.findHql(
-								"from StartOrEndEntity where startid=? and endid=? and linetype=?",
-								lin.getStartLocation(), zdId, lin.getType());
+								"from StartOrEndEntity where endid=? and lineId=? and linetype=?",
+								zdId, lin.getId(), lin.getType());
 						systemService.delete(list.get(0));
 					}
 					if ("3".equals(lin.getType()) || "5".equals(lin.getType())) {
 						List<StartOrEndEntity> list = systemService.findHql(
-								"from StartOrEndEntity where startid=? and endid=? and linetype=?", zdId,
-								lin.getEndLocation(), lin.getType());
+								"from StartOrEndEntity where startid=? and lineId=? and linetype=?", zdId,lin.getId(),lin.getType());
 						systemService.delete(list.get(0));
 					}
 
@@ -346,9 +347,9 @@ public class LineInfoController extends BaseController {
 					lineInfo.setLineNumber(linecode);// 设置线路编号
 				}
 				lineInfo.setStatus("1");
+				lineInfo.setVersion("1");
 				lineInfo.setApplicationStatus("0");
-				lineInfo.setApplicationEditStatus("0");
-
+				
 				StartOrEndEntity st = new StartOrEndEntity();
 				if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {
 					st.setStartid(lineInfo.getStartLocation());
@@ -359,13 +360,13 @@ public class LineInfoController extends BaseController {
 				if (StringUtil.isNotEmpty(lineInfo.getType())) {
 					st.setLinetype(lineInfo.getType());
 				}
-
-				startOrEndService.save(st);
+				
+				st.setStationStatus("0");
 				lineInfoService.save(lineInfo);
-				// lineInfoService.findByQueryString("sdsdd");
+				st.setLineId(lineInfo.getId());
+				startOrEndService.save(st);
 				message = "线路添加成功！";
 
-				// -----数据修改日志[类SVN]------------
 				Gson gson = new Gson();
 				systemService.addDataLog("lineInfo", lineInfo.getId(), gson.toJson(lineInfo));
 				// -----数据修改日志[类SVN]------------
@@ -580,6 +581,8 @@ public class LineInfoController extends BaseController {
 		request.setAttribute("lineInfoId", lineInfoId);
 		String lineType = request.getParameter("lineType");
 		request.setAttribute("lineType", lineType);
+		String history = request.getParameter("history");
+		request.setAttribute("history", history);
 		return new ModelAndView("yhy/lines/busStopInfoList");
 	}
 
@@ -591,11 +594,21 @@ public class LineInfoController extends BaseController {
 			HttpServletResponse response, DataGrid dataGrid) {
 		String lineInfoId = request.getParameter("lineInfoId");
 		String lineType = request.getParameter("lineType");
+		String history = request.getParameter("history");
 		if (StringUtil.isNotEmpty(lineInfoId)) {
-			LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
+			if("1".equals(history)){
 
-			JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, dataGrid, lineInfo);
-			responseDatagrid(response, jObject);
+				LineinfoHistoryEntity lineInfos = systemService.getEntity(LineinfoHistoryEntity.class, lineInfoId);
+
+				JSONObject jObject = busStopInfoService.getDatagrid3b(busStopInfo, dataGrid, lineInfos);
+				responseDatagrid(response, jObject);
+			}else{
+				LineInfoEntity lineInfo = systemService.getEntity(LineInfoEntity.class, lineInfoId);
+
+				JSONObject jObject = busStopInfoService.getDatagrid3a(busStopInfo, dataGrid, lineInfo);
+				responseDatagrid(response, jObject);
+			}
+			
 		}
 
 	}
@@ -606,11 +619,18 @@ public class LineInfoController extends BaseController {
 	@RequestMapping(params = "updateBusStopOrder")
 	public ModelAndView updateBusStopOrder(Line_busStopEntity lineBusStop, HttpServletRequest request) {
 		String busstopid = request.getParameter("line_busstopId");
+		String history = request.getParameter("history");
 		
+		request.setAttribute("history", history);
 		request.setAttribute("id", busstopid);
 		request.setAttribute("name", request.getParameter("name"));
 		request.setAttribute("siteOrder", request.getParameter("siteOrder"));
-		request.setAttribute("bussiteOrder",getSiteOrder(busstopid) );
+		
+		if("1".equals(history)){
+			request.setAttribute("bussiteOrder",getSiteOrder1(busstopid));
+		}else{
+			request.setAttribute("bussiteOrder",getSiteOrder(busstopid));
+		}
 		request.setAttribute("arrivalTime", request.getParameter("arrivalTime"));
 		
 		return new ModelAndView("yhy/lines/lineBusStopUpdate");
@@ -638,6 +658,28 @@ public class LineInfoController extends BaseController {
 		return lie;
 			
 	}
+	
+	/**
+	 * 获取序号
+	 * @return
+	 */
+	public List<LineBusstopHistoryEntity> getSiteOrder1(String busstopid){
+		
+		List<LineBusstopHistoryEntity> lie = new ArrayList<LineBusstopHistoryEntity>();
+		LineBusstopHistoryEntity busstop = this.systemService.getEntity(LineBusstopHistoryEntity.class, busstopid);
+		String sql = "select b.siteOrder from line_busstop_history b where b.lineId='"+busstop.getLineId()+"' and b.siteOrder!=0 and b.siteOrder!=99 ORDER BY b.siteOrder";
+		List<Object> list = this.systemService.findListbySql(sql);
+				
+		if(list.size()>0){
+			for (int i = 0; i < list.size(); i++) {
+				LineBusstopHistoryEntity linr = new LineBusstopHistoryEntity();
+				int siteOrder =  (int) list.get(i);
+				linr.setSiteOrder(siteOrder);
+				lie.add(linr);
+			}
+		}
+		return lie;
+	}
 
 	/**
 	 * 上移
@@ -650,20 +692,35 @@ public class LineInfoController extends BaseController {
 		String id = request.getParameter("id");
 		String busid = request.getParameter("line_busstopId");
 		String siteOrder = request.getParameter("siteOrder");
+		String history = request.getParameter("history");
 		if (StringUtil.isNotEmpty(siteOrder)) {
 			int site = Integer.parseInt(siteOrder);
 			if (site != 0 && site != 1 && site != 99) {
 				int order = site - 1;
-				Line_busStopEntity ln = this.systemService.getEntity(Line_busStopEntity.class, busid);
-				List<Line_busStopEntity> list = this.systemService
-						.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order, ln.getLineId());
-				Line_busStopEntity line = list.get(0);
-				String sql = "update line_busstop set siteOrder=" + order + "  where id='" + id + "'";
-				System.out.println(sql);
-				systemService.updateBySqlString(
-						"update line_busstop set siteOrder=" + order + "  where id='" + busid + "'");
-				systemService.updateBySqlString(
-						"update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+				if("1".equals(history)){
+					LineBusstopHistoryEntity ln = this.systemService.getEntity(LineBusstopHistoryEntity.class, busid);
+					List<LineBusstopHistoryEntity> list = this.systemService
+							.findHql("from LineBusstopHistoryEntity where siteOrder=? and lineId=?", order, ln.getLineId());
+					LineBusstopHistoryEntity line = list.get(0);
+					String sql = "update line_busstop_history set siteOrder=" + order + "  where id='" + id + "'";
+					System.out.println(sql);
+					systemService.updateBySqlString(
+							"update line_busstop_history set siteOrder=" + order + "  where id='" + busid + "'");
+					systemService.updateBySqlString(
+							"update line_busstop_history set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+				}else{
+					Line_busStopEntity ln = this.systemService.getEntity(Line_busStopEntity.class, busid);
+					List<Line_busStopEntity> list = this.systemService
+							.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order, ln.getLineId());
+					Line_busStopEntity line = list.get(0);
+					String sql = "update line_busstop set siteOrder=" + order + "  where id='" + id + "'";
+					System.out.println(sql);
+					systemService.updateBySqlString(
+							"update line_busstop set siteOrder=" + order + "  where id='" + busid + "'");
+					systemService.updateBySqlString(
+							"update line_busstop set siteOrder='" + site + "'  where id='" + line.getId() + "'");
+				}
+				
 				message = "站点上移成功！";
 			} else if (site == 0) {
 				message = "起点站不能上移";
@@ -688,34 +745,68 @@ public class LineInfoController extends BaseController {
 		String id = request.getParameter("id");
 		String busid = request.getParameter("line_busstopId");
 		String siteOrder = request.getParameter("siteOrder");
+		String history = request.getParameter("history");
 		int siteOreder = 0;
-		String sql = "select b.siteOrder from  line_busstop b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
-		List<Object> bList = systemService.findListbySql(sql.toString());
-		if (bList.size() > 0) {
-			siteOreder = (int) bList.get(0);
-		}
+		
+		if("1".equals(history)){
+			String sql = "select b.siteOrder from line_busstop_history b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
+			List<Object> bList = systemService.findListbySql(sql.toString());
+			if (bList.size() > 0) {
+				siteOreder = (int) bList.get(0);
+			}
 
-		if (StringUtil.isNotEmpty(siteOrder)) {
-			int site = Integer.parseInt(siteOrder);
-			if (site != 0 && site != siteOreder && site != 99) {
-				//需要交换对象的排序值
-				int order = site + 1;
-				Line_busStopEntity ln = systemService.getEntity(Line_busStopEntity.class, busid);
-				List<Line_busStopEntity> list = systemService.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order, ln.getLineId());
-				Line_busStopEntity lb = list.get(0);
-				systemService.updateBySqlString(
-						"update line_busstop set siteOrder='" + order + "' where id='" + busid + "'");
-				systemService.updateBySqlString(
-						"update line_busstop set siteOrder='" + site + "' where id='" + lb.getId() + "'");
-				message = "站点下移成功！";
-			} else if (site == 0) {
-				message = "起点站不能下移";
-			} else if (site == siteOreder) {
-				message = "终点站不可更改";
-			} else if (site == 99) {
-				message = "终点站不能下移";
+			if (StringUtil.isNotEmpty(siteOrder)) {
+				int site = Integer.parseInt(siteOrder);
+				if (site != 0 && site != siteOreder && site != 99) {
+					//需要交换对象的排序值
+					int order = site + 1;
+					LineBusstopHistoryEntity ln = systemService.getEntity(LineBusstopHistoryEntity.class, busid);
+					List<LineBusstopHistoryEntity> list = systemService.findHql("from LineBusstopHistoryEntity where siteOrder=? and lineId=?", order, ln.getLineId());
+					LineBusstopHistoryEntity lb = list.get(0);
+					systemService.updateBySqlString(
+							"update line_busstop_history set siteOrder='" + order + "' where id='" + busid + "'");
+					systemService.updateBySqlString(
+							"update line_busstop_history set siteOrder='" + site + "' where id='" + lb.getId() + "'");
+					message = "站点下移成功！";
+				} else if (site == 0) {
+					message = "起点站不能下移";
+				} else if (site == siteOreder) {
+					message = "终点站不可更改";
+				} else if (site == 99) {
+					message = "终点站不能下移";
+				}
+			}
+		}else{
+			String sql = "select b.siteOrder from  line_busstop b where b.siteOrder!='99' ORDER BY b.siteOrder DESC";
+			List<Object> bList = systemService.findListbySql(sql.toString());
+			if (bList.size() > 0) {
+				siteOreder = (int) bList.get(0);
+			}
+
+			if (StringUtil.isNotEmpty(siteOrder)) {
+				int site = Integer.parseInt(siteOrder);
+				if (site != 0 && site != siteOreder && site != 99) {
+					//需要交换对象的排序值
+					int order = site + 1;
+					Line_busStopEntity ln = systemService.getEntity(Line_busStopEntity.class, busid);
+					List<Line_busStopEntity> list = systemService.findHql("from Line_busStopEntity where siteOrder=? and lineId=?", order, ln.getLineId());
+					Line_busStopEntity lb = list.get(0);
+					systemService.updateBySqlString(
+							"update line_busstop set siteOrder='" + order + "' where id='" + busid + "'");
+					systemService.updateBySqlString(
+							"update line_busstop set siteOrder='" + site + "' where id='" + lb.getId() + "'");
+					message = "站点下移成功！";
+				} else if (site == 0) {
+					message = "起点站不能下移";
+				} else if (site == siteOreder) {
+					message = "终点站不可更改";
+				} else if (site == 99) {
+					message = "终点站不能下移";
+				}
 			}
 		}
+		
+		
 		j.setMsg(message);
 		return j;
 	}
@@ -733,20 +824,39 @@ public class LineInfoController extends BaseController {
 		int site = Integer.parseInt(siteOrder);
 		String arrivalTime = request.getParameter("arrivalTime");
 		
+		String history = request.getParameter("history");
+		
 		if (StringUtil.isNotEmpty(id) && StringUtil.isNotEmpty(siteOrder)) {
 			
-			Line_busStopEntity line = this.systemService.getEntity(Line_busStopEntity.class, id);
-			if(site>line.getSiteOrder()){
-				String s = "update line_busstop b set siteOrder=siteOrder-1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>"+line.getSiteOrder()+" and b.siteOrder<="+site;
-				systemService.updateBySqlString(s);
+			if("1".equals(history)){
+				LineBusstopHistoryEntity line = this.systemService.getEntity(LineBusstopHistoryEntity.class, id);
+				if(site>line.getSiteOrder()){
+					String s = "update line_busstop_history b set siteOrder=siteOrder-1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>"+line.getSiteOrder()+" and b.siteOrder<="+site;
+					systemService.updateBySqlString(s);
+				}else{
+					String si = "update line_busstop_history b set siteOrder=siteOrder+1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>="+site+" and b.siteOrder<"+line.getSiteOrder();
+					systemService.updateBySqlString(si);
+				}
+				
+				String sql = "update line_busstop_history set siteOrder='" + siteOrder + "', arrivalTime = '" + arrivalTime + "'";
+				systemService.updateBySqlString(sql + " where id='" + id + "'");
+				message = "站点序号更新成功";
 			}else{
-				String si = "update line_busstop b set siteOrder=siteOrder+1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>="+site+" and b.siteOrder<"+line.getSiteOrder();
-				systemService.updateBySqlString(si);
+				Line_busStopEntity line = this.systemService.getEntity(Line_busStopEntity.class, id);
+				if(site>line.getSiteOrder()){
+					String s = "update line_busstop b set siteOrder=siteOrder-1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>"+line.getSiteOrder()+" and b.siteOrder<="+site;
+					systemService.updateBySqlString(s);
+				}else{
+					String si = "update line_busstop b set siteOrder=siteOrder+1 where b.siteOrder!=0 and b.siteOrder!=99 and b.lineId='"+line.getLineId()+"' and b.siteOrder>="+site+" and b.siteOrder<"+line.getSiteOrder();
+					systemService.updateBySqlString(si);
+				}
+				
+				String sql = "update line_busstop set siteOrder='" + siteOrder + "', arrivalTime = '" + arrivalTime + "'";
+				systemService.updateBySqlString(sql + " where id='" + id + "'");
+				message = "站点序号更新成功";
 			}
 			
-			String sql = "update line_busstop set siteOrder='" + siteOrder + "', arrivalTime = '" + arrivalTime + "'";
-			systemService.updateBySqlString(sql + " where id='" + id + "'");
-			message = "站点序号更新成功";
+			
 		}
 		j.setMsg(message);
 		return j;
@@ -782,7 +892,7 @@ public class LineInfoController extends BaseController {
 				st.append(" and b.station_type = '1'");
 			}
 			if (StringUtil.isNotEmpty(startLocation)) {
-				st.append(" and b.id not in(select se.endId from start_end se where 1=1 and se.startId='"
+				st.append(" and b.id not in(select se.endId from start_end se where se.station_status='1' and se.startId='"
 						+ startLocation + "' and se.lineType like '%" + type + "%')");
 			}
 		}

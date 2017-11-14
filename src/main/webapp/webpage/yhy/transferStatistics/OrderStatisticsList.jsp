@@ -20,6 +20,7 @@
 			<t:dgCol title="下单联系人" field="realName" align="center" width="80"></t:dgCol>
 			<t:dgCol title="乘车联系人" field="orderContactsname" align="center" width="80"></t:dgCol>
 			<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center" width="80"></t:dgCol>
+			<t:dgCol title="用户类型" field="userType" dictionary="userType" width="80" align="center"></t:dgCol>
 			<t:dgCol title="所属公司" field="departname" align="center" query="true" width="80"></t:dgCol>
 			<t:dgCol title="司机名称" field="driverName" align="center" query="true" width="80"></t:dgCol>
 			<t:dgCol title="车牌号" field="licencePlate" align="center" width="80"></t:dgCol>

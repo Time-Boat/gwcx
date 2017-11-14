@@ -28,8 +28,10 @@ import com.google.gson.Gson;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
+import com.yhy.lin.entity.LineBusstopHistoryEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Line_busStopEntity;
+import com.yhy.lin.entity.LineinfoHistoryEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
@@ -264,6 +266,26 @@ public class BusStopInfoController extends BaseController {
 	}
 	
 	
+	/**
+	 * 获取站点挂接站点序号
+	 */
+	private synchronized int getMaxSiteOrders(String lineInfoId){
+		int siteOreder=0;
+		StringBuffer st = new StringBuffer();
+		st.append("select b.siteOrder from  line_busstop_history b where b.siteOrder!='99'");
+		if(StringUtil.isNotEmpty(lineInfoId)){
+			st.append(" and b.lineId='");
+			st.append(lineInfoId+"'");
+		}
+		st.append(" ORDER BY b.siteOrder DESC");
+		List<Object> bList =systemService.findListbySql(st.toString());
+		if(bList.size()>0){
+			 siteOreder = (int) bList.get(0);
+		}
+		
+		return siteOreder;
+	}
+	
 	 /**
      * 挂接站点保存
      * @param req request
@@ -276,69 +298,116 @@ public class BusStopInfoController extends BaseController {
 	        AjaxJson j = new AjaxJson();
 	        try{
 		        String lineInfoId = request.getParameter("lineInfoId");
-		        //公务车线路为1    接送机线路为2
-		        //String lineType = request.getParameter("lineType");
-		        LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, lineInfoId);
-		        
-		        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
-		        List<String> idsList = extractIdListByComma(ids);
-		        List<Line_busStopEntity> list = new ArrayList<Line_busStopEntity>();
-		        StringBuffer sql = new StringBuffer();
-		        for(int i=0;i<idsList.size();i++){
-		        	Line_busStopEntity lin_busStop = new Line_busStopEntity();
-		        	lin_busStop.setLineId(lineInfoId);
-		        	lin_busStop.setBusStopsId(idsList.get(i));
-		        	int site = getMaxSiteOrder(lineInfoId);
-		        	int pum = site+1+i;
-		        	lin_busStop.setSiteOrder(pum);
+		        String history = request.getParameter("history");
+		        if("1".equals(history)){
 		        	
-		        	StartOrEndEntity st = new StartOrEndEntity();
-		        	if("2".equals(line.getType()) || "4".equals(line.getType())){
-		        		
-						if (StringUtil.isNotEmpty(line.getStartLocation())) {
-							st.setStartid(line.getStartLocation());
-						}
-						if (StringUtil.isNotEmpty(ids)) {
-							st.setEndid(idsList.get(i));
-						}
-						st.setLinetype(line.getType());
-						
-		        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
-		        		if (StringUtil.isNotEmpty(ids)) {
-							st.setStartid(idsList.get(i));
-						}
-						if (StringUtil.isNotEmpty(line.getEndLocation())) {
-							st.setEndid(line.getEndLocation());
-						}
-						st.setLinetype(line.getType());
-	        		}
-		        	startOrEndService.save(st);
-		        	
-		        	if(StringUtil.isNotEmpty(idsList.get(i))){
-		        		if(i==(idsList.size()-1)){
-		        			sql.append("'"+idsList.get(i)+"'");
-		        		}else{
-		        			sql.append("'"+idsList.get(i)+"',");
-		        		}
-		        	}
-		        	list.add(lin_busStop);
-		        }
-		        //原设定是修改站点的挂接状态，占时不适用   (为啥不适用呢...)
-		        /*System.out.println("update busstopinfo set status='" + lineType + "' where id in ("+sql.toString()+")");
-		        StringBuffer updateSql = new StringBuffer();
-		        if (StringUtil.isNotEmpty(line.getType())) {
-		        	 updateSql.append("update busstopinfo set status=CONCAT(status,'" + line.getType() + "') where id in ("+sql.toString()+") ");
-		        	 updateSql.append(" and station_type = '0' ");
-		        	 systemService.updateBySqlString(updateSql.toString());
+		        	 LineinfoHistoryEntity line = this.systemService.getEntity(LineinfoHistoryEntity.class, lineInfoId);
+				        
+				        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
+				        List<String> idsList = extractIdListByComma(ids);
+				        List<LineBusstopHistoryEntity> list = new ArrayList<LineBusstopHistoryEntity>();
+				        StringBuffer sql = new StringBuffer();
+				        for(int i=0;i<idsList.size();i++){
+				        	LineBusstopHistoryEntity lin_busStop = new LineBusstopHistoryEntity();
+				        	lin_busStop.setLineId(lineInfoId);
+				        	lin_busStop.setBusStopsId(idsList.get(i));
+				        	lin_busStop.setVersion(line.getVersion());
+				        	int site = getMaxSiteOrders(lineInfoId);
+				        	int pum = site+1+i;
+				        	lin_busStop.setSiteOrder(pum);
+				        	
+				        	StartOrEndEntity st = new StartOrEndEntity();
+				        	if("2".equals(line.getType()) || "4".equals(line.getType())){
+				        		
+								if (StringUtil.isNotEmpty(line.getStartLocation())) {
+									st.setStartid(line.getStartLocation());
+								}
+								if (StringUtil.isNotEmpty(ids)) {
+									st.setEndid(idsList.get(i));
+								}
+								st.setLinetype(line.getType());
+								
+				        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
+				        		if (StringUtil.isNotEmpty(ids)) {
+									st.setStartid(idsList.get(i));
+								}
+								if (StringUtil.isNotEmpty(line.getEndLocation())) {
+									st.setEndid(line.getEndLocation());
+								}
+								st.setLinetype(line.getType());
+			        		}
+				        	st.setStationStatus("0");
+				        	st.setLineId(line.getId());
+				        	startOrEndService.save(st);
+				        	
+				        	if(StringUtil.isNotEmpty(idsList.get(i))){
+				        		if(i==(idsList.size()-1)){
+				        			sql.append("'"+idsList.get(i)+"'");
+				        		}else{
+				        			sql.append("'"+idsList.get(i)+"',");
+				        		}
+				        	}
+				        	list.add(lin_busStop);
+				        }
 				        
 				        systemService.saveAllEntitie(list);
-				        message="站点挂接成功";
-		        }*/
-		        systemService.saveAllEntitie(list);
+		        }else{
+		        	 LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, lineInfoId);
+				        
+				        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
+				        List<String> idsList = extractIdListByComma(ids);
+				        List<Line_busStopEntity> list = new ArrayList<Line_busStopEntity>();
+				        StringBuffer sql = new StringBuffer();
+				        for(int i=0;i<idsList.size();i++){
+				        	Line_busStopEntity lin_busStop = new Line_busStopEntity();
+				        	lin_busStop.setLineId(lineInfoId);
+				        	lin_busStop.setBusStopsId(idsList.get(i));
+				        	int site = getMaxSiteOrder(lineInfoId);
+				        	int pum = site+1+i;
+				        	lin_busStop.setSiteOrder(pum);
+				        	
+				        	StartOrEndEntity st = new StartOrEndEntity();
+				        	if("2".equals(line.getType()) || "4".equals(line.getType())){
+				        		
+								if (StringUtil.isNotEmpty(line.getStartLocation())) {
+									st.setStartid(line.getStartLocation());
+								}
+								if (StringUtil.isNotEmpty(ids)) {
+									st.setEndid(idsList.get(i));
+								}
+								
+								st.setLinetype(line.getType());
+								
+				        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
+				        		if (StringUtil.isNotEmpty(ids)) {
+									st.setStartid(idsList.get(i));
+								}
+								if (StringUtil.isNotEmpty(line.getEndLocation())) {
+									st.setEndid(line.getEndLocation());
+								}
+								st.setLinetype(line.getType());
+			        		}
+				        	st.setStationStatus("0");
+				        	st.setLineId(lineInfoId);
+				        	
+				        	startOrEndService.save(st);
+				        	
+				        	if(StringUtil.isNotEmpty(idsList.get(i))){
+				        		if(i==(idsList.size()-1)){
+				        			sql.append("'"+idsList.get(i)+"'");
+				        		}else{
+				        			sql.append("'"+idsList.get(i)+"',");
+				        		}
+				        	}
+				        	list.add(lin_busStop);
+				        }
+				        
+				        systemService.saveAllEntitie(list);
+		        }
+		        //公务车线路为1    接送机线路为2
+		        //String lineType = request.getParameter("lineType");
+		       
 		        message="站点挂接成功";
-		        //只有站点类型是普通站点的时候，才修改它的状态，让其只能在一条线路中使用
-		        //如果是机场站点或者火车站点，则可以重复使用
-		        
 		        
 	        }catch (Exception e) {
 	        	message = "站点挂接失败";

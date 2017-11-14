@@ -240,7 +240,7 @@ public class AuthInterceptor implements HandlerInterceptor {
 
             String orgId = currLoginUser.getCurrentDepart().getId();
 
-            String functionOfOrgSql = " ELECT DISTINCT f.id from t_s_function f, t_s_role_function rf, t_s_role_org ro  " +
+            String functionOfOrgSql = " SELECT DISTINCT f.id from t_s_function f, t_s_role_function rf, t_s_role_org ro  " +
                     " WHERE f.ID=rf.functionid AND rf.roleid=ro.role_id " +
                     " AND ro.org_id='" +orgId+ "' AND f.functionurl like '"+requestPath+"%' ";
             List functionOfOrgList = this.systemService.findListbySql(functionOfOrgSql);

@@ -44,7 +44,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username,a.application_edit_status,a.application_edit_time, "
+		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username, "
 		 		+ " a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content, "
 		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status,a.is_dealer_line,a.application_time,p.departname ");
 		 sql.append(" from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id= "
@@ -83,8 +83,6 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				,new Db2Page("dispath", "dispath", null)
 				,new Db2Page("applicationStatus", "application_status", null)
 				,new Db2Page("applicationTime", "application_time", null)
-				,new Db2Page("applicationEditStatus", "application_edit_status", null)
-				,new Db2Page("applicationEditTime", "application_edit_time", null)
 				,new Db2Page("isDealerLine", "is_dealer_line", null)
 				
 				
@@ -94,7 +92,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	}
 
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_LINE_AUDIT, AppGlobals.OPERATION_MANAGER , AppGlobals.ORG_JOB_TYPE}, objTableUserId = " a.createUserId ", orgTable="b"
-			, auditSql = " and  CASE WHEN a.status ='0' then a.application_status in('1','2','3','4','5','6') when a.status='1' then a.application_status in('2','3','4','6') END "
+			, auditSql = " and  CASE WHEN a.status ='1' then a.application_status in('2','3','4','6') ELSE a.application_status in('1','2','3','4','5','6') END "
 			, operationSql = " and a.application_status in('1','2','3','4','5','6') ")
 	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
@@ -161,6 +159,10 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		sqlWhere.append(" and a.deleteFlag='0'");
 		if(StringUtil.isNotEmpty(lineInfo.getName())){
 			sqlWhere.append(" and  a.name like '%"+lineInfo.getName()+"%'");
+		}
+		
+		if(StringUtil.isNotEmpty(lineInfo.getIsDealerLine())){
+			sqlWhere.append(" and  a.is_dealer_line = '"+lineInfo.getIsDealerLine()+"'");
 		}
 		if(StringUtil.isNotEmpty(username)){
 			sqlWhere.append(" and u.username like '%"+username+"%'");
@@ -352,6 +354,93 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 				
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;
+	}
+	
+	
+	@Override
+	public LineInfoView getDetailHistory(String id) {
+		
+		StringBuffer sql = new StringBuffer();
+		sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username,a.imageurl,a.type,"
+				+ "a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content,a.lineNumber,a.departId,"
+				+ "a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as "
+				+ "endname,a.application_status,p.departname,a.application_time,a.trial_reason,a.review_reason,a.first_application_time,"
+				+ "a.last_application_time,a.application_user_id,a.first_application_user,a.last_application_user from lineinfo_history a inner join t_s_depart b on a.departId =b.ID left join "
+				+ "cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id="
+				+ "a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN "
+				+ "t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else "
+				+ "substring(t.org_code,1,6) END)=p.org_code and a.id='"+id+"'");
+		
+		List<Object[]> list = findListbySql(sql.toString());
+		LineInfoView lineInfoView = new LineInfoView();
+		if (list.size() > 0) {
+			Object[] obj = list.get(0);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				lineInfoView.setCityId(String.valueOf(obj[0]));
+				lineInfoView.setCityName(String.valueOf(obj[1]));
+				lineInfoView.setId(String.valueOf(obj[2]));
+				lineInfoView.setName(String.valueOf(obj[3]));
+				lineInfoView.setStartLocation(String.valueOf(obj[4]));
+				lineInfoView.setEndLocation(String.valueOf(obj[5]));
+				lineInfoView.setCreateUserId(String.valueOf(obj[6]));
+				lineInfoView.setCreatePeople(String.valueOf(obj[7]));
+				lineInfoView.setImageurl(String.valueOf(obj[8]));
+				lineInfoView.setType(String.valueOf(obj[9]));
+				lineInfoView.setStatus(String.valueOf(obj[10]));
+				lineInfoView.setRemark(String.valueOf(obj[11]));
+				lineInfoView.setDeleteFlag((short)Integer.parseInt(obj[12].toString()));
+				if (obj[13] != null) {
+					lineInfoView.setCreateTime(sdf.parse(obj[13].toString()));
+				}
+				lineInfoView.setCreatePeople(String.valueOf(obj[14]));
+				lineInfoView.setPrice(new BigDecimal(obj[15].toString()));
+				lineInfoView.setApplyContent(String.valueOf(obj[16]));
+				lineInfoView.setLineNumber(String.valueOf(obj[17]));
+				lineInfoView.setDepartId(String.valueOf(obj[18]));
+				if (obj[19] != null) {
+					lineInfoView.setLstartTime(sdf.parse(obj[19].toString()));
+				}
+				if (obj[20] != null) {
+					lineInfoView.setLendTime(sdf.parse(obj[20].toString()));
+				}
+				lineInfoView.setLineTimes(String.valueOf(obj[21]));
+				lineInfoView.setSettledCompanyId(String.valueOf(obj[22]));
+				lineInfoView.setSettledCompanyName(String.valueOf(obj[23]));
+				lineInfoView.setDispath(String.valueOf(obj[24]));
+				lineInfoView.setStartName(String.valueOf(obj[25]));
+				lineInfoView.setEndName(String.valueOf(obj[26]));
+				lineInfoView.setApplicationStatus(String.valueOf(obj[27]));
+				lineInfoView.setCompanyName(String.valueOf(obj[28]));
+				if (obj[29] != null) {
+					lineInfoView.setApplicationTime(sdf.parse(obj[29].toString()));
+				}
+				if (obj[30] != null) {
+					lineInfoView.setTrialReason(String.valueOf(obj[30]));
+				}
+				if (obj[31] != null) {
+					lineInfoView.setReviewReason(String.valueOf(obj[31]));
+				}
+				if (obj[32] != null) {
+					lineInfoView.setFirstAuditDate(sdf.parse(obj[32].toString()));
+				}
+				if (obj[33] != null) {
+					lineInfoView.setLastAuditDate(sdf.parse(obj[33].toString()));
+				}
+				if (obj[34] != null) {
+					lineInfoView.setApplicationUserid(String.valueOf(obj[34]));
+				}
+				if (obj[35] != null) {
+					lineInfoView.setFirstApplicationUser(String.valueOf(obj[35]));
+				}
+				if (obj[36] != null) {
+					lineInfoView.setLastApplicationUser(String.valueOf(obj[36]));
+				}
+				
+			} catch (Exception e) {
+			}
+			}
+		return lineInfoView;
 	}
 
 	@Override
