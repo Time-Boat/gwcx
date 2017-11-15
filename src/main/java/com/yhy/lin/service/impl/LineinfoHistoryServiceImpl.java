@@ -152,7 +152,7 @@ public class LineinfoHistoryServiceImpl extends CommonServiceImpl implements Lin
 		if(StringUtil.isNotEmpty(lineType)){//接送机的线路判断
 			sqlWhere.append(" and a.type "+lineType);
 		}
-		sqlWhere.append(" and a.deleteFlag='0' and p.status='0' and a.version=(select MAX(version) from lineinfo_history where a.lineNumber=lineNumber)");
+		sqlWhere.append(" and a.deleteFlag='0' and p.status='0' and a.version='0'");
 		
 		return sqlWhere.toString();
 	}

@@ -435,7 +435,7 @@
 			tip('该线路已上架，不能编辑区间价格');
 			return;
 		}
-		if(rows[0].status=='1'){
+		if(rows[0].status=='1' || rows[0].status=='2'){
 			if(rows[0].applicationStatus=='1'){
 				tip('该线路初审，不能编辑区间价格');
 				return;
@@ -445,6 +445,7 @@
 				return;
 			}
 		}
+		
 		add("编辑座位区间价格", "lineInfoSpecializedController.do?addCarRegion&id=" + rows[0].id,"500px","470px");
 	}
 	

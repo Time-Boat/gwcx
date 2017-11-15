@@ -285,7 +285,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 				sqlCnt.append(" and a.id not in(select se.endId from start_end se where se.line_id='"+lineInfo.getId()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 			}
 			if("3".equals(lineInfo.getType()) || "5".equals(lineInfo.getType())){
-				sqlCnt.append(" and a.id not in(select se.startId from start_end se where se.station_status='1' se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
+				sqlCnt.append(" and a.id not in(select se.startId from start_end se where se.station_status='1' and se.endId='"+lineInfo.getEndLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 				sqlCnt.append("and a.id not in(select se.startId from start_end se where se.line_id='"+lineInfo.getId()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 			}
 			

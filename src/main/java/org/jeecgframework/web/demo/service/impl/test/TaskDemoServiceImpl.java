@@ -27,7 +27,7 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 		
 		//定时修改状态
 		List<TransferorderEntity> tList = findByQueryString(
-				"from TransferorderEntity where order_status='2' and order_paystatus='0' and TIMESTAMPDIFF(HOUR,order_startime,SYSDATE()) >= 0 ");
+				"from TransferorderEntity where order_status='2' and order_paystatus='0' and UNIX_TIMESTAMP(order_startime) <= UNIX_TIMESTAMP(SYSDATE()) ");
 		
 		for(TransferorderEntity t : tList){
 			t.setOrderStatus(0);

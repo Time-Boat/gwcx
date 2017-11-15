@@ -427,17 +427,7 @@ public class LineinfoHistoryController extends BaseController {
 		try {
 		if(StringUtil.isNotEmpty(line)){
 			if("1".equals(line.getApplicationEditStatus())){
-				/*List<LineInfoEntity> lineinfolist = this.systemService.findByProperty(LineInfoEntity.class, "lineNumber", line.getLineNumber());
-				if(lineinfolist.size()>0){
-					for (int i = 0; i < lineinfolist.size(); i++) {
-						LineInfoEntity lineinfo = lineinfolist.get(i);
-						if("1".equals(lineinfo.getApplicationStatus()) || "2".equals(lineinfo.getApplicationStatus())){
-							message = "线路正在审核，请勿修改！";
-							j.setMsg(message);
-							return j;
-						}
-					}
-				}*/
+				
 				j=checkEnabled(line);
 				if(j.isSuccess()==false){
 					return j;
@@ -456,6 +446,22 @@ public class LineinfoHistoryController extends BaseController {
 				line.setApplicationEditStatus("3");
 				line.setLastApplicationEditTime(AppUtil.getDate());
 				line.setLastApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
+				
+				
+				LineinfoHistoryEntity history = new LineinfoHistoryEntity();
+				MyBeanUtils.copyBeanNotNull2Bean(line, history);
+				List<Object> calist = this.systemService.findListbySql("SELECT a.version from lineinfo_history a where a.lineNumber = '"+line.getLineNumber()+"' ORDER BY a.version desc");
+				Object ca = null;
+				if(calist.size()>0){
+					ca = calist.get(0);
+				}
+				if(!StringUtil.isNotEmpty(ca)){
+					ca="0";
+				}
+				history.setVersion(Integer.parseInt(ca.toString())+1+"");
+				this.systemService.save(history);
+				saveCarTSTypeLine(history);
+				
 				saveCarTSTypeLine(line);  //修改车辆类型区间价格状态
 				//修改线路赋值
 				saveLineinfo(line);
@@ -464,6 +470,7 @@ public class LineinfoHistoryController extends BaseController {
 		}
 			message = "申请成功！";
 			this.systemService.saveOrUpdate(line);
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			message = "服务器异常！";

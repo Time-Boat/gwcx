@@ -468,7 +468,7 @@ public class LineInfoSpecializedController extends BaseController {
 		String id = request.getParameter("id");
 		String lineStatus= request.getParameter("status");
 		String isDealerLine = request.getParameter("isDealerLine");
-		if("1".equals(lineStatus)){
+		if("1".equals(lineStatus) || "2".equals(lineStatus)){
 			if("1".equals(isDealerLine)){
 				if(StringUtil.isNotEmpty(id)){
 					List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", id);
@@ -753,6 +753,7 @@ public class LineInfoSpecializedController extends BaseController {
 	public void saveLineHistory(HttpServletRequest request,LineInfoEntity line){
 		
 		LineinfoHistoryEntity history = new LineinfoHistoryEntity();
+		LineinfoHistoryEntity history1 = new LineinfoHistoryEntity();
 		try {
 			
 			List<Object> calist = this.systemService.findListbySql("SELECT a.version from lineinfo_history a where a.lineNumber = '"+line.getLineNumber()+"' ORDER BY a.version desc");
@@ -764,10 +765,23 @@ public class LineInfoSpecializedController extends BaseController {
 				ca="0";
 			}
 			if(StringUtil.isNotEmpty(line)){
-				MyBeanUtils.copyBeanNotNull2Bean(line, history);
-				history.setVersion(Integer.parseInt(ca.toString())+1+"");
+				if(!"0".equals(ca)){
+					List<LineinfoHistoryEntity> hisylist = this.systemService.findHql("from LineinfoHistoryEntity where lineNumber=? and version=? ", line.getLineNumber(),"0");
+					if(hisylist.size()>0){
+						history = hisylist.get(0);
+					}
+				}else{
+					MyBeanUtils.copyBeanNotNull2Bean(line, history);
+				}
 				history.setStatus("0");
+				history.setVersion("0");
 				history.setApplicationEditStatus("0");
+				this.systemService.save(history);
+				
+				MyBeanUtils.copyBeanNotNull2Bean(line, history1);
+				history1.setVersion(Integer.parseInt(ca.toString())+1+"");
+				history1.setStatus("0");
+				history1.setApplicationEditStatus("0");
 			}
 			
 			List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", line.getId());
@@ -776,7 +790,10 @@ public class LineInfoSpecializedController extends BaseController {
 				caline.setApplyStatus("1");
 				carTSTypeLineServiceI.saveOrUpdate(caline);
 			}
-			this.systemService.save(history);
+			
+			this.systemService.save(history1);
+			
+			
 			saveStartAndEndHistory(history, line);
 			
 			List<CarTSTypeLineEntity> catlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", line.getId());
@@ -791,12 +808,28 @@ public class LineInfoSpecializedController extends BaseController {
 					this.systemService.save(carTSTypeLine);
 				}
 			}
+			if(!"0".equals(ca)){
+				if(StringUtil.isNotEmpty(history)){
+					List<LineBusstopHistoryEntity> hisbusslist = this.systemService.findByProperty(LineBusstopHistoryEntity.class, "lineId", history.getId());
+					if(hisbusslist.size()>0){
+						for (int i = 0; i < hisbusslist.size(); i++) {
+							LineBusstopHistoryEntity LineBusstopHistory = hisbusslist.get(i);
+							this.systemService.delete(LineBusstopHistory);
+						}
+					}
+				}
+			}
+			saveUserToOrg(request, history1,line);
 			saveUserToOrg(request, history,line);
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	
+	
 	
 	//起点和终点关联表保存历史记录
 	public void saveStartAndEndHistory(LineinfoHistoryEntity history,LineInfoEntity line){
