@@ -606,11 +606,12 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency> -->
-		<dependency>
+		<!-- 这个包和slf4j-log4j12-1.6.1有冲突，删掉 -->
+		<!-- <dependency>
                  <groupId>org.slf4j</groupId>
                  <artifactId>log4j-over-slf4j</artifactId>
                  <version>1.6.1</version>
-         </dependency>
+         </dependency> -->
 		<!-- classmate -->
 		<dependency>
 			<groupId>com.fasterxml</groupId>

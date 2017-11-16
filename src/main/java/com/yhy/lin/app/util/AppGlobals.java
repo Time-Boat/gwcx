@@ -62,10 +62,10 @@ public interface AppGlobals {
 	/** 包车 */
 
 	/** windows图片base路径 */
-	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
+//	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
 
 	/** linux图片base路径 */
-//	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
+	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
 
 	/** app客户头像路径 */
 	public static final String APP_USER_FILE_PATH = "/image/user/";
@@ -83,7 +83,6 @@ public interface AppGlobals {
 	//public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
 	public static final String SERVCR_URL = "dysmsapi.aliyuncs.com";
 	
-
 	/** 阿里大鱼测试url */
 	public static final String TEST_SERVCR_URL = "https://gw.api.tbsandbox.com/router/rest";
 
