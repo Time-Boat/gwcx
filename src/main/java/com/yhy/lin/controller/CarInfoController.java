@@ -418,19 +418,29 @@ public class CarInfoController extends BaseController {
 		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
 
 		try {
-			String apply = carInfo.getApplyContent();
+			
+			if(StringUtil.isNotEmpty(carInfo)){
+				String apply = carInfo.getApplyContent();
 
-			carInfo.setAuditTime(AppUtil.getDate());
-			carInfo.setAuditStatus("1");
-			carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
+				if ("0".equals(apply)) {
+					
+					if(StringUtil.isNotEmpty(carInfo.getDriverId())){
+						j = checkStatus(carInfo.getDriverId());
+						if(j.isSuccess()==false){
+							return j;
+						}
+					}
+					carInfo.setCarStatus("0");
+				} else {
+					carInfo.setCarStatus("2");
+				}
+				carInfo.setAuditTime(AppUtil.getDate());
+				carInfo.setAuditStatus("1");
+				carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
 
-			if ("0".equals(apply)) {
-				carInfo.setCarStatus("0");
-			} else {
-				carInfo.setCarStatus("2");
+				systemService.saveOrUpdate(carInfo);
 			}
-
-			systemService.saveOrUpdate(carInfo);
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -438,6 +448,26 @@ public class CarInfoController extends BaseController {
 		message = "审核成功";
 		j.setMsg(message);
 		return j;
+	}
+	
+	public AjaxJson checkStatus(String id){
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		boolean success = false;
+		if(StringUtil.isNotEmpty(id)){
+			List<DriversInfoEntity> carelist = systemService.findHql(
+					"from DriversInfoEntity where id=? and status=? ", id, "2");
+			if(carelist.size()>0){
+				message = "车辆挂接的司机已停用，不能申请上架!";
+				success = false;
+			}else{
+				success = true;
+			}
+		}
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+		
 	}
 
 	/**

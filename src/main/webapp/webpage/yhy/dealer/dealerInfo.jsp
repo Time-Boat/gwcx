@@ -188,7 +188,7 @@
 					<td class="value">
 						<input class="inputxt" id="creditCode" name="creditCode" datatype="*" onchange="checkCreditCode(this.value)" 
 							<c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if> value="${dealerInfoPage.creditCode}">
-						<span id="checkCreditCode" class="Validform_checktip"></span>e3  
+						<span id="checkCreditCode" class="Validform_checktip"></span>  
 					</td>
 				</tr>
 			</table>

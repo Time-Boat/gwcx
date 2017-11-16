@@ -66,13 +66,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status, ");
+		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status,ca.user_type, ");
 		sql.append(" a.last_audit_date,a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name, ");
 		sql.append(" a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.refund_time,a.refund_price, ");
 		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime, p.departname ");
 		sql.append(" from transferorder a left join order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId = c.id "
 				+ "	left join driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId "
-				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user "
+				+ " left join t_s_base_user u on u.id = a.first_audit_user left join t_s_base_user us on us.id = a.last_audit_user LEFT JOIN car_customer ca on a.user_id=ca.id"
 				+ " ,t_s_depart p  ");
 		
 		if (!sqlWhere.isEmpty()) {
@@ -97,6 +97,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				new Db2Page("orderTotalPrice", "order_totalPrice", null),
 				new Db2Page("name", "name", null),
 				new Db2Page("phoneNumber", "phoneNumber", null),
+				new Db2Page("userType", "user_type", null),
 				new Db2Page("applicationTime", "applicationTime", null),
 				new Db2Page("orderStartingstation", "order_starting_station_name", null),
 				new Db2Page("orderTerminusstation", "order_terminus_station_name", null),

@@ -23,6 +23,7 @@
 		<%-- <t:dgCol title="支付方式" field="orderPaytype" replace="微信_0,支付宝_1,银联_2" align="center"></t:dgCol> --%>
 		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
 		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
+		<t:dgCol title="用户类型" field="userType" dictionary="userType" align="center"></t:dgCol>
 		<%--<t:dgCol title="支付状态" field="orderPaystatus" replace="已付款_0,退款中_1,已退款_2,已拒绝_4" align="center"></t:dgCol> --%>
 		<t:dgCol title="申请退款时间" field="refundTime" formatter="yyyy-MM-dd hh:mm:ss" align="center" query="true" queryMode="group" ></t:dgCol>
 		<t:dgCol title="退款金额" field="refundPrice" align="center"></t:dgCol>

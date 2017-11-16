@@ -519,7 +519,7 @@ public class DriversInfoController extends BaseController {
 			DriversInfoEntity driver = this.systemService.getEntity(DriversInfoEntity.class, id);
 			if(StringUtil.isNotEmpty(driver)){
 				try {
-					driver.setApplicationStatus("1");
+					
 					/*if("0".equals(driver.getStatus())){
 						driver.setStatus("1");;//司机状态
 					}else{
@@ -528,9 +528,13 @@ public class DriversInfoController extends BaseController {
 					if("0".equals(driver.getApplyContent())){
 						driver.setStatus("1");
 					}else{
+						j = checkStatus(id);
+						if(j.isSuccess()==false){
+							return j;
+						}
 						driver.setStatus("2");
 					}
-					
+					driver.setApplicationStatus("1");
 					driver.setAuditor(ResourceUtil.getSessionUserName().getId());
 					driver.setAuditTime(AppUtil.getDate());
 					message = "申请成功！";

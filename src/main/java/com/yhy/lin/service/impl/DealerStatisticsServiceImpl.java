@@ -125,7 +125,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 
 		String sqlCnt = "select count(*) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id LEFT JOIN car_customer w on w.id= "
 				+ " t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where w.open_id = d.open_id and f.id=d.dealer_id "
-				+ " and t.order_status='0' and td.id=f.departId and (case when LENGTH(td.org_code)<6 then td.org_code else "
+				+ " and t.order_status='0' and t.order_user_type='0' and td.id=f.departId and (case when LENGTH(td.org_code)<6 then td.org_code else "
 				+ " substring(td.org_code,1,6) END)=p.org_code ";
 
 		if (!sqlWhere.isEmpty()) {
@@ -136,7 +136,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		sql.append(" select f.account,t.order_completed_time,t.order_id,l.name as line_name,l.type as line_type,t.order_startime,w.real_name,t.order_contactsname, "
 				+ " t.order_contactsmobile,t.order_status,t.order_numbers,t.order_totalPrice,p.departname from transferorder t LEFT JOIN lineinfo l on "
 				+ " t.line_id = l.id LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where w.open_id = d.open_id "
-				+ " and f.id=d.dealer_id and t.order_status='0' and td.id=f.departId "
+				+ " and f.id=d.dealer_id and t.order_status='0' and t.order_user_type='0' and td.id=f.departId "
 				+ " and (case when LENGTH(td.org_code)<6 then td.org_code else substring(td.org_code,1,6) END)=p.org_code ");
 		if (!sqlWhere.isEmpty()) {
 			sql.append(sqlWhere);
