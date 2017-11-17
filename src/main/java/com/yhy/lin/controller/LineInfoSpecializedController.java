@@ -248,7 +248,7 @@ public class LineInfoSpecializedController extends BaseController {
 	}
 
 	/**
-	 * 申请上架、申请下架
+	 * 批量分配
 	 */
 	@RequestMapping(params = "allot")
 	@ResponseBody
@@ -265,6 +265,16 @@ public class LineInfoSpecializedController extends BaseController {
 				LineInfoEntity lineinfo = this.systemService.getEntity(LineInfoEntity.class, linId);
 				lineinfo.setCreateUserId(id);
 				lineinfo.setCreatePeople(username);
+				
+				List<LineinfoHistoryEntity> historylist = systemService.findHql(
+						"from LineinfoHistoryEntity where lineNumber=? and version=? ",lineinfo.getLineNumber(),"0");
+				if(historylist.size()>0){
+					LineinfoHistoryEntity history = historylist.get(0);
+					history.setCreateUserId(id);
+					history.setCreatePeople(username);
+					this.systemService.saveOrUpdate(history);
+				}
+				
 				try {
 					message = "分配成功！";
 					this.systemService.saveOrUpdate(lineinfo);
@@ -532,7 +542,7 @@ public class LineInfoSpecializedController extends BaseController {
 
 	public  AjaxJson checkEdit(LineInfoEntity lineinfo) {
 		String message = null;
-		boolean success = false;
+		boolean success = true;
 		AjaxJson j = new AjaxJson();
 
 		if(StringUtil.isNotEmpty(lineinfo)){
@@ -676,7 +686,7 @@ public class LineInfoSpecializedController extends BaseController {
 
 	//验证是否存在站点已挂接
 	public AjaxJson checkEnabled(LineInfoEntity  line){
-		boolean success=false;
+		boolean success=true;
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		//判断站点是否被启用

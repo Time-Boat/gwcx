@@ -10,6 +10,7 @@ import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
 
@@ -202,6 +203,13 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 				customer.setUserType("1");
 				
 				dealerInfo.setStatus("0");
+				
+				String mobiles=customer.getPhone();
+				if (StringUtil.isNotEmpty(mobiles)) {
+					SendMessageUtil.sendMessage(mobiles,new String[0],new String[0],
+							SendMessageUtil.TEMPLATE_ARRANGE_DEALER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_ORDER);
+				}
+				
 			} else {//如果是申请停用，则将渠道商账号转为普通用户
 				if(customer != null){
 					customer.setPassword("");

@@ -44,10 +44,10 @@ public class SendMessageUtil {
 	public static final String TEMPLATE_ARRANGE_ORDER = "SMS_102350065";//SMS_102350065
 	//接送机订单提醒
 	//public static final String TEMPLATE_ARRANGE_AIRORDER = "SMS_78745200";//SMS_78570092
-	public static final String TEMPLATE_ARRANGE_AIRORDER = "SMS_102220081";//SMS_102220081
+	public static final String TEMPLATE_ARRANGE_AIRORDER = "SMS_110835253";//SMS_102220081
 	//接送火车订单提醒
 	//public static final String TEMPLATE_ARRANGE_TRORDER = "SMS_78935036";//SMS_78570092
-	public static final String TEMPLATE_ARRANGE_TRORDER = "SMS_102205078";//SMS_102205078
+	public static final String TEMPLATE_ARRANGE_TRORDER = "SMS_110845263";//SMS_102205078
 
 	// 安排车辆信息模板
 	//public static final String TEMPLATE_ARRANGE_CAR = "SMS_70420532";//SMS_69620002
@@ -55,6 +55,9 @@ public class SendMessageUtil {
 	// 安排车辆信息模板对应签名
 	//public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "变更验证";
 	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "小龙出行";
+	
+	//渠道商短信提醒
+	public static final String TEMPLATE_ARRANGE_DEALER = "SMS_110830263";//SMS_110830263
 
 	/**
 	 * 发送短信
@@ -189,6 +192,8 @@ public class SendMessageUtil {
 		return b;
 	}
 	public static void main(String[] args) {
-		sendMessage("15159732758", new String[] {"ordair","ordtr"}, new String[] {"3","5"},SendMessageUtil.TEMPLATE_ARRANGE_ORDER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+		//sendMessage("15159732758", new String[] {"ordair","ordtr"}, new String[] {"3","5"},SendMessageUtil.TEMPLATE_ARRANGE_ORDER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+		SendMessageUtil.sendMessage("15159732758",new String[0],new String[0],
+				SendMessageUtil.TEMPLATE_ARRANGE_DEALER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_ORDER);
 	}
 }
