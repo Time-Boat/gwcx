@@ -528,13 +528,13 @@ public class AppInterfaceController extends AppBaseController {
 				
 				switch (codeType) {
 				case "0":
-					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
+					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
 					break;
 				case "1":
-					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
 					break;
 				case "2":
-					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
+					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
 					break;
 				case "3":
 					//验证手机号是否重复

@@ -28,7 +28,7 @@ import com.yhy.lin.app.entity.AppMessageListEntity;
 public class SendMessageUtil {
 
 	private static final Logger logger = Logger.getLogger(SendMessageUtil.class);
-	// 登录验证码信息模板
+	// 普通用户登录验证码信息模板
 	//public static final String TEMPLATE_SMS_CODE = "SMS_66640251";//个人SMS_63766002
 	public static final String TEMPLATE_SMS_CODE = "SMS_103040027";//个人SMS_103040027
 	// 验证码信息模板对应签名
@@ -56,7 +56,7 @@ public class SendMessageUtil {
 	//public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "变更验证";
 	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "小龙出行";
 	
-	//渠道商短信提醒
+	//申请渠道商审核通过短信提醒
 	public static final String TEMPLATE_ARRANGE_DEALER = "SMS_110830263";//SMS_110830263
 
 	/**
@@ -136,13 +136,8 @@ public class SendMessageUtil {
 
 		boolean b = false;
 		
-		if(AppGlobals.IS_TEST_ENVIRONMENT){
-			return true;
-		}
-		
 		final String product = "Dysmsapi";//短信API产品名称（短信产品名固定，无需修改）
 		final String domain = "dysmsapi.aliyuncs.com";//短信API产品域名（接口地址固定，无需修改）
-
 
 		IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", AppGlobals.APP_KEY,AppGlobals.APP_SECRET);
 		try {
@@ -191,9 +186,10 @@ public class SendMessageUtil {
 
 		return b;
 	}
+	
 	public static void main(String[] args) {
 		//sendMessage("15159732758", new String[] {"ordair","ordtr"}, new String[] {"3","5"},SendMessageUtil.TEMPLATE_ARRANGE_ORDER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-		SendMessageUtil.sendMessage("15159732758",new String[0],new String[0],
-				SendMessageUtil.TEMPLATE_ARRANGE_DEALER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_ORDER);
+		SendMessageUtil.sendMessage("15527916902",new String[]{"code"},new String[]{"1111"},
+				SendMessageUtil.TEMPLATE_SMS_CODE , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_ORDER);
 	}
 }

@@ -11,7 +11,7 @@ public interface AppGlobals {
 	/** 服务器地址 */
 	public static final String SERVER_BASE_URL = "www.youngloong.com";
 	
-	public static final boolean IS_TEST_ENVIRONMENT = true;
+	public static final boolean IS_TEST_ENVIRONMENT = false;
 	
 	/** app 返回状态 */
 	/** 返回成功 */
@@ -65,7 +65,11 @@ public interface AppGlobals {
 //	public static final String IMAGE_BASE_FILE_PATH = "C:/nginx";
 
 	/** linux图片base路径 */
-	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
+	/** 测试服务器图片存储路径*/
+//	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
+	
+	/** 线上服务器图片存储路径*/
+	public static final String IMAGE_BASE_FILE_PATH = "/opt/java";
 
 	/** app客户头像路径 */
 	public static final String APP_USER_FILE_PATH = "/image/user/";

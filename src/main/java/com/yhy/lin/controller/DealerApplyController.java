@@ -14,19 +14,15 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
-import org.jeecgframework.web.system.pojo.base.TSUserOrg;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.DealerApplyEntity;
-import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.impl.DealerApplyServiceI;
 
 import net.sf.json.JSONObject;
