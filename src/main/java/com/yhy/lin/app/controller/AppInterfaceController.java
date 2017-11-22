@@ -224,33 +224,36 @@ public class AppInterfaceController extends AppBaseController {
 							String token = "";
 							Date date = AppUtil.getDate();
 							
-							CarCustomerEntity user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-							//是否是已注册用户
-							if (user == null) {
+							CarCustomerEntity user = null;
+							synchronized (this) {
+								user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
+								//是否是已注册用户
+								if (user == null) {
+									user = new CarCustomerEntity();
+									user.setId(UUIDGenerator.generate());
+									user.setUserType("0");
+									user.setPhone(mobile);
+									user.setCreateTime(date);
+									user.setLoginCount(0);
+									
+									// 生成token
+									token = AppUtil.generateToken(user.getId(), user.getPhone());
+									
+									user.setToken(token);
+									user.setTokenUpdateTime(date);
+									
+									// 新注册用户 标识
+									isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
+									
+								} else {
+									token = user.getToken();
+									user.setTokenUpdateTime(date);
+									//防止异步发生的问题，加了个锁
+									user.setLoginCount(user.getLoginCount() + 1);
+								}
 								
-								user = new CarCustomerEntity();
-								user.setId(UUIDGenerator.generate());
-								user.setUserType("0");
-								user.setPhone(mobile);
-								user.setCreateTime(date);
-								user.setLoginCount(0);
-								
-								// 生成token
-								token = AppUtil.generateToken(user.getId(), user.getPhone());
-								
-								user.setToken(token);
-								user.setTokenUpdateTime(date);
-								
-								// 新注册用户 标识
-								isNew = PasswordUtil.encrypt(mobile, token, PasswordUtil.getStaticSalt());
-								
-							} else {
-								token = user.getToken();
-								user.setTokenUpdateTime(date);
-								user.setLoginCount(user.getLoginCount() + 1);
+								systemService.save(user);
 							}
-							
-							systemService.save(user);
 							
 							// 添加登陆日志
 							String message = "app手机用户: " + user.getPhone() + "登录成功";
@@ -330,31 +333,32 @@ public class AppInterfaceController extends AppBaseController {
 				checkToken(token);//验证token
 				
 				if(StringUtil.isNotEmpty(token)){
-					List<CarCustomerEntity> userList = systemService.findByQueryString("from CarCustomerEntity where token='" + token + "' and userType='" + userType + "'");
-					
-					if(userList.size() > 0){
-						CarCustomerEntity user = userList.get(0);
-						// 添加登陆日志
-						// String message = "app手机用户: " + user.getUserName()
-						// + "[" + user.getPhone() + "]" + "登录成功";
-						String message = "app手机用户: " + user.getPhone() + "登录成功";
-						systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
+					CarCustomerEntity user = null;
+					synchronized (this) {
+						List<CarCustomerEntity> userList = systemService.findByQueryString("from CarCustomerEntity where token='" + token + "' and userType='" + userType + "'");
 						
-						msg = "登录成功!";
-						data.put("token", token);
-						data.put("userId", user.getUserId());
-						// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
-						data.put("userName", AppUtil.Null2Blank(user.getUserName()));
-						data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
-						data.put("phone", user.getPhone());
-						data.put("isNew", isNew);
-						data.put("userType", user.getUserType());
-						statusCode = AppGlobals.APP_SUCCESS;
-						//添加登录次数
-						StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count=" + (user.getLoginCount() + 1) + " where token ='"+token+"'");
-					    
-					    this.systemService.updateBySqlString(updateSql.toString());
+						if(userList.size() > 0){
+							user = userList.get(0);
+							//添加登录次数
+							StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count=" + (user.getLoginCount() + 1) + " where token ='"+token+"'");
+							
+							msg = "登录成功!";
+							data.put("token", token);
+							data.put("userId", user.getUserId());
+							// 如果value为空的话，这个键值对不会再json字符串中显示，所以将null转换成""
+							data.put("userName", AppUtil.Null2Blank(user.getUserName()));
+							data.put("customerImg", AppUtil.Null2Blank(user.getCustomerImg()));
+							data.put("phone", user.getPhone());
+							data.put("isNew", isNew);
+							data.put("userType", user.getUserType());
+							statusCode = AppGlobals.APP_SUCCESS; 
+							
+						    this.systemService.updateBySqlString(updateSql.toString());
+						}
 					}
+					
+					String message = "app手机用户: " + user.getPhone() + "登录成功";
+					systemService.addLog(message, Globals.Log_Type_LOGIN, Globals.Log_Leavel_INFO);
 				}
 				
 			} catch (ParameterException e) {

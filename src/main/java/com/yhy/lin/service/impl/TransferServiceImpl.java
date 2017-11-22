@@ -576,10 +576,23 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 					} catch (ParseException e) {
 						e.printStackTrace();
 					}
-
-					contents.add(new String[] { t.getOrderContactsname(), t.getOrderStartingStationName() + " ",
-							" " + t.getOrderTerminusStationName(), strDate, t.getOrderContactsmobile() });
-
+					DriversInfoEntity driver = this.getEntity(DriversInfoEntity.class, driverId);
+					List<String> lists = new ArrayList<String>();
+					lists.add(t.getOrderContactsname());
+					lists.add(t.getOrderStartingStationName());
+					lists.add(t.getOrderTerminusStationName());
+					lists.add(strDate);
+					
+					if("1".equals(t.getOrderUserType())){
+						lists.add(driver.getName());
+						lists.add(driver.getPhoneNumber());
+					}
+					lists.add(t.getOrderContactsmobile());
+					int size = lists.size();  
+					String[] string = (String[])lists.toArray(new String[size]);
+					contents.add(string);
+					/*contents.add(new String[] { t.getOrderContactsname(), t.getOrderStartingStationName() + " ",
+							" " + t.getOrderTerminusStationName(), strDate, t.getOrderContactsmobile() });*/
 				}
 			}
 			saveAllEntitie(list);
@@ -751,5 +764,6 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		return sql.toString();
 	}
-
+	public static void main(String[] args) {
+}
 }

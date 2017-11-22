@@ -25,11 +25,11 @@ import org.jeecgframework.web.system.pojo.base.TSUser;
 public class DealerApplyServiceImpl extends CommonServiceImpl implements DealerApplyServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, String companyName, String phone, String applyPeople) {
+	public JSONObject getDatagrid(DataGrid dataGrid, String companyName, String phone, String applyPeople,String username) {
 		
 		List<Object> list = new ArrayList<>();
 		
-		StringBuffer sqlWhere = getWhere(companyName, phone, applyPeople, list);
+		StringBuffer sqlWhere = getWhere(companyName, phone, applyPeople,username, list);
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_apply d left join t_s_base_user u on d.responsible_user_id = u.id  "
@@ -57,7 +57,7 @@ public class DealerApplyServiceImpl extends CommonServiceImpl implements DealerA
 		return jObject;
 	}
 
-	private StringBuffer getWhere(String companyName, String phone, String applyPeople, List<Object> list) {
+	private StringBuffer getWhere(String companyName, String phone, String applyPeople,String username, List<Object> list) {
 		
 		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 				
@@ -78,6 +78,10 @@ public class DealerApplyServiceImpl extends CommonServiceImpl implements DealerA
 		if(StringUtil.isNotEmpty(applyPeople)){
 			sqlWhere.append(" and apply_people like ? ");
 			list.add("%" + applyPeople + "%");
+		}
+		if(StringUtil.isNotEmpty(username)){
+			sqlWhere.append(" and u.username like ? ");
+			list.add("%" + username + "%");
 		}
 		return sqlWhere;
 	}

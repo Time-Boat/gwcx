@@ -79,7 +79,7 @@
 			<t:dgFunOpt funname="lookEditRejectReason(id)" title="复审拒绝原因"
 				operationCode="rejectReason" exp="applicationEditStatus#eq#5"></t:dgFunOpt>
 			<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
-			<t:dgToolBar funname="addCarRegion(id)" icon="icon-edit"
+			<t:dgToolBar funname="addCarRegion(id)" operationCode="addCarRegion" icon="icon-edit"
 				title="编辑座位区间价格"></t:dgToolBar>
 			<t:dgToolBar funname="detailCarRegion(id)" icon="icon-search"
 				title="查看座位区间价格"></t:dgToolBar>

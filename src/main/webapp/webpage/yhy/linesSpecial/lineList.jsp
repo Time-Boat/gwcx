@@ -39,9 +39,9 @@
 	<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search" url="lineInfoSpecializedController.do?linedetail" funname="detail"></t:dgToolBar>
 	<t:dgToolBar funname="coerceShelves(id)" title="强制下架" icon="icon-put" url="lineInfoSpecializedController.do?coerceShelves" operationCode="coerceShelves" ></t:dgToolBar>
 	
-	<t:dgFunOpt title="删除" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#0"/>
-	<t:dgFunOpt title="删除" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#5"/>
-	<t:dgFunOpt title="删除" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#6"/>
+	<t:dgFunOpt title="删除" operationCode="delLine" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#0"/>
+	<t:dgFunOpt title="删除" operationCode="delLine" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#5"/>
+	<t:dgFunOpt title="删除" operationCode="delLine" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#6"/>
 	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>

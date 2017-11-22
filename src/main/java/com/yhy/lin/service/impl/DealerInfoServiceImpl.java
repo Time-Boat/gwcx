@@ -183,7 +183,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			dealerInfo.setLastAuditStatus("1");
 			dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
 			
-			//如果这个手机号已经是普通用户了，则将其直接转为渠道商用户，并删除未支付订单
+			//如果这个手机号已经是普通用户了，则将其直接转为渠道·商用户，并删除未支付订单
 			CarCustomerEntity customer = findUniqueByProperty(CarCustomerEntity.class, "phone", dealerInfo.getPhone());
 			
 			//如果是申请启用，则创建渠道商账号
@@ -202,7 +202,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 				customer.setPassword(pwd);
 				customer.setUserType("1");
 				
-				dealerInfo.setStatus("0");
+				 dealerInfo.setStatus("0");
 				
 				String mobiles=customer.getPhone();
 				if (StringUtil.isNotEmpty(mobiles)) {

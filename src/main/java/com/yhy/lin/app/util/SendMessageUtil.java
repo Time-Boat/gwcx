@@ -51,7 +51,9 @@ public class SendMessageUtil {
 
 	// 安排车辆信息模板
 	//public static final String TEMPLATE_ARRANGE_CAR = "SMS_70420532";//SMS_69620002
-	public static final String TEMPLATE_ARRANGE_CAR = "SMS_102500006";//SMS_102500006
+	public static final String TEMPLATE_ARRANGE_CARS = "SMS_113120029";//SMS_102500006
+	
+	public static final String TEMPLATE_ARRANGE_CAR = "SMS_113090140";//SMS_102500006
 	// 安排车辆信息模板对应签名
 	//public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "变更验证";
 	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "小龙出行";

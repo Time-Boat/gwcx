@@ -280,9 +280,9 @@
    
    <t:dgCol title="操作" field="opt" ></t:dgCol>
    
-   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#eq#-1"/>
-   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&auditStatus#eq#2"/>
-   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" exp="status#eq#1&&lastAuditStatus#eq#2"/>
+   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" operationCode="dealerDel" exp="status#eq#1&&auditStatus#eq#-1"/>
+   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" operationCode="dealerDel" exp="status#eq#1&&auditStatus#eq#2"/>
+   <t:dgDelOpt title="删除" url="dealerInfoController.do?del&id={id}" operationCode="dealerDel" exp="status#eq#1&&lastAuditStatus#eq#2"/>
    
    <t:dgToolBar title="录入" icon="icon-add" url="dealerInfoController.do?addorupdate" funname="add" operationCode="dealerAdd" ></t:dgToolBar>
    <t:dgToolBar title="编辑" icon="icon-edit" url="dealerInfoController.do?addorupdate" funname="update" operationCode="dealerUpdate" ></t:dgToolBar>

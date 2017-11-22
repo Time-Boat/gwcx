@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -49,6 +50,12 @@ public class ExportTransferorderEntity implements java.io.Serializable {
 	private java.lang.Integer orderType;
 	/**订单状态 0：订单已完成。1：待派车。2：待出行。3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付。7：已审核。*/
 	private java.lang.Integer orderStatus;
+	/**序号*/
+	@Excel(name="序号")
+	private java.lang.String num;
+	/**申请人*/
+	@Excel(name="申请人")
+	private java.lang.String realName;
 	/**起点站名称*/
 	@Excel(name="起点站名称")
 	private java.lang.String orderStartingStationName;
@@ -79,13 +86,36 @@ public class ExportTransferorderEntity implements java.io.Serializable {
 	/**火车车次*/
 	@Excel(name="火车车次")
 	private java.lang.String orderTrainnumber;
+	/**联系人姓名*/
+	//@Excel(name="联系人姓名")
+	private java.lang.String orderContactsname;
 	/**联系人手机号*/
-	@Excel(name="联系人手机号")
+	//@Excel(name="联系人手机号")
 	private java.lang.String orderContactsmobile;
+	@Excel(name="联系人手机号")
+	private java.lang.String contactsMobileAndName;
 	/**订单备注*/
 	@Excel(name="订单备注")
 	private java.lang.String remark;
 	
+	@Transient
+	public java.lang.String getNum() {
+		return num;
+	}
+
+	public void setNum(java.lang.String num) {
+		this.num = num;
+	}
+
+	@Column(name ="REAL_NAME",nullable=true,length=255)
+	public java.lang.String getRealName() {
+		return realName;
+	}
+
+	public void setRealName(java.lang.String realName) {
+		this.realName = realName;
+	}
+
 	/**
 	 *方法: 取得java.lang.Integer
 	 *@return: java.lang.Integer  站点顺序
@@ -394,6 +424,16 @@ public class ExportTransferorderEntity implements java.io.Serializable {
 	public void setOrderTrainnumber(java.lang.String orderTrainnumber){
 		this.orderTrainnumber = orderTrainnumber;
 	}
+	
+	@Column(name ="ORDER_CONTACTSNAME",nullable=true,length=100)
+	public java.lang.String getOrderContactsname() {
+		return orderContactsname;
+	}
+
+	public void setOrderContactsname(java.lang.String orderContactsname) {
+		this.orderContactsname = orderContactsname;
+	}
+	
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  联系人手机号
@@ -410,6 +450,15 @@ public class ExportTransferorderEntity implements java.io.Serializable {
 	public void setOrderContactsmobile(java.lang.String orderContactsmobile){
 		this.orderContactsmobile = orderContactsmobile;
 	}
+	
+	@Transient
+	public java.lang.String getContactsMobileAndName() {
+		return getOrderContactsname() + "\n" + getOrderContactsmobile();
+	}
+
+	public void setContactsMobileAndName(java.lang.String contactsMobileAndName) {
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  订单备注

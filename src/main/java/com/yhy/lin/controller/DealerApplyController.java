@@ -76,7 +76,8 @@ public class DealerApplyController extends BaseController {
 		String companyName = request.getParameter("companyName");
 		String phone = request.getParameter("phone");
 		String applyPeople = request.getParameter("applyPeople");
-		JSONObject jObject = dealerApplyService.getDatagrid(dataGrid, companyName, phone, applyPeople);
+		String username = request.getParameter("username");
+		JSONObject jObject = dealerApplyService.getDatagrid(dataGrid, companyName, phone, applyPeople,username);
 		
 		responseDatagrid(response, jObject);
 		
