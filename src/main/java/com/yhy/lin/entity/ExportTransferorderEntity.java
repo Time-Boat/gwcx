@@ -54,7 +54,7 @@ public class ExportTransferorderEntity implements java.io.Serializable {
 	@Excel(name="序号")
 	private java.lang.String num;
 	/**申请人*/
-	@Excel(name="申请人")
+	@Excel(name="订单来源")
 	private java.lang.String realName;
 	/**起点站名称*/
 	@Excel(name="起点站名称")

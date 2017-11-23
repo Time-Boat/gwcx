@@ -11,6 +11,9 @@ public interface AppGlobals {
 	/** 服务器地址 */
 	public static final String SERVER_BASE_URL = "www.youngloong.com";
 	
+	/** 测试地址 */
+	//public static final String SERVER_BASE_URL = "car.cywtrip.com";
+	
 	//public static final boolean IS_TEST_ENVIRONMENT = false;
 	
 	/** app 返回状态 */
@@ -141,7 +144,6 @@ public interface AppGlobals {
 	 * 商品名称
 	 */
 	public static final String SP_NAME = "小龙出行";
-	
 	
 	/** 项目管理员名称（开发） */
 	public static final String XM_ADMIN_NAME = "admin1";

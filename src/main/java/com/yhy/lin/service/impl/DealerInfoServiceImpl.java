@@ -202,7 +202,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 				customer.setPassword(pwd);
 				customer.setUserType("1");
 				
-				 dealerInfo.setStatus("0");
+				dealerInfo.setStatus("0");
 				
 				String mobiles=customer.getPhone();
 				if (StringUtil.isNotEmpty(mobiles)) {

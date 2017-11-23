@@ -59,7 +59,7 @@ public class SendMessageUtil {
 	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "小龙出行";
 	
 	//申请渠道商审核通过短信提醒
-	public static final String TEMPLATE_ARRANGE_DEALER = "SMS_110830263";//SMS_110830263
+	public static final String TEMPLATE_ARRANGE_DEALER = "SMS_112470631";//SMS_110830263
 
 	/**
 	 * 发送短信
