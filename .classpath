@@ -37,5 +37,6 @@
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/aliyun-java-sdk-dysmsapi-1.0.0.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/aliyun-sdk-mns-1.1.8.jar"/>
 	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/httpcore-nio-4.4.1.jar"/>
+	<classpathentry kind="lib" path="src/main/webapp/WEB-INF/lib/javax.mail.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
