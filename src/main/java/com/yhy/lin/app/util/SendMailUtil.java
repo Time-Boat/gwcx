@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.Properties;
 
 import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.Message.RecipientType;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -113,7 +111,7 @@ public class SendMailUtil {
 
 		// 设置为debug模式, 可以查看详细的发送 log
 		session.setDebug(true);
- 
+
 		// 3. 创建一封邮件
 		MimeMessage message = createMimeMessage(session, properties.getProperty("from.user"),subject, content, toUsers);
 
