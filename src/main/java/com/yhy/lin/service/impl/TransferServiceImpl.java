@@ -41,7 +41,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	private SystemService systemService;
 	
 	// app客户消息信息
-	private final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
+	private final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，请合理安排行程。";
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation
@@ -551,7 +551,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 					String msgInfo = USER_MESSAGE_INFO.replace("%1", t.getOrderId())
 							.replace("%2", t.getOrderStartingStationName())
 							.replace("%3", t.getOrderTerminusStationName()).replace("%4", t.getOrderStartime())
-							.replace("%5", d.getPhoneNumber()).replace("%6", licencePlateName);
+							.replace("%5", d.getPhoneNumber());
 
 					String type = "0";
 					// 这个订单是否已经被处理过

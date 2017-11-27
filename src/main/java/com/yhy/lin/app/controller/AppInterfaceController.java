@@ -340,7 +340,12 @@ public class AppInterfaceController extends AppBaseController {
 						if(userList.size() > 0){
 							user = userList.get(0);
 							//添加登录次数
-							StringBuffer updateSql = new StringBuffer("UPDATE car_customer set login_count=" + (user.getLoginCount() + 1) + " where token ='"+token+"'");
+							StringBuffer updateSql = new StringBuffer();
+							updateSql.append(" UPDATE car_customer set login_count = ");
+							updateSql.append(user.getLoginCount() + 1);
+							updateSql.append(" where token = '");
+							updateSql.append(token);
+							updateSql.append("'");
 							
 							msg = "登录成功!";
 							data.put("token", token);
@@ -388,103 +393,6 @@ public class AppInterfaceController extends AppBaseController {
 
 		responseOutWrite(response, returnJsonObj);
 	}
-	
-	/*// 短信发送接口
-	@RequestMapping(params = "getSmscode")
-	public void getSmscode(HttpServletRequest request, HttpServletResponse response) {
-		AppUtil.responseUTF8(response);
-		JSONObject returnJsonObj = new JSONObject();
-
-		String msg = "";
-		String statusCode = "";
-		JSONObject data = new JSONObject();
-
-		String mobile = request.getParameter("mobile");
-		
-		//验证码类型       0：登录验证码    1：渠道商用户修改密码验证码     2：渠道商忘记密码验证码    3:申请渠道商验证码接口
-		String codeType = request.getParameter("codeType");
-		
-		// 验证参数
-		try {
-			checkParam(new String[] { "codeType", "mobile" }, codeType, mobile);
-			
-			List<DealerInfoEntity> dealer = systemService.findHql("from DealerInfoEntity where status = 0 and phone = ? ", mobile);
-			
-			logger.info("手机号: " + mobile);
-			if (!mobile.matches(AppGlobals.CHECK_PHONE)) {
-				msg = "手机号格式不正确";
-				statusCode = "002";
-			} else if(("1".equals(codeType) || "2".equals(codeType)) && dealer.size() <= 0){
-				msg = "用户不存在";
-				statusCode = "011";
-			} else if ("0".equals(codeType) && dealer.size() > 0) {
-				msg = "请从渠道商入口登录";
-				statusCode = "010";
-			} else {
-				// 生成4位数的验证码
-				String code = StringUtil.numRandom(4);
-				logger.info("验证码: " + code);
-				
-				String templateCode = "";
-				
-				switch (codeType) {
-				case "0":
-					templateCode = SendMessageUtil.TEMPLATE_MODIFY_PASSWORD_SMS_CODE;
-					break;
-				case "1":
-					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
-					break;
-				case "2":
-					templateCode = SendMessageUtil.TEMPLATE_SMS_CODE;
-					break;
-				default:
-					break;
-				}
-				
-				// 发送端短消息
-				boolean b = SendMessageUtil.sendMessage(mobile, new String[] {"code"}, new String[] {code},
-						templateCode , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
-//				boolean b = true;
-				if (b) {
-					
-					// 判断用户是否在数据库中有记录用接口类方便扩展
-					UserInfo user = systemService.findUniqueByProperty(CarCustomerEntity.class, "phone", mobile);
-					
-					// 当前时间
-					String curTime = AppUtil.getCurTime();
-					String sql = "";
-					// 存储验证码相关信息
-					if (user == null) {
-						sql = "insert into car_customer set id='" + UUIDGenerator.generate()
-								+ "',user_type = '0' ,phone = ? ,create_time = ? " + ",status = '0',login_count = 0,code_update_time = ? ,security_code = ?";
-						systemService.executeSql(sql, mobile, curTime, curTime, code);
-					} else {
-						sql = "update car_customer set status = '0', code_update_time = ? ,security_code = ? where phone = ? ";
-						systemService.executeSql(sql, curTime, code, mobile);
-					}
-	
-					data.put("codemsg", code);
-					msg = "短信发送成功";
-					statusCode = AppGlobals.APP_SUCCESS;
-				} else {
-					//msg = "允许每分钟1条，累计每小时7条。每天10条";
-					msg = "您的操作过于频繁，请稍后再试";
-					statusCode = "003";
-				}
-			}
-		} catch (ParameterException e) {
-			e.printStackTrace();
-			statusCode = e.getCode();
-			msg = e.getErrorMessage();
-			logger.error(e.getErrorMessage());
-		}
-		returnJsonObj.put("msg", msg);
-		returnJsonObj.put("code", statusCode);
-		returnJsonObj.put("data", data.toString());
-
-		responseOutWrite(response, returnJsonObj);
-
-	}*/
 	
 	// 短信发送接口
 	@RequestMapping(params = "getSmscode")

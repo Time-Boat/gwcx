@@ -154,6 +154,9 @@ public interface AppGlobals {
 	/** 项目管理员（开发） */
 	public static final String XM_ADMIN = "xmAdmin";
 	
+	/** 项目开发管理员（开发） */
+	public static final String D_ADMIN = "admin";
+	
 	/** 运营专员 */
 	public static final String OPERATION_SPECIALIST = "operationS";
 
