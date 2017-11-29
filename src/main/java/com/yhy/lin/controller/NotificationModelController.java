@@ -17,6 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
+import org.jeecgframework.core.common.service.CommonService;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.service.SystemService;
@@ -25,6 +26,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.NotificationModelEntity;
 import com.yhy.lin.service.NotificationModelServiceI;
 
@@ -73,7 +75,6 @@ public class NotificationModelController extends BaseController {
 	@RequestMapping(params = "datagrid")
 	public void datagrid(NotificationModelEntity notificationModel,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		JSONObject jObject = notificationModelService.getDatagrid(dataGrid, notificationModel);
-		
 		responseDatagrid(response, jObject);
 	}
 
@@ -136,7 +137,7 @@ public class NotificationModelController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-
+		
 	/**
 	 * 系统消息通知模板列表页面跳转
 	 * 

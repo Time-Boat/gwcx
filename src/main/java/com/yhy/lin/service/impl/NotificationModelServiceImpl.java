@@ -1,11 +1,10 @@
 package com.yhy.lin.service.impl;
 
-import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.NotificationModelEntity;
-import com.yhy.lin.service.DealerInfoServiceI;
 import com.yhy.lin.service.NotificationModelServiceI;
 
 import net.sf.json.JSONObject;
@@ -15,8 +14,6 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.IMyDataExchanger;
 import org.jeecgframework.core.util.StringUtil;
 
 @Service("notificationModelService")
@@ -44,7 +41,6 @@ public class NotificationModelServiceImpl extends CommonServiceImpl implements N
 		/*if(StringUtil.isNotEmpty(dataGrid.getSort()) && StringUtil.isNotEmpty(dataGrid.getOrder()) ){
 			sql += " order by " + dataGrid.getSort() + " " + dataGrid.getOrder();
 		}*/
-		
 		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {

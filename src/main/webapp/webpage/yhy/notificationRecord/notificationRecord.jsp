@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
  <head>
-  <title>发送的系统消息记录</title>
+  <title>系统消息发送记录</title>
   <t:base type="jquery,easyui,tools,DatePicker"></t:base>
  </head>
  <body style="overflow-y: hidden" scroll="no">
@@ -13,12 +13,36 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							真正发送的内容:
+							通知标题:
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="realContent" name="realContent" ignore="ignore"
-							   value="${notificationRecordPage.realContent}">
+						<input class="inputxt" id="title" name="title" ignore="ignore"
+							   value="${notificationRecordPage.title}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							通知内容:
+						</label>
+					</td>
+					<td class="value">
+						<input class="inputxt" id="content" name="content" ignore="ignore"
+							   value="${notificationRecordPage.content}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							通知目标:
+						</label>
+					</td>
+					<td class="value">
+						<input class="inputxt" id="target" name="target" ignore="ignore"
+							   value="${notificationRecordPage.target}">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
@@ -37,12 +61,36 @@
 				<tr>
 					<td align="right">
 						<label class="Validform_label">
-							通知模板id:
+							通知方式   1：邮件   2：短信   3：站内信   4：消息中心:
 						</label>
 					</td>
 					<td class="value">
-						<input class="inputxt" id="modelId" name="modelId" ignore="ignore"
-							   value="${notificationRecordPage.modelId}">
+						<input class="inputxt" id="nType" name="nType" ignore="ignore"
+							   value="${notificationRecordPage.nType}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							用户id:
+						</label>
+					</td>
+					<td class="value">
+						<input class="inputxt" id="createUserId" name="createUserId" ignore="ignore"
+							   value="${notificationRecordPage.createUserId}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							创建时间:
+						</label>
+					</td>
+					<td class="value">
+						<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})"  style="width: 150px" id="createTime" name="createTime" ignore="ignore"
+							     value="<fmt:formatDate value='${notificationRecordPage.createTime}' type="date" pattern="yyyy-MM-dd hh:mm:ss"/>">
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>

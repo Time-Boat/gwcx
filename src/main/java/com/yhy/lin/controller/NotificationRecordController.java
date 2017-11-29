@@ -25,9 +25,9 @@ import com.yhy.lin.service.NotificationRecordServiceI;
 
 /**   
  * @Title: Controller
- * @Description: 发送的系统消息记录
+ * @Description: 系统消息发送记录
  * @author zhangdaihao
- * @date 2017-11-24 11:00:54
+ * @date 2017-11-28 10:39:33
  * @version V1.0   
  *
  */
@@ -44,15 +44,14 @@ public class NotificationRecordController extends BaseController {
 	@Autowired
 	private SystemService systemService;
 	
-
 	/**
-	 * 发送的系统消息记录列表 页面跳转
+	 * 系统消息发送记录列表 页面跳转
 	 * 
 	 * @return
 	 */
 	@RequestMapping(params = "list")
 	public ModelAndView list(HttpServletRequest request) {
-		return new ModelAndView("yhy/notificationRecord/notificationRecordList");
+		return new ModelAndView("com/yhy/lin/yhy/notificationRecordList");
 	}
 
 	/**
@@ -74,7 +73,7 @@ public class NotificationRecordController extends BaseController {
 	}
 
 	/**
-	 * 删除发送的系统消息记录
+	 * 删除系统消息发送记录
 	 * 
 	 * @return
 	 */
@@ -84,7 +83,7 @@ public class NotificationRecordController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		notificationRecord = systemService.getEntity(NotificationRecordEntity.class, notificationRecord.getId());
-		message = "发送的系统消息记录删除成功";
+		message = "系统消息发送记录删除成功";
 		notificationRecordService.delete(notificationRecord);
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
 		
@@ -92,9 +91,12 @@ public class NotificationRecordController extends BaseController {
 		return j;
 	}
 
+	public static void a(){
+		
+	}
 
 	/**
-	 * 添加发送的系统消息记录
+	 * 添加系统消息发送记录
 	 * 
 	 * @param ids
 	 * @return
@@ -105,7 +107,7 @@ public class NotificationRecordController extends BaseController {
 		String message = null;
 		AjaxJson j = new AjaxJson();
 		if (StringUtil.isNotEmpty(notificationRecord.getId())) {
-			message = "发送的系统消息记录更新成功";
+			message = "系统消息发送记录更新成功";
 			NotificationRecordEntity t = notificationRecordService.get(NotificationRecordEntity.class, notificationRecord.getId());
 			try {
 				MyBeanUtils.copyBeanNotNull2Bean(notificationRecord, t);
@@ -113,10 +115,10 @@ public class NotificationRecordController extends BaseController {
 				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 			} catch (Exception e) {
 				e.printStackTrace();
-				message = "发送的系统消息记录更新失败";
+				message = "系统消息发送记录更新失败";
 			}
 		} else {
-			message = "发送的系统消息记录添加成功";
+			message = "系统消息发送记录添加成功";
 			notificationRecordService.save(notificationRecord);
 			systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
 		}
@@ -125,7 +127,7 @@ public class NotificationRecordController extends BaseController {
 	}
 
 	/**
-	 * 发送的系统消息记录列表页面跳转
+	 * 系统消息发送记录列表页面跳转
 	 * 
 	 * @return
 	 */
@@ -135,7 +137,7 @@ public class NotificationRecordController extends BaseController {
 			notificationRecord = notificationRecordService.getEntity(NotificationRecordEntity.class, notificationRecord.getId());
 			req.setAttribute("notificationRecordPage", notificationRecord);
 		}
-		return new ModelAndView("yhy/notificationRecord/notificationRecord");
+		return new ModelAndView("com/yhy/lin/yhy/notificationRecord");
 	}
 	
 }
