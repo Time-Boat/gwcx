@@ -89,34 +89,6 @@
 			}
 			var a4 = '</select></span>';
 			
-			/* var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
-	 		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
-			var aa3 = '<select name="driverId" style="width: 150px">';
-			var cc1 = '<option value="">选择司机</option>';
-			
-			if(json2.indexOf("driverId")>0){
-				var obj2 = eval('(' + json2 + ')');
-				for (var i = 0; i < obj2.data.length; i++) {
-					cc1 += '<option value="'+obj2.data[i].driverId+'">' + obj2.data[i].driverName+ '</option>';
-				}
-			}
-			
-			var aa4 = '</select></span>';
-			
-			var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
-	 		var aaa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车票号">车牌号：</span>';
-			var aaa3 = '<select name="carId" style="width: 150px">';
-			var ccc1 = '<option value="">选择车牌号</option>';
-			
-			if(json1.indexOf("carId")>0){
-				var obj1 = eval('(' + json1 + ')');
-				for (var i = 0; i < obj1.data.length; i++) {
-					ccc1 += '<option value="'+obj1.data[i].carId+'">' + obj1.data[i].licencePlate+ '</option>';
-				}
-			}
-			
-			var aaa4 = '</select></span>'; */
-			
 			var d1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 	 		var d2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
 			var d3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="driverName" class="inuptxt" style="width: 100px"></span>';

@@ -61,6 +61,7 @@ public class NotificationModelController extends BaseController {
 	 */
 	@RequestMapping(params = "list")
 	public ModelAndView list(HttpServletRequest request) {
+		SystemMessage.getInstance().saveMessage(systemService, "测试", "测试邮件内容", new String[]{AppGlobals.XM_ADMIN}, new String[]{"1","3"});
 		return new ModelAndView("yhy/notificationModel/notificationModelList");
 	}
 

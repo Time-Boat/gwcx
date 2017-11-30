@@ -363,12 +363,11 @@ public class LineinfoHistoryController extends BaseController {
 		boolean success = false;
 		String lineId = request.getParameter("id");
 		String isDealerLine = request.getParameter("isDealerLine");
-		//String lineStatus= request.getParameter("applicationEditStatus");
 		try {
 			
 		if(StringUtil.isNotEmpty(lineId)){
 			
-			if("1".equals(isDealerLine)){
+			if(isDealerLine.contains("1")){
 				if(StringUtil.isNotEmpty(lineId)){
 					List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
 					if(carlist.size()>0){

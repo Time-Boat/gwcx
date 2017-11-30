@@ -153,7 +153,8 @@ public class TransferStatisticsController extends BaseController {
 
 		StringBuffer orsql = new StringBuffer();
 		orsql.append(
-				"select SUM(a.order_numbers) as sum_order,SUM(a.order_totalPrice) as sum_price from transferorder a LEFT"
+				"select SUM(a.order_numbers) as sum_order,SUM(a.order_totalPrice) as sum_price,SUM(a.refund_price) as refund_prices,"
+				+ " (select SUM(a.order_numbers) from transferorder a where a.order_paystatus='2') as refund_order_numbers from transferorder a LEFT"
 						+ " JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
 						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
 		if (!transferStatisticsServiceI.getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin, fc_end,departname)
@@ -164,7 +165,9 @@ public class TransferStatisticsController extends BaseController {
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 
 		int sumorder;
+		int refundorder;
 		BigDecimal sumPrice=new BigDecimal("0");
+		BigDecimal sumrefundPrice=new BigDecimal("0");
 		if (mlist.size() > 0) {
 			Object[] ob = (Object[]) mlist.get(0);
 			if (ob[0] != null) {
@@ -177,13 +180,25 @@ public class TransferStatisticsController extends BaseController {
 			if(bsum != null){
 				sumPrice = sumPrice.add(bsum);
 			}
+			BigDecimal bsum1 = (BigDecimal) ob[2];
+			if(bsum1 != null){
+				sumrefundPrice = sumrefundPrice.add(bsum1);
+			}
+			if (ob[3] != null) {
+				String obnum2 = ob[3] + "";
+				refundorder = Integer.parseInt(obnum2.substring(0, obnum2.indexOf(".")));
+			} else {
+				refundorder = 0;
+			}
 			
 		} else {
+			
 			sumorder = 0;
+			refundorder=0;
 		}
 
-		jsonObj.put("sumorder", sumorder);
-		jsonObj.put("sumPrice", sumPrice);
+		jsonObj.put("sumorder", sumorder-refundorder);
+		jsonObj.put("sumPrice", sumPrice.subtract(sumrefundPrice).doubleValue());
 		return jsonObj;
 	}
 
@@ -203,7 +218,7 @@ public class TransferStatisticsController extends BaseController {
 		StringBuffer resql = new StringBuffer();
 		resql.append("select SUM(a.order_numbers),SUM(a.refund_price) from transferorder a LEFT JOIN order_linecardiver b "
 						+ "on a.id=b.id left join car_info c on b.licencePlateId =c.id left join driversinfo d on b.driverId =d.id left "
-						+ "join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
+						+ "join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID where a.order_paystatus='2'");
 		if (!transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName, orderType,departname).isEmpty()) {
 			resql.append(transferStatisticsServiceI.getWhere1(orderId,orderStartingstation, orderTerminusstation, lineName,orderType,departname));
 		}

@@ -13,8 +13,8 @@
 			fitColumns="true" idField="id" fit="true" queryMode="group"
 			checkbox="true">
 			<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-			<t:dgCol title="渠道商" field="isDealerLine" query="true" dictionary="is_dealer"
-				align="center"></t:dgCol>
+			
+			<t:dgCol title="用户类型" field="isDealerLine" query="true" dictionary="userType" align="center"></t:dgCol>
 			<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true"
 				align="center" width="80"></t:dgCol>
 			<t:dgCol title="起点地址" field="startLocation" query="true"
@@ -306,10 +306,19 @@
 			tip('只能编辑一条线路的区间价格');
 			return;
 		}
-		if (rows[0].isDealerLine != '1') {
+		/* if (rows[0].isDealerLine != '1') {
 			tip('该线路没有渠道商，不能编辑区间价格');
 			return;
-		}
+		} */
+		
+		var array = new Array();
+		var isDealerLine = rows[0].isDealerLine;
+			array=isDealerLine;
+		var arr=$.inArray("1", array);
+			if(arr=='-1'){
+				tip('该线路没有渠道商，不能编辑区间价格');
+				return;
+			}
 		
 		if (rows[0].status == '1') {
 			if (rows[0].applicationStatus == '1') {

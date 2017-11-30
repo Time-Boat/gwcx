@@ -162,7 +162,7 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getIsDealerLine())){
-			sqlWhere.append(" and  a.is_dealer_line = '"+lineInfo.getIsDealerLine()+"'");
+			sqlWhere.append(" and  a.is_dealer_line like '%"+lineInfo.getIsDealerLine()+"%'");
 		}
 		if(StringUtil.isNotEmpty(username)){
 			sqlWhere.append(" and u.username like '%"+username+"%'");

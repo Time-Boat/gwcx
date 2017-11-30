@@ -34,27 +34,5 @@
 		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
 
-	//安排车辆司机
-	function editCarAndDriver(title,url,id,width,height){
-		var ids = '';
-		var rows = $("#transferOrderList").datagrid("getSelections");
-		for(var i=0;i<rows.length;i++){
-			ids+=rows[i].id;
-			ids+=',';
-		}
-		ids = ids.substring(0,ids.length-1);
-		if(ids.length==0){
-			tip('请选择项目');
-			return;
-		}
-		url += '&ids='+ids;
-		createwindow(title,url,width,height);
-		/* $("#function-transferOrderAdd").panel(
-			{
-				title :'司机车辆信息',
-				href: url
-			}
-		); */
-	} 
 </script>
  

@@ -479,7 +479,8 @@ public class LineInfoSpecializedController extends BaseController {
 		String lineStatus= request.getParameter("status");
 		String isDealerLine = request.getParameter("isDealerLine");
 		if("1".equals(lineStatus) || "2".equals(lineStatus)){
-			if("1".equals(isDealerLine)){
+			if(isDealerLine.contains("1")){
+			//if("1".equals(isDealerLine)){
 				if(StringUtil.isNotEmpty(id)){
 					List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", id);
 					if(carlist.size()>0){

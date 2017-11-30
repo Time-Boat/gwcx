@@ -17,13 +17,15 @@ import com.yhy.lin.entity.NotificationUserMiddleEntity;
 */
 public class SystemMessage {
 	
-	public static SystemMessage systemMassage = null;
+	private static SystemMessage systemMassage = null;
 	
 	private SystemMessage(){}
 	
 	public static SystemMessage getInstance(){
-		if(systemMassage == null){
-			systemMassage = new SystemMessage();
+		synchronized(APIHttpClient.class){
+			if(systemMassage == null){
+				systemMassage = new SystemMessage();
+			}
 		}
 		return systemMassage;
 	}

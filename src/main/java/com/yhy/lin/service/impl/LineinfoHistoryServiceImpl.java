@@ -101,7 +101,7 @@ public class LineinfoHistoryServiceImpl extends CommonServiceImpl implements Lin
 			sqlWhere.append(" and a.createUserId = '"+lineInfo.getCreateUserId()+"' ");
 		}
 		if(StringUtil.isNotEmpty(lineInfo.getIsDealerLine())){
-			sqlWhere.append(" and  a.is_dealer_line = '"+lineInfo.getIsDealerLine()+"'");
+			sqlWhere.append(" and  a.is_dealer_line like '%"+lineInfo.getIsDealerLine()+"%'");
 		}
 		
 		if(StringUtil.isNotEmpty(cityid)){

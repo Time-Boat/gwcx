@@ -5,6 +5,15 @@
 <head>
 <title>新增线路</title>
 <t:base type="jquery,easyui,tools,DatePicker"></t:base>
+
+<!-- 多选框样式 -->
+  <style type="text/css">
+  	.demo--label{margin:10px 20px 0 10px;display:inline-block;height: 30px}
+	.demo--radio{display:none}
+	.demo--radioInput{background-color:#fff;border:1px solid rgba(0,0,0,0.15);border-radius:100%;display:inline-block;height:16px;margin-right:10px;margin-top:-1px;vertical-align:middle;width:16px;line-height:1}
+	.demo--radio:checked + .demo--radioInput:after{background-color:#57ad68;border-radius:100%;content:"";display:inline-block;height:12px;margin:2px;width:12px}
+	.demo--checkbox.demo--radioInput,.demo--radio:checked + .demo--checkbox.demo--radioInput:after{border-radius:0}
+  </style>
 <script type="text/javascript">
    
     //进入触发 
@@ -17,6 +26,16 @@
     	
   		$('#ends').val($('#endLocation option:selected').text());
   		$('#starts').val($('#startLocation option:selected').text());
+  		
+  		var fruit = "";
+  		$("input:checkbox[name='isDealerLine']:checked").each(function() {
+			fruit += $(this).val();
+		});
+  		
+  		if(fruit.indexOf("0")==-1){
+  			$("#linePrice").hide(); 
+  		}
+  		
     });
     
     //给起点站点赋值
@@ -85,10 +104,40 @@
   		}
     }
   	
+  	//是否选中普通用户
+  	function choose(){
+  		
+  		var a = $("#isDealerLine").prop("checked");
+  		if(a){
+  			$("#linePrice").show(); 
+  		 }else{
+  			$("#linePrice").hide(); 
+  			$("#linePrice").val(""); 
+  		 };
+  	}
+  	
+  	function check(){
+  		var fruit = "";
+  		$("input:checkbox[name='isDealerLine']:checked").each(function() {
+			fruit += $(this).val();
+		});
+  		if(fruit==""){
+  			tip('用户类型不能为空！');
+  			return false;
+  		}
+  		if(fruit.indexOf("0")!=-1){
+  			var price =$("#price").val();
+  			if(price==""){
+  				tip('线路价格不能为空！');
+  				return false;
+  			}
+  		}
+  	}
+  	
 </script>
 </head>
 <body style="overflow-y: hidden" scroll="no">
-<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" action="lineInfoController.do?save">
+<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" beforeSubmit="check()" action="lineInfoController.do?save">
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
 	<input id="ends" name="endLocations" type="hidden" value="${lineInfo.endLocation}">
 	<input id="starts" name="startLocations" type="hidden" value="${lineInfo.startLocation}">
@@ -138,18 +187,6 @@
 		
 		<tr>
 			<td align="right">
-				<label class="Validform_label"> 出车时间段: </label>
-			</td>
-			<td class="value">
-				
-				<t:dictSelect id="dispath" field="dispath" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
-				
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		
-		<tr>
-			<td align="right">
 				<label class="Validform_label"> 起始发车地址: </label>
 			</td>
 			<td class="value">
@@ -183,6 +220,18 @@
 		
 		<tr>
 			<td align="right">
+				<label class="Validform_label"> 出车时间段: </label>
+			</td>
+			<td class="value">
+				
+				<t:dictSelect id="dispath" field="dispath" typeGroupCode="dispathtime" hasLabel="false" defaultVal="${lineInfo.dispath}" datatype="*"></t:dictSelect>	
+				
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		
+		<tr>
+			<td align="right">
 				<label class="Validform_label"> 线路时长: </label>
 			</td>
 			<td class="value">
@@ -191,21 +240,52 @@
 			</td>
 		</tr>
 		
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 线路定价(元/人): </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="price" value="${lineInfo.price}" style="width: 60%" datatype="d"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
+		<%-- <tr>
 			<td align="right">
 				<label class="Validform_label"> 是否有渠道商: </label>
 			</td>
 			<td class="value">
 				<t:dictSelect id="isDealerLine" field="isDealerLine" typeGroupCode="is_dealer" hasLabel="false" defaultVal="${lineInfo.isDealerLine}" datatype="*"></t:dictSelect>
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr> --%>
+		<tr>
+			<td align="right">
+				<label class="Validform_label">用户类型: </label>
+			</td>
+			<td class="value">
+				<label class="demo--label">
+					<c:choose>
+						<c:when test="${fn:contains(lineInfo.isDealerLine,'0')}">
+							<input class="demo--radio" id="isDealerLine" name="isDealerLine" type="checkbox" checked="checked" value="0" onchange="choose()"/>
+						</c:when>
+						<c:otherwise>
+							<input class="demo--radio" id="isDealerLine" name="isDealerLine" type="checkbox" value="0" onchange="choose()"/>
+						</c:otherwise>
+					</c:choose>
+					<span class="demo--checkbox demo--radioInput"></span>普通用户
+				</label>
+				<label class="demo--label">
+					<c:choose>
+						<c:when test="${fn:contains(lineInfo.isDealerLine,'1')}">
+							<input class="demo--radio" name="isDealerLine" type="checkbox" checked="checked" value="1" />
+						</c:when>
+						<c:otherwise>
+							<input class="demo--radio" name="isDealerLine" type="checkbox" value="1" />
+						</c:otherwise>
+					</c:choose>
+					<span class="demo--checkbox demo--radioInput"></span>渠道商用户
+				</label>
+				
+			</td>
+		
+		</tr>
+		<tr id="linePrice">
+			<td align="right">
+				<label class="Validform_label"> 线路定价(元/人): </label>
+			</td>
+			<td class="value">
+				<input class="inputxt" id="price" name="price" value="${lineInfo.price}" style="width: 60%"  > 
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>

@@ -1,5 +1,7 @@
 package com.yhy.lin.app.util;
 
+import org.jeecgframework.core.util.PropertiesUtil;
+
 /**
  * Description : app全局常量 (也包括web端的一些常量)
  * 
@@ -7,6 +9,9 @@ package com.yhy.lin.app.util;
  * @date 2017年5月4日 上午9:34:30
  */
 public interface AppGlobals {
+	
+	PropertiesUtil util = new PropertiesUtil("appGlobals.properties");
+	
 	
 	/** 服务器地址 */
 	public static final String SERVER_BASE_URL = "www.youngloong.com";
@@ -72,73 +77,73 @@ public interface AppGlobals {
 //	public static final String IMAGE_BASE_FILE_PATH = "/usr/local/nginx";
 	
 	/** 线上服务器图片存储路径*/
-	public static final String IMAGE_BASE_FILE_PATH = "/opt/java";
+	public static final String IMAGE_BASE_FILE_PATH = util.readProperty("image_base_file_path");
 
 	/** app客户头像路径 */
-	public static final String APP_USER_FILE_PATH = "/image/user/";
+	public static final String APP_USER_FILE_PATH = util.readProperty("app_user_file_path");
 
 	/** 司机头像路径 */
-	public static final String DRIVER_FILE_PATH = "/image/driver/";
+	public static final String DRIVER_FILE_PATH = util.readProperty("driver_file_path");
 
 	/** 二维码图片路径 */
-	public static final String QR_CODE_FILE_PATH = "/image/QRCode/";
+	public static final String QR_CODE_FILE_PATH = util.readProperty("qr_code_file_path");
 	
 	/** 渠道商图片路径 */
-	public static final String DEALER_FILE_PATH = "/image/dealer/";
+	public static final String DEALER_FILE_PATH = util.readProperty("dealer_file_path");
 
 	/** 阿里大鱼服务器url */
 	//public static final String SERVCR_URL = "https://eco.taobao.com/router/rest";
-	public static final String SERVCR_URL = "dysmsapi.aliyuncs.com";
+	public static final String SERVCR_URL = util.readProperty("servcr_url");
 	
 	/** 阿里大鱼测试url */
-	public static final String TEST_SERVCR_URL = "https://gw.api.tbsandbox.com/router/rest";
+	public static final String TEST_SERVCR_URL = util.readProperty("test_servcr_url");
 
 	/** 阿里大鱼appKey */
 	//public static final String APP_KEY = "23850099"; // 个人23785248
-	public static final String APP_KEY = "LTAIqLN1Q1cC2LWG"; // 个人23785248
+	public static final String APP_KEY = util.readProperty("app_key");
 
 	/** 阿里大鱼appSecret */
 	//public static final String APP_SECRET = "5be5a4659944c0ce41129ad3fc2f3fad";// 个人fb8a26bf549a4d68082338d8a6391007
-	public static final String APP_SECRET = "3nxySsYhljnlhSX68mKzIxK6XOHGdx";
+	public static final String APP_SECRET = util.readProperty("app_secret");
 
 	/** 手机号验证 */
 	public static final String CHECK_PHONE = "^1[34578]\\d{9}$";
 
 	/** 微信第三方支付 */
 	/** 微信服务器验证token */
-	public static final String SERVER_TOKEN = "longyouchuxing2017";
+	public static final String SERVER_TOKEN = util.readProperty("server_token");
 	
 	/** 退款url */
-	public static final String REFUND_URL = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+	public static final String REFUND_URL = util.readProperty("refund_url");
 
 	/** 获取access_token url */
-	public static final String ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token?grant_type=%1&appid=%2&secret=%3";
+	public static final String ACCESS_TOKEN_URL = util.readProperty("access_token_url");
 	
 	/** 微信appId */
 //	public static final String WECHAT_ID = "wx1775577d8050cf73";
-	public static final String WECHAT_ID = "wx8833558481d9167e";
+	public static final String WECHAT_ID = util.readProperty("wechai_id");
 	
 	/** 微信第三方唯一凭证密码 */
 //	public static final String WECHAT_APP_SECRET = "807e12ebcb667f66820d4b4eb9118467";
-	public static final String WECHAT_APP_SECRET = "295837c0efff32c1bd73534458f9b45c";
+	public static final String WECHAT_APP_SECRET = util.readProperty("wechat_app_secret");
 
 	/** 收款商家商户号 */
 //	public static final String MCH_ID = "1481189932";
-	public static final String MCH_ID = "1489142572";
+	public static final String MCH_ID = util.readProperty("mch_id");
 
 	/** 收款商户后台进行配置，登录微信商户平台–账户设置–安全设置–api安全，设置32位key值 */
 //	public static final String WECHAT_KEY = "GZLYXNYYYYXGS20170601jiesongyewu";
-	public static final String WECHAT_KEY = "xiaolongshenzhoukeji2017HONHHUOX";
+	public static final String WECHAT_KEY = util.readProperty("wechat_key");
 	
 	/** 证书路径 */
-	public static final String CERT_PATH_LOCATION = "WEB-INF/cert/apiclient_cert.p12";
+	public static final String CERT_PATH_LOCATION = util.readProperty("cert_path_location");
 
 	/**
 	 * 交易类型
 	 */
-	public static final String TRADE_TYPE = "JSAPI";
+	public static final String TRADE_TYPE = util.readProperty("trade_type");
 
-	public static final String SIGN_TYPE = "MD5";
+	public static final String SIGN_TYPE = util.readProperty("sign_type");
 
 	/**
 	 * 商品名称

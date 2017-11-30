@@ -9,7 +9,7 @@
 <t:datagrid name="lineList2" title="线路管理" autoLoadData="true" actionUrl="lineInfoSpecializedController.do?datagrid&linetype=2"  fitColumns="true"
 	idField="id" fit="true" queryMode="group" checkbox="true">
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
-	<t:dgCol title="渠道商" field="isDealerLine" query="true" dictionary="is_dealer" align="center"></t:dgCol>
+	<t:dgCol title="用户类型" field="isDealerLine" query="true" dictionary="userType" align="center"></t:dgCol>
 	<t:dgCol title="线路名称" field="name" query="true" frozenColumn="true" align="center" width="120"></t:dgCol>
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
@@ -64,7 +64,7 @@
 	<t:dgFunOpt funname="lookRejectReason(id)" title="初审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#6"></t:dgFunOpt> 
 	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
-	<t:dgToolBar funname="addCarRegion(id)" icon="icon-edit" title="编辑座位区间价格" operationCode="editSitPrice" ></t:dgToolBar>
+	<t:dgToolBar funname="addCarRegion()" icon="icon-edit" title="编辑座位区间价格" operationCode="editSitPrice" ></t:dgToolBar>
 	<t:dgToolBar funname="detailCarRegion(id)" icon="icon-search" title="查看座位区间价格" ></t:dgToolBar>
 	
 </t:datagrid> </div>
@@ -417,7 +417,7 @@
 		createdetailwindow(title,url,700,670);
 	}
 	
-	function addCarRegion(id) {
+	function addCarRegion() {
 		var rows = $("#lineList2").datagrid("getSelections");
 		if(rows.length==0){
 			tip('请选择一条要编辑区间价格的线路');
@@ -427,10 +427,15 @@
 			tip('只能编辑一条线路的区间价格');
 			return;
 		}
-		if(rows[0].isDealerLine!='1'){
-			tip('该线路没有渠道商，不能编辑区间价格');
-			return;
-		}
+		var array = new Array();
+		var isDealerLine = rows[0].isDealerLine;
+			array=isDealerLine;
+		var arr=$.inArray("1", array);
+			if(arr=='-1'){
+				tip('该线路没有渠道商，不能编辑区间价格');
+				return;
+			}
+		
 		if(rows[0].status=='0'){
 			tip('该线路已上架，不能编辑区间价格');
 			return;

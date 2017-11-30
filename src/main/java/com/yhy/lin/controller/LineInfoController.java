@@ -298,6 +298,7 @@ public class LineInfoController extends BaseController {
 		lineInfo.setCreateUserId(user.getId());
 		
 		String cityId = request.getParameter("city");
+		
 		if (StringUtil.isNotEmpty(cityId)) {
 			List<CitiesEntity> listCity = systemService.findByProperty(CitiesEntity.class, "cityId", cityId);
 			if (StringUtil.isNotEmpty(listCity)) {
