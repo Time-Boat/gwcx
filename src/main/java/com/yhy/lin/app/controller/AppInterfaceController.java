@@ -38,7 +38,6 @@ import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.MessageCodeEntity;
-import com.yhy.lin.app.entity.UserInfo;
 import com.yhy.lin.app.exception.ParameterException;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppGlobals;

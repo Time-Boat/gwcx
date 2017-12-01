@@ -25,7 +25,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineBusstopHistoryEntity;
@@ -274,6 +276,10 @@ public class LineInfoSpecializedController extends BaseController {
 					history.setCreatePeople(username);
 					this.systemService.saveOrUpdate(history);
 				}
+				
+				SystemMessage.getInstance().saveMessage(
+						systemService, "线路分配通知", "您被分配了新的线路，请及时查看。", 
+						new String[]{AppGlobals.OPERATION_MANAGER, AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
 				
 				try {
 					message = "分配成功！";
@@ -529,16 +535,14 @@ public class LineInfoSpecializedController extends BaseController {
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 			
 			//发送通知
-			if("0".equals(line.getStatus())){
-				line.setApplyContent("1");//申请下架
-			}else{
-				line.setApplyContent("0");//申请上架
-			}
+			SystemMessage.getInstance().saveMessage(
+					systemService, "线路待审核", "您有一条线路待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_MANAGER}, new String[]{"1","2"}
+					, new String[]{});
 		}
 		
 		try {
 			message = "申请成功！";
-			success=true;
+			success = true;
 			this.systemService.saveOrUpdate(line);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -609,7 +613,9 @@ public class LineInfoSpecializedController extends BaseController {
 		LineInfoEntity  line = this.systemService.getEntity(LineInfoEntity.class, id);
 
 		if(StringUtil.isNotEmpty(line)){
+			//待审核
 			if("1".equals(line.getApplicationStatus())){
+				//未上架或已终止
 				if("1".equals(line.getStatus()) || "2".equals(line.getStatus())){
 					j=checkEnabled(line);
 					if(j.isSuccess()==false){
@@ -621,9 +627,20 @@ public class LineInfoSpecializedController extends BaseController {
 					}
 				}
 
-				line.setApplicationStatus("2");//初审
+				line.setApplicationStatus("2");//初审同意
 				line.setFirstApplicationUser(ResourceUtil.getSessionUserName().getId());
 				line.setFirstApplicationTime(AppUtil.getDate());
+				
+				List<String> list = systemService.findListbySql("select tsu.id from t_s_role r left join t_s_role_user ru on r.id = ru.roleid "
+						+ " left join t_s_user tsu on tsu.id = ru.userid where r.rolecode in ('" + AppGlobals.PLATFORM_LINE_AUDIT + "') and tsu.org_company like "
+						+ " CONCAT('%',(select SUBSTRING(t.org_code,1,6) from lineinfo l left join t_s_user_org o on o.user_id = l.createUserId "
+						+ " left join t_s_depart t on o.org_id = t.id where l.id = '" + line.getId() + "'),'%')");
+				
+				//发送通知
+				SystemMessage.getInstance().saveMessage(
+						systemService, "线路待审核", "您有一条线路待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_LINE_AUDIT}, new String[]{"1","2"},
+						new String[]{list.get(0)}); 
+				
 			}else if("2".equals(line.getApplicationStatus())){
 
 				//验证线路是否在申请修改
@@ -632,7 +649,12 @@ public class LineInfoSpecializedController extends BaseController {
 					return j;
 				}
 				
+				String s = "";
+				
 				if("0".equals(line.getStatus())){
+					
+					s = "下";
+					
 					line.setApplicationStatus("4");//复审
 					line.setStatus("2");//已下架
 					if(StringUtil.isNotEmpty(line.getId())){
@@ -657,15 +679,16 @@ public class LineInfoSpecializedController extends BaseController {
 							}
 						}
 						
-
 						editStationStatus(line.getId());//线路下架释放起点和终点关联数据-->线路表数据
-
+						
 						//线路下架修改线路历史记录线路状态
 
 					}
 
 				}else if("1".equals(line.getStatus()) || "2".equals(line.getStatus())){
 
+					s = "上";
+					
 					j=checkEnabled(line);
 					if(j.isSuccess()==false){
 						return j;
@@ -675,11 +698,17 @@ public class LineInfoSpecializedController extends BaseController {
 
 					saveLineHistory(request,line);//保存历史记录和相关车辆类型区间价格
 					enabledStartEndState(line);//启用起点和终点关联表状态
-
+					
 				}
 
 				line.setLastApplicationTime(AppUtil.getDate());
 				line.setLastApplicationUser(ResourceUtil.getSessionUserName().getId());
+				
+				//发送通知
+				SystemMessage.getInstance().saveMessage(
+						systemService, "线路已" + s + "架", line.getName() + "的线路" + s + "架申请已经通过审核，请及时查看。",
+						new String[]{AppGlobals.OPERATION_SPECIALIST, AppGlobals.OPERATION_MANAGER}, new String[]{"1","2"}, 
+						new String[]{line.getCreateUserId(),line.getFirstApplicationUser()});
 			}
 		}
 		try {
@@ -964,7 +993,21 @@ public class LineInfoSpecializedController extends BaseController {
 				line.setLastApplicationUser(ResourceUtil.getSessionUserName().getId());
 				line.setLastApplicationTime(AppUtil.getDate());
 			}
-
+			
+			String s = "";
+			
+			//下架被拒绝
+			if("0".equals(line.getStatus())){
+				s = "下";
+			//上架被拒绝
+			}else{
+				s = "上";
+			}
+			
+			//发送通知
+			SystemMessage.getInstance().saveMessage(
+					systemService, "线路" + s + "架未通过", line.getName() + "的线路" + s + "架申请被拒绝，原因是 " + rejectReason,
+					new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"}, new String[]{line.getCreateUserId()});
 		}
 
 		try {
@@ -1304,6 +1347,10 @@ public class LineInfoSpecializedController extends BaseController {
 				line.setLastApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
 			}
 		}
+		
+		SystemMessage.getInstance().saveMessage(
+				systemService, "线路修改未通过", line.getName() + "的线路修改申请被拒绝，原因是" + rejectReason, 
+				new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"}, new String[]{line.getCreateUserId()});
 
 		try {
 			message = "拒绝成功！";

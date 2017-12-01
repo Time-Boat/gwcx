@@ -18,7 +18,7 @@ import org.jeecgframework.core.common.entity.IdEntity;
 @Table(name="lineinfo")
 public class LineInfoEntity extends IdEntity implements java.io.Serializable{	
 	private static final long serialVersionUID = 1L;
-	/**姓名*/
+	/**线路名称*/
 	private String name;
 	/**起始位置*/
 	private String startLocation;

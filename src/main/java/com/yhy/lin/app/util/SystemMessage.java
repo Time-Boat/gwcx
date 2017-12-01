@@ -52,28 +52,40 @@ public class SystemMessage {
 	 *            发送消息的目标 []
 	 * @param nType
 	 *            发送消息的方式 1：邮件 2：站内信 
+	 * @param users
+	 *            接收消息的用户id
 	 */
-	public synchronized void saveMessage(CommonService commonService, String title, String content, String[] target, String[] nType) {
+	public synchronized void saveMessage(CommonService commonService, String title, String content, String[] target, String[] nType, String[] users) {
 
 		String userId = ResourceUtil.getSessionUserName().getId();
-		String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
 		
 		Date d = AppUtil.getDate();
 
-		StringBuilder t = new StringBuilder();
-		StringBuilder tSql = new StringBuilder();
-		for (String temp : target) {
-			t.append(temp);
-			t.append(",");
+//		StringBuilder t = new StringBuilder();
+//		StringBuilder tSql = new StringBuilder();
+//		for (String temp : target) {
+//			t.append(temp);
+//			t.append(",");
+//
+//			tSql.append("'");
+//			tSql.append(temp);
+//			tSql.append("',");
+//		}
+		
+		StringBuilder u = new StringBuilder();
+		StringBuilder uSql = new StringBuilder();
+		for (String temp1 : users) {
+			u.append(temp1);
+			u.append(",");
 
-			tSql.append("'");
-			tSql.append(temp);
-			tSql.append("',");
+			uSql.append("'");
+			uSql.append(temp1);
+			uSql.append("',");
 		}
 
 		StringBuilder nt = new StringBuilder();
-		for (String temp1 : nType) {
-			nt.append(temp1);
+		for (String temp2 : nType) {
+			nt.append(temp2);
 			nt.append(",");
 		}
 
@@ -83,20 +95,26 @@ public class SystemMessage {
 		n.setCreateUserId(userId);
 		n.setCreateTime(d);
 		n.setSendTime(d);
-		n.setTarget(t.length() > 0 ? t.deleteCharAt(t.length() - 1).toString() : "");
+		//n.setTarget(t.length() > 0 ? t.deleteCharAt(t.length() - 1).toString() : "");
 		n.setNType(nt.length() > 0 ? nt.deleteCharAt(nt.length() - 1).toString() : "");
 
-		String roles = tSql.length() > 0 ? tSql.deleteCharAt(tSql.length() - 1).toString() : "";
+//		String roles = tSql.length() > 0 ? tSql.deleteCharAt(tSql.length() - 1).toString() : "";
+		
+		String us = uSql.length() > 0 ? uSql.deleteCharAt(uSql.length() - 1).toString() : "";
 
 		//保存站内信信息
 		commonService.save(n);
 
 		//只通知本公司的人员
-		List<Object[]> list = commonService.findListbySql(
-				" select u.id,tsu.email from t_s_role r left join t_s_role_user ru on r.id = ru.roleid left join t_s_base_user u on ru.userid = u.id "
-				+ " left join t_s_user tsu on tsu.id = u.id left join t_s_user_org o on o.user_id = u.id left join t_s_depart t on o.org_id = t.id "
-				+ " where r.rolecode in (" + roles + ") and t.org_code like '%" + orgCode + "%' ");
+//		List<Object[]> list = commonService.findListbySql(
+//				" select u.id,tsu.email from t_s_role r left join t_s_role_user ru on r.id = ru.roleid left join t_s_base_user u on ru.userid = u.id "
+//				+ " left join t_s_user tsu on tsu.id = u.id left join t_s_user_org o on o.user_id = u.id left join t_s_depart t on o.org_id = t.id "
+//				+ " where r.rolecode in (" + roles + ") and t.org_code like '%" + orgCode + "%' ");
 
+		//只通知本公司的人员
+		List<Object[]> list = commonService.findListbySql(
+				" select u.id,u.email from t_s_user u where id in (" + us + ") ");
+				
 		List<NotificationUserMiddleEntity> nList = new ArrayList<>();
 
 		String[] emails = new String[list.size()];

@@ -28,7 +28,9 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 
 import com.google.gson.Gson;
+import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.CitiesEntity;
@@ -49,7 +51,7 @@ import javax.validation.Validator;
 
 /**   
  * @Title: Controller
- * @Description: 线路历史记录表
+ * @Description: 线路修改
  * @author zhangdaihao
  * @date 2017-10-30 15:59:01
  * @version V1.0   
@@ -384,7 +386,6 @@ public class LineinfoHistoryController extends BaseController {
 
 			LineinfoHistoryEntity lnfo = this.systemService.getEntity(LineinfoHistoryEntity.class, lineId);
 			
-			
 			List<LineInfoEntity> lineinfolist = this.systemService.findByProperty(LineInfoEntity.class, "lineNumber", lnfo.getLineNumber());
 			if(lineinfolist.size()>0){
 				for (int i = 0; i < lineinfolist.size(); i++) {
@@ -401,7 +402,10 @@ public class LineinfoHistoryController extends BaseController {
 			lnfo.setApplyContent("2");
 			lnfo.setApplicationEditTime(AppUtil.getDate());
 			lnfo.setApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
-			this.systemService.saveOrUpdate(lnfo);
+			systemService.saveOrUpdate(lnfo);
+			
+			SystemMessage.getInstance().saveMessage(
+					systemService, "线路修改待审核", "您有一条修改线路待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_MANAGER}, new String[]{"1","2"});
 		}
 			success=true;
 			message = "申请成功！";
@@ -431,10 +435,14 @@ public class LineinfoHistoryController extends BaseController {
 				if(j.isSuccess()==false){
 					return j;
 				}
-				line.setApplicationEditStatus("2");//初审
+				line.setApplicationEditStatus("2");//初审同意
 				line.setFirstApplicationEditTime(AppUtil.getDate());
 				line.setFirstApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
 				line.setFirstApplicationUser(ResourceUtil.getSessionUserName().getId());
+				
+				SystemMessage.getInstance().saveMessage(
+						systemService, "线路修改待审核", "您有一条修改线路待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_LINE_AUDIT}, new String[]{"1","2"});
+				
 			}else if("2".equals(line.getApplicationEditStatus())){
 				
 				
@@ -465,6 +473,10 @@ public class LineinfoHistoryController extends BaseController {
 				//修改线路赋值
 				saveLineinfo(line);
 				saveLineUserToOrg(line);
+				
+				SystemMessage.getInstance().saveMessage(
+						systemService, "线路已修改", line.getName() + "的线路修改申请已通过审核，请及时查看。", 
+						new String[]{AppGlobals.OPERATION_MANAGER, AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
 			}
 		}
 			message = "申请成功！";

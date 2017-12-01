@@ -193,7 +193,7 @@ public class OrderRefundController extends BaseController {
 				
 				//新增订单消息提醒
 				SystemMessage.getInstance().saveMessage(
-						systemService, "订单待处理", "您收到一条新增订单，请尽快处理。", new String[]{AppGlobals.PLATFORM_REFUND_AUDIT}, new String[]{"1","2"});
+						systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_REFUND_AUDIT}, new String[]{"1","2"});
 				
 			}
 			
