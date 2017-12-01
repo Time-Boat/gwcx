@@ -424,14 +424,14 @@ public class TransferOrderController extends BaseController {
 				if(p.length>5){
 					stringlist.add("driverName");
 					stringlist.add("driverPhone");
-					util=SendMessageUtil.TEMPLATE_ARRANGE_CARS;
+					util = SendMessageUtil.TEMPLATE_ARRANGE_CARS;
 				}else{
-					util=SendMessageUtil.TEMPLATE_ARRANGE_CAR;
+					util = SendMessageUtil.TEMPLATE_ARRANGE_CAR;
 				}
 				int size = stringlist.size();  
 				keys = (String[])stringlist.toArray(new String[size]);
 				
-				SendMessageUtil.sendMessage(p[p.length-1], keys, contents.get(i), util, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
+				SendMessageUtil.sendMessage("15527916902"/*p[p.length-1]*/, keys, contents.get(i), util, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
 			}
 			success = true;
 			message = "订单处理成功";

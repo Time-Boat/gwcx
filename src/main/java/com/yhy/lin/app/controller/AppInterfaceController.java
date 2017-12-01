@@ -46,6 +46,7 @@ import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.Base64ImageUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerApplyEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
@@ -1328,7 +1329,13 @@ public class AppInterfaceController extends AppBaseController {
 				t.setOrderPaystatus("1");
 				
 				t.setRefundTime(AppUtil.getCurTime());
+				
+				
 				systemService.updateEntitie(t);
+				
+				//新增订单消息提醒
+				SystemMessage.getInstance().saveMessage(
+						systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
 
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;

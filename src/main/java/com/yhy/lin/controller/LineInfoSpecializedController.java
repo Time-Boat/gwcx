@@ -476,8 +476,9 @@ public class LineInfoSpecializedController extends BaseController {
 		boolean success = false;
 		AjaxJson j = new AjaxJson();
 		String id = request.getParameter("id");
-		String lineStatus= request.getParameter("status");
+		String lineStatus = request.getParameter("status");
 		String isDealerLine = request.getParameter("isDealerLine");
+		//如果是未上架或者已终止状态
 		if("1".equals(lineStatus) || "2".equals(lineStatus)){
 			if(isDealerLine.contains("1")){
 			//if("1".equals(isDealerLine)){
@@ -497,18 +498,18 @@ public class LineInfoSpecializedController extends BaseController {
 			if(StringUtil.isNotEmpty(id)){
 				LineInfoEntity lineinfo = this.systemService.getEntity(LineInfoEntity.class, id);
 				if(StringUtil.isNotEmpty(lineinfo)){
-					j=checkEnabled(lineinfo);
+					j = checkEnabled(lineinfo);
 					if(j.isSuccess()==false){
 						return j;
 					}
 
 				}
 			}
-
+		//如果是已上架状态
 		}else if("0".equals(lineStatus)){
 			if(StringUtil.isNotEmpty(id)){
 				LineInfoEntity lineinfo = this.systemService.getEntity(LineInfoEntity.class, id);
-				j=checkEdit(lineinfo);
+				j = checkEdit(lineinfo);
 				if(j.isSuccess()==false){
 					return j;
 				}
@@ -519,14 +520,22 @@ public class LineInfoSpecializedController extends BaseController {
 		if(StringUtil.isNotEmpty(line)){
 			line.setApplicationStatus("1");//待审核
 			if("0".equals(line.getStatus())){
-				line.setApplyContent("1");//申请内容
+				line.setApplyContent("1");//申请下架
 			}else{
-				line.setApplyContent("0");//申请内容
+				line.setApplyContent("0");//申请上架
 			}
 
 			line.setApplicationTime(AppUtil.getDate());
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
+			
+			//发送通知
+			if("0".equals(line.getStatus())){
+				line.setApplyContent("1");//申请下架
+			}else{
+				line.setApplyContent("0");//申请上架
+			}
 		}
+		
 		try {
 			message = "申请成功！";
 			success=true;

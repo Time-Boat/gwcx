@@ -34,6 +34,7 @@ import com.yhy.lin.app.service.WeixinPayService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SendMessageUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.CommonUtil;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.app.wechat.Sha1Util;
@@ -323,8 +324,11 @@ public class WeixinPayController extends AppBaseController{
 								systemService.save(app);
 								//新增消息后，要把对应的用户状态改一下
 								systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
-
 								systemService.saveOrUpdate(t);
+								
+								//新增订单消息提醒
+								SystemMessage.getInstance().saveMessage(
+										systemService, "订单待处理", "您收到一条新增订单，请尽快处理。", new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
 								
 								logger.info("消息保存成功 ");
 								

@@ -40,9 +40,12 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	@Autowired
 	private SystemService systemService;
 	
-	// app客户消息信息
-	private final String USER_MESSAGE_INFO = "您的订单编号为 %1 %2-%3 的订单，确定发车时间为%4，司机手机号为%5，请合理安排行程。";
+	// 普通用户消息信息
+	private final String COMMON_USER_MESSAGE_INFO = "您购买的 %1至%2 的订单发车时间为 %3，请合理安排行程。";
 	
+	// 渠道商用户消息信息
+	private final String DEALER_USER_MESSAGE_INFO = "您购买的 %1至%2 的订单发车时间为 %3，司机%4（手机%5）,请合理安排行程。";
+		
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderStartingstation,String orderTerminusstation
 			,String lineId,String driverId,String carId, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
@@ -543,26 +546,9 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				t.setOrderStartime(startTime);
 				tList.add(t);
 				
-				// app端客户消息信息
-				DriversInfoEntity d = get(DriversInfoEntity.class, driverId);
 				// 只有已付款待审核状态的订单才能创建消息
 				if ("0".equals(t.getOrderPaystatus())) {
-					// "您的订单编号为%1%2-%3的订单，确定发车时间为%4，司机手机号为%5，车牌号为%6，请合理安排行程。";
-					String msgInfo = USER_MESSAGE_INFO.replace("%1", t.getOrderId())
-							.replace("%2", t.getOrderStartingStationName())
-							.replace("%3", t.getOrderTerminusStationName()).replace("%4", t.getOrderStartime())
-							.replace("%5", d.getPhoneNumber());
-
-					String type = "0";
-					// 这个订单是否已经被处理过
-					long l = getCountForJdbcParam("select count(1) from order_linecardiver where id=? ",
-							new Object[] { orderIds.get(i) });
-					// 被处理过 就将消息类型改为修改
-					if (l > 0) {
-						type = "1";
-					}
 					
-					mList.add(SendMessageUtil.buildAppMessage(t.getUserId(), msgInfo, "0", type, orderIds.get(i)));
 					
 					userIds.append("'" + t.getUserId() + "',");
 					
@@ -593,6 +579,38 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 					contents.add(string);
 					/*contents.add(new String[] { t.getOrderContactsname(), t.getOrderStartingStationName() + " ",
 							" " + t.getOrderTerminusStationName(), strDate, t.getOrderContactsmobile() });*/
+					
+					// 保存短信消息
+					// 普通用户消息信息
+					//"您购买的 %1至%2 的订单发车时间为 %3，请合理安排行程。";
+					// 渠道商用户消息信息
+					//"您购买的 %1至%2 的订单发车时间为 %3，司机%4（手机%5）,请合理安排行程。";
+					String msgInfo = "";
+					if("0".equals(t.getOrderUserType())){
+						msgInfo = COMMON_USER_MESSAGE_INFO
+								.replace("%1", t.getOrderStartingStationName())
+								.replace("%2", t.getOrderTerminusStationName())
+								.replace("%3", t.getOrderStartime());
+					}else{
+						msgInfo = DEALER_USER_MESSAGE_INFO
+								.replace("%1", t.getOrderStartingStationName())
+								.replace("%2", t.getOrderTerminusStationName())
+								.replace("%3", t.getOrderStartime())
+								.replace("%4", driver.getName())
+								.replace("%5", driver.getPhoneNumber());
+					}
+					
+
+					String type = "0";
+					// 这个订单是否已经被处理过
+					long l = getCountForJdbcParam("select count(1) from order_linecardiver where id=? ",
+							new Object[] { orderIds.get(i) });
+					// 被处理过 就将消息类型改为修改
+					if (l > 0) {
+						type = "1";
+					}
+					
+					mList.add(SendMessageUtil.buildAppMessage(t.getUserId(), msgInfo, "0", type, orderIds.get(i)));
 				}
 			}
 			saveAllEntitie(list);

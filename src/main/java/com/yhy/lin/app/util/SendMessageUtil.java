@@ -54,6 +54,7 @@ public class SendMessageUtil {
 	public static final String TEMPLATE_ARRANGE_CARS = "SMS_113120029";//SMS_102500006
 	
 	public static final String TEMPLATE_ARRANGE_CAR = "SMS_113090140";//SMS_102500006
+	
 	// 安排车辆信息模板对应签名
 	//public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "变更验证";
 	public static final String TEMPLATE_ARRANGE_CAR_SIGN_NAME = "小龙出行";
@@ -70,38 +71,38 @@ public class SendMessageUtil {
 	 * @param signName		模板签名
 	 * @return boolean		用于判断短信是否发送成功
 	 */
-	public static boolean sendMessages(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
-
-		boolean b = false;
-
-		// 生成4位数的验证码
-		//		String code = StringUtil.numRandom(4);
-
-		TaobaoClient client = new DefaultTaobaoClient(AppGlobals.SERVCR_URL, AppGlobals.APP_KEY, AppGlobals.APP_SECRET);
-		AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
-		req.setExtend("123456"); // 短信回传时的可以携带的信息 ？？？
-		req.setSmsType("normal"); // 短信类型
-		req.setSmsFreeSignName(signName); // 模板签名
-		StringBuffer ps = new StringBuffer("{");
-		for (int i = 0; i < paramKey.length; i++) {
-			ps.append("'" + paramKey[i] + "':'" + paramValue[i] + "',");
-		}
-		if (ps.length() > 1) {
-			ps.deleteCharAt(ps.length() - 1);
-		}
-		ps.append("}");
-		req.setSmsParamString(ps.toString());
-		req.setRecNum(mobile);
-		req.setSmsTemplateCode(templateCode);
-		AlibabaAliqinFcSmsNumSendResponse rsp = null;
-		try {
-			rsp = client.execute(req);
-			b = rsp.getResult().getSuccess();
-		} catch (ApiException e) {
-			e.printStackTrace();
-		}
-		return b;
-	}
+//	public static boolean sendMessages(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
+//
+//		boolean b = false;
+//
+//		// 生成4位数的验证码
+//		//		String code = StringUtil.numRandom(4);
+//
+//		TaobaoClient client = new DefaultTaobaoClient(AppGlobals.SERVCR_URL, AppGlobals.APP_KEY, AppGlobals.APP_SECRET);
+//		AlibabaAliqinFcSmsNumSendRequest req = new AlibabaAliqinFcSmsNumSendRequest();
+//		req.setExtend("123456"); // 短信回传时的可以携带的信息 ？？？
+//		req.setSmsType("normal"); // 短信类型
+//		req.setSmsFreeSignName(signName); // 模板签名
+//		StringBuffer ps = new StringBuffer("{");
+//		for (int i = 0; i < paramKey.length; i++) {
+//			ps.append("'" + paramKey[i] + "':'" + paramValue[i] + "',");
+//		}
+//		if (ps.length() > 1) {
+//			ps.deleteCharAt(ps.length() - 1);
+//		}
+//		ps.append("}");
+//		req.setSmsParamString(ps.toString());
+//		req.setRecNum(mobile);
+//		req.setSmsTemplateCode(templateCode);
+//		AlibabaAliqinFcSmsNumSendResponse rsp = null;
+//		try {
+//			rsp = client.execute(req);
+//			b = rsp.getResult().getSuccess();
+//		} catch (ApiException e) {
+//			e.printStackTrace();
+//		}
+//		return b;
+//	}
 
 	/**
 	 * 把消息推送到用户的消息中心
@@ -182,7 +183,6 @@ public class SendMessageUtil {
 				b=true;
 			}
 		} catch (ClientException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

@@ -39,7 +39,7 @@ public class NotificationRecordEntity implements java.io.Serializable {
 	private java.lang.String target;
 	/**发送时间*/
 	private java.util.Date sendTime;
-	/**通知方式   1：邮件   2：短信   3：站内信   4：消息中心*/
+	/**通知方式   1：邮件   2：站内信  */
 	private java.lang.String nType;
 	/**用户id*/
 	private java.lang.String createUserId;

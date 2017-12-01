@@ -11,6 +11,8 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.jeecgframework.core.util.StringUtil;
+
 /**
  * Description :
  * 
@@ -78,10 +80,10 @@ public class SendMailUtil {
 	public static void sendMail(String subject, String content, String[] toUsers) throws Exception {
 
 		// 1. 创建参数配置, 用于连接邮件服务器的参数配置
-		 Properties props = new Properties(); // 参数配置
-		 props.setProperty("mail.transport.protocol", "smtp"); // 使用的协议（JavaMail规范要求）
-		 props.setProperty("mail.smtp.host", "smtp.mxhichina.com"); // 发件人的邮箱的 SMTP 服务器地址
-		 props.setProperty("mail.smtp.auth", "true"); // 需要请求认证
+//		 Properties props = new Properties(); // 参数配置
+//		 props.setProperty("mail.transport.protocol", "smtp"); // 使用的协议（JavaMail规范要求）
+//		 props.setProperty("mail.smtp.host", "smtp.mxhichina.com"); // 发件人的邮箱的 SMTP 服务器地址
+//		 props.setProperty("mail.smtp.auth", "true"); // 需要请求认证
 		 
 		// PS: 某些邮箱服务器要求 SMTP 连接需要使用 SSL 安全认证 (为了提高安全性, 邮箱支持SSL连接, 也可以自己开启),
 		// 如果无法连接邮件服务器, 仔细查看控制台打印的 log, 如果有有类似 “连接失败, 要求 SSL 安全连接” 等错误,
@@ -102,13 +104,13 @@ public class SendMailUtil {
 		
 		// 2. 根据配置创建会话对象, 用于和邮件服务器交互
 		// Session session = Session.getInstance(props);
-		Session session = Session.getDefaultInstance(props, new Authenticator() {// 匿名内部类
+		Session session = Session.getDefaultInstance(properties, new Authenticator() {// 匿名内部类
 			@Override
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(user, password);
 			}
-		}); 
-
+		});
+		
 		// 设置为debug模式, 可以查看详细的发送 log
 		session.setDebug(true);
 
@@ -173,7 +175,9 @@ public class SendMailUtil {
 		if(receiveMails.length > 1){
 			for(int i=1;i<receiveMails.length;i++){
 //				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMails[i], "USER_DD", "UTF-8"));
-				message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMails[i]));
+				if(StringUtil.isNotEmpty(receiveMails[i])){
+					message.addRecipient(MimeMessage.RecipientType.TO, new InternetAddress(receiveMails[i]));
+				}
 			}
 		}
 		
@@ -193,7 +197,7 @@ public class SendMailUtil {
 	}
 
 	public static void main(String[] args) throws Exception {
-		sendMail("司机待审核", "您有一个司机待审核，请尽快处理。", new String[]{"13294239459@qq.com","2806234016@qq.com"});
+		sendMail("司机待审核", "您有一个司机待审核，请尽快处理。", new String[]{"2806234016@qq.com"});
 	}
 	
 }

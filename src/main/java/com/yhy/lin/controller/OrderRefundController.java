@@ -23,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.OrderRefundServiceI;
@@ -156,7 +157,6 @@ public class OrderRefundController extends BaseController {
 		//是不是平台审核员
 		boolean hasPermission = checkRole(AppGlobals.PLATFORM_REFUND_AUDIT);
 		
-		String message = null;
 		Map<String,String> map = null;
 		try {
 			String ids = request.getParameter("ids");
@@ -190,6 +190,11 @@ public class OrderRefundController extends BaseController {
 				map.put("description", "共有" + l + "条数据被处理");
 				map.put("statusCode", AppGlobals.APP_SUCCESS);
 				map.put("success", "true");
+				
+				//新增订单消息提醒
+				SystemMessage.getInstance().saveMessage(
+						systemService, "订单待处理", "您收到一条新增订单，请尽快处理。", new String[]{AppGlobals.PLATFORM_REFUND_AUDIT}, new String[]{"1","2"});
+				
 			}
 			
 //			String[] entitys = ids.split(",");

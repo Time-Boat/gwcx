@@ -23,6 +23,8 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import com.yhy.lin.entity.NotificationRecordEntity;
 import com.yhy.lin.service.NotificationRecordServiceI;
 
+import net.sf.json.JSONObject;
+
 /**   
  * @Title: Controller
  * @Description: 系统消息发送记录
@@ -51,7 +53,7 @@ public class NotificationRecordController extends BaseController {
 	 */
 	@RequestMapping(params = "list")
 	public ModelAndView list(HttpServletRequest request) {
-		return new ModelAndView("com/yhy/lin/yhy/notificationRecordList");
+		return new ModelAndView("yhy/notificationRecord/notificationRecordList");
 	}
 
 	/**
@@ -64,12 +66,9 @@ public class NotificationRecordController extends BaseController {
 	 */
 
 	@RequestMapping(params = "datagrid")
-	public void datagrid(NotificationRecordEntity notificationRecord,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
-		CriteriaQuery cq = new CriteriaQuery(NotificationRecordEntity.class, dataGrid);
-		//查询条件组装器
-		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, notificationRecord, request.getParameterMap());
-		this.notificationRecordService.getDataGridReturn(cq, true);
-		TagUtil.datagrid(response, dataGrid);
+	public void datagrid(NotificationRecordEntity notificationRecord, HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
+		JSONObject jObject = notificationRecordService.getDatagrid(dataGrid, notificationRecord);
+		responseDatagrid(response, jObject);
 	}
 
 	/**
@@ -137,7 +136,7 @@ public class NotificationRecordController extends BaseController {
 			notificationRecord = notificationRecordService.getEntity(NotificationRecordEntity.class, notificationRecord.getId());
 			req.setAttribute("notificationRecordPage", notificationRecord);
 		}
-		return new ModelAndView("com/yhy/lin/yhy/notificationRecord");
+		return new ModelAndView("yhy/notificationRecord/notificationRecord");
 	}
 	
 }
