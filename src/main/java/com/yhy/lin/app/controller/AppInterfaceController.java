@@ -1332,9 +1332,12 @@ public class AppInterfaceController extends AppBaseController {
 				
 				systemService.updateEntitie(t);
 				
+				LineInfoEntity line = systemService.getEntity(LineInfoEntity.class, t.getLineId());
+				
 				//新增订单消息提醒
 				SystemMessage.getInstance().saveMessage(
-						systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
+						systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_SPECIALIST}
+						, new String[]{"1","2"}, new String[]{line.getCreateUserId()});
 
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;

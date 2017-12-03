@@ -279,7 +279,7 @@ public class LineInfoSpecializedController extends BaseController {
 				
 				SystemMessage.getInstance().saveMessage(
 						systemService, "线路分配通知", "您被分配了新的线路，请及时查看。", 
-						new String[]{AppGlobals.OPERATION_MANAGER, AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
+						new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"}, new String[]{id});
 				
 				try {
 					message = "分配成功！";
@@ -534,10 +534,20 @@ public class LineInfoSpecializedController extends BaseController {
 			line.setApplicationTime(AppUtil.getDate());
 			line.setApplicationUserid(ResourceUtil.getSessionUserName().getId());
 			
+			String userId = line.getCreateUserId();
+			
+			//根据创建线路的运营专员向上找一级，找到运营经理的id
+			List<String> userList = this.systemService.findListbySql(
+					" select u.id from t_s_base_user u left join t_s_user_org o on o.user_id = u.id left join t_s_depart t on t.id = o.org_id "
+					+ " where t.org_code = SUBSTRING((select t.org_code from t_s_base_user u left join t_s_user_org o on o.user_id = u.id "
+					+ " left join t_s_depart t on o.org_id = t.id where u.id = '" + userId + "') ,1,9)");
+			
+			String[] users = new String[userList.size()];
+			
 			//发送通知
 			SystemMessage.getInstance().saveMessage(
 					systemService, "线路待审核", "您有一条线路待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_MANAGER}, new String[]{"1","2"}
-					, new String[]{});
+					, users);
 		}
 		
 		try {

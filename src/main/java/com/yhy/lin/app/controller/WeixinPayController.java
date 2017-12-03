@@ -41,6 +41,7 @@ import com.yhy.lin.app.wechat.Sha1Util;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.app.wechat.menu.MenuContext;
 import com.yhy.lin.entity.DealerCustomerEntity;
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -326,9 +327,12 @@ public class WeixinPayController extends AppBaseController{
 								systemService.updateBySqlString("update car_customer set msg_status='0' where id='" + t.getUserId() + "'");
 								systemService.saveOrUpdate(t);
 								
+								LineInfoEntity line = systemService.getEntity(LineInfoEntity.class, t.getLineId());
+								
 								//新增订单消息提醒
 								SystemMessage.getInstance().saveMessage(
-										systemService, "订单待处理", "您收到一条新增订单，请尽快处理。", new String[]{AppGlobals.OPERATION_SPECIALIST}, new String[]{"1","2"});
+										systemService, "订单待处理", "您收到一条新增订单，请尽快处理。", new String[]{AppGlobals.OPERATION_SPECIALIST},
+										new String[]{"1","2"}, new String[]{line.getCreateUserId()});
 								
 								logger.info("消息保存成功 ");
 								

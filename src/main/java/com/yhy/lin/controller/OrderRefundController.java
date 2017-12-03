@@ -159,6 +159,7 @@ public class OrderRefundController extends BaseController {
 		
 		Map<String,String> map = null;
 		try {
+			//订单id
 			String ids = request.getParameter("ids");
 			String fees = request.getParameter("fees");
 			
@@ -191,10 +192,28 @@ public class OrderRefundController extends BaseController {
 				map.put("statusCode", AppGlobals.APP_SUCCESS);
 				map.put("success", "true");
 				
-				//新增订单消息提醒
-				SystemMessage.getInstance().saveMessage(
-						systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_REFUND_AUDIT}, new String[]{"1","2"});
+				//为了找出线路作为条件
+				List<TransferorderEntity> tList = systemService.findByQueryString(" from TransferorderEntity where in(" + ids + ")"); 
+
+				int tLen = tList.size();
+				StringBuffer lineIds = new StringBuffer();
+				for(int i = 0;i < tList.size(); i++){
+					lineIds.append("'" + tList.get(i).getLineId() + "',");
+				}
 				
+				if(tLen > 0){
+					//根据创建线路的运营专员，找到其所属的公司，然后根据所属公司找到管理这家公司的平台审核员
+					List<String> list = systemService.findListbySql("select tsu.id from t_s_role r left join t_s_role_user ru on r.id = ru.roleid "
+							+ " left join t_s_user tsu on tsu.id = ru.userid where r.rolecode in ('" + AppGlobals.PLATFORM_REFUND_AUDIT + "') and tsu.org_company like "
+							+ " CONCAT('%',(select SUBSTRING(t.org_code,1,6) from lineinfo l left join t_s_user_org o on o.user_id = l.createUserId "
+							+ " left join t_s_depart t on o.org_id = t.id where l.id in (" + lineIds.deleteCharAt(lineIds.length()-1).toString() + "),'%')");
+					
+					String[] users = new String[list.size()];
+					
+					SystemMessage.getInstance().saveMessage(
+							systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_REFUND_AUDIT}, 
+							new String[]{"1","2"}, users);
+				}
 			}
 			
 //			String[] entitys = ids.split(",");
