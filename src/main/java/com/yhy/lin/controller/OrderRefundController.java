@@ -192,7 +192,8 @@ public class OrderRefundController extends BaseController {
 				map.put("statusCode", AppGlobals.APP_SUCCESS);
 				map.put("success", "true");
 				
-				//为了找出线路作为条件
+				
+				//为了找出线路id作为条件
 				List<TransferorderEntity> tList = systemService.findByQueryString(" from TransferorderEntity where in(" + ids + ")"); 
 
 				int tLen = tList.size();

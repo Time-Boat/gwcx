@@ -41,6 +41,7 @@ import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.HttpUtils;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
@@ -232,6 +233,10 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setLastRejectReason("");
 			
 			dealerInfoService.saveOrUpdate(dealerInfo);
+			
+			SystemMessage.getInstance().saveMessage(
+					systemService, "渠道商待审核", "您有一个渠道商待审核，请尽快处理。", new String[]{AppGlobals.COMMERCIAL_MANAGER}
+					, new String[]{"1","2"}, getUsers(dealerInfo.getCreateUserId()));
 		} catch (Exception e) {
 			message = "服务器失败";
 			e.printStackTrace();
@@ -271,6 +276,11 @@ public class DealerInfoController extends BaseController {
 			dealerInfo.setLastRejectReason("");
 
 			dealerInfoService.saveOrUpdate(dealerInfo);
+			
+			SystemMessage.getInstance().saveMessage(
+					systemService, "渠道商待审核", "您有一个渠道商待审核，请尽快处理。", new String[]{AppGlobals.COMMERCIAL_MANAGER}
+					, new String[]{"1","2"}, getUsers(dealerInfo.getCreateUserId()));
+			
 		} catch (Exception e) {
 			message = "服务器失败";
 			e.printStackTrace();
@@ -320,6 +330,11 @@ public class DealerInfoController extends BaseController {
 			}
 			
 			dealerInfoService.saveAllEntitie(list);
+			
+			SystemMessage.getInstance().saveMessage(
+					systemService, "渠道商分配通知", "您被分配了新的渠道商，请及时查看。", new String[]{AppGlobals.COMMERCIAL_MANAGER}
+					, new String[]{"1","2"}, new String[]{userId});
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -344,8 +359,13 @@ public class DealerInfoController extends BaseController {
 		String id = req.getParameter("id");
 
 		try {
+			DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
+			String[] users = null;
+			if ("0".equals(dealerInfo.getAuditStatus())) { // 如果初审状态是待审核状态，则进行初审
+				users = getAudits(dealerInfo.getCreateUserId(), AppGlobals.PLATFORM_DEALER_AUDIT);
+			}
 			
-			dealerInfoService.agreeAudit(id);
+			dealerInfoService.agreeAudit(dealerInfo, users);
 			
 		} catch (Exception e) {
 			message = "服务器异常";
@@ -375,21 +395,35 @@ public class DealerInfoController extends BaseController {
 
 			String status = dealerInfo.getAuditStatus();
 			String recheck = dealerInfo.getLastAuditStatus();
-
+			
 			if ("0".equals(status)) { // 如果初审状态是待审核状态，则进行初审
 				dealerInfo.setAuditDate(AppUtil.getDate());
 				dealerInfo.setAuditStatus("2");
 				dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 				dealerInfo.setRejectReason(rejectReason);
 			} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
-				
 				dealerInfo.setLastAuditDate(AppUtil.getDate());
 				dealerInfo.setLastAuditStatus("2");
 				dealerInfo.setLastAuditUser(ResourceUtil.getSessionUserName().getUserName());
 				dealerInfo.setLastRejectReason(rejectReason);
 			}
-
+			
 			dealerInfoService.saveOrUpdate(dealerInfo);
+			
+			String apply = dealerInfo.getApplyType();
+			String s = "";
+			if("0".equals(apply)){
+				s = "启用";
+			}else{
+				s = "停用";
+			}
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					dealerInfoService, "渠道商" + s + "未通过", dealerInfo.getAccount() + s + "申请被拒绝，原因是" + rejectReason, 
+					new String[]{AppGlobals.COMMERCIAL_SPECIALIST}, 
+					new String[]{"1","2"}, new String[]{dealerInfo.getCreateUserId(), dealerInfo.getAuditUser()});
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -686,4 +720,36 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
+	
+	/**
+	 * 验证邮箱是否存在
+	 */
+	@RequestMapping(params = "checkEmail")
+	@ResponseBody
+	public AjaxJson checkEmail(HttpServletRequest request) {
+		String message = "";
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		try {
+			String email = request.getParameter("email");
+			String id = request.getParameter("id");
+			List<DealerInfoEntity> list = this.systemService
+					.findHql("from DealerInfoEntity where email = ? and status !=2 and id != ?", email, id);
+			if (list.size() > 0) {
+				message = "邮箱已经存在";
+				success = false;
+			} else {
+				message = "添加成功！";
+				success = true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
+	
+	
 }

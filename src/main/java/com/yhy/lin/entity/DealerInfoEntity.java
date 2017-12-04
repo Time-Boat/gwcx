@@ -39,6 +39,8 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private java.lang.Integer scanCount;
 	/**联系电话*/
 	private java.lang.String phone;
+	//邮箱
+	private String email;
 	/**负责人*/
 	private java.lang.String manager;
 	/**地址*/
@@ -403,5 +405,13 @@ public class DealerInfoEntity implements java.io.Serializable {
 	public void setCreditCode(String creditCode) {
 		this.creditCode = creditCode;
 	}
-	
+
+	@Column(name ="email",nullable=true,length=50)
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
 }

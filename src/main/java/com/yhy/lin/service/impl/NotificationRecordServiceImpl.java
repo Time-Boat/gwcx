@@ -28,16 +28,16 @@ public class NotificationRecordServiceImpl extends CommonServiceImpl implements 
 		String userId = ResourceUtil.getSessionUserName().getId();
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = " select count(*) from notification_record nr left join notification_user_middle nu on nr.id = nu.record_id ";
-				//+ " where nu.user_id = ? ";
+		String sqlCnt = " select count(*) from notification_record nr left join notification_user_middle nu on nr.id = nu.record_id "
+				+ " where nu.user_id = ? ";
 //		if (!sqlWhere.isEmpty()) {
 //			sqlCnt += sqlWhere;
 //		}
-		Long iCount = getCountForJdbcParam(sqlCnt, new Object[]{}); //userId
+		Long iCount = getCountForJdbcParam(sqlCnt, new Object[]{userId}); //userId
 		// 取出当前页的数据 
 		String sql = " select n.id,n.send_time,n.title,n.content,n.n_type,n.create_time,n.status,n.remark,u.username "   //,n.target
-				+ " from notification_record n left join notification_user_middle nu on n.id = nu.record_id left join t_s_base_user u on n.create_user_id = u.id ";
-				//+ " where nu.user_id = ? ";
+				+ " from notification_record n left join notification_user_middle nu on n.id = nu.record_id left join t_s_base_user u on n.create_user_id = u.id "
+				+ " where nu.user_id = ? ";
 //				if (!sqlWhere.isEmpty()) {
 //					sql += sqlWhere;
 //				}
@@ -46,7 +46,7 @@ public class NotificationRecordServiceImpl extends CommonServiceImpl implements 
 		/*if(StringUtil.isNotEmpty(dataGrid.getSort()) && StringUtil.isNotEmpty(dataGrid.getOrder()) ){
 			sql += " order by " + dataGrid.getSort() + " " + dataGrid.getOrder();
 		}*/
-		List<Map<String, Object>> mapList = findForJdbcParam(sql, dataGrid.getPage(), dataGrid.getRows());//, userId);
+		List<Map<String, Object>> mapList = findForJdbcParam(sql, dataGrid.getPage(), dataGrid.getRows(), userId);
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
 				new Db2Page("id","id")

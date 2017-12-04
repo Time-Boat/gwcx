@@ -175,7 +175,9 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		if(userType.equals("1")){
 			sql.append(" and lf.is_dealer_line=1 ");
 		}
-		
+		if(userType.equals("0")){
+			sql.append(" and lf.is_dealer_line=0 ");
+		}
 		// 根据起点id城市查找线路信息
 		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), stationId, cityId, serveType);
 

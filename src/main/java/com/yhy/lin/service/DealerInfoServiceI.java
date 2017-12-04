@@ -14,5 +14,5 @@ public interface DealerInfoServiceI extends CommonService{
 	String getWhere(DealerInfoEntity dealerInfo,String username, String departname);
 
 	//同意审核之后的操作
-	void agreeAudit(String id);
+	void agreeAudit(DealerInfoEntity dealerInfo, String[] users);
 }

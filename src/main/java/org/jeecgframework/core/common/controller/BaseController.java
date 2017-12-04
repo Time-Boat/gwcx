@@ -172,6 +172,48 @@ public class BaseController {
 		return hasPermission;
   	}
   	
+  	/**
+	 * 根据给定的专员id，查找其上级的经理
+	 * @param userId 
+	 */
+  	public String[] getUsers(String userId){
+  		
+  		//根据创建线路的专员向上找一级，找到经理的id
+  		List<String> userList = systemService.findListbySql(
+  				" select u.id from t_s_base_user u left join t_s_user_org o on o.user_id = u.id left join t_s_depart t on t.id = o.org_id "
+  				+ " where t.org_code = SUBSTRING((select t.org_code from t_s_base_user u left join t_s_user_org o on o.user_id = u.id "
+  				+ " left join t_s_depart t on o.org_id = t.id where u.id = '" + userId + "') ,1,9)");
+  		
+  		String[] users = new String[userList.size()];
+  		
+  		for (int i = 0; i < userList.size(); i++) {
+  			users[i] = userList.get(i);
+		}
+  		
+		return users;
+  	}
+  	
+  	/**
+	 * 根据给定的运营专员id，查找其上级的公司，然后找到管理这家公司的平台审核员
+	 * @param userId 用户id
+	 * @param role   角色编码
+	 */
+  	public String[] getAudits(String userId, String role){
+  		
+  		//根据数据的创建人所在的公司，找到管理其公司的审核员
+  		List<String> list = systemService.findListbySql("select tsu.id from t_s_role r left join t_s_role_user ru on r.id = ru.roleid "
+				+ " left join t_s_user tsu on tsu.id = ru.userid where r.rolecode in ('" + role + "') and tsu.org_company like "
+				+ " CONCAT('%',(select SUBSTRING(t.org_code,1,6) from t_s_user_org o left join t_s_depart t on o.org_id = t.id "
+				+ "  where o.user_Id = '" + userId + "'),'%')");
+  		
+  		String[] users = new String[list.size()];
+  		
+  		for (int i = 0; i < list.size(); i++) {
+  			users[i] = list.get(i);
+		}
+  		
+		return users;
+  	}
   	
  // -----------------------------------------------------------------------------------    以下的方法不应该放在base中
   	/**

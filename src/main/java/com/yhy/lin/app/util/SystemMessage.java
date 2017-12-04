@@ -40,7 +40,7 @@ public class SystemMessage {
 	// 因为这边持有了对对象systemService的引用，会不会导致controller那边的systemService不会被释放掉，而占用内存
 	// 整个过程结束时，工具类对象本身并不会持有传入对象的引用
 	// 就是说不用全局变量去引用这个形参指定的变量应该不会有问题
-	// 为了防止异步操作，用户名被改变，加个锁
+	// 为了防止异步操作，用户名被改变，加个锁    （为啥要加锁。。忘记了。。    局部变量和形参是不会有同步异步问题）
 	/**
 	 * @param commonService
 	 *            用于数据库查询对象
@@ -57,7 +57,7 @@ public class SystemMessage {
 	 */
 	public synchronized void saveMessage(CommonService commonService, String title, String content, String[] target, String[] nType, String[] users) {
 
-		String userId = ResourceUtil.getSessionUserName().getId();
+		//String userId = ResourceUtil.getSessionUserName().getId();
 		
 		Date d = AppUtil.getDate();
 
@@ -92,7 +92,7 @@ public class SystemMessage {
 		NotificationRecordEntity n = new NotificationRecordEntity();
 		n.setTitle(title);
 		n.setContent(content);
-		n.setCreateUserId(userId);
+		//n.setCreateUserId(userId); 
 		n.setCreateTime(d);
 		n.setSendTime(d);
 		//n.setTarget(t.length() > 0 ? t.deleteCharAt(t.length() - 1).toString() : "");
@@ -111,16 +111,30 @@ public class SystemMessage {
 //				+ " left join t_s_user tsu on tsu.id = u.id left join t_s_user_org o on o.user_id = u.id left join t_s_depart t on o.org_id = t.id "
 //				+ " where r.rolecode in (" + roles + ") and t.org_code like '%" + orgCode + "%' ");
 
-		//只通知本公司的人员
-		List<Object[]> list = commonService.findListbySql(
-				" select u.id,u.email from t_s_user u where id in (" + us + ") ");
+		//本想着这条sql的查询结果可以通过在外部直接传进来，因为外部已经查询过一次了，多带点参数就行了
+		//但是有些是从原有的对象中取的，如果通过值传进来，还是要在外部查询一遍，所以这样写还是更方便一些
+//		List<Object[]> list = commonService.findListbySql(
+//				" select u.id,u.email from t_s_user u where id in (" + us + ") ");
 				
+		//测试
+		List<Object[]> list = commonService.findListbySql(
+				" select u.id,u.email,ts.username,ts.realname,ts.userkey from t_s_user u left join t_s_base_user ts on ts.id = u.id where u.id in (" + us + ") ");
+		
+		
+		
 		List<NotificationUserMiddleEntity> nList = new ArrayList<>();
 
 		String[] emails = new String[list.size()];
 		
 		int i = 0;
 		for (Object[] userInfo : list) {
+			
+			//测试
+			StringBuilder s = new StringBuilder(content);
+			s.append("    测试：username=" + userInfo[2] + ",realname=" + userInfo[3] + ",userkey=" + userInfo[4]);
+			content = s.toString();
+			
+			
 			String e = String.valueOf(userInfo[1]);
 			
 			if (StringUtil.isNotEmpty(e)) {
@@ -138,7 +152,7 @@ public class SystemMessage {
 			// 判断发送消息的方式
 			// 1：邮件 2：站内信
 			if (nt.indexOf("1") != -1) {
-				//SendMailUtil.sendMail(title, content, emails);
+				SendMailUtil.sendMail(title, content, emails);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

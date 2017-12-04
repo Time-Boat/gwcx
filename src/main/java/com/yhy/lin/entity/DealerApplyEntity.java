@@ -42,6 +42,8 @@ public class DealerApplyEntity implements java.io.Serializable {
 	/**申请人*/
 	private java.lang.String applyPeople;
 	
+	private String email;
+	
 	/**负责人id*/
 	private java.lang.String responsibleUserId;
 	
@@ -153,4 +155,19 @@ public class DealerApplyEntity implements java.io.Serializable {
 	public void setApplyPeople(java.lang.String applyPeople){
 		this.applyPeople = applyPeople;
 	}
+
+	/**
+	 * 邮箱
+	 * @return
+	 */
+	@Column(name ="email",nullable=true,length=50)
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+	
+	
 }

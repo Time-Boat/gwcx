@@ -35,6 +35,7 @@ import org.jeecgframework.core.util.ResourceUtil;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
@@ -448,7 +449,7 @@ public class DriversInfoController extends BaseController {
 	}
 	
 	/**
-	 * 申请启动
+	 * 申请启用
 	 */
 	@RequestMapping(params = "applyEnable")
 	@ResponseBody
@@ -461,12 +462,14 @@ public class DriversInfoController extends BaseController {
 			DriversInfoEntity  driver = this.systemService.getEntity(DriversInfoEntity.class, id);
 			if(StringUtil.isNotEmpty(driver)){
 			
+				//申请停用
 				if("1".equals(driver.getStatus())){
 					driver.setApplyContent("1");//申请内容
 					j = checkStatus(id);
 					if(j.isSuccess()==false){
 						return j;
 					}
+				//申请启用
 				}else{
 					driver.setApplyContent("0");//申请内容
 				}
@@ -476,7 +479,13 @@ public class DriversInfoController extends BaseController {
 			}
 			try {
 				message = "申请成功！";
-				this.systemService.saveOrUpdate(driver);
+				systemService.saveOrUpdate(driver);
+				
+				//消息通知
+				SystemMessage.getInstance().saveMessage(
+						systemService, "司机待审核", "您有一个司机待审核，请尽快处理。", 
+						new String[]{AppGlobals.TECHNICAL_MANAGER}, new String[]{"1","2"}, getUsers(driver.getCreateUserId()));
+				
 			} catch (Exception e) {
 				message = "服务器异常！";
 			}
@@ -525,9 +534,13 @@ public class DriversInfoController extends BaseController {
 					}else{
 						driver.setStatus("0");;//司机状态
 					}*/
+					
+					String s = "";
 					if("0".equals(driver.getApplyContent())){
+						s = "启用";
 						driver.setStatus("1");
 					}else{
+						s = "停用";
 						j = checkStatus(id);
 						if(j.isSuccess()==false){
 							return j;
@@ -539,6 +552,13 @@ public class DriversInfoController extends BaseController {
 					driver.setAuditTime(AppUtil.getDate());
 					message = "申请成功！";
 					systemService.saveOrUpdate(driver);
+					
+					//消息通知
+					SystemMessage.getInstance().saveMessage(
+							systemService, "司机已" + s, driver.getName() + s + "申请已通过，请及时查看。", 
+							new String[]{AppGlobals.TECHNICAL_SPECIALIST}, new String[]{"1","2"}, 
+							new String[]{driver.getCreateUserId()});
+					
 				} catch (Exception e) {
 					message = "服务器异常！";
 				}
@@ -571,10 +591,24 @@ public class DriversInfoController extends BaseController {
 				driver.setAuditor(ResourceUtil.getSessionUserName().getId());
 				driver.setAuditTime(AppUtil.getDate());
 			}
-
+			
 			try {
 				message = "拒绝成功！";
 				this.systemService.saveOrUpdate(driver);
+				
+				String s = "";
+				if("0".equals(driver.getApplyContent())){
+					s = "启用";
+				}else{
+					s = "停用";
+				}
+				
+				//消息通知
+				SystemMessage.getInstance().saveMessage(
+						systemService, "司机" + s + "未通过", driver.getName() + s + "申请被拒绝，原因是" + rejectReason, 
+						new String[]{AppGlobals.TECHNICAL_SPECIALIST}, new String[]{"1","2"}, 
+						new String[]{driver.getCreateUserId()});
+				
 			} catch (Exception e) {
 				// TODO: handle exception
 				message = "服务器异常！";
@@ -651,6 +685,12 @@ public class DriversInfoController extends BaseController {
 			}
 			
 			systemService.saveAllEntitie(driverList);
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					systemService, "司机分配通知", "您被分配了新的司机和司机关联的车辆，请及时查看。", 
+					new String[]{AppGlobals.TECHNICAL_SPECIALIST}, new String[]{"1","2"}, new String[]{userId});
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();

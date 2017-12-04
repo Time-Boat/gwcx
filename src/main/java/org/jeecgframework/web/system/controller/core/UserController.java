@@ -64,6 +64,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.SystemMessage;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -599,7 +600,6 @@ public class UserController extends BaseController {
 	 * @param req
 	 * @return
 	 */
-
 	@RequestMapping(params = "saveUser")
 	@ResponseBody
 	public AjaxJson saveUser(HttpServletRequest req, TSUser user) {
@@ -678,6 +678,12 @@ public class UserController extends BaseController {
 					}
 				}
 				systemService.addLog(message, Globals.Log_Type_INSERT, Globals.Log_Leavel_INFO);
+				
+				//发送通知
+				SystemMessage.getInstance().saveMessage(
+						systemService, "加入管理用户", "加入管理用户", new String[]{AppGlobals.OPERATION_MANAGER}
+						, new String[]{"2"}, new String[]{user.getId()});
+				
 			}
 
 		}

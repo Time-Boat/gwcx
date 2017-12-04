@@ -10,7 +10,9 @@ import com.yhy.lin.app.entity.CarCustomerEntity;
 import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SendMailUtil;
 import com.yhy.lin.app.util.SendMessageUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
 
@@ -166,9 +168,8 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 	// readOnly=true//, timeout=30 //timeout 允许在执行第一条sql之后保持连接30秒
 	)
 	@Override
-	public void agreeAudit(String id) {
+	public void agreeAudit(DealerInfoEntity dealerInfo, String[] users) {
 		
-		DealerInfoEntity dealerInfo = getEntity(DealerInfoEntity.class, id);
 		String apply = dealerInfo.getApplyType();
 		String status = dealerInfo.getAuditStatus();
 		String recheck = dealerInfo.getLastAuditStatus();
@@ -178,6 +179,11 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			dealerInfo.setAuditStatus("1");
 			dealerInfo.setAuditUser(ResourceUtil.getSessionUserName().getUserName());
 			dealerInfo.setLastAuditStatus("0");
+			
+			SystemMessage.getInstance().saveMessage(
+					this, "渠道商待审核", "您有一个渠道商待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_DEALER_AUDIT}
+					, new String[]{"1","2"}, users);
+			
 		} else if ("0".equals(recheck)) { // 如果复审状态是待审核状态，则进行复审
 			dealerInfo.setLastAuditDate(AppUtil.getDate());
 			dealerInfo.setLastAuditStatus("1");
@@ -186,8 +192,13 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			//如果这个手机号已经是普通用户了，则将其直接转为渠道·商用户，并删除未支付订单
 			CarCustomerEntity customer = findUniqueByProperty(CarCustomerEntity.class, "phone", dealerInfo.getPhone());
 			
+			String s = "";
+			
 			//如果是申请启用，则创建渠道商账号
 			if ("0".equals(apply)) {
+				
+				s = "启用";
+				
 				//生成渠道商的登录密码
 				String pwd = PasswordUtil.encrypt(dealerInfo.getPhone(), "123456", PasswordUtil.getStaticSalt());
 				
@@ -204,13 +215,25 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 				
 				dealerInfo.setStatus("0");
 				
-				String mobiles=customer.getPhone();
+				String mobiles = customer.getPhone();
 				if (StringUtil.isNotEmpty(mobiles)) {
 					SendMessageUtil.sendMessage(mobiles,new String[0],new String[0],
 							SendMessageUtil.TEMPLATE_ARRANGE_DEALER , SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_ORDER);
 				}
 				
+				String email = customer.getEmail();
+				if (StringUtil.isNotEmpty(email)) {
+					//通知该渠道商已经通过审核
+					try {
+						SendMailUtil.sendMail("加入渠道商", "您已经成为小龙出行渠道商用户，您的初始登录密码是123456。为了您的账户安全，您可以在设置-修改密码中修改您的初始密码。", new String[]{email});
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
 			} else {//如果是申请停用，则将渠道商账号转为普通用户
+				
+				s = "停用";
+				
 				if(customer != null){
 					customer.setPassword("");
 					customer.setUserType("0");
@@ -224,6 +247,13 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			save(customer);
 			//删除所有未付款订单
 			executeSql(" delete from transferorder where user_id = ? and order_status = '6' and order_paystatus = '3' ", customer.getId());
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					this, "渠道商已" + s, dealerInfo.getAccount() + s + "用申请已通过，请及时查看。", 
+					new String[]{AppGlobals.COMMERCIAL_MANAGER, AppGlobals.COMMERCIAL_SPECIALIST}, 
+					new String[]{"1","2"}, new String[]{dealerInfo.getCreateUserId(), dealerInfo.getAuditUser()});
+			
 		}
 		
 		saveOrUpdate(dealerInfo);

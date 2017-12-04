@@ -61,6 +61,28 @@
           }
       });
 	}
+	var e = false;
+	//验证邮箱是否存在
+	function checkEmail(email){
+		
+		var id = $('#id').val();
+		
+		$.ajax({
+          type:"get",
+          url:"dealerInfoController.do?checkEmail&email="+email+"&id="+id,
+          dataType:'json',
+          success:function(d){
+	       		var obj = eval('('+d.jsonStr+')');
+	       		e = obj.success;
+	       		if(!e){
+	       			tip(obj.msg);
+	       			$('#checkEmail').text(obj.msg).css({color:"red"});
+	       		}else{
+	       			$('#checkEmail').text('通过信息验证！').css({color:"#71b83d"});
+	       		}
+          }
+      });
+	}
 	
 	//提交前验证公司社会信用代码
   	function cp(){
@@ -68,6 +90,11 @@
 			tip('手机号已经存在，请重新输入');
 			$('#checkPhone').text('');
 			return a;
+		}
+		if(!e){
+			tip('邮箱已经存在，请重新输入');
+			$('#checkEmail').text('');
+			return e;
 		}
 		if(!b){
 			tip('公司社会信用代码已经存在，请重新输入');
@@ -189,6 +216,19 @@
 						<input class="inputxt" id="creditCode" name="creditCode" datatype="*" onchange="checkCreditCode(this.value)" 
 							<c:if test="${dealerInfoPage.status == 0 }">disabled="disabled"</c:if> value="${dealerInfoPage.creditCode}">
 						<span id="checkCreditCode" class="Validform_checktip"></span>  
+					</td>
+				</tr>
+				
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							邮箱:
+						</label>
+					</td>
+					<td class="value">
+						<input class="inputxt" id="email" name="email" datatype="e" 
+							errormsg="邮箱格式非法" onchange="checkEmail(this.value)" value="${dealerInfoPage.email}">
+						<span id="checkEmail" class="Validform_checktip"></span>
 					</td>
 				</tr>
 			</table>

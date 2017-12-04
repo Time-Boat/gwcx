@@ -50,6 +50,7 @@ public class DealerApplyServiceImpl extends CommonServiceImpl implements DealerA
 				,new Db2Page("companyName", "company_name", null)
 				,new Db2Page("address", "address", null)
 				,new Db2Page("phone", "phone", null)
+				,new Db2Page("email", "email", null)
 				,new Db2Page("applyPeople", "apply_people", null)
 				,new Db2Page("username", "username", null)
 		};

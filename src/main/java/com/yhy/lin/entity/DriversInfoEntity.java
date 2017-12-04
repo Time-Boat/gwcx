@@ -64,7 +64,7 @@ public class DriversInfoEntity implements java.io.Serializable {
 	private Date applicationTime;
 	//提交申请人
 	private String applicationUserId;
-	//申请内容
+	//申请类型      0：申请启用     1：申请停用     2：申请修改
 	private String applyContent;
 	//审核人
 	private String auditor;

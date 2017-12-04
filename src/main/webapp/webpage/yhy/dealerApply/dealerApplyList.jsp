@@ -28,6 +28,7 @@
    <t:dgCol title="公司名称" field="companyName" align="center" query="true" width="120"></t:dgCol>
    <t:dgCol title="地址" field="address" align="center" width="120"></t:dgCol>
    <t:dgCol title="手机号" field="phone" align="center" query="true" width="120"></t:dgCol>
+   <t:dgCol title="邮箱" field="email" align="center" width="120"></t:dgCol>
    <t:dgCol title="申请人" field="applyPeople" align="center" query="true" width="120"></t:dgCol>
    <t:dgCol title="负责人" field="username" align="center" query="true" width="120"></t:dgCol>
    <c:if test="${del == 1}">

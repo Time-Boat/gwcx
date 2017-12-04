@@ -29,6 +29,7 @@ import javax.validation.Validator;
 
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
@@ -271,6 +272,12 @@ public class CarInfoController extends BaseController {
 			carInfo.setRejectReason("");
 			
 			systemService.saveOrUpdate(carInfo);
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					systemService, "车辆待审核", "您有一个车辆待审核，请尽快处理", 
+					new String[]{AppGlobals.TECHNICAL_MANAGER}, new String[]{"1","2"}, getUsers(carInfo.getCreateUserId()));
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -306,6 +313,12 @@ public class CarInfoController extends BaseController {
 			carInfo.setRejectReason("");
 
 			systemService.saveOrUpdate(carInfo);
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					systemService, "车辆待审核", "您有一个车辆待审核，请尽快处理", 
+					new String[]{AppGlobals.TECHNICAL_MANAGER}, new String[]{"1","2"}, getUsers(carInfo.getCreateUserId()));
+			
 		} catch (Exception e) {
 			message = "服务器失败";
 			e.printStackTrace();
@@ -381,6 +394,12 @@ public class CarInfoController extends BaseController {
 			
 			systemService.saveAllEntitie(carList);
 			systemService.saveAllEntitie(driverList);
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					systemService, "车辆分配通知", "您被分配了新的车辆和车辆关联的司机，请及时查看。", 
+					new String[]{AppGlobals.TECHNICAL_SPECIALIST}, new String[]{"1","2"}, new String[]{userId});
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();
@@ -421,8 +440,10 @@ public class CarInfoController extends BaseController {
 			
 			if(StringUtil.isNotEmpty(carInfo)){
 				String apply = carInfo.getApplyContent();
-
+				
+				String s = "";
 				if ("0".equals(apply)) {
+					s = "启用";
 					
 					if(StringUtil.isNotEmpty(carInfo.getDriverId())){
 						j = checkStatus(carInfo.getDriverId());
@@ -432,6 +453,8 @@ public class CarInfoController extends BaseController {
 					}
 					carInfo.setCarStatus("0");
 				} else {
+					s = "停用";
+					
 					carInfo.setCarStatus("2");
 				}
 				carInfo.setAuditTime(AppUtil.getDate());
@@ -439,6 +462,11 @@ public class CarInfoController extends BaseController {
 				carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
 
 				systemService.saveOrUpdate(carInfo);
+				
+				//消息通知
+				SystemMessage.getInstance().saveMessage(
+						systemService, "车辆已" + s, carInfo.getLicencePlate() + s + "申请已通过，请及时查看。", 
+						new String[]{AppGlobals.TECHNICAL_SPECIALIST}, new String[]{"1","2"}, new String[]{carInfo.getCreateUserId()});
 			}
 			
 		} catch (Exception e) {
@@ -484,15 +512,28 @@ public class CarInfoController extends BaseController {
 		String id = req.getParameter("id");
 		String rejectReason = req.getParameter("rejectReason");
 
-		CarInfoEntity dealerInfo = systemService.getEntity(CarInfoEntity.class, id);
+		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
 		try {
 
-			dealerInfo.setAuditTime(AppUtil.getDate());
-			dealerInfo.setAuditStatus("2");
-			dealerInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
-			dealerInfo.setRejectReason(rejectReason);
+			carInfo.setAuditTime(AppUtil.getDate());
+			carInfo.setAuditStatus("2");
+			carInfo.setAuditUserId(ResourceUtil.getSessionUserName().getId());
+			carInfo.setRejectReason(rejectReason);
 
-			systemService.saveOrUpdate(dealerInfo);
+			systemService.saveOrUpdate(carInfo);
+			
+			String s = "";
+			if ("0".equals(carInfo.getApplyContent())) {
+				s = "启用";
+			} else {
+				s = "停用";
+			}
+			
+			//消息通知
+			SystemMessage.getInstance().saveMessage(
+					systemService, "车辆" + s + "未通过", carInfo.getLicencePlate() + s + "申请被拒绝，原因是" + rejectReason, 
+					new String[]{AppGlobals.TECHNICAL_SPECIALIST}, new String[]{"1","2"}, new String[]{carInfo.getCreateUserId()});
+			
 		} catch (Exception e) {
 			message = "服务器异常";
 			e.printStackTrace();

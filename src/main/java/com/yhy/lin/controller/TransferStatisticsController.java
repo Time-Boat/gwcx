@@ -156,7 +156,9 @@ public class TransferStatisticsController extends BaseController {
 				"select SUM(a.order_numbers) as sum_order,SUM(a.order_totalPrice) as sum_price,SUM(a.refund_price) as refund_prices,"
 				+ " (select SUM(a.order_numbers) from transferorder a where a.order_paystatus='2') as refund_order_numbers from transferorder a LEFT"
 						+ " JOIN order_linecardiver b on a.id = b.id left join car_info c on b.licencePlateId =c.id left join "
-						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id LEFT JOIN t_s_depart t on l.departId=t.ID");
+						+ "driversinfo d on b.driverId =d.id left join lineinfo l on l.id = a.line_id LEFT JOIN car_customer w on w.id=a.user_id "
+						+ "LEFT JOIN dealer_customer dc on w.open_id = dc.open_id LEFT JOIN dealer_info fi on fi.id=dc.dealer_id LEFT JOIN t_s_depart t "
+						+ "on l.departId=t.ID,t_s_depart p where (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code");
 		if (!transferStatisticsServiceI.getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin, fc_end,departname)
 				.isEmpty()) {
 			orsql.append(transferStatisticsServiceI.getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin,
@@ -196,9 +198,18 @@ public class TransferStatisticsController extends BaseController {
 			sumorder = 0;
 			refundorder=0;
 		}
-
-		jsonObj.put("sumorder", sumorder-refundorder);
-		jsonObj.put("sumPrice", sumPrice.subtract(sumrefundPrice).doubleValue());
+		if(sumorder>0){
+			jsonObj.put("sumorder", sumorder-refundorder);
+		}else{
+			jsonObj.put("sumorder", sumorder);
+		}
+		
+		if(sumPrice.intValue()>0){
+			jsonObj.put("sumPrice", sumPrice.subtract(sumrefundPrice).doubleValue());
+		}else{
+			jsonObj.put("sumPrice", sumPrice);
+		}
+		
 		return jsonObj;
 	}
 

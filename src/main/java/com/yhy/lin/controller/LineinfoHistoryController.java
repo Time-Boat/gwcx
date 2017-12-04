@@ -404,19 +404,12 @@ public class LineinfoHistoryController extends BaseController {
 			info.setApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
 			systemService.saveOrUpdate(info);
 			
-			//根据创建线路的运营专员向上找一级，找到运营经理的id
-			List<String> userList = this.systemService.findListbySql(
-					" select u.id from t_s_base_user u left join t_s_user_org o on o.user_id = u.id left join t_s_depart t on t.id = o.org_id "
-					+ " where t.org_code = SUBSTRING((select t.org_code from t_s_base_user u left join t_s_user_org o on o.user_id = u.id "
-					+ " left join t_s_depart t on o.org_id = t.id where u.id = '" + info.getCreateUserId() + "') ,1,9)");
-			
-			String[] users = new String[userList.size()];
 			
 			SystemMessage.getInstance().saveMessage(
 					systemService, "线路修改待审核", "您有一条修改线路待审核，请尽快处理。", new String[]{AppGlobals.OPERATION_MANAGER}
-					, new String[]{"1","2"}, users);
+					, new String[]{"1","2"}, getUsers(info.getCreateUserId()));
 		}
-			success=true;
+			success = true;
 			message = "申请成功！";
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -450,20 +443,11 @@ public class LineinfoHistoryController extends BaseController {
 				line.setFirstApplicationEditUserId(ResourceUtil.getSessionUserName().getId());
 				line.setFirstApplicationUser(ResourceUtil.getSessionUserName().getId());
 
-				//根据创建线路的运营专员，找到其所属的公司，然后根据所属公司找到管理这家公司的平台审核员
-				List<String> list = systemService.findListbySql("select tsu.id from t_s_role r left join t_s_role_user ru on r.id = ru.roleid "
-						+ " left join t_s_user tsu on tsu.id = ru.userid where r.rolecode in ('" + AppGlobals.PLATFORM_LINE_AUDIT + "') and tsu.org_company like "
-						+ " CONCAT('%',(select SUBSTRING(t.org_code,1,6) from lineinfo l left join t_s_user_org o on o.user_id = l.createUserId "
-						+ " left join t_s_depart t on o.org_id = t.id where l.id = '" + line.getId() + "'),'%')");
-				
-				String[] users = new String[list.size()];
-				
 				SystemMessage.getInstance().saveMessage(
 						systemService, "线路修改待审核", "您有一条修改线路待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_LINE_AUDIT}
-						, new String[]{"1","2"}, users);
+						, new String[]{"1","2"}, getAudits(line.getCreateUserId(), AppGlobals.PLATFORM_LINE_AUDIT));
 			//复审
 			}else if("2".equals(line.getApplicationEditStatus())){
-				
 				
 				j=checkEnabled(line);
 				if(j.isSuccess()==false){
