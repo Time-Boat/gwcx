@@ -431,7 +431,7 @@ public class TransferOrderController extends BaseController {
 				int size = stringlist.size();  
 				keys = (String[])stringlist.toArray(new String[size]);
 				
-				SendMessageUtil.sendMessage("15527916902"/*p[p.length-1]*/, keys, contents.get(i), util, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
+				SendMessageUtil.sendMessage(p[p.length-1], keys, contents.get(i), util, SendMessageUtil.TEMPLATE_ARRANGE_CAR_SIGN_NAME);
 			}
 			success = true;
 			message = "订单处理成功";

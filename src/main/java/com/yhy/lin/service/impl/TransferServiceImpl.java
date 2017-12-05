@@ -599,18 +599,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 								.replace("%4", driver.getName())
 								.replace("%5", driver.getPhoneNumber());
 					}
-					
 
-					String type = "0";
-					// 这个订单是否已经被处理过
-					long l = getCountForJdbcParam("select count(1) from order_linecardiver where id=? ",
-							new Object[] { orderIds.get(i) });
-					// 被处理过 就将消息类型改为修改
-					if (l > 0) {
-						type = "1";
-					}
-					
-					mList.add(SendMessageUtil.buildAppMessage(t.getUserId(), msgInfo, "0", type, orderIds.get(i)));
+					mList.add(SendMessageUtil.buildAppMessage(t.getUserId(), msgInfo, "0", "0", orderIds.get(i)));
 				}
 			}
 			saveAllEntitie(list);

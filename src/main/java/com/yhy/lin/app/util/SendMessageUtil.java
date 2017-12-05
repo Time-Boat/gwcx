@@ -62,6 +62,9 @@ public class SendMessageUtil {
 	//申请渠道商审核通过短信提醒
 	public static final String TEMPLATE_ARRANGE_DEALER = "SMS_112470631";//SMS_110830263
 
+	//订单退款通知
+	public static final String TEMPLATE_ORDER_REFUND = "SMS_115675032";//SMS_110830263
+	
 	/**
 	 * 发送短信
 	 * @param mobile 		用户手机号
@@ -141,6 +144,7 @@ public class SendMessageUtil {
 		
 		if(1 == 1){
 			b = true;
+			return b;
 		}
 		
 		final String product = "Dysmsapi";//短信API产品名称（短信产品名固定，无需修改）

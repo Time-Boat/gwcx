@@ -361,7 +361,7 @@ public class DealerInfoController extends BaseController {
 		try {
 			DealerInfoEntity dealerInfo = dealerInfoService.getEntity(DealerInfoEntity.class, id);
 			String[] users = null;
-			if ("0".equals(dealerInfo.getAuditStatus())) { // 如果初审状态是待审核状态，则进行初审
+			if ("0".equals(dealerInfo.getAuditStatus())) { // 如果初审状态是待审核状态，则通知平台审核员
 				users = getAudits(dealerInfo.getCreateUserId(), AppGlobals.PLATFORM_DEALER_AUDIT);
 			}
 			

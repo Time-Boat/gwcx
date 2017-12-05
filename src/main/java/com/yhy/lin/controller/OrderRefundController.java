@@ -46,9 +46,6 @@ public class OrderRefundController extends BaseController {
 	@Autowired
 	private OrderRefundServiceI orderRefundService;
 	
-	@Autowired
-	private UserService userService;
-	
 	//退款管理
 	@RequestMapping(params = "orderRefundList")
 	public ModelAndView orderRefundOrderList(HttpServletRequest request, HttpServletResponse response) {
@@ -77,27 +74,27 @@ public class OrderRefundController extends BaseController {
 		responseDatagrid(response, jObject);
 	}
 
-	// 同意退款
-	@RequestMapping(params = "agreeRefund")
-	@ResponseBody
-	public AjaxJson agreeRefund(HttpServletRequest request, HttpServletResponse response) {
-
-		String message = null;
-		AjaxJson j = new AjaxJson();
-		String id = request.getParameter("id");// id
-
-		boolean b = orderRefundService.agreeRefund(id);
-
-		if (b) {
-			message = "订单处理成功";
-		} else {
-			message = "服务器异常";
-		}
-
-		j.setSuccess(true);
-		j.setMsg(message);
-		return j;
-	}
+//	// 同意退款
+//	@RequestMapping(params = "agreeRefund")
+//	@ResponseBody
+//	public AjaxJson agreeRefund(HttpServletRequest request, HttpServletResponse response) {
+//
+//		String message = null;
+//		AjaxJson j = new AjaxJson();
+//		String id = request.getParameter("id");// id
+//
+//		boolean b = orderRefundService.agreeRefund(id);
+//
+//		if (b) {
+//			message = "订单处理成功";
+//		} else {
+//			message = "服务器异常";
+//		}
+//
+//		j.setSuccess(true);
+//		j.setMsg(message);
+//		return j;
+//	}
 
 	// 拒绝退款
 	@RequestMapping(params = "rejectRefund")

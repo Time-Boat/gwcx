@@ -81,7 +81,7 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	/** 渠道商密码，只有渠道商用户才有此字段 */
 	private java.lang.String email;
 	
-	@Column(name = "PSD_MODIFY_TIME", nullable = true, length = 50)
+	@Column(name = "EMAIL", nullable = true, length = 50)
 	public java.lang.String getEmail() {
 		return email;
 	}

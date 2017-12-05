@@ -36,7 +36,7 @@ public class AppMessageListEntity implements java.io.Serializable {
 	private java.lang.String status;
 	/** 订单id */
 	private java.lang.String orderId;
-	/** 消息类型  0:新增  1:修改   */
+	/** 消息类型   0：订单通知    1：普通消息通知   */
 	private java.lang.String msgType;
 	
 	@Column(name ="ORDER_ID",nullable=true,length=32)

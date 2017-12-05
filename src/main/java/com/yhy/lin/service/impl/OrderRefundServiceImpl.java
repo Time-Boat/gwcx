@@ -1,6 +1,7 @@
 package com.yhy.lin.service.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +25,13 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yhy.lin.app.controller.AppInterfaceController;
+import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.RefundReqData;
 import com.yhy.lin.app.quartz.BussAnnotation;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SendMailUtil;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.wechat.MobiMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -241,7 +245,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	}
 
 	//@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
-	//不要加事物，批量退款的时候，如果前两个人的款项已经退还，数据库就要做相应的修改
+	//不要加事物，批量退款的时候，如果前两个人的款项已经退还，数据库就要做相应的修改       这名字取的像*一样....
 	@Override
 	public Map<String,String> firstAgreeAllRefund(String[] arrId, String fees, RequestHandler refundRequest, String path) {
 		
@@ -254,6 +258,8 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		
 		int sCount = 0;   //退款成功订单数
 		int fCount = 0;   //退款失败订单数
+		
+		List<AppMessageListEntity> mList = new ArrayList<AppMessageListEntity>();
 		
 		RefundReqData refundReqData = new RefundReqData();
 		String[] arrFee = fees.split(",");
@@ -327,6 +333,13 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 					trans.setRefundPrice(fee + "");
 					saveOrUpdate(trans);
 					
+					//发送消息和短信
+					SendMessageUtil.sendMessage(trans.getOrderContactsmobile(), new String[]{}, new String[]{}, 
+							SendMessageUtil.TEMPLATE_ORDER_REFUND, SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
+					
+					mList.add(SendMessageUtil.buildAppMessage(
+							t.getUserId(), "您的申请的退款已审核通过，退款金额最迟3-5日内会返回到原支付账户。", "0", "0", trans.getId()));
+					
 				} else {
 					// 返回错误描述
 					// return JSONObject.fromObject(getMap.get("err_code_des"));
@@ -340,11 +353,16 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				}
 				logger.info("订单id：" + arrId[i] + "   订单信息：" + msg);
 			}
+			
+			saveAllEntitie(mList);
+			
 		} catch (Exception e) {
 			statusCode = AppGlobals.SYSTEM_ERROR;
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
+		
+		
 		
 		map.put("msg", msg);
 		if(success){

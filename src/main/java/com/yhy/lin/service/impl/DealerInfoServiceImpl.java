@@ -208,6 +208,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 					customer.setCreateTime(AppUtil.getDate());
 					customer.setLoginCount(0);
 					customer.setRealName(dealerInfo.getAccount());
+					customer.setEmail(dealerInfo.getEmail());
 				}
 				
 				customer.setPassword(pwd);

@@ -28,8 +28,10 @@ import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 
 import com.google.gson.Gson;
+import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
+import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
@@ -466,7 +468,7 @@ public class LineinfoHistoryController extends BaseController {
 					ca = calist.get(0);
 				}
 				if(!StringUtil.isNotEmpty(ca)){
-					ca="0";
+					ca = "0";
 				}
 				history.setVersion(Integer.parseInt(ca.toString())+1+"");
 				this.systemService.save(history);
@@ -481,6 +483,33 @@ public class LineinfoHistoryController extends BaseController {
 						systemService, "线路已修改", line.getName() + "的线路修改申请已通过审核，请及时查看。", 
 						new String[]{AppGlobals.OPERATION_MANAGER, AppGlobals.OPERATION_SPECIALIST}, 
 						new String[]{"1","2"}, new String[]{line.getCreateUserId(),line.getFirstApplicationUser()});
+				
+				List<AppMessageListEntity> mList = new ArrayList<AppMessageListEntity>();
+				
+				List<String> uList = null;
+				//通知前端用户
+				String d = line.getIsDealerLine();
+				
+				if(d.equals("0,1")){
+					uList = systemService.findListbySql("select id from car_customer");
+				}else{
+					if(d.contains("0")){
+						uList = systemService.findListbySql("select id from car_customer where user_type='0'");
+					}
+					if(d.contains("1")){
+						uList = systemService.findListbySql("select id from car_customer where user_type='1'");
+					}
+				}
+				
+				String sName = systemService.get(BusStopInfoEntity.class, line.getStartLocation()).getName();
+				String eName = systemService.get(BusStopInfoEntity.class, line.getEndLocation()).getName();
+				
+				
+				for(String userId : uList){
+					mList.add(SendMessageUtil.buildAppMessage(
+							userId, sName + "至" + eName + "的线路业务已变更，变更内容，特此告知。", "0", "0", null));
+				}
+				systemService.saveAllEntitie(mList);
 			}
 		}
 			message = "申请成功！";
@@ -498,58 +527,58 @@ public class LineinfoHistoryController extends BaseController {
 	
 	
 	//验证是否存在站点已挂接
-		public AjaxJson checkEnabled(LineinfoHistoryEntity  line){
-			boolean success=false;
-			String message = null;
-			AjaxJson j = new AjaxJson();
-			//判断站点是否被启用
-			if(StringUtil.isNotEmpty(line.getId())){
-				List<StartOrEndEntity> startlist = this.systemService.findByProperty(StartOrEndEntity.class, "lineId", line.getId());
-				List<LineInfoEntity> infolist = this.systemService.findByProperty(LineInfoEntity.class, "lineNumber", line.getLineNumber());
-				if(infolist.size()>0){
-					LineInfoEntity lineinfo = infolist.get(0);
-					if(startlist.size()>0){
-						for (int i = 0; i < startlist.size(); i++) {
-							StartOrEndEntity see = startlist.get(i);
-							if(StringUtil.isNotEmpty(see)){
-								List<StartOrEndEntity> list = this.systemService.findHql("from StartOrEndEntity where startid=? and endid=? and stationStatus=? and linetype=?", see.getStartid(),see.getEndid(),"1",line.getType());
-								if(list.size()>0){
-									for (int k = 0; k < list.size(); k++) {
-										StartOrEndEntity sre = list.get(k);
-										if(!line.getId().equals(sre.getLineId()) && !lineinfo.getId().equals(sre.getLineId())){
-											if("1".equals(sre.getStationStatus())){
-												BusStopInfoEntity bus = new BusStopInfoEntity();
-												if ("2".equals(line.getType()) || "4".equals(line.getType())) {
-													if(StringUtil.isNotEmpty(sre.getEndid()) ){
-														 bus = this.systemService.getEntity(BusStopInfoEntity.class, sre.getEndid());
-													}
-												}else if("3".equals(line.getType()) || "5".equals(line.getType())){
-													if(StringUtil.isNotEmpty(sre.getStartid())){
-														 bus = this.systemService.getEntity(BusStopInfoEntity.class, sre.getStartid());
-													}
+	public AjaxJson checkEnabled(LineinfoHistoryEntity  line){
+		boolean success=false;
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		//判断站点是否被启用
+		if(StringUtil.isNotEmpty(line.getId())){
+			List<StartOrEndEntity> startlist = this.systemService.findByProperty(StartOrEndEntity.class, "lineId", line.getId());
+			List<LineInfoEntity> infolist = this.systemService.findByProperty(LineInfoEntity.class, "lineNumber", line.getLineNumber());
+			if(infolist.size()>0){
+				LineInfoEntity lineinfo = infolist.get(0);
+				if(startlist.size()>0){
+					for (int i = 0; i < startlist.size(); i++) {
+						StartOrEndEntity see = startlist.get(i);
+						if(StringUtil.isNotEmpty(see)){
+							List<StartOrEndEntity> list = this.systemService.findHql("from StartOrEndEntity where startid=? and endid=? and stationStatus=? and linetype=?", see.getStartid(),see.getEndid(),"1",line.getType());
+							if(list.size()>0){
+								for (int k = 0; k < list.size(); k++) {
+									StartOrEndEntity sre = list.get(k);
+									if(!line.getId().equals(sre.getLineId()) && !lineinfo.getId().equals(sre.getLineId())){
+										if("1".equals(sre.getStationStatus())){
+											BusStopInfoEntity bus = new BusStopInfoEntity();
+											if ("2".equals(line.getType()) || "4".equals(line.getType())) {
+												if(StringUtil.isNotEmpty(sre.getEndid()) ){
+													 bus = this.systemService.getEntity(BusStopInfoEntity.class, sre.getEndid());
 												}
-												if(!"1".equals(bus.getStationType()) && !"2".equals(bus.getStationType())){
-													message = bus.getName()+"已被启用，不能重复添加！";
-													success = false;
-													j.setSuccess(success);
-													j.setMsg(message);
-													return j;
+											}else if("3".equals(line.getType()) || "5".equals(line.getType())){
+												if(StringUtil.isNotEmpty(sre.getStartid())){
+													 bus = this.systemService.getEntity(BusStopInfoEntity.class, sre.getStartid());
 												}
 											}
+											if(!"1".equals(bus.getStationType()) && !"2".equals(bus.getStationType())){
+												message = bus.getName()+"已被启用，不能重复添加！";
+												success = false;
+												j.setSuccess(success);
+												j.setMsg(message);
+												return j;
+											}
 										}
-										
 									}
 									
 								}
+								
 							}
 						}
 					}
 				}
-				
-				
 			}
-			j.setMsg(message);
-			return j;
+			
+			
+		}
+		j.setMsg(message);
+		return j;
 	}
 	
 	public void saveCarTSTypeLine(LineinfoHistoryEntity  line){
