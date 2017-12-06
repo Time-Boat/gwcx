@@ -62,7 +62,36 @@
             z-index: 9999;
         }
         
+        .search {
+        	position: absolute;
+        	top: 22%;
+        	right: 50px;
+        }
+        
+        .button-group {
+			position: absolute;
+			bottom: 20px;
+			right: 20px;
+			font-size: 12px;
+			padding: 10px;
+		}
+		
+		.button-group .button {
+			height: 28px;
+			line-height: 28px;
+			background: #0D9BF2;
+			color: #FFF;
+			border: 0;
+			outline: none;
+			padding-left: 5px;
+			padding-right: 5px;
+			border-radius: 3px;
+			margin-bottom: 4px;
+			cursor: pointer;
+		}
+
 	  </style>
+	  <!-- <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/> -->
 	<title>新增验票员</title>
 
 	</head>
@@ -86,7 +115,7 @@
 					<label class="Validform_label">站点类型: </label>
 				</td>
 				<td class="value">
-					<t:dictSelect field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" datatype="*" ></t:dictSelect>	
+					<t:dictSelect extendJson="{onchange:changeSType(this.value)}" field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" datatype="*" ></t:dictSelect>	
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
 				<td align="center">
@@ -104,7 +133,7 @@
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
 			</tr>
-			<tr>
+			<tr id="stationInfo" >
 				<td align="center">
 					<label class="Validform_label">
 						所选地址:
@@ -140,20 +169,43 @@
 		
 	</t:formvalid>
 	<t:authFilter name="formtableId"></t:authFilter>
-
 	<div id="container" tabindex="0" style="height:80%" >
-    	<div >
-	    	<input type="text" id="keyword" placeholder="请输入关键字" name="keyword" />
-	    	<div id="panel"></div>
-    	</div>
+	</div>
+	<div class="search">
+    	<input type="text" id="keyword" placeholder="请输入关键字" name="keyword" />
+    	<div id="panel"></div>
+   	</div>
+	<div class="button-group" id="bt_group" >
+		<input type="button" class="button" value="清除" id="clear"/>
+	    <%-- <input type="button" class="button" value="鼠标绘制点" id="point"/>
+	    <input type="button" class="button" value="鼠标绘制线" id="line"/> --%>
+	    <input type="button" class="button" value="鼠标绘制面" id="polygon"/>
     </div>
     <!-- script必须放在body中。。 -->
-    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123" ></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123&plugin=AMap.MouseTool" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
     
+    	function changeSType(value){
+    		console.log(value);
+    		if(value == '3'){
+    			$('#bt_group').show();
+    			$('#stationInfo').hide();
+    			$('#stopLocation').val('');
+    			$('#x').val('');
+    			$('#y').val('');
+    			if(typeof(marker) != "undefined"){
+        			map.remove(marker);
+        		}
+    			infoWindow.close();
+    		}else{
+    			$('#stationInfo').show();
+    			$('#bt_group').hide();
+    		}
+    	}
+    	
     	//跳转城市
     	function changeCity(value){
     		console.log(value);
@@ -173,8 +225,13 @@
     	var placeSearch;
     	//城市编码
     	var cityCode = $('#city').val();
+    	//绘制区域中所有点的经纬度
+    	
+    	
     	
     	function loadMapStationBs(){
+    		
+    		$('#bt_group').hide();
     		
     		var asx = $('#x').val();
         	var asy = $('#y').val();
@@ -191,6 +248,27 @@
             });
         	
 			afterLoadBs();
+			
+			//在地图中添加MouseTool插件
+		    var mouseTool = new AMap.MouseTool(map);
+		    /* AMap.event.addDomListener(document.getElementById('point'), 'click', function() {
+		        mouseTool.marker({offset:new AMap.Pixel(-14,-11)});
+		    }, false);
+		    AMap.event.addDomListener(document.getElementById('line'), 'click', function() {
+		        mouseTool.polyline();
+		    }, false); */
+		    AMap.event.addDomListener(document.getElementById('polygon'), 'click', function() {
+		        mouseTool.polygon();
+		    }, false);
+		    AMap.event.addDomListener(document.getElementById('clear'), 'click', function() {
+		    	//清除地图上的所有标记
+		    	map.clearMap();
+		    }, false);
+		    
+		    var drawPolygon = mouseTool.polygon(); //用鼠标工具画多边形
+		    AMap.event.addListener( mouseTool,'draw',function(e){ //添加事件
+		      console.log(e.obj.getPath());//获取路径/范围
+		    });
     	}
     	
     	//打开窗体
@@ -206,7 +284,6 @@
        	        geocoder = new AMap.Geocoder({
        	            city: '010'//城市，默认：“全国”
        	        });
-       	        //TODO: 使用geocoder 对象完成相关功能
        	    })
        	    
     	    createMarkerBs();
@@ -215,8 +292,16 @@
    	    	if(location != null && location != ""){
    	    		openInfoWin(location, marker.getPosition());
    	    	}
+   	    	
    	      	//点击事件
    		    map.on('click', function(e) {
+   		    	
+   		    	var st = $("select[name='stationType']").val()
+   	   	    	console.log(st);
+   	   	    	if(st == '3'){
+   	   	    		return;
+   	   	    	}
+   	   	    	
    		    	createMarkerBs();
    		    	marker.setPosition(e.lnglat);
    		    	openInfoWin("正在获取位置信息...", e.lnglat);
@@ -324,7 +409,6 @@
            		map: map,
            		bubble: true
        		});
-   			
     	}
     	
     	function markerClick(e){

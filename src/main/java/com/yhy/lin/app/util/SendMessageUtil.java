@@ -112,10 +112,10 @@ public class SendMessageUtil {
 	 * @param userId	用户id
 	 * @param content	消息内容
 	 * @param status	消息状态 0:否	 1:是
-	 * @param type		消息类型 0:新增    1:修改
+	 * @param type		消息类型 0：订单通知    1：普通消息通知
 	 * @param orderId	订单id
 	 */
-	public static AppMessageListEntity buildAppMessage(String userId, String content, String status, String type, String orderId) {
+	public static AppMessageListEntity buildAppMessage(String userId,String content, String status, String type, String orderId) {
 
 		// 如果购买成功，将消息添加到消息中心
 		AppMessageListEntity app = new AppMessageListEntity();
@@ -125,10 +125,18 @@ public class SendMessageUtil {
 		app.setUserId(userId);
 		app.setMsgType(type);
 		app.setOrderId(orderId);
+		if("0".equals(type)){
+			app.setTitle(AppGlobals.ORDER_MESSAGE);
+		}else if("1".equals(type)){
+			app.setTitle(AppGlobals.BASIC_MESSAGE);
+		}else if("2".equals(type)){
+			app.setTitle(AppGlobals.REFUND_MESSAGE);
+		}
 
 		return app;
 
 	}
+	
 	/**
 	 * 发送短信
 	 * @param mobile 		用户手机号

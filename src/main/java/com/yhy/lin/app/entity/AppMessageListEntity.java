@@ -39,6 +39,8 @@ public class AppMessageListEntity implements java.io.Serializable {
 	/** 消息类型   0：订单通知    1：普通消息通知   */
 	private java.lang.String msgType;
 	
+	private String title;
+	
 	@Column(name ="ORDER_ID",nullable=true,length=32)
 	public java.lang.String getOrderId() {
 		return orderId;
@@ -140,4 +142,14 @@ public class AppMessageListEntity implements java.io.Serializable {
 	public void setStatus(java.lang.String status){
 		this.status = status;
 	}
+
+	@Column(name ="title",nullable=true,length=100)
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
 }

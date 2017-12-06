@@ -504,10 +504,9 @@ public class LineinfoHistoryController extends BaseController {
 				String sName = systemService.get(BusStopInfoEntity.class, line.getStartLocation()).getName();
 				String eName = systemService.get(BusStopInfoEntity.class, line.getEndLocation()).getName();
 				
-				
 				for(String userId : uList){
 					mList.add(SendMessageUtil.buildAppMessage(
-							userId, sName + "至" + eName + "的线路业务已变更，变更内容，特此告知。", "0", "0", null));
+							userId, sName + "至" + eName + "的线路业务已变更，变更内容，特此告知。", "0", "1", null));
 				}
 				systemService.saveAllEntitie(mList);
 			}

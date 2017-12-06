@@ -166,7 +166,23 @@
 				}
 				url += '&id='+rowsData[0].id;
 			}
-			createwindow(title,url,width,height);
+			var a = false;
+			$.ajax({
+		          type:"get",
+		          url:"carInfoController.do?getCarStatus&id="+rowsData[0].id,
+		          dataType:'json',
+		          success:function(d){
+		        	  var obj = eval('('+d.jsonStr+')');
+			       		a = obj.success;
+			       		if(!a){
+			       			tip(obj.msg);
+			       			return;
+			       		}
+			       		createwindow(title,url,width,height);
+		          }
+		      });
+			
+			
 		}
 		
 		function carAllot(title,url,id,width,height){

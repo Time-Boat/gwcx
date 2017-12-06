@@ -33,7 +33,7 @@ public class PermissionInterceptor {
 	
 	@Autowired
 	private UserService userService;
-	
+
 	// 定义切入点 @Pointcut("execution(public * com.jay..*.*(..))") -- 表示对com.jay
 	// 包下的所有方法都可添加切入点
 //	@Pointcut("execution(* com.yhy.lin.*.*.*(..)) && @annotation(com.yhy.lin.app.quartz.BussAnnotation )")
@@ -50,7 +50,7 @@ public class PermissionInterceptor {
 	@Around("execution(* com.yhy.lin.*.*.*(..)) && @annotation(org.springframework.web.bind.annotation.RequestMapping) ")
 	public Object requestMapping(ProceedingJoinPoint pj) throws Throwable {
 		Object object = pj.proceed();
-		System.out.println(pj.getSignature().getName());
+//		System.out.println(pj.getSignature().getName());
 		return object;
 	}
 

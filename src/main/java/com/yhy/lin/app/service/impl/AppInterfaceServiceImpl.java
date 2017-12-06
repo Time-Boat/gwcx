@@ -408,6 +408,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		for (Map<String, Object> m : lm) {
 			AppMessageListEntity am = new AppMessageListEntity();
 			am.setContent(m.get("content") + "");
+			am.setTitle(m.get("title") + "");
 			am.setCreateTime(m.get("create_time") + "");
 			am.setId(m.get("id") + "");
 			am.setMsgType(m.get("msg_type") + "");

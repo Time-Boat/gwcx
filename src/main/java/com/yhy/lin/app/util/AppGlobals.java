@@ -206,4 +206,13 @@ public interface AppGlobals {
 	/** 入驻公司 */
 	public static final String ORG_ENTER_COMPANY_TYPE = "5";
 	
+	//订单消息通知
+	public static final String ORDER_MESSAGE = "订单消息通知";
+	
+	//普通消息通知
+	public static final String BASIC_MESSAGE = "普通消息通知";
+	
+	//退款消息通知
+	public static final String REFUND_MESSAGE = "退款消息通知";
+	
 }

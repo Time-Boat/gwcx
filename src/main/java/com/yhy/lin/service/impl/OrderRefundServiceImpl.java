@@ -338,7 +338,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 							SendMessageUtil.TEMPLATE_ORDER_REFUND, SendMessageUtil.TEMPLATE_SMS_CODE_SIGN_NAME);
 					
 					mList.add(SendMessageUtil.buildAppMessage(
-							t.getUserId(), "您的申请的退款已审核通过，退款金额最迟3-5日内会返回到原支付账户。", "0", "0", trans.getId()));
+							t.getUserId(), "您的申请的退款已审核通过，退款金额最迟3-5日内会返回到原支付账户。", "0", "1", trans.getId()));
 					
 				} else {
 					// 返回错误描述

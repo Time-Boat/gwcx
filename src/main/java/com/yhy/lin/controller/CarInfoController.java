@@ -31,7 +31,6 @@ import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.CarInfoEntity;
-import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
 
@@ -260,7 +259,13 @@ public class CarInfoController extends BaseController {
 
 		CarInfoEntity carInfo = systemService.getEntity(CarInfoEntity.class, id);
 		try {
-
+			
+			j=getCarStatus(req);
+			if(j.isSuccess()==false){
+				message = "车辆已安排订单，不能申请停用!";
+				j.setMsg(message);
+				return j;
+			}
 			carInfo.setApplyTime(AppUtil.getDate());
 			carInfo.setAuditStatus("0");
 			carInfo.setApplyContent("1");
@@ -584,4 +589,32 @@ public class CarInfoController extends BaseController {
 		return j;
 	}
 	
+	/**
+	 * 检查车辆是否正在运行中
+	 */
+	@RequestMapping(params = "getCarStatus")
+	@ResponseBody
+	public AjaxJson getCarStatus(HttpServletRequest request) {
+		String message = "";
+		boolean success = true;
+		AjaxJson j = new AjaxJson();
+		try {
+			String id = request.getParameter("id");
+			 String sql = "select r.order_id from order_linecardiver o LEFT JOIN transferorder r on o.id=r.id where "
+			 		+ "o.licencePlateId='"+id+"' and (r.order_completed_time>NOW() or r.order_completed_time is null) ";
+			if(StringUtil.isNotEmpty(id)){
+				List list  = this.systemService.findListbySql(sql);
+				if (list.size() > 0) {
+					message = "车辆已安排订单，不能编辑";
+					success = false;
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
 }

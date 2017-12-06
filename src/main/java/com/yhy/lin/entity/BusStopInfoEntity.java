@@ -44,7 +44,7 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	private String stopLocation;
 	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
 //	private String hangingStatus;
-	/**站点类型  0 普通站点      1 火车站点       2机场站点*/
+	/**站点类型     站点类型 0：普通站点    1：火车站点    2：飞机站点    3：区域站点*/
 	private String stationType;
 	
 	private String  cityId;
