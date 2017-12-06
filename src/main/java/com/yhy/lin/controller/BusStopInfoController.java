@@ -194,6 +194,10 @@ public class BusStopInfoController extends BaseController {
 	public AjaxJson save(BusStopInfoEntity busStopInfo,HttpServletRequest request,HttpServletResponse respone){
 		String message = null;
 		AjaxJson j = new AjaxJson();
+		
+		//绘制区域中的各个站点
+		String areaStations = request.getParameter("areaStations");
+		
 		busStopInfo.setDeleteFlag((short)0);
 		busStopInfo.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
 		String cityId = request.getParameter("city");

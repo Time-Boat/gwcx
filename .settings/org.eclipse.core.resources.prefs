@@ -2,7 +2,6 @@ eclipse.preferences.version=1
 encoding//src/main/resources/appGlobals.properties=UTF-8
 encoding//src/main/resources/mailConfig.properties=UTF-8
 encoding//src/main/webapp/error.jsp=UTF-8
-encoding//src/main/webapp/webpage/yhy/areaLine/areaLineAddStation.jsp=UTF-8
 encoding//src/main/webapp/webpage/yhy/dealer/dealerUploadFile.jsp=UTF-8
 encoding//src/main/webapp/webpage/yhy/mapStation/mapStationList.jsp=UTF-8
 encoding/<project>=UTF-8

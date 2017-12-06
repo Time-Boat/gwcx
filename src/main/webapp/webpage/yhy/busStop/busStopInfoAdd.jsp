@@ -96,8 +96,9 @@
 
 	</head>
 <body style="overflow-y: hidden" scroll="no" onload="loadMapStationBs()" >
-	<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="busStopInfoController.do?save">
+	<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="busStopInfoController.do?save" beforeSubmit="checkStation()" >
 		<input id="id" name="id" type="hidden" value="${busStopInfo.id }">
+		<input id="areaStations" name="areaStations" type="hidden" value="${busStopInfo.areaStations}">
 		
 		<table style="width: 100%;height: 100%" cellpadding="0" cellspacing="1" class="formtable">
 			<tr>
@@ -109,20 +110,13 @@
 				<td class="value">
 					<input class="inputxt" style="height: 30px;" id="name" name="name" dataType="*"
 						   value="${busStopInfo.name }">
-					<!-- <span class="Validform_checktip"></span> -->
-				</td>
-				<td align="center">
-					<label class="Validform_label">站点类型: </label>
-				</td>
-				<td class="value">
-					<t:dictSelect extendJson="{onchange:changeSType(this.value)}" field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" datatype="*" ></t:dictSelect>	
-					<!-- <span class="Validform_checktip"></span> -->
+					<span class="Validform_checktip"></span>
 				</td>
 				<td align="center">
 					<label class="Validform_label"> 选择线路城市: </label>
 				</td>
 				<td class="value">
-					<select name="city" id="city" onchange="changeCity(this.value)" dataType="*" >
+					<select name="city" id="city" onchange="changeCity(this.value)" >
 							<option value="">--请选择城市--</option>
 							<c:forEach var="c" items="${cities}">
 								<option value="${c.cityId}" <c:if test="${busStopInfo.cityId == c.cityId}" >selected="selected"</c:if>  >
@@ -130,7 +124,14 @@
 								</option>
 							</c:forEach>
 					</select> 
-					<!-- <span class="Validform_checktip"></span> -->
+					<span class="Validform_checktip"></span>
+				</td>
+				<td align="center">
+					<label class="Validform_label">站点类型: </label>
+				</td>
+				<td class="value">
+					<t:dictSelect extendJson="{onchange:changeSType(this.value)}" field="stationType" typeGroupCode="sType" hasLabel="false" defaultVal="${busStopInfo.stationType}" ></t:dictSelect>	
+					<span class="Validform_checktip"></span>
 				</td>
 			</tr>
 			<tr id="stationInfo" >
@@ -140,7 +141,7 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="stopLocation" name="stopLocation" dataType="*"
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="stopLocation" name="stopLocation" 
 						   value="${busStopInfo.stopLocation }">
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
@@ -150,9 +151,9 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="x" name="x" dataType="*"
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="x" name="x" 
 						   value="${busStopInfo.x}">
-					<span class="Validform_checktip"></span>
+					<!-- <span class="Validform_checktip"></span> -->
 				</td>
 				<td align="center">
 					<label class="Validform_label">
@@ -160,7 +161,7 @@
 					</label>
 				</td>
 				<td class="value">
-					<input class="inputxt" readonly="readonly" style="height: 30px;" id="y" name="y" dataType="*"
+					<input class="inputxt" readonly="readonly" style="height: 30px;" id="y" name="y" 
 						   value="${busStopInfo.y}">
 					<!-- <span class="Validform_checktip"></span> -->
 				</td>
@@ -188,8 +189,41 @@
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
     
+	    function checkStation() {
+	        var as = $("#areaStations").val();
+	        var x = $("#x").val();
+	        console.log(as + "----" + x);
+	        if(as == "" && x == ""){
+	        	tip("请输入站点");
+	        	return false;
+	        }
+	        return true;
+	    }
+    
+	  	//地图对象
+		var map;
+		//窗体对象
+		var infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
+		//搜索对象
+		var placeSearch;
+		//城市编码
+		var cityCode = $('#city').val();
+		//绘制区域中所有点的经纬度
+		var areaPoint = [];
+		//区域对象
+		var polygon;
+		//MouseTool插件
+	    var mouseTool;
+	
     	function changeSType(value){
+    		if(cityCode == "" || cityCode == null){
+    			tip("城市不能为空");
+			    $("select[name='stationType'] option").eq(0).attr("selected",true);
+			    return;
+    		}
+    		
     		console.log(value);
+    		
     		if(value == '3'){
     			$('#bt_group').show();
     			$('#stationInfo').hide();
@@ -200,11 +234,20 @@
         			map.remove(marker);
         		}
     			infoWindow.close();
+    			
+    			if(typeof(polygon) == "undefined"){
+	    			loadPlygon();
+    			}
     		}else{
     			$('#stationInfo').show();
     			$('#bt_group').hide();
     		}
+    		if(typeof(polygon) != "undefined"){
+    			clearMap();
+    		}
     	}
+    	
+    	
     	
     	//跳转城市
     	function changeCity(value){
@@ -215,20 +258,11 @@
     		console.log(city.trim());
     		map.setCity(city.trim());
     		map.setZoom(10);
+    		if(typeof(polygon) != "undefined"){
+    			clearMap();
+    		}
     	}
     
-    	//地图对象
-    	var map;
-    	//窗体对象
-    	var infoWindow = new AMap.InfoWindow({offset: new AMap.Pixel(0, -30)});
-    	//搜索对象
-    	var placeSearch;
-    	//城市编码
-    	var cityCode = $('#city').val();
-    	//绘制区域中所有点的经纬度
-    	
-    	
-    	
     	function loadMapStationBs(){
     		
     		$('#bt_group').hide();
@@ -243,14 +277,16 @@
         	map = new AMap.Map('container',{	
                 resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
                 zoom: 10,						//地图显示的缩放级别
-                center: [asx, asy],  //地图中心点
+                center: [asx, asy],  			//地图中心点
             	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
-        	
 			afterLoadBs();
-			
-			//在地图中添加MouseTool插件
-		    var mouseTool = new AMap.MouseTool(map);
+    	}
+    	
+    	//加载画多边形的组件
+    	function loadPlygon(){
+    		//在地图中添加MouseTool插件
+		    mouseTool = new AMap.MouseTool(map);
 		    /* AMap.event.addDomListener(document.getElementById('point'), 'click', function() {
 		        mouseTool.marker({offset:new AMap.Pixel(-14,-11)});
 		    }, false);
@@ -261,14 +297,44 @@
 		        mouseTool.polygon();
 		    }, false);
 		    AMap.event.addDomListener(document.getElementById('clear'), 'click', function() {
-		    	//清除地图上的所有标记
-		    	map.clearMap();
+		    	//清除区域
+		    	if(areaPoint.length > 0){
+					polygon.setMap(null);
+					areaPoint = [];
+				}
 		    }, false);
 		    
-		    var drawPolygon = mouseTool.polygon(); //用鼠标工具画多边形
-		    AMap.event.addListener( mouseTool,'draw',function(e){ //添加事件
-		      console.log(e.obj.getPath());//获取路径/范围
+		    AMap.event.addListener(mouseTool,'draw',function(e){ //添加事件
+		    	
+		    	//区域对象，只会存在一个，事件只会绑定一次
+		    	polygon = e.obj;
+		    	areaPoint = e.obj.getPath();//获取路径/范围
+		    	//经度
+	    		var m = '';
+		    	//纬度
+	    		var o = '';
+		    	console.log(areaPoint.length);
+		    	for(var i=0;i<areaPoint.length;i++){
+		    		m += areaPoint[i].M;
+		    		o += areaPoint[i].O;
+		    		if(i != areaPoint.length-1){
+		    			m += '&';
+			    		o += '&';
+		    		}
+		    	}
+		    	
+		    	$('#areaStations').val(m + ',' + o);
+		    	console.log(areaPoint);
 		    });
+    	}
+    	
+    	//关闭画多边形功能，并清除地图覆盖物
+    	function clearMap(){
+   			console.log(111);
+			polygon.setMap(null);
+			areaPoint = [];
+			//关闭当前鼠标事件操作，这里关闭了绘制多边形的动作
+			mouseTool.close(true);
     	}
     	
     	//打开窗体
@@ -297,7 +363,12 @@
    		    map.on('click', function(e) {
    		    	
    		    	var st = $("select[name='stationType']").val()
-   	   	    	console.log(st);
+   	   	    	//console.log(e);
+   		    	
+   		    	if(areaPoint.length > 0){
+		    		polygon.setMap(null)
+		    	}
+   		    	
    	   	    	if(st == '3'){
    	   	    		return;
    	   	    	}
