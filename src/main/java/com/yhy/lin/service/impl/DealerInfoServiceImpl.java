@@ -45,7 +45,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
 		String sql = "select d.dealer_discount,d.id,d.account,d.create_date,d.QR_code_url,d.scan_count,d.phone,d.manager,d.position,d.bank_account,d.status,p.departname,d.dealer_file_path,"
-				+ " d.audit_user,d.audit_date,d.audit_status,d.last_audit_user,d.last_audit_date,d.last_audit_status,d.commit_apply_date,d.apply_type,u.username "
+				+ " d.audit_user,d.audit_date,d.audit_status,d.last_audit_user,d.last_audit_date,d.last_audit_status,d.commit_apply_date,d.apply_type,d.email,u.username "
 				+ " from dealer_info d left join t_s_base_user u on d.create_user_id = u.id join t_s_depart b on b.id = d.departId "
 				+ " LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p "
 				+ " where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ";
@@ -83,6 +83,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 				,new Db2Page("departname", "departname", null)
 				,new Db2Page("dealerDiscount", "dealer_discount", null)
 				,new Db2Page("status", "status", null)
+				,new Db2Page("email", "email", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
 		return jObject;

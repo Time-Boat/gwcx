@@ -173,11 +173,11 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		sql.append(" where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ");
 		
 		if(userType.equals("1")){
-			sql.append(" and lf.is_dealer_line=1 ");
+			sql.append(" and lf.is_dealer_line like '%1%' ");
+		}else if(userType.equals("0")){
+			sql.append(" and lf.is_dealer_line like '%0%' ");
 		}
-		if(userType.equals("0")){
-			sql.append(" and lf.is_dealer_line=0 ");
-		}
+		
 		// 根据起点id城市查找线路信息
 		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), stationId, cityId, serveType);
 

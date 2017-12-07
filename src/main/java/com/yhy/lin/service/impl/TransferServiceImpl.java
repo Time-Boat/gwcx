@@ -631,7 +631,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		//过滤到公司这一层
 		orgCode = orgCode.length() <= 6 ? orgCode : orgCode.substring(0, 6);
 		
-		String sqlWhere = " and c.business_type = '1' and c.car_status = '0' and t.org_code like '" + orgCode + "%'";
+		String sqlWhere = " and c.business_type = '1' and c.car_status = '0' and c.audit_status!='0' and t.org_code like '" + orgCode + "%'";
 		
 		String sqlCnt = " select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
 				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id,t_s_depart p "

@@ -2,6 +2,7 @@ package com.yhy.lin.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,6 +16,7 @@ import org.jeecgframework.core.util.ExceptionUtil;
 import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
+import org.jeecgframework.core.util.UUIDGenerator;
 import org.jeecgframework.core.util.oConvertUtils;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.service.SystemService;
@@ -25,7 +27,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.google.gson.Gson;
-import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CitiesEntity;
 import com.yhy.lin.entity.LineBusstopHistoryEntity;
@@ -34,9 +35,12 @@ import com.yhy.lin.entity.Line_busStopEntity;
 import com.yhy.lin.entity.LineinfoHistoryEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
+import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.entity.AreaStationMiddleEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
 import com.yhy.lin.service.StartOrEndServiceI;
 
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
@@ -67,7 +71,14 @@ public class BusStopInfoController extends BaseController {
 	//接送机
 	@RequestMapping(params="busStopInfoList2")
 	public ModelAndView stopList2(HttpServletRequest request){
-		request.setAttribute("cityList",getOpencity());	
+		request.setAttribute("cityList",getOpencity());
+		
+		//权限判断，只有运营专员和运营经理能看到安排司机车辆按钮
+		if(checkRole(AppGlobals.OPERATION_SPECIALIST) || checkRole(AppGlobals.OPERATION_MANAGER) || checkRole(AppGlobals.SUBSIDIARY_ADMIN)){
+			request.setAttribute("permission", "0");
+		}else{
+			request.setAttribute("permission", "1");
+		}
 		return new ModelAndView("yhy/busStop/busStopInfoList2");
 	}
 	
@@ -180,6 +191,27 @@ public class BusStopInfoController extends BaseController {
 		if (StringUtil.isNotEmpty(busStopInfo.getId())) {
 			busStopInfo = busStopInfoService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
 			req.setAttribute("busStopInfo", busStopInfo);
+			
+			if("3".equals(busStopInfo.getStationType())){
+				List<Map<String,Object>> list = busStopInfoService.findForJdbc(
+						"select area_x,area_y from area_station_middle where station_id = ? order by xy_seq asc", busStopInfo.getId());
+				
+				StringBuffer sbfX = new StringBuffer();
+				StringBuffer sbfY = new StringBuffer();
+				for(Map<String,Object> map : list){
+					sbfX.append(map.get("area_x"));
+					sbfX.append("&");
+					sbfY.append(map.get("area_y"));
+					sbfY.append("&");
+				}
+				
+				String json = "";
+				if(sbfX.length() > 0){
+					json = sbfX.deleteCharAt(sbfX.length()-1).toString() + "," + sbfY.deleteCharAt(sbfY.length()-1).toString();
+				}
+				
+				req.setAttribute("areaStations", json);
+			}
 		}
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
@@ -208,29 +240,35 @@ public class BusStopInfoController extends BaseController {
 				busStopInfo.setCityName(listCity.getCity());
 			}
 		}
-		if(StringUtil.isNotEmpty(busStopInfo.getId())){
-			try{
+		try{
+			if(StringUtil.isNotEmpty(busStopInfo.getId())){
 				BusStopInfoEntity l = busStopInfoService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
+				
+				String oldType = l.getStationType();
+				
 				MyBeanUtils.copyBeanNotNull2Bean(busStopInfo, l);
 				busStopInfoService.saveOrUpdate(l);
+				
+				//添加新的区域站点前，先删除原有的站点集合
+				if("3".equals(oldType)){
+					List<AreaStationMiddleEntity> delList = 
+							busStopInfoService.findByProperty(AreaStationMiddleEntity.class, "stationId", busStopInfo.getId());
+					busStopInfoService.deleteAllEntitie(delList);
+				}
+				
 				message ="站点修改成功！";
 				//-----数据修改日志[类SVN]------------
 				Gson gson = new Gson();
 				systemService.addDataLog("busStopInfo", l.getId(), gson.toJson(l));
 				//-----数据修改日志[类SVN]------------
 				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
-			}catch (Exception e) {
-				message = "站点添加失败！";
-				j.setSuccess(false);
-				logger.error(ExceptionUtil.getExceptionMessage(e));
-				//e.printStackTrace();
-			}
-		}else{
-			try{
+				
+			}else{
 				if(busStopInfo.getStatus()==null){
 					busStopInfo.setStatus("0");
 				}
 				busStopInfoService.save(busStopInfo);
+				
 				//lineInfoService.findByQueryString("sdsdd");	
 				message ="站点添加成功！";
 				//-----数据修改日志[类SVN]------------
@@ -238,12 +276,25 @@ public class BusStopInfoController extends BaseController {
 				systemService.addDataLog("busStopInfo", busStopInfo.getId(), gson.toJson(busStopInfo));
 				//-----数据修改日志[类SVN]------------
 				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
-			}catch (Exception e) {
-				message = "站点添加失败！";
-				j.setSuccess(false);
-				logger.error(ExceptionUtil.getExceptionMessage(e));
-				//e.printStackTrace();
 			}
+			if(StringUtil.isNotEmpty(areaStations) && "3".equals(busStopInfo.getStationType())){
+				
+				String[] xy = areaStations.split(",");
+				//经度
+				String[] x = xy[0].split("&");
+				//纬度
+				String[] y = xy[1].split("&");
+				for (int i = 0; i < x.length; i++) {
+					systemService.executeSql(" insert into area_station_middle VALUES (?, ?, ?, ?, ?) ", 
+							UUIDGenerator.generate(), busStopInfo.getId(), x[i], y[i], i + "");
+				}
+				
+			}
+		}catch (Exception e) {
+			message = "站点添加失败！";
+			j.setSuccess(false);
+			logger.error(ExceptionUtil.getExceptionMessage(e));
+			//e.printStackTrace();
 		}
 		j.setMsg(message);
 		return j;		

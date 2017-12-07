@@ -98,7 +98,7 @@
 <body style="overflow-y: hidden" scroll="no" onload="loadMapStationBs()" >
 	<t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" styleClass="form_head" action="busStopInfoController.do?save" beforeSubmit="checkStation()" >
 		<input id="id" name="id" type="hidden" value="${busStopInfo.id }">
-		<input id="areaStations" name="areaStations" type="hidden" value="${busStopInfo.areaStations}">
+		<input id="areaStations" name="areaStations" type="hidden" value="${areaStations}">
 		
 		<table style="width: 100%;height: 100%" cellpadding="0" cellspacing="1" class="formtable">
 			<tr>
@@ -225,19 +225,7 @@
     		console.log(value);
     		
     		if(value == '3'){
-    			$('#bt_group').show();
-    			$('#stationInfo').hide();
-    			$('#stopLocation').val('');
-    			$('#x').val('');
-    			$('#y').val('');
-    			if(typeof(marker) != "undefined"){
-        			map.remove(marker);
-        		}
-    			infoWindow.close();
-    			
-    			if(typeof(polygon) == "undefined"){
-	    			loadPlygon();
-    			}
+    			showPlygon();
     		}else{
     			$('#stationInfo').show();
     			$('#bt_group').hide();
@@ -246,8 +234,6 @@
     			clearMap();
     		}
     	}
-    	
-    	
     	
     	//跳转城市
     	function changeCity(value){
@@ -280,7 +266,30 @@
                 center: [asx, asy],  			//地图中心点
             	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
-			afterLoadBs();
+        	var sType = $("select[name='stationType']").val();
+        	initPlaceSearch();
+        	
+        	if(sType == '3'){
+        		showPlygon();
+        		
+        		var data = $('#areaStations').val();
+        		var dxy = data.split(",");
+        		var dx = dxy[0].split("&");
+        		var dy = dxy[1].split("&");
+        		
+        		for(var i=0;i<dx.length;i++){
+        			areaPoint[i] = [dx[i],dy[i]];
+        		}
+        		console.log(areaPoint);
+        		polygon = new AMap.Polygon({
+        	        path: areaPoint,//设置多边形边界路径
+        	    });
+        	    polygon.setMap(map);
+        	    
+        	    map.setCenter(areaPoint[0]);
+        	}else{
+				afterLoadBs();
+        	}
     	}
     	
     	//加载画多边形的组件
@@ -306,8 +315,12 @@
 		    
 		    AMap.event.addListener(mouseTool,'draw',function(e){ //添加事件
 		    	
-		    	//区域对象，只会存在一个，事件只会绑定一次
+		    	//区域对象
+		    	if(typeof(polygon) != "undefined"){
+	    			polygon.setMap(null);
+		    	}
 		    	polygon = e.obj;
+
 		    	areaPoint = e.obj.getPath();//获取路径/范围
 		    	//经度
 	    		var m = '';
@@ -337,6 +350,26 @@
 			mouseTool.close(true);
     	}
     	
+    	//显示绘制多边形界面
+    	function showPlygon(){
+    		$('#bt_group').show();
+			$('#stationInfo').hide();
+			$('#stopLocation').val('');
+			$('#x').val('');
+			$('#y').val('');
+			if(typeof(marker) != "undefined"){
+    			map.remove(marker);
+    		}
+			
+			if(typeof(infoWindow) != "undefined"){
+				infoWindow.close();
+			}
+			
+			if(typeof(polygon) == "undefined"){
+    			loadPlygon();
+			}
+    	}
+    	
     	//打开窗体
     	function openInfoWin(content, position) {
     		infoWindow.setContent('<p class="my-desc">' + content + '</p>');//点击以后窗口展示的内容
@@ -353,7 +386,7 @@
        	    })
        	    
     	    createMarkerBs();
-      	    	
+      	    
    	    	var location = $('#stopLocation').val();
    	    	if(location != null && location != ""){
    	    		openInfoWin(location, marker.getPosition());
@@ -417,7 +450,11 @@
    	            openInfoWin("正在获取位置信息...", marker.getPosition());
    	        });
        		
-    	    AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
+       	}
+    	
+       	//初始化地点搜索服务
+       	function initPlaceSearch(){
+       		AMap.plugin(['AMap.Autocomplete','AMap.PlaceSearch'],function(){
 				var autoOptions = {
 					city: city, //城市，默认全国
 					input: "keyword"//使用联想输入的input的id
@@ -467,7 +504,7 @@
 				});
     	    });
        	}
-    	
+       	
     	var marker;
     	function createMarkerBs(){
     		if(typeof(marker) != "undefined"){

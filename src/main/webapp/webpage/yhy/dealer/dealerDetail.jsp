@@ -78,6 +78,17 @@
 						<span class="Validform_checktip"></span>
 					</td>
 				</tr>
+				<tr>
+					<td align="right">
+						<label class="Validform_label">
+							邮箱:
+						</label>
+					</td>
+					<td class="value" colspan="3">
+						<input class="inputxt" id="email" name="email" value="${dealerInfoPage.email}">
+						<span class="Validform_checktip"></span>
+					</td>
+				</tr>
 				<c:if test="${dealerInfoPage.auditStatus != -1}">
 					<tr>	
 						<td align="right">

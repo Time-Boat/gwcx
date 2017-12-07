@@ -167,7 +167,7 @@ public class TransferStatisticsController extends BaseController {
 		List<Object> mlist = systemService.findListbySql(orsql.toString());
 
 		int sumorder;
-		int refundorder;
+		//int refundorder;
 		BigDecimal sumPrice=new BigDecimal("0");
 		BigDecimal sumrefundPrice=new BigDecimal("0");
 		if (mlist.size() > 0) {
@@ -186,24 +186,24 @@ public class TransferStatisticsController extends BaseController {
 			if(bsum1 != null){
 				sumrefundPrice = sumrefundPrice.add(bsum1);
 			}
-			if (ob[3] != null) {
+			/*if (ob[3] != null) {
 				String obnum2 = ob[3] + "";
 				refundorder = Integer.parseInt(obnum2.substring(0, obnum2.indexOf(".")));
 			} else {
 				refundorder = 0;
-			}
+			}*/
 			
 		} else {
 			
 			sumorder = 0;
-			refundorder=0;
+			//refundorder=0;
 		}
-		if(sumorder>0){
-			jsonObj.put("sumorder", sumorder-refundorder);
-		}else{
+		/*if(sumorder>0){
 			jsonObj.put("sumorder", sumorder);
-		}
-		
+		}else{
+			
+		}*/
+		jsonObj.put("sumorder", sumorder);
 		if(sumPrice.intValue()>0){
 			jsonObj.put("sumPrice", sumPrice.subtract(sumrefundPrice).doubleValue());
 		}else{

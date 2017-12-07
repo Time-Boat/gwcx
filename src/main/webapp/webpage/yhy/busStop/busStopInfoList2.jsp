@@ -19,7 +19,9 @@
 	<t:dgToolBar operationCode="add" title="添加站点" icon="icon-add" url="busStopInfoController.do?addorupdate" height="800" width="1200" funname="add"></t:dgToolBar>
 	<t:dgToolBar operationCode="edit" title="修改站点" icon="icon-edit" url="busStopInfoController.do?addorupdate" width="1200" height="800" funname="update"></t:dgToolBar>
 	<t:dgCol title="操作" field="opt" align="center" width="50"></t:dgCol>
+	<c:if test="${permission == 1}">
 	<t:dgFunOpt funname="stopStation(id)" title="下架" urlStyle="align:center" operationCode="stopStation"></t:dgFunOpt>
+	</c:if>
 	<%-- <t:dgToolBar title="批量下架" icon="icon-remove" url="busStopInfoController.do?doDeleteALLSelect" funname="deleteALLSelect"></t:dgToolBar> --%>
 	<t:dgToolBar operationCode="detail" title="站点信息查看" icon="icon-search" url="busStopInfoController.do?addorupdate" height="800" width="1200" funname="detail"></t:dgToolBar>
 </t:datagrid>
