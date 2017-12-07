@@ -36,6 +36,7 @@ import com.yhy.lin.entity.LineinfoHistoryEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.entity.AreaStationDTO;
 import com.yhy.lin.entity.AreaStationMiddleEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
 import com.yhy.lin.service.StartOrEndServiceI;
@@ -211,6 +212,56 @@ public class BusStopInfoController extends BaseController {
 				}
 				
 				req.setAttribute("areaStations", json);
+				
+				
+				List<Map<String,Object>> aList = busStopInfoService.findForJdbc(
+						"select b.name,area_x,area_y,xy_seq from area_station_middle asm join busstopinfo b on b.id = asm.station_id"
+						+ " where station_id != ? order by station_id,xy_seq", busStopInfo.getId());
+				
+				List<AreaStationDTO> asdList = new ArrayList<>();
+				
+				//这个算法头都大了，后面肯定会忘记的....     看有没有时间来波优化了
+				AreaStationDTO as = null;
+				String[][] path = null;
+				//存储临时的xy值
+				StringBuffer sbf = null;
+				//加个<=是为了最后一次赋值
+				for(int k=0;k<=aList.size();k++){
+					Map<String,Object> map = null;
+					String seq = "0";
+					if(k != aList.size()){
+						map = aList.get(k);
+						seq = map.get("xy_seq") + "";
+					}
+					
+					//初始化    最后一波要赋值一次
+					if("0".equals(seq)){
+						//第一波因为没有值，不用初始化
+						if(k != 0) {
+							//机智的我，居然能想出这种办法，啧啧啧...
+							String[] xyArr = sbf.toString().split(",");
+							path = new String[xyArr.length][];
+							for(int i=0;i<xyArr.length;i++){
+								path[i] = xyArr[i].split("&");
+							}
+							as.setPath(path);
+							asdList.add(as);
+						}
+						//最后一波，就不用初始化了
+						if(k != aList.size()){
+							sbf = new StringBuffer();
+							as = new AreaStationDTO();
+							as.setName(map.get("name") + "");
+						}else{
+							//最后一次是用来给区域站点赋值的，所以不用再sbf.append了，不然会出现空值，直接跳出
+							break;
+						}
+					}
+					sbf.append(map.get("area_x") + "&" +map.get("area_y") + ",");
+				}
+				
+				req.setAttribute("otherAreaStations", asdList);
+				
 			}
 		}
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
