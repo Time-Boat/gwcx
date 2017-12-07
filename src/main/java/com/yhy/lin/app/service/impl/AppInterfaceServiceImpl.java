@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
 import org.jeecgframework.core.util.DateUtils;
+import org.jeecgframework.core.util.MyBeanUtils;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.core.util.UUIDGenerator;
 import org.jeecgframework.web.system.service.SystemService;
@@ -29,6 +30,7 @@ import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.entity.AreaStationMiddleEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
@@ -185,6 +187,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			return;
 		}
 
+		//线路id的集合
 		StringBuffer sbf = new StringBuffer();
 		for (Map<String, Object> a : lineList) {
 
@@ -210,10 +213,49 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			ssql += " and name like '%" + likeStation + "%' ";
 		}
 		
-		// 查询指定id线路中的所有普通站点
-		List<AppStationInfoEntity> stationList1 = findHql(ssql, 0);
-		stationList.addAll(stationList1);
-
+		// 普通用户查找普通站点，渠道商用户查找区域站点
+		if("1".equals(userType)){
+			List<AppStationInfoEntity> stationList1 = findHql(ssql, "3");
+			for(AppStationInfoEntity aInfo : stationList1){
+				
+				AppStationInfoEntity asi = new AppStationInfoEntity();
+				
+				try {
+					//直接修改查出来的值会报错，克隆一个实体出来，性能需要优化
+					MyBeanUtils.copyBeanNotNull2Bean(aInfo, asi);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				
+				List<Map<String,Object>> mList = findForJdbc(
+						"select area_x,area_y from area_station_middle where station_id = ? order by xy_seq asc", asi.getId());
+				
+//				String[][] path = new String[mList.size()][];
+//				for(int i=0;i<mList.size();i++){
+//					path[i] = new String[]{mList.get(i).get("area_x") + "", mList.get(i).get("area_y") + ""};
+//				}
+				StringBuffer sbfX = new StringBuffer();
+				StringBuffer sbfY = new StringBuffer();
+				for(Map<String,Object> map : mList){
+					sbfX.append(map.get("area_x"));
+					sbfX.append("&");
+					sbfY.append(map.get("area_y"));
+					sbfY.append("&");
+				}
+				
+				if(sbfX.length() > 0){
+					asi.setX(sbfX.deleteCharAt(sbfX.length()-1).toString());
+					asi.setY(sbfY.deleteCharAt(sbfY.length()-1).toString());
+				}
+//				asi.setPath(path);
+				stationList.add(asi);
+			}
+		}else{
+			// 查询指定id线路中的所有普通站点
+			List<AppStationInfoEntity> stationList1 = findHql(ssql, "0");
+			stationList.addAll(stationList1);
+		}
+		
 		// 常用站点列表
 		// List<CustomerCommonAddrEntity> c =
 		// systemService.findHql("from CustomerCommonAddrEntity where

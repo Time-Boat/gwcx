@@ -11,12 +11,13 @@
 	<t:dgCol title="预计站点到站时间" field="arrivalTime" align="center" ></t:dgCol>
 	<t:dgCol title="操作" field="opt"></t:dgCol>
 	<t:dgFunOpt title="删除关联站点" funname="delZd(id,line_busstopId)" />
-	<t:dgToolBar title="添加站点挂接"  operationCode="addSite" icon="icon-add" url="lineInfoController.do?busStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}" funname="add"></t:dgToolBar>
+	<t:dgToolBar title="添加站点挂接"  operationCode="addSite" icon="icon-add" url="lineInfoController.do?busStopInfoList&lineInfoId=${lineInfoId}&lineType=${lineType}" funname="adds"></t:dgToolBar>
 	<t:dgToolBar title="站点时间、序号编辑" operationCode="editSite"  icon="icon-edit" url="lineInfoController.do?updateBusStopOrder" funname="update"></t:dgToolBar>
 	<t:dgToolBar title="上移"  icon="icon-putout" url="lineInfoController.do?moveup" funname="moveup"></t:dgToolBar>
 	<t:dgToolBar title="下移"  icon="icon-put" url="lineInfoController.do?movedown" funname="movedown"></t:dgToolBar>
 </t:datagrid>
 </div>
+<input type="hidden" value="${isDealerLine}" id="isDealerLine" />
 </div>
 <script type="text/javascript">
 
@@ -235,6 +236,25 @@ function delZd(id,line_busstopId){
 	    }
 	});
 	
+}
+/** 
+ * 添加事件打开窗口
+ * @param title 编辑框标题
+ * @param addurl//目标页面地址
+ */
+function adds(title,addurl,gname,width,height) {
+	
+	gridname=gname;
+	  <%-- var isDealerLine = "<%=request.getAttribute("isDealerLine")%>"; --%>
+	 var isDealerLine = $("#isDealerLine").val();
+	 if(isDealerLine=='1'){
+		 tip('渠道商用户不能添加站点挂接！');
+		 //$('#roleUserListLB').datagrid('reload');
+		 reloadTable();
+		 return false;
+		
+	 }
+	createwindow(title, addurl,width,height);
 }
 
 </script>

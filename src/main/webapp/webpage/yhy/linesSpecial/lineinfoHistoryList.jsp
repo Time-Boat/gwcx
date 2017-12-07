@@ -53,7 +53,7 @@
 			<t:dgToolBar operationCode="detail" title="查看详情" icon="icon-search"
 				url="lineInfoSpecializedController.do?linedetail&history=1" funname="detail"></t:dgToolBar>
 			<t:dgFunOpt
-				funname="addBusStop(id,name,status,applicationEditStatus)"
+				funname="addBusStop(id,name,status,applicationEditStatus,isDealerLine)"
 				title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
 				
 			<t:dgFunOpt funname="applyEdit(id,applicationEditStatus,isDealerLine)" title="申请修改"
@@ -385,7 +385,7 @@
 		});
 	}
 
-	function addBusStop(id, name, status, applicationEditStatus) {
+	function addBusStop(id, name, status, applicationEditStatus,isDealerLine) {
 
 		if (applicationEditStatus == 1) {
 			tip('初审不能进行站点管理');
@@ -402,7 +402,7 @@
         }
         $('#main_typegroup_list').layout('panel','east').panel('setTitle', title);
 		
-		$("#function-panelAddBusStop").panel("refresh","lineinfoHistoryController.do?addBusStop&lineInfoId="+id+"&lineType=2");
+		$("#function-panelAddBusStop").panel("refresh","lineinfoHistoryController.do?addBusStop&lineInfoId="+id+"&lineType=2&isDealerLine="+isDealerLine);
 	}
 	function update(title, url, id, width, height) {
 		var rows = $("#applyEditList").datagrid("getSelections");

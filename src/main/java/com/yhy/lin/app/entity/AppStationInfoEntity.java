@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -32,6 +33,17 @@ public class AppStationInfoEntity implements java.io.Serializable {
 	
 	/**线路id*/
 	private String lineId;
+	
+//	/**区域站点路径    只有渠道商才有的字段*/
+//	private String[][] path;
+//	
+//	@Transient
+//	public String[][] getPath() {
+//		return path;
+//	}
+//	public void setPath(String[][] path) {
+//		this.path = path;
+//	}
 	
 	@Column(name ="LINEID",nullable=true,length=50)
 	public String getLineId() {

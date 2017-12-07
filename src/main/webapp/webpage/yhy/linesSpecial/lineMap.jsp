@@ -84,8 +84,9 @@
 	  </style>
 	  <title>站点信息</title>
 	</head>
- <body style="overflow-y: hidden" scroll="no" onload="loadMapStation()" >
+ <body style="overflow: hidden" onload="loadMapStation()" >
    	<input type="hidden" id="stations" name="stations" value="${stations}" />
+   	<input type="hidden" id="lineAreaStation" name="lineAreaStation" value="${lineAreaStation}" />
     	
     <div id="container" tabindex="0" style="height:100%;" >
     	<div id="panel">
@@ -101,13 +102,13 @@
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
     
-	    function loadTable(stations){
+	    function loadTable(){
 			var td = '<tr><td class="btbg font-center titfont" ></td><td class="btbg font-center titfont" >站点</td></tr>';
-				td += '<tr><td class="btbg2 font-center">起点</td><td class="font-center">' + stations[0].name + '</td></tr>';
-			for(var i=1;i<stations.length-1;i++){
-				td += '<tr><td class="btbg2 font-center">途经点</td><td class="font-center">' + stations[i].name + '</td></tr>';
+				td += '<tr><td class="btbg2 font-center">起点</td><td class="font-center">' + obj[0].name + '</td></tr>';
+			for(var i=1;i<obj.length-1;i++){
+				td += '<tr><td class="btbg2 font-center">途经点</td><td class="font-center">' + obj[i].name + '</td></tr>';
         	}
-				td += '<tr><td class="btbg2 font-center">终点</td><td class="font-center">' + stations[stations.length-1].name + '</td></tr>';
+				td += '<tr><td class="btbg2 font-center">终点</td><td class="font-center">' + obj[obj.length-1].name + '</td></tr>';
 			$('#stationTable').append(td);
 		}
     
@@ -120,31 +121,90 @@
     	//管理marker的容器
     	var markerArr = [];
         
+    	//绘制区域中所有点的经纬度
+		var areaPoint = [];
+		//区域对象
+		var polygon;
+		
+		//站点对象
+		var obj;
+		
     	function loadMapStation(){
     		var stations = $('#stations').val();
-    		var obj = eval('(' + stations + ')');
+    		obj = eval('(' + stations + ')');
         	
-    		console.log(obj.length);
+    		console.log(obj);
     		
-    		if(obj.length == 0){
-    			map = new AMap.Map('container',{	
-                    resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
-                    zoom: 1,						//地图显示的缩放级别
-                    center: ['116.397428', '39.90923'],  			//地图中心点
-                	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
-                });
+    		if(initMap()){
     			tip('该线路没有站点');
     			return;
+    		}
+    		
+    		var las = $('#lineAreaStation').val();
+    		console.log(las);
+        	if(las != ''){
+        		initPolygon();
+        	}else{
+        		initDriving();
+        	}
+       	}
+        
+    	//初始化地图组件
+    	function initMap(){
+    		if(obj.length == 0){
+    			map = new AMap.Map('container',{	
+                    resizeEnable: true,             	//是否监控地图容器尺寸变化，默认值为false
+                    zoom: 1,							//地图显示的缩放级别
+                    center: ['116.397428', '39.90923'], //地图中心点
+                	keyboardEnable: false  				//是否可以通过键盘来控制地图移动
+                });
+    			return true;
     		}
     		
         	map = new AMap.Map('container',{	
                 resizeEnable: true,             //是否监控地图容器尺寸变化，默认值为false
                 zoom: 12,						//地图显示的缩放级别
-                center: [obj[0].x, obj[0].y],  			//地图中心点
+                center: [obj[0].x, obj[0].y],  	//地图中心点
             	keyboardEnable: false  			//是否可以通过键盘来控制地图移动
             });
+        	return false;
+    	}
+    	
+    	//初始化地图区域对象
+    	function initPolygon(){
+    		var data = $('#lineAreaStation').val();
+    		var dxy = data.split(",");
+    		var dx = dxy[0].split("&");
+    		var dy = dxy[1].split("&");
+    		
+    		for(var i=0;i<dx.length;i++){
+    			areaPoint[i] = [dx[i],dy[i]];
+    		}
+    		console.log(areaPoint);
+    		polygon = new AMap.Polygon({
+    	        path: areaPoint,//设置多边形边界路径
+    	        strokeColor: "#FF33FF", //线颜色
+    	        strokeOpacity: 0.2, //线透明度
+    	        strokeWeight: 3,    //线宽
+    	        fillColor: "#1791fc", //填充色
+    	        fillOpacity: 0.35//填充透明度
+    	    });
+    	    polygon.setMap(map);
+    	    
+    	    var contentStyle;
+    	  	//起点
+        	if(obj[0].siteOrder == '0'){
+        		contentStyle = '<div class="marker-route marker-marker-bus-from"></div>';
+        	}else{//终点
+        		contentStyle = '<div class="marker-route amap-marker-background"></div>';
+        	}
         	
-           	/* createMarkerForTP();
+    	    createMarker(new AMap.LngLat(obj[0].x, obj[0].y), obj[0].name, contentStyle);
+    	}
+    	
+    	//初始化路径组件
+    	function initDriving(){
+    		/* createMarkerForTP();
            	markerTP.setPosition(new AMap.LngLat(obj[0].x, obj[0].y));
            	
         	openInfoWin(obj[0].stopLocation, new AMap.LngLat(obj[0].x, obj[0].y)); */
@@ -187,7 +247,7 @@
         		createMarker(new AMap.LngLat(obj[i].x, obj[i].y), obj[i].name, passContent);
         	}
         	
-        	loadTable(obj);
+        	loadTable();
         	
         	console.log(opts);
         	
@@ -206,9 +266,7 @@
        			}
         	);
 			//afterLoad();
-       	}
-        
-    	
+    	}
     	
        	//打开窗体
        	function openInfoWin(content, position) {

@@ -157,9 +157,16 @@ public class LineinfoHistoryController extends BaseController {
 		if (StringUtil.isNotEmpty(id)) {
 			lineInfo = lineinfoHistoryService.getEntity(LineinfoHistoryEntity.class, id);
 			req.setAttribute("lineInfo", lineInfo);
-			req.setAttribute("startList", getStartLocation(lineInfo.getCityId(), lineInfo.getType()));
-			req.setAttribute("endList",
-					getEndLocation(lineInfo.getCityId(), lineInfo.getType(), lineInfo.getStartLocation()));
+			req.setAttribute("isDealerLine", lineInfo.getIsDealerLine());
+			
+			if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {
+				BusStopInfoEntity bus = this.systemService.getEntity(BusStopInfoEntity.class, lineInfo.getStartLocation());
+				req.setAttribute("startList", bus.getName());
+			}
+			if (StringUtil.isNotEmpty(lineInfo.getEndLocation())) {
+				BusStopInfoEntity bus = this.systemService.getEntity(BusStopInfoEntity.class, lineInfo.getEndLocation());
+				req.setAttribute("endList", bus.getName());
+			}
 		}
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
@@ -341,6 +348,7 @@ public class LineinfoHistoryController extends BaseController {
 	public ModelAndView lineAddBusStop(HttpServletRequest request, HttpServletResponse response) {
 		request.setAttribute("lineInfoId", request.getParameter("lineInfoId"));
 		request.setAttribute("lineType", request.getParameter("lineType"));
+		request.setAttribute("isDealerLine", request.getParameter("isDealerLine"));
 		return new ModelAndView("yhy/lines/lineHistoryAddBusStopList");
 	}
 	

@@ -112,7 +112,7 @@ public class SendMailUtil {
 		});
 		
 		// 设置为debug模式, 可以查看详细的发送 log
-		session.setDebug(true);
+		session.setDebug(false);
 
 		// 3. 创建一封邮件
 		MimeMessage message = createMimeMessage(session, properties.getProperty("from.user"), subject, content, toUsers);

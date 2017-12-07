@@ -14,7 +14,7 @@
 	<t:dgCol title="起点地址" field="startLocation" query="true" align="center" width="100"></t:dgCol>
 	<t:dgCol title="终点地址" field="endLocation" query="true" align="center" width="100"></t:dgCol>
 	
-	<t:dgCol title="线路类型" field="type" query="true" replace="接机_2,送机 _3,接火车_4,送火车_5"  align="center" width="50"></t:dgCol>
+	<t:dgCol title="线路类型" field="type" query="true" replace="接机_2,送机 _3,接火车_4,送火车_5,接送服务_6"  align="center" width="50"></t:dgCol>
 	<%--<t:dgCol title="出车时间段" field="dispath" dictionary="dispathtime" align="center" width="90"></t:dgCol> --%>
 	<%--
 	<t:dgCol title="线路图片" field="imageurl"  align="center" width="60"></t:dgCol>
@@ -42,7 +42,7 @@
 	<t:dgFunOpt title="删除" operationCode="delLine" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#0"/>
 	<t:dgFunOpt title="删除" operationCode="delLine" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#5"/>
 	<t:dgFunOpt title="删除" operationCode="delLine" funname="delLine(id)" exp="status#eq#1&&applicationStatus#eq#6"/>
-	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus)" title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
+	<t:dgFunOpt funname="addBusStop(id,name,status,applicationStatus,isDealerLine)" title="站点管理" operationCode="addBusStop"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#0"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="applyShelves(id,status,isDealerLine)" title="申请上架" operationCode="applyShelves" exp="status#eq#1&&applicationStatus#eq#6"></t:dgFunOpt>
@@ -63,7 +63,7 @@
 	<t:dgFunOpt funname="refuse(id)" title="拒绝" operationCode="refuses" exp="applicationStatus#eq#2"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="初审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#5"></t:dgFunOpt>
 	<t:dgFunOpt funname="lookRejectReason(id)" title="复审拒绝原因" operationCode="rejectReason" exp="applicationStatus#eq#6"></t:dgFunOpt> 
-	<t:dgFunOpt funname="lookLine(id,name)" title="查看"></t:dgFunOpt>
+	<t:dgFunOpt funname="lookLine(id,name,isDealerLine,type)" title="查看"></t:dgFunOpt>
 	<t:dgToolBar funname="addCarRegion()" icon="icon-edit" title="编辑座位区间价格" operationCode="editSitPrice" ></t:dgToolBar>
 	<t:dgToolBar funname="detailCarRegion(id)" icon="icon-search" title="查看座位区间价格" ></t:dgToolBar>
 	
@@ -128,7 +128,7 @@
         var li_east = 0;
     });
 	
-	function addBusStop(id,name,status,applicationStatus) {
+	function addBusStop(id,name,status,applicationStatus,isDealerLine) {
 		
 		if(applicationStatus==1){
 			tip('初审不能进行站点管理');
@@ -148,7 +148,7 @@
         }
         $('#main_typegroup_list').layout('panel','east').panel('setTitle', title);
 		
-		$("#function-panelAddBusStop").panel("refresh","lineInfoController.do?addBusStop&lineInfoId="+id+"&lineType=2");
+		$("#function-panelAddBusStop").panel("refresh","lineInfoController.do?addBusStop&lineInfoId="+id+"&lineType=2&isDealerLine="+isDealerLine);
 				
 	}
 	$(function() {
@@ -168,30 +168,12 @@
 		var a4 = '</select></span>';
 		$("#lineList2Form").append(a1 + a2 + a3 + c1 + a4);//....
 		
-		/* //添加所属公司条件
-		var json1 = $("#companyList").val();
-		console.log(json);
-		var obj1 = "";
-		var ss = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
-		ss += 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属公司">选择公司：</span>';
-		ss += '<select name="company" style="width: 150px">';
-		ss += '<option value="">选择公司</option>';
-		
-		if(json1.indexOf("dCode")>0){
-			var obj1 = eval('(' + json1 + ')');
-			for (var i = 0; i < obj1.data.length; i++) {
-				ss += '<option value="'+obj1.data[i].dCode+'">' + obj1.data[i].dName + '</option>';
-			}
-		}
-		
-		ss += '</select></span>'; 
-		$("#lineList2Form").append(ss);//....*/
-		
 	});
 	
-	function lookLine(id, name) {
+	function lookLine(id, name, isDealerLine, type) {
 		//console.log(id + '------' + name);
-		createdetailwindow(name, "lineInfoSpecializedController.do?lineMap&id=" + id,"1200px","800px");
+		createdetailwindow(
+				name, "lineInfoSpecializedController.do?lineMap&id=" + id + "&isDealerLine=" + isDealerLine + "&type=" + type,"1200px","800px");
 	}
 	
 	//申请上、下架

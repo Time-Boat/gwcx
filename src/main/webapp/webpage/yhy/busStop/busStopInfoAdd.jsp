@@ -188,7 +188,7 @@
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
     <script type="text/javascript" >
-    
+    	
 	    function checkStation() {
 	        var as = $("#areaStations").val();
 	        var x = $("#x").val();
@@ -199,7 +199,7 @@
 	        }
 	        return true;
 	    }
-    
+    	
 	  	//地图对象
 		var map;
 		//窗体对象
@@ -283,6 +283,11 @@
         		console.log(areaPoint);
         		polygon = new AMap.Polygon({
         	        path: areaPoint,//设置多边形边界路径
+        	        strokeColor: "#FF33FF", //线颜色
+        	        strokeOpacity: 0.2, //线透明度
+        	        strokeWeight: 3,    //线宽
+        	        fillColor: "#1791fc", //填充色
+        	        fillOpacity: 0.35//填充透明度
         	    });
         	    polygon.setMap(map);
         	    

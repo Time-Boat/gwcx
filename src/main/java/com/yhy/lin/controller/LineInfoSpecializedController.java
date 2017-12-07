@@ -175,9 +175,20 @@ public class LineInfoSpecializedController extends BaseController {
 		if (StringUtil.isNotEmpty(id)) {
 			lineInfo = lineInfoService.getEntity(LineInfoEntity.class, id);
 			req.setAttribute("lineInfo", lineInfo);
-			req.setAttribute("startList", getStartLocation(lineInfo.getCityId(), lineInfo.getType()));
-			req.setAttribute("endList",
-					getEndLocation(lineInfo.getCityId(), lineInfo.getType(), lineInfo.getStartLocation()));
+			req.setAttribute("isDealerLine", lineInfo.getIsDealerLine());
+			
+			if (StringUtil.isNotEmpty(lineInfo.getStartLocation())) {
+				BusStopInfoEntity bus = this.systemService.getEntity(BusStopInfoEntity.class, lineInfo.getStartLocation());
+				req.setAttribute("startList", bus.getName());
+			}
+			if (StringUtil.isNotEmpty(lineInfo.getEndLocation())) {
+				BusStopInfoEntity bus = this.systemService.getEntity(BusStopInfoEntity.class, lineInfo.getEndLocation());
+				req.setAttribute("endList", bus.getName());
+			}			
+			//req.setAttribute("startList", lineInfo.getStartLocation());
+			//req.setAttribute("endList", lineInfo.getEndLocation());
+			//req.setAttribute("startList", getStartLocation(lineInfo.getCityId(), lineInfo.getType()));
+			//req.setAttribute("endList",getEndLocation(lineInfo.getCityId(), lineInfo.getType(), lineInfo.getStartLocation()));
 		}
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
@@ -422,11 +433,12 @@ public class LineInfoSpecializedController extends BaseController {
 	 * @return
 	 */
 	@RequestMapping(params = "lineMap")
-	public ModelAndView lineMap(LineInfoEntity lineInfo, HttpServletRequest req) {
-		// 获取部门信息
+	public ModelAndView lineMap(HttpServletRequest req) {
 
 		String lineId = req.getParameter("id");
-
+		String isDealerLine = req.getParameter("isDealerLine");//是否是渠道商   1是
+		String type = req.getParameter("type");//接送机类型     接机_2,送机 _3,接火车_4,送火车_5
+		
 		// List<Line_busStopEntity> lbs = systemService.findListbySql(
 		// "select b.* from line_busstop lb join busstopinfo b on b.id =
 		// lb.busStopsId "
@@ -434,13 +446,46 @@ public class LineInfoSpecializedController extends BaseController {
 		// + "where lineId = '" + lineId + "'");
 
 		List<Map<String, Object>> lbs = systemService.findForJdbc(
-				"select b.name,b.x,b.y,b.stopLocation,lb.siteOrder from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
+				"select b.name,b.x,b.y,b.stopLocation,lb.siteOrder,lb.busStopsId from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
 						+ "where lineId = '" + lineId + "' order by siteOrder ");
-
+		
+		if("1".equals(isDealerLine)){
+			
+			String sId = "";
+			
+			//接       终点是区域站点
+			if("2".equals(type) || "4".equals(type)){
+				sId = lbs.get(lbs.size()-1).get("busStopsId") + "";
+				//渠道商只有一个机场站点和一个区域站点
+				lbs.remove(lbs.size()-1);
+			}else{//送       起点是区域站点
+				sId = lbs.get(0).get("busStopsId") + "";
+				lbs.remove(0);
+			}
+			
+			List<Map<String,Object>> list = systemService.findForJdbc(
+					"select area_x,area_y from area_station_middle where station_id = ? order by xy_seq asc", sId);
+			
+			StringBuffer sbfX = new StringBuffer();
+			StringBuffer sbfY = new StringBuffer();
+			for(Map<String,Object> map : list){
+				sbfX.append(map.get("area_x"));
+				sbfX.append("&");
+				sbfY.append(map.get("area_y"));
+				sbfY.append("&");
+			}
+			
+			String lineAreaStation = "";
+			if(sbfX.length() > 0){
+				lineAreaStation = sbfX.deleteCharAt(sbfX.length()-1).toString() + "," + sbfY.deleteCharAt(sbfY.length()-1).toString();
+			}
+			
+			req.setAttribute("lineAreaStation", lineAreaStation);
+		}
+		
 		String json = JSONArray.fromObject(lbs).toString().replaceAll("\"", "'");
-
 		req.setAttribute("stations", json);
-
+		
 		return new ModelAndView("yhy/linesSpecial/lineMap");
 	}
 

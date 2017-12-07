@@ -24,17 +24,30 @@
     		 $("#type").attr("disabled", "disabled");
     	}
     	
-  		$('#ends').val($('#endLocation option:selected').text());
-  		$('#starts').val($('#startLocation option:selected').text());
+  		/* $('#ends').val($('#endLocation option:selected').text());
+  		$('#starts').val($('#startLocation option:selected').text()); */
   		
-  		var fruit = "";
+  		/* var fruit = "";
   		$("input:checkbox[name='isDealerLine']:checked").each(function() {
 			fruit += $(this).val();
 		});
   		
   		if(fruit.indexOf("0")==-1){
   			$("#linePrice").hide(); 
-  		}
+  		} */
+    	var isDealerLines= $("#isDealerLines").val();
+    	if(isDealerLines!=""){
+   		 	$("#isDealerLine").attr("disabled", "disabled");
+   		 	$("#DealerLine").attr("disabled", "disabled");
+  	 	}	
+    	
+    	var radio =$("input[type='radio']:checked").val();
+ 		 if(radio=='0'){
+ 			$("#linePrice").show(); 
+ 		 }else{
+ 			$("#linePrice").hide();
+ 			$("#linePrice").val(""); 
+ 		 };
     });
     
     //给起点站点赋值
@@ -98,17 +111,39 @@
   //是否选中普通用户
   	function choose(){
   		
-  		var a = $("#isDealerLine").prop("checked");
+  		/* var a = $("#isDealerLine").prop("checked");
   		if(a){
   			$("#linePrice").show(); 
   		 }else{
   			$("#linePrice").hide(); 
   			$("#linePrice").val(""); 
+  		 }; */
+  		$("#type ").val("--请选择--");
+   		$("#startLocation ").val("--请选择--");
+   		$("#endLocation ").val("--请选择--");
+  		var radio =$("input[type='radio']:checked").val();
+  		 if(radio=='0'){
+  			$("#linePrice").show(); 
+  		 }else{
+  			$("#linePrice").hide();
+  			$("#linePrice").val(""); 
   		 };
   	}
   	
   	function check(){
-  		var fruit = "";
+  		var isDealerLine =$("input[type='radio']:checked").val();//获取用户类型 
+  		if(isDealerLine==""){
+  			tip('用户类型不能为空！');
+  			return false;
+  		}
+  		if(isDealerLine=='0'){
+  			var price =$("#price").val();
+  			if(price==""){
+  				tip('线路价格不能为空！');
+  				return false;
+  			}
+  		}
+  		/* var fruit = "";
   		$("input:checkbox[name='isDealerLine']:checked").each(function() {
 			fruit += $(this).val();
 		});
@@ -122,7 +157,7 @@
   				tip('线路价格不能为空！');
   				return false;
   			}
-  		}
+  		} */
   	}
     
 </script>
@@ -130,6 +165,7 @@
 <body style="overflow-y: hidden" scroll="no">
 <t:formvalid formid="formobj" dialog="true" usePlugin="password" layout="table" beforeSubmit="check()" action="lineinfoHistoryController.do?save">
 	<input id="id" name="id" type="hidden" value="${lineInfo.id }">
+	<input id="isDealerLines" name="isDealerLines" type="hidden" value="${lineInfo.isDealerLine}">
 	<input id="ends" name="endLocations" type="hidden" value="${lineInfo.endLocation}">
 	<input id="starts" name="startLocations" type="hidden" value="${lineInfo.startLocation}">
 	<input id="types" name="types" type="hidden" value="${lineInfo.type}">
@@ -167,12 +203,77 @@
 		
 		<tr>
 			<td align="right">
+				<label class="Validform_label">用户类型: </label>
+			</td>
+			<td class="value">
+				<label class="demo--label">
+					<c:choose>
+						<c:when test="${fn:contains(lineInfo.isDealerLine,'0')}">
+							<input class="demo--radio" id="isDealerLine" name="isDealerLine" type="radio" checked="checked" value="0" onchange="choose()"/>
+						</c:when>
+						<c:otherwise>
+							<input class="demo--radio" id="isDealerLine" name="isDealerLine" type="radio" value="0" onchange="choose()"/>
+						</c:otherwise>
+					</c:choose>
+					<span class="demo--checkbox demo--radioInput"></span>普通用户
+				</label>
+				<label class="demo--label">
+					<c:choose>
+						<c:when test="${fn:contains(lineInfo.isDealerLine,'1')}">
+							<input class="demo--radio" id="DealerLine" name="isDealerLine" type="radio" checked="checked" value="1" onchange="choose()"/>
+						</c:when>
+						<c:otherwise>
+							<input class="demo--radio" id="DealerLine" name="isDealerLine" type="radio" value="1" onchange="choose()"/>
+						</c:otherwise>
+					</c:choose>
+					<span class="demo--checkbox demo--radioInput"></span>渠道商用户
+				</label>
+				
+			</td>
+		
+		</tr>
+		
+		<tr>
+			<td align="right">
 				<label class="Validform_label"> 线路类型: </label>
 			</td>
 			<td class="value">
 				
 				<t:dictSelect id="type" field="type" extendJson="{onchange:getStartLocation()}" typeGroupCode="transferTy" hasLabel="false" defaultVal="${lineInfo.type}" datatype="*" ></t:dictSelect>	
 				
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 起始发车地址: </label>
+			</td>
+			<td class="value">
+				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" onChange="getEndlocation()" <c:if test="${lineInfo.startLocation!=null }">  disabled="disabled" </c:if>>  
+                <option value="${lineInfo.startLocation}">${startList}</option>
+						<%-- <c:forEach var="b" items="${startList}">
+							<option value="${b.id}" <c:if test="${lineInfo.startLocation == b.id}" >selected="selected"</c:if> >
+								${b.name}
+							</option>
+						</c:forEach> --%>
+                </select>
+				<span class="Validform_checktip"></span>
+			</td>
+		</tr>
+		<tr>
+			<td align="right">
+				<label class="Validform_label"> 终点位置地址:  </label>
+			</td>
+			<td class="value">
+				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" <c:if test="${lineInfo.endLocation!=null }">  disabled="disabled" </c:if>> 
+				<option value="${lineInfo.endLocation}">${endList}</option>
+						<%-- <c:forEach var="b" items="${endList}">
+							<option value="${b.id}" <c:if test="${lineInfo.endLocation == b.id}" >selected="selected"</c:if> >
+								${b.name}
+							</option>
+						</c:forEach>  --%>
+                </select>
 				<span class="Validform_checktip"></span>
 			</td>
 		</tr>
@@ -191,39 +292,6 @@
 		
 		<tr>
 			<td align="right">
-				<label class="Validform_label"> 起始发车地址: </label>
-			</td>
-			<td class="value">
-				<select id="startLocation" style="width: 152px" class="select_field" name="startLocation" onChange="getEndlocation()" <c:if test="${lineInfo.startLocation!=null }">  disabled="disabled" </c:if>>  
-                <option value="">--请选择发车地址--</option>
-						<c:forEach var="b" items="${startList}">
-							<option value="${b.id}" <c:if test="${lineInfo.startLocation == b.id}" >selected="selected"</c:if> >
-								${b.name}
-							</option>
-						</c:forEach>
-                </select>
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 终点位置地址:  </label>
-			</td>
-			<td class="value">
-				<select id="endLocation" style="width: 152px" class="select_field" name="endLocation" <c:if test="${lineInfo.endLocation!=null }">  disabled="disabled" </c:if>> 
-				<option value="">--请选择终点位置地址--</option>
-						<c:forEach var="b" items="${endList}">
-							<option value="${b.id}" <c:if test="${lineInfo.endLocation == b.id}" >selected="selected"</c:if> >
-								${b.name}
-							</option>
-						</c:forEach> 
-                </select>
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		
-		<tr>
-			<td align="right">
 				<label class="Validform_label"> 线路时长: </label>
 			</td>
 			<td class="value">
@@ -232,56 +300,6 @@
 			</td>
 		</tr>
 		
-		<%-- <tr>
-			<td align="right">
-				<label class="Validform_label"> 线路定价(元/人): </label>
-			</td>
-			<td class="value">
-				<input class="inputxt" name="price" value="${lineInfo.price}" style="width: 60%" datatype="d"> 
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr>
-		<tr>
-			<td align="right">
-				<label class="Validform_label"> 是否有渠道商: </label>
-			</td>
-			<td class="value">
-				<t:dictSelect id="isDealerLine" field="isDealerLine" typeGroupCode="is_dealer" hasLabel="false" defaultVal="${lineInfo.isDealerLine}" datatype="*"></t:dictSelect>
-				<span class="Validform_checktip"></span>
-			</td>
-		</tr> --%>
-		
-		<tr>
-			<td align="right">
-				<label class="Validform_label">用户类型: </label>
-			</td>
-			<td class="value">
-				<label class="demo--label">
-					<c:choose>
-						<c:when test="${fn:contains(lineInfo.isDealerLine,'0')}">
-							<input class="demo--radio" id="isDealerLine" name="isDealerLine" type="checkbox" checked="checked" value="0" onchange="choose()"/>
-						</c:when>
-						<c:otherwise>
-							<input class="demo--radio" id="isDealerLine" name="isDealerLine" type="checkbox" value="0" onchange="choose()"/>
-						</c:otherwise>
-					</c:choose>
-					<span class="demo--checkbox demo--radioInput"></span>普通用户
-				</label>
-				<label class="demo--label">
-					<c:choose>
-						<c:when test="${fn:contains(lineInfo.isDealerLine,'1')}">
-							<input class="demo--radio" name="isDealerLine" type="checkbox" checked="checked" value="1" />
-						</c:when>
-						<c:otherwise>
-							<input class="demo--radio" name="isDealerLine" type="checkbox" value="1" />
-						</c:otherwise>
-					</c:choose>
-					<span class="demo--checkbox demo--radioInput"></span>渠道商用户
-				</label>
-				
-			</td>
-		
-		</tr>
 		<tr id="linePrice">
 			<td align="right">
 				<label class="Validform_label"> 线路定价(元/人): </label>
