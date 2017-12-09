@@ -1,6 +1,9 @@
 package com.yhy.lin.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +39,7 @@ import com.yhy.lin.entity.LineinfoHistoryEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.comparators.SortBySeq;
 import com.yhy.lin.entity.AreaStationDTO;
 import com.yhy.lin.entity.AreaStationMiddleEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
@@ -189,16 +193,24 @@ public class BusStopInfoController extends BaseController {
 		//获取部门信息
 		List<TSDepart> departList = systemService.getList(TSDepart.class);
 		req.setAttribute("departList", departList);		
+		
+		
 		if (StringUtil.isNotEmpty(busStopInfo.getId())) {
+			
 			busStopInfo = busStopInfoService.getEntity(BusStopInfoEntity.class, busStopInfo.getId());
 			req.setAttribute("busStopInfo", busStopInfo);
 			
 			if("3".equals(busStopInfo.getStationType())){
 				List<Map<String,Object>> list = busStopInfoService.findForJdbc(
-						"select area_x,area_y from area_station_middle where station_id = ? order by xy_seq asc", busStopInfo.getId());
+						" select area_x,area_y,xy_seq from area_station_middle asm join busstopinfo b on b.id = asm.station_id "
+						+ " where station_id = ? and b.deleteFlag = 0 order by station_id,xy_seq asc ", busStopInfo.getId());
 				
 				StringBuffer sbfX = new StringBuffer();
 				StringBuffer sbfY = new StringBuffer();
+				
+				//查出来的结果是无序的，拍个序，不然会有问题
+				Collections.sort(list, new SortBySeq());
+				
 				for(Map<String,Object> map : list){
 					sbfX.append(map.get("area_x"));
 					sbfX.append("&");
@@ -212,61 +224,88 @@ public class BusStopInfoController extends BaseController {
 				}
 				
 				req.setAttribute("areaStations", json);
-				
-				
-				List<Map<String,Object>> aList = busStopInfoService.findForJdbc(
-						"select b.name,area_x,area_y,xy_seq from area_station_middle asm join busstopinfo b on b.id = asm.station_id"
-						+ " where station_id != ? order by station_id,xy_seq", busStopInfo.getId());
-				
-				List<AreaStationDTO> asdList = new ArrayList<>();
-				
-				//这个算法头都大了，后面肯定会忘记的....     看有没有时间来波优化了
-				AreaStationDTO as = null;
-				String[][] path = null;
-				//存储临时的xy值
-				StringBuffer sbf = null;
-				//加个<=是为了最后一次赋值
-				for(int k=0;k<=aList.size();k++){
-					Map<String,Object> map = null;
-					String seq = "0";
-					if(k != aList.size()){
-						map = aList.get(k);
-						seq = map.get("xy_seq") + "";
-					}
-					
-					//初始化    最后一波要赋值一次
-					if("0".equals(seq)){
-						//第一波因为没有值，不用初始化
-						if(k != 0) {
-							//机智的我，居然能想出这种办法，啧啧啧...
-							String[] xyArr = sbf.toString().split(",");
-							path = new String[xyArr.length][];
-							for(int i=0;i<xyArr.length;i++){
-								path[i] = xyArr[i].split("&");
-							}
-							as.setPath(path);
-							asdList.add(as);
-						}
-						//最后一波，就不用初始化了
-						if(k != aList.size()){
-							sbf = new StringBuffer();
-							as = new AreaStationDTO();
-							as.setName(map.get("name") + "");
-						}else{
-							//最后一次是用来给区域站点赋值的，所以不用再sbf.append了，不然会出现空值，直接跳出
-							break;
-						}
-					}
-					sbf.append(map.get("area_x") + "&" +map.get("area_y") + ",");
-				}
-				
-				req.setAttribute("otherAreaStations", asdList);
-				
 			}
+			
 		}
+		
 		List<OpenCityEntity> cities = systemService.findByProperty(OpenCityEntity.class, "status", "0");
 		req.setAttribute("cities", cities);
 		return new ModelAndView("yhy/busStop/busStopInfoAdd");
+	}
+
+	/**
+	 * 获取其他当前区域站点
+	 */
+	@RequestMapping(params="getOtherAreaStation")
+	@ResponseBody
+	public AjaxJson getOtherAreaStation(BusStopInfoEntity busStopInfo,HttpServletRequest request,HttpServletResponse respone){
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		
+		String bId = request.getParameter("bId");
+		String cityId = request.getParameter("cityId");
+		
+		if(!StringUtil.isNotEmpty(bId)){
+			bId = "";
+		}
+		try{
+			//查出其他区域站点，显示在地图上，不能让绘制的区域和这些已经存在的区域重叠
+			List<Map<String,Object>> aList = busStopInfoService.findForJdbc(
+					"select b.name,area_x,area_y,xy_seq from area_station_middle asm join busstopinfo b on b.id = asm.station_id"
+							+ " where station_id != ? and b.deleteflag = 0 and b.cityId = ? order by station_id,xy_seq", bId, cityId);
+			
+			List<AreaStationDTO> asdList = new ArrayList<>();
+			
+			Map<String,String> tempMap = new HashMap<>();
+			
+			//同一个对象
+			String sName = "";
+			String tempName = "";
+			
+			//这个算法头都大了，后面肯定会忘记的....     看有没有时间来波优化了
+			AreaStationDTO as = null;
+			String[][] path = null;
+			
+			//思维是越发的精进了（优化后）
+			int sum = 0;
+			
+			//最后一个对象少个点，回去做
+			for(int i=0;i<aList.size();i++){
+				Map<String,Object> map = aList.get(i);
+				
+				tempName = sName;
+				sName = map.get("name") + "";
+				
+				if(i == aList.size()-1){
+					tempMap.put(map.get("xy_seq") + "", map.get("area_x") + "," + map.get("area_y"));
+					sum++;
+				}
+				
+				if((!sName.equals(tempName) && i != 0) || i == aList.size()-1){
+					path = new String[sum][];
+					for(int s=0;s<sum;s++){ 
+						path[s] = tempMap.get(s + "").split(",");
+					}
+					as = new AreaStationDTO();
+					as.setName(tempName);
+					as.setPath(path);
+					asdList.add(as);
+					tempMap.clear();
+					sum = 0;
+				}
+				sum++;
+				tempMap.put(map.get("xy_seq") + "", map.get("area_x") + "," + map.get("area_y"));
+			}
+			
+			j.setSuccess(true);
+			j.setObj(JSONArray.fromObject(asdList).toString().replace("\"", "'"));
+		}catch (Exception e) {
+			message = "获取其他站点失败！";
+			j.setSuccess(false);
+			logger.error(ExceptionUtil.getExceptionMessage(e));
+		}
+		j.setMsg(message);
+		return j;		
 	}
 	
 	/**
@@ -328,6 +367,7 @@ public class BusStopInfoController extends BaseController {
 				//-----数据修改日志[类SVN]------------
 				systemService.addLog(message, Globals.Log_Type_UPDATE, Globals.Log_Leavel_INFO);
 			}
+			
 			if(StringUtil.isNotEmpty(areaStations) && "3".equals(busStopInfo.getStationType())){
 				
 				String[] xy = areaStations.split(",");
@@ -339,8 +379,8 @@ public class BusStopInfoController extends BaseController {
 					systemService.executeSql(" insert into area_station_middle VALUES (?, ?, ?, ?, ?) ", 
 							UUIDGenerator.generate(), busStopInfo.getId(), x[i], y[i], i + "");
 				}
-				
 			}
+			
 		}catch (Exception e) {
 			message = "站点添加失败！";
 			j.setSuccess(false);
@@ -407,108 +447,108 @@ public class BusStopInfoController extends BaseController {
 		        String history = request.getParameter("history");
 		        if("1".equals(history)){
 		        	
-		        	 LineinfoHistoryEntity line = this.systemService.getEntity(LineinfoHistoryEntity.class, lineInfoId);
+		        	 LineinfoHistoryEntity line = systemService.getEntity(LineinfoHistoryEntity.class, lineInfoId);
 				        
-				        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
-				        List<String> idsList = extractIdListByComma(ids);
-				        List<LineBusstopHistoryEntity> list = new ArrayList<LineBusstopHistoryEntity>();
-				        StringBuffer sql = new StringBuffer();
-				        for(int i=0;i<idsList.size();i++){
-				        	LineBusstopHistoryEntity lin_busStop = new LineBusstopHistoryEntity();
-				        	lin_busStop.setLineId(lineInfoId);
-				        	lin_busStop.setBusStopsId(idsList.get(i));
-				        	lin_busStop.setVersion(line.getVersion());
-				        	int site = getMaxSiteOrders(lineInfoId);
-				        	int pum = site+1+i;
-				        	lin_busStop.setSiteOrder(pum);
-				        	
-				        	StartOrEndEntity st = new StartOrEndEntity();
-				        	if("2".equals(line.getType()) || "4".equals(line.getType())){
-				        		
-								if (StringUtil.isNotEmpty(line.getStartLocation())) {
-									st.setStartid(line.getStartLocation());
-								}
-								if (StringUtil.isNotEmpty(ids)) {
-									st.setEndid(idsList.get(i));
-								}
-								st.setLinetype(line.getType());
-								
-				        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
-				        		if (StringUtil.isNotEmpty(ids)) {
-									st.setStartid(idsList.get(i));
-								}
-								if (StringUtil.isNotEmpty(line.getEndLocation())) {
-									st.setEndid(line.getEndLocation());
-								}
-								st.setLinetype(line.getType());
+			        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
+			        List<String> idsList = extractIdListByComma(ids);
+			        List<LineBusstopHistoryEntity> list = new ArrayList<LineBusstopHistoryEntity>();
+			        StringBuffer sql = new StringBuffer();
+			        for(int i=0;i<idsList.size();i++){
+			        	LineBusstopHistoryEntity lin_busStop = new LineBusstopHistoryEntity();
+			        	lin_busStop.setLineId(lineInfoId);
+			        	lin_busStop.setBusStopsId(idsList.get(i));
+			        	lin_busStop.setVersion(line.getVersion());
+			        	int site = getMaxSiteOrders(lineInfoId);
+			        	int pum = site+1+i;
+			        	lin_busStop.setSiteOrder(pum);
+			        	
+			        	StartOrEndEntity st = new StartOrEndEntity();
+			        	if("2".equals(line.getType()) || "4".equals(line.getType())){
+			        		
+							if (StringUtil.isNotEmpty(line.getStartLocation())) {
+								st.setStartid(line.getStartLocation());
+							}
+							if (StringUtil.isNotEmpty(ids)) {
+								st.setEndid(idsList.get(i));
+							}
+							st.setLinetype(line.getType());
+							
+			        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
+			        		if (StringUtil.isNotEmpty(ids)) {
+								st.setStartid(idsList.get(i));
+							}
+							if (StringUtil.isNotEmpty(line.getEndLocation())) {
+								st.setEndid(line.getEndLocation());
+							}
+							st.setLinetype(line.getType());
+		        		}
+			        	st.setStationStatus("0");
+			        	st.setLineId(line.getId());
+			        	startOrEndService.save(st);
+			        	
+			        	if(StringUtil.isNotEmpty(idsList.get(i))){
+			        		if(i==(idsList.size()-1)){
+			        			sql.append("'"+idsList.get(i)+"'");
+			        		}else{
+			        			sql.append("'"+idsList.get(i)+"',");
 			        		}
-				        	st.setStationStatus("0");
-				        	st.setLineId(line.getId());
-				        	startOrEndService.save(st);
-				        	
-				        	if(StringUtil.isNotEmpty(idsList.get(i))){
-				        		if(i==(idsList.size()-1)){
-				        			sql.append("'"+idsList.get(i)+"'");
-				        		}else{
-				        			sql.append("'"+idsList.get(i)+"',");
-				        		}
-				        	}
-				        	list.add(lin_busStop);
-				        }
-				        
-				        systemService.saveAllEntitie(list);
+			        	}
+			        	list.add(lin_busStop);
+			        }
+			        
+			        systemService.saveAllEntitie(list);
 		        }else{
-		        	 LineInfoEntity line = this.systemService.getEntity(LineInfoEntity.class, lineInfoId);
-				        
-				        String ids = oConvertUtils.getString(request.getParameter("ids"));//站点ID
-				        List<String> idsList = extractIdListByComma(ids);
-				        List<Line_busStopEntity> list = new ArrayList<Line_busStopEntity>();
-				        StringBuffer sql = new StringBuffer();
-				        for(int i=0;i<idsList.size();i++){
-				        	Line_busStopEntity lin_busStop = new Line_busStopEntity();
-				        	lin_busStop.setLineId(lineInfoId);
-				        	lin_busStop.setBusStopsId(idsList.get(i));
-				        	int site = getMaxSiteOrder(lineInfoId);
-				        	int pum = site+1+i;
-				        	lin_busStop.setSiteOrder(pum);
-				        	
-				        	StartOrEndEntity st = new StartOrEndEntity();
-				        	if("2".equals(line.getType()) || "4".equals(line.getType())){
-				        		
-								if (StringUtil.isNotEmpty(line.getStartLocation())) {
-									st.setStartid(line.getStartLocation());
-								}
-								if (StringUtil.isNotEmpty(ids)) {
-									st.setEndid(idsList.get(i));
-								}
-								
-								st.setLinetype(line.getType());
-								
-				        	}else if("3".equals(line.getType()) || "5".equals(line.getType())){
-				        		if (StringUtil.isNotEmpty(ids)) {
-									st.setStartid(idsList.get(i));
-								}
-								if (StringUtil.isNotEmpty(line.getEndLocation())) {
-									st.setEndid(line.getEndLocation());
-								}
-								st.setLinetype(line.getType());
-			        		}
-				        	st.setStationStatus("0");
-				        	st.setLineId(lineInfoId);
-				        	
-				        	startOrEndService.save(st);
-				        	
-				        	if(StringUtil.isNotEmpty(idsList.get(i))){
-				        		if(i==(idsList.size()-1)){
-				        			sql.append("'"+idsList.get(i)+"'");
-				        		}else{
-				        			sql.append("'"+idsList.get(i)+"',");
-				        		}
-				        	}
-				        	list.add(lin_busStop);
-				        }
-				        
-				        systemService.saveAllEntitie(list);
+				LineInfoEntity line = systemService.getEntity(LineInfoEntity.class, lineInfoId);
+
+				String ids = oConvertUtils.getString(request.getParameter("ids"));// 站点ID
+				List<String> idsList = extractIdListByComma(ids);
+				List<Line_busStopEntity> list = new ArrayList<Line_busStopEntity>();
+				StringBuffer sql = new StringBuffer();
+					for (int i = 0; i < idsList.size(); i++) {
+						Line_busStopEntity lin_busStop = new Line_busStopEntity();
+						lin_busStop.setLineId(lineInfoId);
+						lin_busStop.setBusStopsId(idsList.get(i));
+						int site = getMaxSiteOrder(lineInfoId);
+						int pum = site + 1 + i;
+						lin_busStop.setSiteOrder(pum);
+	
+						StartOrEndEntity st = new StartOrEndEntity();
+						if ("2".equals(line.getType()) || "4".equals(line.getType())) {
+	
+							if (StringUtil.isNotEmpty(line.getStartLocation())) {
+								st.setStartid(line.getStartLocation());
+							}
+							if (StringUtil.isNotEmpty(ids)) {
+								st.setEndid(idsList.get(i));
+							}
+	
+							st.setLinetype(line.getType());
+	
+						} else if ("3".equals(line.getType()) || "5".equals(line.getType())) {
+							if (StringUtil.isNotEmpty(ids)) {
+								st.setStartid(idsList.get(i));
+							}
+							if (StringUtil.isNotEmpty(line.getEndLocation())) {
+								st.setEndid(line.getEndLocation());
+							}
+							st.setLinetype(line.getType());
+						}
+						st.setStationStatus("0");
+						st.setLineId(lineInfoId);
+	
+						startOrEndService.save(st);
+	
+						if (StringUtil.isNotEmpty(idsList.get(i))) {
+							if (i == (idsList.size() - 1)) {
+								sql.append("'" + idsList.get(i) + "'");
+							} else {
+								sql.append("'" + idsList.get(i) + "',");
+							}
+						}
+						list.add(lin_busStop);
+					}
+	
+					systemService.saveAllEntitie(list);
 		        }
 		        //公务车线路为1    接送机线路为2
 		        //String lineType = request.getParameter("lineType");
@@ -545,5 +585,5 @@ public class BusStopInfoController extends BaseController {
 		
 		return jsonObj;
 	}
-    
+	 
 }

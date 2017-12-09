@@ -183,7 +183,7 @@
 	    <input type="button" class="button" value="鼠标绘制面" id="polygon"/>
     </div>
     <!-- script必须放在body中。。 -->
-    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=b911428c1074ac0db34529ec951bf123&plugin=AMap.MouseTool" ></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.2&key=b911428c1074ac0db34529ec951bf123&plugin=AMap.MouseTool,AMap.GeometryUtil" ></script>
     <script type="text/javascript" src="https://webapi.amap.com/demos/js/liteToolbar.js"></script>
     <script src="https://webapi.amap.com/js/marker.js"></script>
     <script src="https://webapi.amap.com/ui/1.0/main.js"></script>
@@ -210,10 +210,33 @@
 		var cityCode = $('#city').val();
 		//绘制区域中所有点的经纬度
 		var areaPoint = [];
-		//区域对象
+		//当前区域对象
 		var polygon;
+		//其他区域组对象
+		var polygons = [];
 		//MouseTool插件
 	    var mouseTool;
+		
+		//已请求后台区域线路的城市
+		//var citis = [];
+		
+		//当前区域
+	    var curPolygon = {
+	        strokeColor: "#fff", //线颜色
+	        strokeOpacity: 0.2, //线透明度
+	        strokeWeight: 3,    //线宽
+	        fillColor: "#fff", //填充色
+	        fillOpacity: 0.35//填充透明度
+	    };
+	    
+		//其他区域
+	    var otherPolygon = {
+	        strokeColor: "#0f0", //线颜色
+	        strokeOpacity: 0.2, //线透明度
+	        strokeWeight: 3,    //线宽
+	        fillColor: "#0f0", //填充色
+	        fillOpacity: 0.35//填充透明度
+	    };
 	
     	function changeSType(value){
     		if(cityCode == "" || cityCode == null){
@@ -225,13 +248,15 @@
     		console.log(value);
     		
     		if(value == '3'){
+    			showOtherPlygon();
     			showPlygon();
     		}else{
+    			clearPlygon();
     			$('#stationInfo').show();
     			$('#bt_group').hide();
     		}
     		if(typeof(polygon) != "undefined"){
-    			clearMap();
+    			clearPolygon();
     		}
     	}
     	
@@ -244,8 +269,11 @@
     		console.log(city.trim());
     		map.setCity(city.trim());
     		map.setZoom(10);
-    		if(typeof(polygon) != "undefined"){
-    			clearMap();
+    		
+    		var sType = $("select[name='stationType']").val();
+    		if(sType != ''){
+	    		clearPlygon();
+	    		showOtherPlygon();
     		}
     	}
     
@@ -270,6 +298,8 @@
         	initPlaceSearch();
         	
         	if(sType == '3'){
+        		
+        		showOtherPlygon();
         		showPlygon();
         		
         		var data = $('#areaStations').val();
@@ -282,13 +312,14 @@
         		}
         		console.log(areaPoint);
         		polygon = new AMap.Polygon({
-        	        path: areaPoint,//设置多边形边界路径
-        	        strokeColor: "#FF33FF", //线颜色
+        			path: areaPoint,
+        			strokeColor: "#000", //线颜色
         	        strokeOpacity: 0.2, //线透明度
         	        strokeWeight: 3,    //线宽
-        	        fillColor: "#1791fc", //填充色
+        	        fillColor: "#000", //填充色
         	        fillOpacity: 0.35//填充透明度
-        	    });
+        	        });
+        		//polygon.setPath(areaPoint);
         	    polygon.setMap(map);
         	    
         	    map.setCenter(areaPoint[0]);
@@ -318,23 +349,41 @@
 				}
 		    }, false);
 		    
-		    AMap.event.addListener(mouseTool,'draw',function(e){ //添加事件
+		    AMap.event.addListener(mouseTool,'draw',function(e){ //添加绘制完成的事件
 		    	
 		    	//区域对象
 		    	if(typeof(polygon) != "undefined"){
 	    			polygon.setMap(null);
 		    	}
 		    	polygon = e.obj;
-
+		    	
 		    	areaPoint = e.obj.getPath();//获取路径/范围
+		    	
+		    	var isIntersect = false;
+		    	for(var k=0;k<polygons.length;k++){
+		    		var isIntersect = AMap.GeometryUtil.doesRingRingIntersect(areaPoint, polygons[k].getPath());
+		    		console.log(isIntersect);
+		    		if(isIntersect){
+		    			break;
+		    		}
+		    	}
+		    	
+		    	if(isIntersect){
+		    		polygon.setMap(null);
+		    		areaPoint = [];
+		    		tip("绘制的区域不能和已有的区域重叠，请重新绘制!");
+		    		return;
+		    	}
+		    	
 		    	//经度
 	    		var m = '';
 		    	//纬度
 	    		var o = '';
 		    	console.log(areaPoint.length);
+		    	console.log(areaPoint);
 		    	for(var i=0;i<areaPoint.length;i++){
-		    		m += areaPoint[i].M;
-		    		o += areaPoint[i].O;
+		    		m += areaPoint[i].L;
+		    		o += areaPoint[i].N;
 		    		if(i != areaPoint.length-1){
 		    			m += '&';
 			    		o += '&';
@@ -342,17 +391,55 @@
 		    	}
 		    	
 		    	$('#areaStations').val(m + ',' + o);
-		    	console.log(areaPoint);
+		    	console.log(m + ',' + o);
 		    });
     	}
     	
     	//关闭画多边形功能，并清除地图覆盖物
-    	function clearMap(){
+    	function clearPolygon(){
    			console.log(111);
-			polygon.setMap(null);
 			areaPoint = [];
+			clearPlygon();
 			//关闭当前鼠标事件操作，这里关闭了绘制多边形的动作
 			mouseTool.close(true);
+    	}
+    	
+    	//先显示出其他区域站点    (这个不用重复去请求服务器，请求一次之后可以做缓存，现在先这样吧...)
+    	function showOtherPlygon(){
+    		var bId = $("#id").val();
+    		var city = $("#city").val();
+    		$.get(
+   				"busStopInfoController.do?getOtherAreaStation&bId="+bId+"&cityId="+city,
+   				function(data){
+   					//console.log(data);
+    		    	if(data.success){
+    		    		
+    		    		//移除
+    		    		for(var i=0;i<polygons.length;i++){
+    		    			polygons[i].setMap(null);
+    		    		}
+    		    		
+    		    		/* if(typeof(overlayGroup) == "undefined"){
+    		    			overlayGroup = new AMap.OverlayGroup();
+    		    		}else{
+    		    			overlayGroup.clearOverlays();
+    		    		} */
+    		    		
+    		    		var pStr = data.obj;
+    		    		//console.log(pStr);
+    		    		var pObj = eval("(" + pStr + ")");
+    		    		for (var i = 0; i < pObj.length; i++) {
+    		    			var p = new AMap.Polygon(otherPolygon);
+    		    			p.setPath(pObj[i].path);
+    		        	    p.setMap(map);
+    		        	    polygons[i] = p;
+    					}
+    		    		//console.log(pObj);
+    		    		console.log(polygons);
+    		    	}
+   				},
+   				"json"
+    		);
     	}
     	
     	//显示绘制多边形界面
@@ -380,6 +467,11 @@
     		infoWindow.setContent('<p class="my-desc">' + content + '</p>');//点击以后窗口展示的内容
             infoWindow.open(map, position);
         }
+    	
+    	//清除区域站点
+    	function clearPlygon(){
+    		map.clearMap();
+    	}
     	
        	function afterLoadBs(){
        		//经纬度获取详细地址

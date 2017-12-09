@@ -12,6 +12,7 @@ import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
+import com.yhy.lin.entity.DealerOrderUserStationEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -21,8 +22,9 @@ import com.yhy.lin.entity.TransferorderEntity;
 */
 public interface AppInterfaceService extends CommonService{
 
-	/** 保存订单信息，记录常用站点，添加到消息中心 */
-	String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId);
+	/** 保存订单信息，记录常用站点，添加到消息中心 
+	 * @param station */
+	String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId, DealerOrderUserStationEntity station);
 
 	/** 获取机场站点或者火车站站点信息 */
 	List<AppStationInfoEntity> getPTStation(String serveType, String cityId, String userType);

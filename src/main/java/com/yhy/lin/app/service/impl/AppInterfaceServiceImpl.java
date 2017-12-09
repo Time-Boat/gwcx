@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +31,10 @@ import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
+import com.yhy.lin.comparators.SortBySeq;
 import com.yhy.lin.entity.AreaStationMiddleEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
+import com.yhy.lin.entity.DealerOrderUserStationEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
@@ -64,7 +67,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	// noRollbackFor={UserAccountException.class},
 	// readOnly=true//, timeout=30 //timeout 允许在执行第一条sql之后保持连接30秒
 	)
-	public String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId) {
+	public String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId, DealerOrderUserStationEntity station) {
 
 		// 生成订单号
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
@@ -124,8 +127,14 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			c.setUserId(t.getUserId());
 			c.setId(UUIDGenerator.generate());
 		}
-
+		
 		save(t);
+		
+		if("1".equals(t.getOrderUserType())){
+			station.setOrderId(t.getId());
+			save(station);
+		}
+		
 		save(c);
 
 		return t.getId();
@@ -228,12 +237,16 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 				}
 				
 				List<Map<String,Object>> mList = findForJdbc(
-						"select area_x,area_y from area_station_middle where station_id = ? order by xy_seq asc", asi.getId());
+						"select area_x,area_y,xy_seq from area_station_middle where station_id = ? order by xy_seq asc", asi.getId());
 				
 //				String[][] path = new String[mList.size()][];
 //				for(int i=0;i<mList.size();i++){
 //					path[i] = new String[]{mList.get(i).get("area_x") + "", mList.get(i).get("area_y") + ""};
 //				}
+				
+				//查出来的结果是无序的，拍个序，不然会有问题
+				Collections.sort(mList, new SortBySeq());
+				
 				StringBuffer sbfX = new StringBuffer();
 				StringBuffer sbfY = new StringBuffer();
 				for(Map<String,Object> map : mList){

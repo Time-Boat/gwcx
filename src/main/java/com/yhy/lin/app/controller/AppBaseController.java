@@ -11,6 +11,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.util.DateUtils;
 import org.jeecgframework.core.util.StringUtil;
@@ -90,17 +91,28 @@ public class AppBaseController extends BaseController {
 		return id;
 	}
 	
-	/** 验证参数是否为空 (json) */
-	public static JSONObject checkParam(String strJson) throws ParameterException {
+	/**
+	 * 验证参数是否为空 (json)
+	 * @param strJson   json字符串
+	 * @param ignore	要忽略的参数
+	 * @return			json对象
+	 * @throws ParameterException
+	 */
+	public static JSONObject checkParam(String strJson, String... ignore) throws ParameterException {
 		if (!StringUtil.isNotEmpty(strJson)) {
 			throw new ParameterException(AppGlobals.PARAMETER_EMPTY_ERROR_MSG, AppGlobals.PARAMETER_EMPTY_ERROR);
 		}
 		JSONObject json = JSONObject.fromObject(strJson);
-		checkParam(json);
+		checkParam(json, ignore);
 		return json;
 	}
 
-	/** 验证参数是否为空 (param) */
+	/**
+	 * 验证参数是否为空 (param)
+	 * @param fileds	参数名
+	 * @param param		参数值
+	 * @throws ParameterException
+	 */
 	public static void checkParam(String[] fileds, String... param) throws ParameterException {
 		for (int i = 0; i < param.length; i++) {
 			if (!StringUtil.isNotEmpty(param[i])) {
@@ -109,14 +121,23 @@ public class AppBaseController extends BaseController {
 		}
 	}
 
-	/** 验证参数是否为空 (JSONObject) */
-	public static void checkParam(JSONObject param) throws ParameterException {
+	/** 
+	 * 验证参数是否为空 (JSONObject)
+	 * @param param		要验证的json对象
+	 * @param ignore	要忽略的参数
+	 * @throws ParameterException
+	 */
+	public static void checkParam(JSONObject param, String... ignore) throws ParameterException {
 		Set<String> set = param.keySet();
 		for (String p : set) {
 			// System.out.println(param.get(p));
-			if (!StringUtil.isNotEmpty(param.get(p) + "") && !"orderFlightnumber".equals(p) && !"orderUnitprice".equals(p)
-					&& !"orderTrainnumber".equals(p) && !"remark".equals(p) && !"likeStation".equals(p)
-					&& !"header".equals(p) && !"imgName".equals(p) && !"idCard".equals(p) && !"refundPrice".equals(p)) {
+			String ignoreStr = StringUtils.join(ignore);
+			if(ignoreStr.contains(p))
+				continue;
+			
+			if (!StringUtil.isNotEmpty(param.get(p) + "") && !"orderUnitprice".equals(p)
+					&& !"remark".equals(p) && !"likeStation".equals(p)
+					&& !"header".equals(p) && !"imgName".equals(p) && !"idCard".equals(p) ) {
 				throw new ParameterException("参数" + p + "为空", AppGlobals.PARAMETER_ERROR);
 			}
 		}

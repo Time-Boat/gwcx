@@ -41,7 +41,7 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	private String lineId;
 	private String lineName;
 
-	private String orderTerminusStationName;// 终点名称
+	private String orderTerminusStationName;// 终点站名称（渠道商订单取的是用户自己选择点的名称）
 	private String orderStartingStationName;// 起点名称
 
 	private String userId; //用户id

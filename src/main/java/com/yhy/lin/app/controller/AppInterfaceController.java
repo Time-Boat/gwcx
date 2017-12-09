@@ -52,6 +52,7 @@ import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
+import com.yhy.lin.entity.DealerOrderUserStationEntity;
 
 /**
  * Description : 接口处理类
@@ -423,12 +424,13 @@ public class AppInterfaceController extends AppBaseController {
 			System.out.println("createOrder   前端传递参数：" + param);
 			
 			// 验证参数
-			JSONObject jsondata = checkParam(param);
+			JSONObject jsondata = checkParam(
+					param, "orderTrainnumber", "orderFlightnumber", "refundPrice", "X", "Y");
 			
 			String token = jsondata.getString("token");
 			// 验证token
 			checkToken(token);
-
+			
 			String userPhone = jsondata.getString("userPhone");
 			
 			//在linux服务器中日期转换要指定格式
@@ -532,8 +534,18 @@ public class AppInterfaceController extends AppBaseController {
 					default:
 						break;
 					}
-
-					orderId = appService.saveOrder(t, orderPrefix, commonAddrId);
+					
+					//用户自选站点，只有渠道商订单才有
+					DealerOrderUserStationEntity station = null;
+					if("1".equals(userType)){
+						String x = (String) jsondata.get("X");
+						String y = (String) jsondata.get("Y");
+						station = new DealerOrderUserStationEntity();
+						station.setStationX(x);
+						station.setStationY(y);
+					}
+					
+					orderId = appService.saveOrder(t, orderPrefix, commonAddrId, station);
 					logger.info("保存订单成功，订单状态为未支付");
 				}
 				
