@@ -2,6 +2,7 @@ package com.yhy.lin.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SystemMessage;
+import com.yhy.lin.comparators.SortBySeq;
 import com.yhy.lin.entity.BusStopInfoEntity;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineBusstopHistoryEntity;
@@ -464,7 +466,10 @@ public class LineInfoSpecializedController extends BaseController {
 			}
 			
 			List<Map<String,Object>> list = systemService.findForJdbc(
-					"select area_x,area_y from area_station_middle where station_id = ? order by xy_seq asc", sId);
+					"select area_x,area_y,xy_seq from area_station_middle where station_id = ? order by xy_seq asc", sId);
+			
+			//查出来的结果是无序的，拍个序，不然会有问题
+			Collections.sort(list, new SortBySeq());
 			
 			StringBuffer sbfX = new StringBuffer();
 			StringBuffer sbfY = new StringBuffer();
