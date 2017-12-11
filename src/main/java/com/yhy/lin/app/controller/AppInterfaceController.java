@@ -52,7 +52,6 @@ import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.TransferorderEntity;
-import com.yhy.lin.entity.DealerOrderUserStationEntity;
 
 /**
  * Description : 接口处理类
@@ -425,7 +424,7 @@ public class AppInterfaceController extends AppBaseController {
 			
 			// 验证参数
 			JSONObject jsondata = checkParam(
-					param, "orderTrainnumber", "orderFlightnumber", "refundPrice", "X", "Y");
+					param, "orderTrainnumber", "orderFlightnumber", "refundPrice", "stationX", "stationY");
 			
 			String token = jsondata.getString("token");
 			// 验证token
@@ -536,16 +535,16 @@ public class AppInterfaceController extends AppBaseController {
 					}
 					
 					//用户自选站点，只有渠道商订单才有
-					DealerOrderUserStationEntity station = null;
-					if("1".equals(userType)){
-						String x = (String) jsondata.get("X");
-						String y = (String) jsondata.get("Y");
-						station = new DealerOrderUserStationEntity();
-						station.setStationX(x);
-						station.setStationY(y);
-					}
+//					DealerOrderUserStationEntity station = null;
+//					if("1".equals(userType)){
+//						String x = (String) jsondata.get("X");
+//						String y = (String) jsondata.get("Y");
+//						station = new DealerOrderUserStationEntity();
+//						station.setStationX(x);
+//						station.setStationY(y);
+//					}
 					
-					orderId = appService.saveOrder(t, orderPrefix, commonAddrId, station);
+					orderId = appService.saveOrder(t, orderPrefix, commonAddrId);
 					logger.info("保存订单成功，订单状态为未支付");
 				}
 				
@@ -933,6 +932,8 @@ public class AppInterfaceController extends AppBaseController {
 	public void modifyOrder(HttpServletRequest request, HttpServletResponse response) {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
+		
+		JSONObject data = new JSONObject();
 
 		String msg = "";
 		String statusCode = "";
@@ -960,8 +961,7 @@ public class AppInterfaceController extends AppBaseController {
 			
 			if (t != null) {
 				returnJsonObj.put("data", t);
-
-				// 把json中的日期类型替换成字符串类型
+				// 把json中的日期类型替换成字符串类型+
 				Date date = t.getApplicationTime();
 				Date date1 = t.getOrderExpectedarrival();
 				JSONObject str = (JSONObject) returnJsonObj.get("data");

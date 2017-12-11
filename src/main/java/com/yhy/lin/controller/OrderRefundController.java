@@ -167,7 +167,7 @@ public class OrderRefundController extends BaseController {
 			
 			String[] arrId = ids.split(",");
 			
-			if(hasPermission){
+			if(hasPermission ){
 				map = orderRefundService.firstAgreeAllRefund(arrId, fees, refundRequest, path);
 			}else{
 				map = new HashMap<>();

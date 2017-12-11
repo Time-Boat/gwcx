@@ -83,6 +83,44 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String orderUserType;//用户订单类型    0：普通用户订单     1：渠道商用户订单
 	
+	/**x坐标  渠道商用户才有*/
+	private java.lang.String stationX;
+	/**y坐标 渠道商用户才有*/
+	private java.lang.String stationY;
+	
+	/**
+	 *方法: 取得java.lang.String
+	 *@return: java.lang.String  x坐标
+	 */
+	@Column(name ="STATION_X",nullable=true,length=20)
+	public java.lang.String getStationX(){
+		return this.stationX;
+	}
+
+	/**
+	 *方法: 设置java.lang.String
+	 *@param: java.lang.String  x坐标
+	 */
+	public void setStationX(java.lang.String stationX){
+		this.stationX = stationX;
+	}
+	/**
+	 *方法: 取得java.lang.String
+	 *@return: java.lang.String  y坐标
+	 */
+	@Column(name ="STATION_Y",nullable=true,length=20)
+	public java.lang.String getStationY(){
+		return this.stationY;
+	}
+
+	/**
+	 *方法: 设置java.lang.String
+	 *@param: java.lang.String  y坐标
+	 */
+	public void setStationY(java.lang.String stationY){
+		this.stationY = stationY;
+	}
+	
 	@Column(name = "order_user_type")
 	public String getOrderUserType() {
 		return orderUserType;

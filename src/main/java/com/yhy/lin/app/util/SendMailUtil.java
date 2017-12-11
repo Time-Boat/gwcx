@@ -92,11 +92,11 @@ public class SendMailUtil {
 		// SMTP 服务器的端口 (非 SSL 连接的端口一般默认为 25, 可以不添加, 如果开启了 SSL 连接, //
 		//需要改为对应邮箱的 SMTP 服务器的端口, 具体可查看对应邮箱服务的帮助, // QQ邮箱的SMTP(SLL)端口为465或587,
 		//其他邮箱自行去查看) 
-		/*final String smtpPort = "465";
-		properties.setProperty("mail.smtp.port", smtpPort);
+		final String smtpPort = "465";
+//		properties.setProperty("mail.smtp.port", smtpPort);
 		properties.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 		properties.setProperty("mail.smtp.socketFactory.fallback", "false");
-		properties.setProperty("mail.smtp.socketFactory.port", smtpPort);*/
+		properties.setProperty("mail.smtp.socketFactory.port", smtpPort);
 		
 		
 		final String user = properties.getProperty("from.user");

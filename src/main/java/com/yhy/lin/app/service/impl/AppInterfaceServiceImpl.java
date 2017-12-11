@@ -32,14 +32,8 @@ import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.comparators.SortBySeq;
-import com.yhy.lin.entity.AreaStationMiddleEntity;
-import com.yhy.lin.entity.CarTSTypeLineEntity;
-import com.yhy.lin.entity.DealerOrderUserStationEntity;
 import com.yhy.lin.entity.LineInfoEntity;
-import com.yhy.lin.entity.Order_LineCarDiverEntity;
 import com.yhy.lin.entity.TransferorderEntity;
-
-import sun.print.resources.serviceui;
 
 /**
  * Description :
@@ -67,7 +61,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	// noRollbackFor={UserAccountException.class},
 	// readOnly=true//, timeout=30 //timeout 允许在执行第一条sql之后保持连接30秒
 	)
-	public String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId, DealerOrderUserStationEntity station) {
+	public String saveOrder(TransferorderEntity t, String orderPrefix, String commonAddrId) {
 
 		// 生成订单号
 		t.setOrderId(MakeOrderNum.makeOrderNum(orderPrefix));
@@ -129,11 +123,6 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		}
 		
 		save(t);
-		
-		if("1".equals(t.getOrderUserType())){
-			station.setOrderId(t.getId());
-			save(station);
-		}
 		
 		save(c);
 
