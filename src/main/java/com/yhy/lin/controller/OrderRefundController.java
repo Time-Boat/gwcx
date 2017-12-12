@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
@@ -189,9 +190,8 @@ public class OrderRefundController extends BaseController {
 				map.put("statusCode", AppGlobals.APP_SUCCESS);
 				map.put("success", "true");
 				
-				
 				//为了找出线路id作为条件
-				List<TransferorderEntity> tList = systemService.findByQueryString(" from TransferorderEntity where in(" + ids + ")"); 
+				List<TransferorderEntity> tList = systemService.findByQueryString(" from TransferorderEntity where id in(" + ids + ")"); 
 
 				int tLen = tList.size();
 				StringBuffer lineIds = new StringBuffer();
@@ -207,6 +207,9 @@ public class OrderRefundController extends BaseController {
 							+ " left join t_s_depart t on o.org_id = t.id where l.id in (" + lineIds.deleteCharAt(lineIds.length()-1).toString() + "),'%')");
 					
 					String[] users = new String[list.size()];
+					for (int i = 0; i < list.size(); i++) {
+						users[i] = list.get(i);
+					}
 					
 					SystemMessage.getInstance().saveMessage(
 							systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。", new String[]{AppGlobals.PLATFORM_REFUND_AUDIT}, 

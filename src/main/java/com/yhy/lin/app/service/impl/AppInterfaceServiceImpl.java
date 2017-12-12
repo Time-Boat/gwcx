@@ -32,6 +32,7 @@ import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.comparators.SortBySeq;
+import com.yhy.lin.entity.CarTSTypeLineEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
@@ -121,9 +122,8 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			c.setUserId(t.getUserId());
 			c.setId(UUIDGenerator.generate());
 		}
-		
+
 		save(t);
-		
 		save(c);
 
 		return t.getId();
@@ -473,9 +473,21 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	public String getCarTypePrice(String sumPeople, String lineId, String phone, BigDecimal discount) {
 		
 		String tPrice = "";
-		
+		List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
+		Object ca = null;//版本号
+		if(carlist.size()>0){
+
+			List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+lineId+"' ORDER BY c.version desc");
+			
+			if(calist.size()>0){
+				ca = calist.get(0);
+			}
+			if(!StringUtil.isNotEmpty(ca)){
+				ca="0";
+			}
+		}
 		List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
-				+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? ", lineId);
+				+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? and version = ? and apply_status = ? ", lineId,ca,"1");
 		
 		for(Map<String,Object> map : lm){
 			String p = AppUtil.Null2Blank(map.get("typename") + "");

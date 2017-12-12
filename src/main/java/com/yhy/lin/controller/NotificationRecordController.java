@@ -1,5 +1,8 @@
 package com.yhy.lin.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -20,6 +23,7 @@ import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
 
+import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.NotificationRecordEntity;
 import com.yhy.lin.service.NotificationRecordServiceI;
 
@@ -137,6 +141,36 @@ public class NotificationRecordController extends BaseController {
 			req.setAttribute("notificationRecordPage", notificationRecord);
 		}
 		return new ModelAndView("yhy/notificationRecord/notificationRecord");
+	}
+	
+	/**
+	 * 批量删除系统通知
+	 * 
+	 * @return
+	 * @author Administrator
+	 * @date 2017-04-17
+	 */
+	@RequestMapping(params = "doDeleteALLSelect")
+	@ResponseBody
+	public AjaxJson doDeleteALLSelect(NotificationRecordEntity notificationRecord, HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+		try {
+			String ids = request.getParameter("ids");
+			String[] entitys = ids.split(",");
+			List<NotificationRecordEntity> list = new ArrayList<NotificationRecordEntity>();
+			for (int i = 0; i < entitys.length; i++) {
+				notificationRecord = systemService.getEntity(NotificationRecordEntity.class, entitys[i]);
+				list.add(notificationRecord);
+			}
+			message = "批量删除成功！";
+			// 批量逻辑删除
+			notificationRecordService.deleteAllEntitie(list);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		j.setMsg(message);
+		return j;
 	}
 	
 }

@@ -264,8 +264,8 @@
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建人" field="username" query="true" align="center" width="80"></t:dgCol>
    <t:dgCol title="推广人数" field="scanCount" align="center" width="60"></t:dgCol>
-   <t:dgCol title="联系电话" field="phone" align="center" width="120"></t:dgCol>
-   <t:dgCol title="负责人" field="manager" align="center" width="70"></t:dgCol>
+   <t:dgCol title="联系电话" field="phone" query="true" align="center" width="120"></t:dgCol>
+   <t:dgCol title="负责人" field="manager" query="true" align="center" width="70"></t:dgCol>
     <t:dgCol title="邮箱" field="email" align="center" width="70"></t:dgCol>
    <t:dgCol title="折扣" field="dealerDiscount" align="center" width="70"></t:dgCol>
    <t:dgCol title="地址" field="position" align="center" width="120"></t:dgCol>

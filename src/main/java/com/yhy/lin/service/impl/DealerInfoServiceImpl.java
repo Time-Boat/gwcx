@@ -109,6 +109,12 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 		if(StringUtil.isNotEmpty(dealerInfo.getStatus())){
 			sql.append(" and d.status = '" + dealerInfo.getStatus() + "' ");
 		}
+		if(StringUtil.isNotEmpty(dealerInfo.getPhone())){
+			sql.append(" and d.phone = '" + dealerInfo.getPhone() + "' ");
+		}
+		if(StringUtil.isNotEmpty(dealerInfo.getManager())){
+			sql.append(" and d.manager like '%" + dealerInfo.getManager() + "%' ");
+		}
 		
 		if(StringUtil.isNotEmpty(dealerInfo.getAuditStatus())){
 			sql.append(" and d.audit_status = '" + dealerInfo.getAuditStatus() + "' ");

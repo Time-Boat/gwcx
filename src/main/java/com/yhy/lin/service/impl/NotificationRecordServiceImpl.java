@@ -13,8 +13,6 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.Db2Page;
-import org.jeecgframework.core.common.service.impl.CommonServiceImpl.IMyDataExchanger;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 
@@ -27,26 +25,27 @@ public class NotificationRecordServiceImpl extends CommonServiceImpl implements 
 		
 		String userId = ResourceUtil.getSessionUserName().getId();
 		
+		String sqlWhere =getWhere(userId);
+		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = " select count(*) from notification_record nr left join notification_user_middle nu on nr.id = nu.record_id "
-				+ " where nu.user_id = ? ";
-//		if (!sqlWhere.isEmpty()) {
-//			sqlCnt += sqlWhere;
-//		}
-		Long iCount = getCountForJdbcParam(sqlCnt, new Object[]{userId}); //userId
+		String sqlCnt = " select count(*) from notification_record n left join notification_user_middle nu on n.id = nu.record_id ";
+		if (!sqlWhere.isEmpty()) {
+			sqlCnt += sqlWhere;
+		}
+		
+		Long iCount = getCountForJdbcParam(sqlCnt, null); //userId
 		// 取出当前页的数据 
 		String sql = " select n.id,n.send_time,n.title,n.content,n.n_type,n.create_time,n.status,n.remark,u.username "   //,n.target
-				+ " from notification_record n left join notification_user_middle nu on n.id = nu.record_id left join t_s_base_user u on n.create_user_id = u.id "
-				+ " where nu.user_id = ? ";
-//				if (!sqlWhere.isEmpty()) {
-//					sql += sqlWhere;
-//				}
+				+ " from notification_record n left join notification_user_middle nu on n.id = nu.record_id left join t_s_base_user u on n.create_user_id = u.id ";
+		if (!sqlWhere.isEmpty()) {
+			sql += sqlWhere;
+		}
 		
 		//排序   大小写问题报错
 		/*if(StringUtil.isNotEmpty(dataGrid.getSort()) && StringUtil.isNotEmpty(dataGrid.getOrder()) ){
 			sql += " order by " + dataGrid.getSort() + " " + dataGrid.getOrder();
 		}*/
-		List<Map<String, Object>> mapList = findForJdbcParam(sql, dataGrid.getPage(), dataGrid.getRows(), userId);
+		List<Map<String, Object>> mapList = findForJdbc(sql, dataGrid.getPage(), dataGrid.getRows());
 		// 将结果集转换成页面上对应的数据集
 		Db2Page[] db2Pages = {
 				new Db2Page("id","id")
@@ -85,6 +84,16 @@ public class NotificationRecordServiceImpl extends CommonServiceImpl implements 
 				return "";
 			}
 		}
+	}
+	
+	public String getWhere(String userId) {
+		StringBuffer sql = new StringBuffer(" where 1=1");
+		if (StringUtil.isNotEmpty(userId)) {
+			sql.append(" and nu.user_id = '" + userId + "'");
+		}
+		sql.append(" ORDER BY n.create_time desc");
+		
+		return sql.toString();
 	}
 	
 }

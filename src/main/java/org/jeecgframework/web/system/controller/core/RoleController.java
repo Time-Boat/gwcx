@@ -288,6 +288,12 @@ public class RoleController extends BaseController {
 		}
 		cq.add(cc);
 		org.jeecgframework.core.extend.hqlsearch.HqlGenerateUtil.installHql(cq, user);
+		Short[] userstate = new Short[]{Globals.User_Normal, Globals.User_ADMIN, Globals.User_Forbidden};
+        
+        cq.in("status", userstate);
+
+        cq.eq("deleteFlag", Globals.Delete_Normal);
+        cq.add();
 		this.systemService.getDataGridReturn(cq, true);
 		TagUtil.datagrid(response, dataGrid);
 	}

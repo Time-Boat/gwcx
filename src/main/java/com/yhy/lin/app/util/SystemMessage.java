@@ -1,10 +1,12 @@
 package com.yhy.lin.app.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jeecgframework.core.common.service.CommonService;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.yhy.lin.app.controller.AppInterfaceController;
 import com.yhy.lin.entity.NotificationRecordEntity;
 import com.yhy.lin.entity.NotificationUserMiddleEntity;
 
@@ -23,6 +26,11 @@ import com.yhy.lin.entity.NotificationUserMiddleEntity;
  */
 public class SystemMessage {
 
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(AppInterfaceController.class);
+	
 	private static SystemMessage systemMassage = null;
 
 	private SystemMessage() {
@@ -57,10 +65,12 @@ public class SystemMessage {
 	 */
 	public synchronized void saveMessage(CommonService commonService, String title, String content, String[] target, String[] nType, String[] users) {
 
+		logger.info("users:   " + Arrays.toString(users));
+		
 		//String userId = ResourceUtil.getSessionUserName().getId();
 		
 		Date d = AppUtil.getDate();
-
+		
 //		StringBuilder t = new StringBuilder();
 //		StringBuilder tSql = new StringBuilder();
 //		for (String temp : target) {
@@ -72,12 +82,8 @@ public class SystemMessage {
 //			tSql.append("',");
 //		}
 		
-		StringBuilder u = new StringBuilder();
 		StringBuilder uSql = new StringBuilder();
 		for (String temp1 : users) {
-			u.append(temp1);
-			u.append(",");
-
 			uSql.append("'");
 			uSql.append(temp1);
 			uSql.append("',");
@@ -115,12 +121,10 @@ public class SystemMessage {
 		//但是有些是从原有的对象中取的，如果通过值传进来，还是要在外部查询一遍，所以这样写还是更方便一些
 //		List<Object[]> list = commonService.findListbySql(
 //				" select u.id,u.email from t_s_user u where id in (" + us + ") ");
-				
+		
 		//测试
 		List<Object[]> list = commonService.findListbySql(
 				" select u.id,u.email,ts.username,ts.realname,ts.userkey from t_s_user u left join t_s_base_user ts on ts.id = u.id where u.id in (" + us + ") ");
-		
-		
 		
 		List<NotificationUserMiddleEntity> nList = new ArrayList<>();
 
@@ -130,9 +134,9 @@ public class SystemMessage {
 		for (Object[] userInfo : list) {
 			
 			//测试
-			StringBuilder s = new StringBuilder(content);
-			s.append("    测试：username=" + userInfo[2] + ",realname=" + userInfo[3] + ",userkey=" + userInfo[4]);
-			content = s.toString();
+//			StringBuilder s = new StringBuilder(content);
+//			s.append("    测试：username=" + userInfo[2] + ",realname=" + userInfo[3] + ",userkey=" + userInfo[4]);
+//			content = s.toString();
 			
 			
 			String e = String.valueOf(userInfo[1]);
@@ -152,7 +156,7 @@ public class SystemMessage {
 			// 判断发送消息的方式
 			// 1：邮件 2：站内信
 			if (nt.indexOf("1") != -1) {
-				SendMailUtil.sendMail(title, content, emails);
+				//SendMailUtil.sendMail(title, content, emails);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
