@@ -237,6 +237,15 @@
 	        fillColor: "#0f0", //填充色
 	        fillOpacity: 0.35//填充透明度
 	    };
+	    
+	    //其他区域
+	    var test = {
+	        strokeColor: "#00f", //线颜色
+	        strokeOpacity: 0.2, //线透明度
+	        strokeWeight: 3,    //线宽
+	        fillColor: "#0f0", //填充色
+	        fillOpacity: 0.35//填充透明度
+	    };
 	
     	function changeSType(value){
     		if(cityCode == "" || cityCode == null){
@@ -359,16 +368,60 @@
 		    	
 		    	areaPoint = e.obj.getPath();//获取路径/范围
 		    	
+		    	
+		    	//根据地图上添加的覆盖物分布情况，自动缩放地图到合适的视野级别，参数overlayList默认为当前地图上添加的所有覆盖物图层
+		    	//map.setFitView(overlayList:Array)
+		    	
 		    	var isIntersect = false;
+		    	var isInRing = false;
+		    	var isRingInRing = false;
 		    	for(var k=0;k<polygons.length;k++){
-		    		var isIntersect = AMap.GeometryUtil.doesRingRingIntersect(areaPoint, polygons[k].getPath());
-		    		console.log(isIntersect);
-		    		if(isIntersect){
+		    		isIntersect = AMap.GeometryUtil.doesRingRingIntersect(areaPoint, polygons[k].getPath());
+		    		isInRing = AMap.GeometryUtil.isRingInRing(areaPoint, polygons[k].getPath());
+		    		isRingInRing = AMap.GeometryUtil.isRingInRing(polygons[k].getPath(), areaPoint);
+		    		
+		    		console.log(isIntersect + "---" + isInRing + "---" + isRingInRing);
+		    		if(isIntersect || isInRing || isRingInRing){
 		    			break;
 		    		}
+		    		
+		    		//将包裹的多边形排除掉，变成一个带洞多边形
+		    		/*if(isIntersect){
+		    			break;
+		    		} else if(isIntersect){
+		    			var pointers = {
+				    	        outer: polygons[k].getPath(),
+				    	        inner: areaPoint
+				        };
+				    	
+				    	var pathArray = [
+		   	                 pointers.outer,
+		   	                 pointers.inner
+		   	             ];
+				    	map.clearMap();
+				    	var polygon = new AMap.Polygon(test);
+				        polygon.setPath(pathArray);
+				        polygon.setMap(map);
+		    			break;
+		    		}else if(isRingInRing){
+		    			var pointers = {
+				    	        outer: areaPoint,
+				    	        inner: polygons[k].getPath()
+				        };
+				    	
+				    	var pathArray = [
+		   	                 pointers.outer,
+		   	                 pointers.inner
+		   	             ];
+				    	map.clearMap();
+				    	var polygon = new AMap.Polygon(test);
+				        polygon.setPath(pathArray);
+				        polygon.setMap(map);
+		    			break;
+		    		} */
 		    	}
 		    	
-		    	if(isIntersect){
+		    	if(isIntersect || isInRing || isRingInRing){
 		    		polygon.setMap(null);
 		    		areaPoint = [];
 		    		tip("绘制的区域不能和已有的区域重叠，请重新绘制!");

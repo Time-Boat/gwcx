@@ -156,7 +156,7 @@ public class SystemMessage {
 			// 判断发送消息的方式
 			// 1：邮件 2：站内信
 			if (nt.indexOf("1") != -1) {
-				//SendMailUtil.sendMail(title, content, emails);
+				SendMailUtil.sendMail(title, content, emails);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
