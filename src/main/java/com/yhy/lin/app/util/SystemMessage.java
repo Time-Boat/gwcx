@@ -138,7 +138,6 @@ public class SystemMessage {
 //			s.append("    测试：username=" + userInfo[2] + ",realname=" + userInfo[3] + ",userkey=" + userInfo[4]);
 //			content = s.toString();
 			
-			
 			String e = String.valueOf(userInfo[1]);
 			
 			if (StringUtil.isNotEmpty(e)) {

@@ -469,7 +469,7 @@ public class WeixinPayController extends AppBaseController{
 		return new ModelAndView("yhy/wechat/payResult");
 	}
 	
-	//微信公众号的服务器配置验证
+//	//微信公众号的服务器配置验证
 //	@RequestMapping(params = "eventPush")
 //	protected void eventPush(HttpServletRequest request, HttpServletResponse response) throws IOException {  
 //        String signature = request.getParameter("signature");  
@@ -488,19 +488,19 @@ public class WeixinPayController extends AppBaseController{
 //        }
 //        out.close();  
 //    }  
-	
-	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
-        String[] arr = new String[] { AppGlobals.SERVER_TOKEN, timestamp, nonce };  
-        // sort  
-        Arrays.sort(arr);  
-        
-        // generate String
-        String content = arr[0]+arr[1]+arr[2];  
-        
-        // shal code  
-        String temp = Sha1Util.getSha1(content);  
-        return temp.equalsIgnoreCase(signature);  
-    }  
+//	
+//	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
+//        String[] arr = new String[] { AppGlobals.SERVER_TOKEN, timestamp, nonce };  
+//        // sort  
+//        Arrays.sort(arr);
+//        
+//        // generate String
+//        String content = arr[0]+arr[1]+arr[2];  
+//        
+//        // shal code  
+//        String temp = Sha1Util.getSha1(content);  
+//        return temp.equalsIgnoreCase(signature);  
+//    }  
 	
 	/**
 	 * 微信消息推送回调
@@ -526,6 +526,7 @@ public class WeixinPayController extends AppBaseController{
 				logger.info("partnerId: " + eventKey);
 				
 				switch (type) {
+				
 				case "subscribe":
 				case "scan":
 					logger.info("用户扫描二维码进入");
