@@ -30,6 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.exception.ParameterException;
 import com.yhy.lin.app.service.WeixinPayService;
 import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.app.util.AppUtil;
@@ -469,38 +470,38 @@ public class WeixinPayController extends AppBaseController{
 		return new ModelAndView("yhy/wechat/payResult");
 	}
 	
-//	//微信公众号的服务器配置验证
-//	@RequestMapping(params = "eventPush")
-//	protected void eventPush(HttpServletRequest request, HttpServletResponse response) throws IOException {  
-//        String signature = request.getParameter("signature");  
-//        String timestamp = request.getParameter("timestamp");  
-//        String nonce = request.getParameter("nonce");
-//        String echostr = request.getParameter("echostr");  
-//        logger.info("signature : " + signature);
-//        logger.info("timestamp : " + timestamp);
-//        logger.info("nonce : " + nonce);
-//        logger.info("echostr : " + echostr);
-//        
-//        PrintWriter out = response.getWriter();  
-//        if (checkSignature(signature, timestamp, nonce)){  
-//        	logger.info("check token : ok");  
-//            out.print(echostr);  
-//        }
-//        out.close();  
-//    }  
-//	
-//	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
-//        String[] arr = new String[] { AppGlobals.SERVER_TOKEN, timestamp, nonce };  
-//        // sort  
-//        Arrays.sort(arr);
-//        
-//        // generate String
-//        String content = arr[0]+arr[1]+arr[2];  
-//        
-//        // shal code  
-//        String temp = Sha1Util.getSha1(content);  
-//        return temp.equalsIgnoreCase(signature);  
-//    }  
+	//微信公众号的服务器配置验证
+	/*@RequestMapping(params = "eventPush")
+	protected void eventPush(HttpServletRequest request, HttpServletResponse response) throws IOException {  
+        String signature = request.getParameter("signature");  
+        String timestamp = request.getParameter("timestamp");  
+        String nonce = request.getParameter("nonce");
+        String echostr = request.getParameter("echostr");
+        logger.info("signature : " + signature);
+	    logger.info("timestamp : " + timestamp);
+	    logger.info("nonce : " + nonce);
+	    logger.info("echostr : " + echostr);
+	        
+	    PrintWriter out = response.getWriter();
+	    if (checkSignature(signature, timestamp, nonce)){  
+	       logger.info("check token : ok");  
+	       out.print(echostr);
+	     }
+	     out.close();
+    }  
+	
+	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
+        String[] arr = new String[] { AppGlobals.SERVER_TOKENS, timestamp, nonce };  
+        // sort  
+        Arrays.sort(arr);  
+        
+        // generate String
+        String content = arr[0]+arr[1]+arr[2];  
+        
+        // shal code  
+        String temp = Sha1Util.getSha1(content);
+        return temp.equalsIgnoreCase(signature);  
+    }*/
 	
 	/**
 	 * 微信消息推送回调
@@ -526,7 +527,6 @@ public class WeixinPayController extends AppBaseController{
 				logger.info("partnerId: " + eventKey);
 				
 				switch (type) {
-				
 				case "subscribe":
 				case "scan":
 					logger.info("用户扫描二维码进入");

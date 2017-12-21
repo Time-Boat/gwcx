@@ -1,19 +1,14 @@
 package com.yhy.lin.entity;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
-import javax.persistence.SequenceGenerator;
 
 /**   
  * @Title: Entity
@@ -37,6 +32,9 @@ public class NotificationUserMiddleEntity implements java.io.Serializable {
 	private java.lang.String userId;
 	/**接收时间*/
 	private java.util.Date receiveTime;
+	
+	/**消息状态 :0：未读    1：已读*/
+	private String status;
 	
 	/**
 	 *方法: 取得java.lang.String
@@ -106,4 +104,22 @@ public class NotificationUserMiddleEntity implements java.io.Serializable {
 	public void setReceiveTime(java.util.Date receiveTime){
 		this.receiveTime = receiveTime;
 	}
+
+	/**
+	 *方法: 取得java.lang.String
+	 *@return: java.lang.String  状态
+	 */
+	@Column(name ="status")
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 *方法: 设置java.lang.String
+	 *@param: java.lang.String  状态
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
 }

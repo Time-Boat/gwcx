@@ -35,7 +35,7 @@ public class NotificationRecordServiceImpl extends CommonServiceImpl implements 
 		
 		Long iCount = getCountForJdbcParam(sqlCnt, null); //userId
 		// 取出当前页的数据 
-		String sql = " select n.id,n.send_time,n.title,n.content,n.n_type,n.create_time,n.status,n.remark,u.username "   //,n.target
+		String sql = " select n.id,n.send_time,n.title,n.content,n.n_type,n.create_time,nu.status,n.remark,u.username "   //,n.target
 				+ " from notification_record n left join notification_user_middle nu on n.id = nu.record_id left join t_s_base_user u on n.create_user_id = u.id ";
 		if (!sqlWhere.isEmpty()) {
 			sql += sqlWhere;
@@ -54,6 +54,7 @@ public class NotificationRecordServiceImpl extends CommonServiceImpl implements 
 				//,new Db2Page("target", "target", null)
 				,new Db2Page("nType", "n_type", new MyDataExchangerNType2Ch())
 				,new Db2Page("userName", "username", null)
+				,new Db2Page("status", "status", null)
 				,new Db2Page("createTime", "create_time", null)
 				,new Db2Page("sendTime", "send_time", null)
 				,new Db2Page("remark", "remark", null)

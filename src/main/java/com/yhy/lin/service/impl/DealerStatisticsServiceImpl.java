@@ -117,28 +117,30 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 	@Override
 	public JSONObject getDealerOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String lineName,
 			String orderType, String account, String fc_begin, String fc_end) {
-		String sqlWhere = ((DealerStatisticsServiceI) AopContext.currentProxy()).getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end);
+		String sqlWheres = ((DealerStatisticsServiceI) AopContext.currentProxy()).getWhere4(transferorder,lineName, orderType, account, fc_begin, fc_end);
 		
-		sqlWhere += " order by t.order_completed_time desc ";
+		StringBuffer sqlWhere = new StringBuffer();
+		sqlWhere.append(sqlWheres);
+		sqlWhere.append(" order by t.order_completed_time desc ");
 		
 		StringBuffer sql = new StringBuffer();
 
-		String sqlCnt = "select count(*) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id LEFT JOIN car_customer w on w.id= "
-				+ " t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where w.open_id = d.open_id and f.id=d.dealer_id "
-				+ " and t.order_status='0' and t.order_user_type='0' and td.id=f.departId and (case when LENGTH(td.org_code)<6 then td.org_code else "
-				+ " substring(td.org_code,1,6) END)=p.org_code ";
+		StringBuffer sqlCnt = new StringBuffer("select count(*) from transferorder t LEFT JOIN lineinfo l on t.line_id = l.id "
+				+ "LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where "
+				+ "w.open_id = d.open_id and f.id=d.dealer_id and t.order_status='0' and t.order_user_type='0' and td.id=f.departId "
+				+ "and (case when LENGTH(td.org_code)<6 then td.org_code else substring(td.org_code,1,6) END)=p.org_code ");
 
-		if (!sqlWhere.isEmpty()) {
-			sqlCnt += sqlWhere;
+		if (!sqlWhere.toString().isEmpty()) {
+			sqlCnt.append(sqlWhere);
 		}
-		Long iCount = getCountForJdbcParam(sqlCnt, null);
+		Long iCount = getCountForJdbcParam(sqlCnt.toString(), null);
 
 		sql.append(" select f.account,t.order_completed_time,t.order_id,l.name as line_name,l.type as line_type,t.order_startime,w.real_name,t.order_contactsname, "
 				+ " t.order_contactsmobile,t.order_status,t.order_numbers,t.order_totalPrice,p.departname from transferorder t LEFT JOIN lineinfo l on "
 				+ " t.line_id = l.id LEFT JOIN car_customer w on w.id=t.user_id,dealer_customer d,dealer_info f, t_s_depart td,t_s_depart p where w.open_id = d.open_id "
 				+ " and f.id=d.dealer_id and t.order_status='0' and t.order_user_type='0' and td.id=f.departId "
 				+ " and (case when LENGTH(td.org_code)<6 then td.org_code else substring(td.org_code,1,6) END)=p.org_code ");
-		if (!sqlWhere.isEmpty()) {
+		if (!sqlWhere.toString().isEmpty()) {
 			sql.append(sqlWhere);
 		}
 
@@ -253,33 +255,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		if (StringUtil.isNotEmpty(lineName)) {
 			sql.append(" and  l.name like '%" + lineName + "%'");
 		}
-		
-//		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
-//		String orgCode = depart.getOrgCode();
-//		String orgType = depart.getOrgType();
-//		String userId = ResourceUtil.getSessionUserName().getId();
-//		
-//		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-//		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-//			sql.append(" and f.create_user_id = '" + userId + "' ");
-//		}
-//		
-//		TSUser user = ResourceUtil.getSessionUserName();
-//		String oc = user.getOrgCompany();
-//		
-//		//如果是平台渠道商审核员权限，则根据其选择的子公司来过滤筛选
-//		if(hasPermission && StringUtil.isNotEmpty(oc)){
-//			sql.append("and ( 1=2 ");
-//			
-//			String[] ocArr = oc.split(",");
-//			
-//			for (int i = 0; i < ocArr.length; i++) {
-//				sql.append(" or td.org_code like '"+ocArr[i]+"%' ");
-//			}
-//			sql.append(")");
-//		} else {
-//			sql.append(" and td.org_code like '"+orgCode+"%'");
-//		}
+		sql.append(" and t.applicationTime<f.audit_pass_time ");
 		
 		return sql.toString();
 	}

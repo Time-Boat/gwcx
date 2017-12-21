@@ -84,6 +84,8 @@ public class DealerInfoEntity implements java.io.Serializable {
 	private String dealerFilePath;
 	/**渠道商折扣*/
 	private BigDecimal dealerDiscount;
+	/**审核通过时间*/
+	private Date auditPassTime;
 	
 	@Column(name ="DEALER_DISCOUNT",nullable=true,precision=3,scale=1)
 	public BigDecimal getDealerDiscount() {
@@ -413,5 +415,14 @@ public class DealerInfoEntity implements java.io.Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	@Column(name="audit_pass_time",nullable=true)
+	public Date getAuditPassTime() {
+		return auditPassTime;
+	}
+
+	public void setAuditPassTime(Date auditPassTime) {
+		this.auditPassTime = auditPassTime;
 	}
 }

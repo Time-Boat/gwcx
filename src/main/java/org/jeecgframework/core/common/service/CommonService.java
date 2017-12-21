@@ -361,6 +361,14 @@ public interface CommonService {
 	 * @return
 	 */
 	public <T> List<T> findHql(String hql, Object... param);
+	
+	/**
+	 * 通过hql 修改对象
+	 * @param hql
+	 * @param params
+	 * @return
+	 */
+	public Integer updateHql(String hql, Object... params);
 
 	public <T> List<T> pageList(DetachedCriteria dc, int firstResult,
 			int maxResult);

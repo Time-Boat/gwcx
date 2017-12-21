@@ -37,7 +37,7 @@ import net.sf.json.JSONObject;
 @Transactional
 public class CommonServiceImpl implements CommonService {
 	public ICommonDao commonDao = null;
-
+	
 	/**
 	 * 获取所有数据库表
 	 * 
@@ -226,7 +226,7 @@ public class CommonServiceImpl implements CommonService {
 	public int updateBySqlString(String sql) {
 		return commonDao.updateBySqlString(sql);
 	}
-
+	
 	/**
 	 * 根据sql查找List
 	 * 
@@ -506,6 +506,18 @@ public class CommonServiceImpl implements CommonService {
 	@Override
 	public <T> List<T> findHql(String hql, Object... param) {
 		return this.commonDao.findHql(hql, param);
+	}
+	
+	/**
+	 * 通过hql 修改对象
+	 * 
+	 * @param <T>
+	 * @param query
+	 * @return
+	 */
+	@Override
+	public Integer updateHql(String hql, Object... params) {
+		return this.commonDao.updateHql(hql, params);
 	}
 
 	@Override

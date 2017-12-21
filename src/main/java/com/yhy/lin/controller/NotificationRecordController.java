@@ -14,16 +14,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.jeecgframework.core.util.MyBeanUtils;
+import org.jeecgframework.core.util.ResourceUtil;
 
-import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.NotificationRecordEntity;
 import com.yhy.lin.service.NotificationRecordServiceI;
 
@@ -49,7 +47,7 @@ public class NotificationRecordController extends BaseController {
 	private NotificationRecordServiceI notificationRecordService;
 	@Autowired
 	private SystemService systemService;
-	
+
 	/**
 	 * 系统消息发送记录列表 页面跳转
 	 * 
@@ -89,13 +87,9 @@ public class NotificationRecordController extends BaseController {
 		message = "系统消息发送记录删除成功";
 		notificationRecordService.delete(notificationRecord);
 		systemService.addLog(message, Globals.Log_Type_DEL, Globals.Log_Leavel_INFO);
-		
+
 		j.setMsg(message);
 		return j;
-	}
-
-	public static void a(){
-		
 	}
 
 	/**
@@ -137,12 +131,53 @@ public class NotificationRecordController extends BaseController {
 	@RequestMapping(params = "addorupdate")
 	public ModelAndView addorupdate(NotificationRecordEntity notificationRecord, HttpServletRequest req) {
 		if (StringUtil.isNotEmpty(notificationRecord.getId())) {
-			notificationRecord = notificationRecordService.getEntity(NotificationRecordEntity.class, notificationRecord.getId());
-			req.setAttribute("notificationRecordPage", notificationRecord);
+			try {
+				String userId = ResourceUtil.getSessionUserName().getId();
+				notificationRecord = notificationRecordService.getEntity(NotificationRecordEntity.class, notificationRecord.getId());
+				
+				//修改状态，设置为已读
+				systemService.updateHql("update NotificationUserMiddleEntity set status='1' where recordId =? and userId =? ", notificationRecord.getId(),userId);
+				logger.info("设为已读");
+				
+				String ntype=notificationRecord.getNType();
+				String notification = getNtype(ntype);//获取通知方式
+				
+				req.setAttribute("notificationRecordPage", notificationRecord);
+				req.setAttribute("notification", notification);
+			} catch (Exception e) {
+				// TODO: handle exception
+				e.printStackTrace();
+			}
 		}
 		return new ModelAndView("yhy/notificationRecord/notificationRecord");
 	}
 	
+	/**
+	 * 获取通知方式
+	 * @param ntype
+	 * @return
+	 */
+	public String getNtype(String ntype){
+		
+		StringBuffer string = new StringBuffer();
+		if (StringUtil.isNotEmpty(ntype)) {
+			String sql ="SELECT t.typename from t_s_type t LEFT JOIN t_s_typegroup g on t.typegroupid=g.ID where g.typegroupcode='notify_type' and t.typecode in("+ntype+");";
+			List<String> list = systemService.findListbySql(sql);
+			if(list.size()>0){
+				for (int i = 0; i < list.size(); i++) {
+					String ntypes = list.get(i);
+					if(i>0){
+						string.append(",");
+					}
+					string.append(ntypes);
+				}
+			}
+		}
+		
+		return string.toString();
+	}
+
+
 	/**
 	 * 批量删除系统通知
 	 * 
@@ -172,5 +207,30 @@ public class NotificationRecordController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
+
+	/**
+	 * 全部设为已读
+	 * @param notificationRecord
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(params = "makeMessageRead")
+	@ResponseBody
+	public AjaxJson makeMessageRead(HttpServletRequest request) {
+		String message = null;
+		AjaxJson j = new AjaxJson();
+
+		try {
+			String userId = ResourceUtil.getSessionUserName().getId();
+			//全部设为已读
+			systemService.updateHql("update NotificationUserMiddleEntity set status='1' where userId =? ",userId);
+			
+			message = "全部设置为已读成功！";
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		j.setMsg(message);
+		return j;
+	}
+
 }

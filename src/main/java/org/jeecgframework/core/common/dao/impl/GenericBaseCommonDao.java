@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -27,7 +26,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.internal.CriteriaImpl;
 import org.hibernate.metadata.ClassMetadata;
 import org.hibernate.persister.entity.AbstractEntityPersister;
-import org.hibernate.type.Type;
 import org.jeecgframework.core.annotation.JeecgEntityTitle;
 import org.jeecgframework.core.common.dao.IGenericBaseCommonDao;
 import org.jeecgframework.core.common.dao.jdbc.JdbcDao;
@@ -81,7 +79,7 @@ public abstract class GenericBaseCommonDao<T, PK extends Serializable>
 	@Autowired
 	@Qualifier("sessionFactory")
 	private SessionFactory sessionFactory;
-
+	
 	@Override
 	public Session getSession() {
 		// 事务必须是开启的(Required)，否则获取不到
@@ -1008,7 +1006,26 @@ public abstract class GenericBaseCommonDao<T, PK extends Serializable>
 		}
 		return q.list();
 	}
-
+	
+	/**
+	 * 通过hql 多参数修改对象
+	 */
+	@Override
+	public Integer updateHql(String hql, Object... params) {
+		Query query = null;
+        try {
+        	 query = getSession().createQuery(hql);
+            if (params != null && params.length > 0) {
+                for (int i = 0; i < params.length; i++) {
+                    query.setParameter(i, params[i]);
+                }
+            }
+        } catch (Exception e) {
+          e.printStackTrace();
+        } 
+        return query.executeUpdate();
+ }
+	
 	/**
 	 * 执行HQL语句操作更新
 	 *
