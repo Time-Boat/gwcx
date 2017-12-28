@@ -54,24 +54,4 @@ public class WeixinPayServiceImpl extends CommonServiceImpl implements WeixinPay
 		}
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
