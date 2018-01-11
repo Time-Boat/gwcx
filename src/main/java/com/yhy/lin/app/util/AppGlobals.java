@@ -14,12 +14,12 @@ public interface AppGlobals {
 	
 	
 	/** 服务器地址 */
-	public static final String SERVER_BASE_URL = "www.youngloong.com";
+//	public static final String SERVER_BASE_URL = "www.youngloong.com";
 	
 	/** 测试地址 */
-	//public static final String SERVER_BASE_URL = "car.cywtrip.com";
+	public static final String SERVER_BASE_URL = "www.yhyoo.com";
 	
-	//public static final boolean IS_TEST_ENVIRONMENT = false;
+	public static final String IS_TEST_ENVIRONMENT = util.readProperty("is_test_environment");
 	
 	/** app 返回状态 */
 	/** 返回成功 */
