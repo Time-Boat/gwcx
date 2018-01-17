@@ -27,11 +27,11 @@ public class LineinfoHistoryServiceImpl extends CommonServiceImpl implements Lin
 	
 	public JSONObject getDatagrid(LineinfoHistoryEntity lineInfo,String cityid,String startTime ,String endTime ,
 			DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,
-			String lineType,String username,String departname, String company) {
-		String sqlWhere = ((LineinfoHistoryServiceI) AopContext.currentProxy()).getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username,departname,company);
+			String lineId,String lineType,String username,String departname, String company) {
+		String sqlWhere = ((LineinfoHistoryServiceI) AopContext.currentProxy()).getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineId,lineType,username,departname,company);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = " select count(*) from lineinfo_history a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id= "
+		String sqlCnt = " select count(*) from lineinfo_history a inner join t_s_depart b on a.departId =b.ID LEFT JOIN lineinfo l on a.lineNumber=l.lineNumber left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id= "
 				+ " a.startLocation left join busstopinfo e on e.id= a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID "
 				+ " LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ";
 		if (!sqlWhere.isEmpty()) {
@@ -42,7 +42,7 @@ public class LineinfoHistoryServiceImpl extends CommonServiceImpl implements Lin
 		 sql.append("select c.cityId,c.city,a.id,a.name,a.startLocation,a.endLocation,a.createUserId,u.username,a.application_edit_status,a.application_edit_time,"
 		 		+ " a.imageurl,a.type,a.status,a.remark,a.deleteFlag,a.createTime,a.createPeople,a.price,a.apply_content,a.application_edit_user_id,"
 		 		+ " a.lineNumber,a.departId,a.lstartTime,a.lendTime,a.lineTimes,a.settledCompanyId,a.settledCompanyName,a.dispath,d.name as startname,e.name as endname,a.application_status,a.is_dealer_line,a.application_time,p.departname ");
-		 sql.append(" from lineinfo_history a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id= "
+		 sql.append(" from lineinfo_history a inner join t_s_depart b on a.departId =b.ID LEFT JOIN lineinfo l on a.lineNumber=l.lineNumber left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id=a.startLocation left join busstopinfo e on e.id= "
 		 		+ " a.endLocation LEFT JOIN t_s_base_user u on a.createUserId=u.ID LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p where 1=1 and (case when "
 		 		+ " LENGTH(t.org_code)<6 then t.org_code else substring(t.org_code,1,6) END)=p.org_code ");
 		 
@@ -93,7 +93,7 @@ public class LineinfoHistoryServiceImpl extends CommonServiceImpl implements Lin
 			objTableUserId = " a.createUserId ", orgTable="b", operationSql=" and a.application_edit_status in('1','2','3','4','5') ",auditSql = " and a.application_edit_status in('2','3','5')" )
 	public String getSqlWhere(LineinfoHistoryEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
-			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company){
+			String lendTime_begin,String lendTime_end,String lineId,String lineType,String username,String departname,String company){
 
 		StringBuffer sqlWhere = new StringBuffer();
 		
@@ -108,8 +108,9 @@ public class LineinfoHistoryServiceImpl extends CommonServiceImpl implements Lin
 			sqlWhere.append(" and a.cityId = '"+cityid+"'");
 		}
 		sqlWhere.append(" and a.deleteFlag='0'");
-		if(StringUtil.isNotEmpty(lineInfo.getName())){
-			sqlWhere.append(" and  a.name like '%"+lineInfo.getName()+"%'");
+		
+		if(StringUtil.isNotEmpty(lineId)){
+			sqlWhere.append(" and  l.id = '"+lineId+"'");
 		}
 		if(StringUtil.isNotEmpty(username)){
 			sqlWhere.append(" and u.username like '%"+username+"%'");

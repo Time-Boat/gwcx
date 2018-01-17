@@ -39,7 +39,7 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	/**站点创建时间*/
 	private Date createTime;
 	/**站点创建人*/
-	private String createPeople;
+	private String createUserId;
 	/**站点地址*/
 	private String stopLocation;
 	/**站点挂接状态 0：未挂接站点  1：已挂接站点*/
@@ -112,12 +112,12 @@ public class BusStopInfoEntity implements java.io.Serializable {
 	public void setCreateTime(Date createTime) {
 		this.createTime = createTime;
 	}
-	@Column(name="createPeople",nullable=true,length=50)
-	public String getCreatePeople() {
-		return createPeople;
+	@Column(name="create_user_id",nullable=true)
+	public String getCreateUserId() {
+		return createUserId;
 	}
-	public void setCreatePeople(String createPeople) {
-		this.createPeople = createPeople;
+	public void setCreateUserId(String createUserId) {
+		this.createUserId = createUserId;
 	}
 	@Column(name="stopLocation",nullable=true,length=200)
 	public String getStopLocation() {

@@ -13,13 +13,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.StringUtil;
-import org.jeecgframework.core.util.oConvertUtils;
-import org.jeecgframework.tag.core.easyui.TagUtil;
 import org.jeecgframework.web.system.pojo.base.TSDepart;
 import org.jeecgframework.web.system.pojo.base.TSUser;
 import org.jeecgframework.web.system.service.SystemService;
@@ -44,6 +41,7 @@ import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
 import com.yhy.lin.service.LineinfoHistoryServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 import com.yhy.lin.service.StartOrEndServiceI;
 
 import net.sf.json.JSONObject;
@@ -78,6 +76,9 @@ public class LineinfoHistoryController extends BaseController {
 	private StartOrEndServiceI startOrEndService;
 	@Autowired
 	private Validator validator;
+	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 	/**
 	 * 线路历史记录表列表 页面跳转
@@ -86,7 +87,18 @@ public class LineinfoHistoryController extends BaseController {
 	 */
 	@RequestMapping(params = "lineinfoHistoryList")
 	public ModelAndView list(HttpServletRequest request) {
-		request.setAttribute("cityList", getOpencity());
+		request.setAttribute("cityList", sharingInfoServiceI.getOpencity());
+		String lineId = request.getParameter("lineId");
+		String lineType =  request.getParameter("lineType");
+		String userType = request.getParameter("userType");
+		String cityid = request.getParameter("cityid");
+		request.setAttribute("linelist", sharingInfoServiceI.getLine(userType,cityid));//线路
+		request.setAttribute("companylist",sharingInfoServiceI.getCompany());//公司
+		request.setAttribute("cityList", sharingInfoServiceI.getOpencity());//开通城市
+		request.setAttribute("createPeoplelist",sharingInfoServiceI.getCreatePeople());//创建人
+		request.setAttribute("startlist",sharingInfoServiceI.getStartStaion(lineId, lineType, userType));//起点站
+		request.setAttribute("endlist",sharingInfoServiceI.getEndStaion(lineId,lineType,userType));//终点站
+		
 		return new ModelAndView("yhy/linesSpecial/lineinfoHistoryList");
 	}
 
@@ -104,6 +116,7 @@ public class LineinfoHistoryController extends BaseController {
 		String departname = request.getParameter("departname");
 		String username = request.getParameter("username");
 		String cityid = request.getParameter("cityID");
+		String lineId = request.getParameter("lineId");// 线路
 		String linetype = request.getParameter("linetype");// 线路类型
 		String beginTime = request.getParameter("createTime_begin");// 线路创建开始查询时间
 		String endTime = request.getParameter("createTime_end");// 线路创建结束查询时间
@@ -117,7 +130,7 @@ public class LineinfoHistoryController extends BaseController {
 		// 因为调用的方法一样，所以在外层来处理... 忘记是啥意思了。。。
 		linetype = " >='" + linetype + "' ";
 		JSONObject jObject = lineinfoHistoryService.getDatagrid(lineinfoHistory, cityid, beginTime, endTime, dataGrid,
-				lstartTime_begin, lstartTime_end, lendTime_begin, lendTime_end, linetype, username, departname,
+				lstartTime_begin, lstartTime_end, lendTime_begin, lendTime_end, lineId,linetype, username, departname,
 				null);
 		responseDatagrid(response, jObject);
 	}
@@ -837,4 +850,5 @@ public class LineinfoHistoryController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
+	
 }

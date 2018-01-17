@@ -10,14 +10,14 @@ import org.jeecgframework.core.util.PropertiesUtil;
  */
 public interface AppGlobals {
 	
-	PropertiesUtil util = new PropertiesUtil("appGlobals.properties");
+	PropertiesUtil util = new PropertiesUtil("appGlobalsTest.properties");
 	
 	
 	/** 服务器地址 */
 //	public static final String SERVER_BASE_URL = "www.youngloong.com";
 	
 	/** 测试地址 */
-	public static final String SERVER_BASE_URL = "www.yhyoo.com";
+	public static final String SERVER_BASE_URL = "www.yhyoo.cn";
 	
 	public static final String IS_TEST_ENVIRONMENT = util.readProperty("is_test_environment");
 	
@@ -113,6 +113,8 @@ public interface AppGlobals {
 	/** 微信服务器验证token */
 	public static final String SERVER_TOKEN = util.readProperty("server_token");
 	
+	public static final String SERVER_TOKENS = util.readProperty("server_tokens");
+	
 	/** 退款url */
 	public static final String REFUND_URL = util.readProperty("refund_url");
 
@@ -148,7 +150,7 @@ public interface AppGlobals {
 	/**
 	 * 商品名称
 	 */
-	public static final String SP_NAME = "小龙出行";
+	public static final String SP_NAME = "一合鱼";
 	
 	/** 项目管理员名称（开发） */
 	public static final String XM_ADMIN_NAME = "admin1";

@@ -16,9 +16,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.entity.CarCustomerEntity;
-import com.yhy.lin.app.util.AppGlobals;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.DealerStatisticsServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -37,6 +37,9 @@ public class DealerStatisticsController extends BaseController {
 
 	@Autowired
 	private DealerStatisticsServiceI dsService;
+	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 	/**
 	 * 渠道商用户统计
@@ -44,7 +47,7 @@ public class DealerStatisticsController extends BaseController {
 	@RequestMapping(params = "dealerUserStatisticsList")
 	public ModelAndView dealerUserStatisticsList(HttpServletRequest request, HttpServletResponse response) {
 		
-		request.setAttribute("accountList",getAccount());
+		request.setAttribute("accountList",sharingInfoServiceI.getAccount());
 		return new ModelAndView("yhy/dealerStatistics/dealerUserStatisticsList");
 	}
 	
@@ -73,7 +76,10 @@ public class DealerStatisticsController extends BaseController {
 	 */
 	@RequestMapping(params = "dealerOrderStatisticsList")
 	public ModelAndView dealerOrderStatisticsList(HttpServletRequest request, HttpServletResponse response) {
-		request.setAttribute("accountList",getAccount());
+		request.setAttribute("accountList",sharingInfoServiceI.getAccount());
+		String userType = request.getParameter("userType");
+		String cityid = request.getParameter("cityid");
+		request.setAttribute("linelist", sharingInfoServiceI.getLine(userType,cityid));
 		return new ModelAndView("yhy/dealerStatistics/dealerOrderStatisticsList");
 	}
 	
@@ -91,7 +97,7 @@ public class DealerStatisticsController extends BaseController {
 		String fc_begin = request.getParameter("orderCompletedTime_begin");
 		String fc_end = request.getParameter("orderCompletedTime_end");
 		String orderType = request.getParameter("ordertype");
-		String lineName = request.getParameter("lineName");
+		String lineName = request.getParameter("linesId");
 		String account = request.getParameter("accountId");
 		
 //		boolean hasPermission = checkRole(AppGlobals.PLATFORM_DEALER_AUDIT);

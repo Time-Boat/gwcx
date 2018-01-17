@@ -7,17 +7,17 @@ package com.yhy.lin.app.entity;
  * @date 2017年5月21日 上午1:18:21
  */
 public class AppUserOrderDetailEntity extends AppBaseOrderEntity {
-
+	
 	private String id;
 	
 	public String getId() {
 		return id;
 	}
-
+	
 	public void setId(String id) {
 		this.id = id;
 	}
-
+	
 	private String orderContactsname; // 联系人
 	private String orderContactsmobile; // 联系人手机号
 	private String applicationTime; // 下单时间
@@ -33,10 +33,38 @@ public class AppUserOrderDetailEntity extends AppBaseOrderEntity {
 	private String stationStartTime;   //出发时间
 	private String stationEndTime;     //到达时间
 	
+	private String servicePhone;     //客服电话
+	
+	private String isShowPhone;      //是否显示客服电话     0:不显示   1：显示
+	
+	private String isException;      //是否是异常订单   0：不是     1：是
+	
 	private String remark;     //用户订单备注
 	
-	
-	
+	public String getIsException() {
+		return isException;
+	}
+
+	public void setIsException(String isException) {
+		this.isException = isException;
+	}
+
+	public String getIsShowPhone() {
+		return isShowPhone;
+	}
+
+	public void setIsShowPhone(String isShowPhone) {
+		this.isShowPhone = isShowPhone;
+	}
+
+	public String getServicePhone() {
+		return servicePhone;
+	}
+
+	public void setServicePhone(String servicePhone) {
+		this.servicePhone = servicePhone;
+	}
+
 	public String getRemark() {
 		return remark;
 	}

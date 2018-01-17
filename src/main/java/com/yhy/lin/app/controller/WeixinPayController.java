@@ -57,6 +57,8 @@ import com.yhy.lin.entity.TransferorderEntity;
 @SuppressWarnings("rawtypes")
 public class WeixinPayController extends AppBaseController{
 
+//	private static String pay_server = "www.youngloong.com";
+	
 	@Autowired
 	private SystemService systemService;
 
@@ -122,13 +124,13 @@ public class WeixinPayController extends AppBaseController{
 			}
 
 			// 网页授权后获取传递的参数
-			String userId = request.getParameter("userId");
+//			String userId = request.getParameter("userId");
 			String code = request.getParameter("code");
 			logger.info("code:" + code);
 			if (!StringUtil.isNotEmpty(code)) {
 				return null;
 			}
-			logger.info("userId:" + userId);
+//			logger.info("userId:" + userId);
 			
 			String URL = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=" + AppGlobals.WECHAT_ID + "&secret="
 					+ AppGlobals.WECHAT_APP_SECRET + "&code=" + code + "&grant_type=authorization_code";
@@ -208,7 +210,7 @@ public class WeixinPayController extends AppBaseController{
 					+ "</spbill_create_ip>" + "<notify_url>" + notify_url + "</notify_url>" + "<trade_type>"
 					+ AppGlobals.TRADE_TYPE + "</trade_type>" + "<openid>" + openId + "</openid>" + "</xml>";
 			logger.info("xml：" + xml);
-
+			
 			String createOrderURL = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 			String prepay_id = "";
 			try {
@@ -471,37 +473,43 @@ public class WeixinPayController extends AppBaseController{
 	}
 	
 	//微信公众号的服务器配置验证
-	/*@RequestMapping(params = "eventPush")
-	protected void eventPush(HttpServletRequest request, HttpServletResponse response) throws IOException {  
-        String signature = request.getParameter("signature");  
-        String timestamp = request.getParameter("timestamp");  
-        String nonce = request.getParameter("nonce");
-        String echostr = request.getParameter("echostr");
-        logger.info("signature : " + signature);
-	    logger.info("timestamp : " + timestamp);
-	    logger.info("nonce : " + nonce);
-	    logger.info("echostr : " + echostr);
-	        
-	    PrintWriter out = response.getWriter();
-	    if (checkSignature(signature, timestamp, nonce)){  
-	       logger.info("check token : ok");  
-	       out.print(echostr);
-	     }
-	     out.close();
-    }  
-	
-	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
-        String[] arr = new String[] { AppGlobals.SERVER_TOKENS, timestamp, nonce };  
-        // sort  
-        Arrays.sort(arr);  
-        
-        // generate String
-        String content = arr[0]+arr[1]+arr[2];  
-        
-        // shal code  
-        String temp = Sha1Util.getSha1(content);
-        return temp.equalsIgnoreCase(signature);  
-    }*/
+//	@RequestMapping(params = "eventPush")
+//	protected void eventPush(HttpServletRequest request, HttpServletResponse response) throws IOException {  
+//        String signature = request.getParameter("signature");  
+//        String timestamp = request.getParameter("timestamp");  
+//        String nonce = request.getParameter("nonce");
+//        String echostr = request.getParameter("echostr");
+//        logger.info("signature : " + signature);
+//	    logger.info("timestamp : " + timestamp);
+//	    logger.info("nonce : " + nonce);
+//	    logger.info("echostr : " + echostr);
+//	    
+//	    PrintWriter out = response.getWriter();
+//	    if (checkSignature(signature, timestamp, nonce)){  
+//	       logger.info("check token : ok");  
+//	       out.print(echostr);
+//	     }
+//	     out.close();
+//    }  
+//	
+//	public static boolean checkSignature(String signature, String timestamp, String nonce) {  
+//        String[] arr = new String[] { AppGlobals.SERVER_TOKEN, timestamp, nonce };  
+//        logger.info("SERVER_TOKEN : " + AppGlobals.SERVER_TOKEN);  
+//        // sort  
+//        Arrays.sort(arr);  
+//        System.out.println("sort : " + Arrays.toString(arr));
+//        // generate String
+//        String content = arr[0]+arr[1]+arr[2];  
+//        
+//        // shal code  
+//        String temp = Sha1Util.getSha1(content);
+//        logger.info("tempSignature : " + temp);  
+//        return temp.equalsIgnoreCase(signature);  
+//    }
+//	
+//	public static void main(String[] args) {
+//		System.out.println(checkSignature("22e06ade3e1ef207a0a0aa46ef409629ec0850c5", "1515727882", "2898445725"));
+//	}
 	
 	/**
 	 * 微信消息推送回调
@@ -604,6 +612,8 @@ public class WeixinPayController extends AppBaseController{
 			// String orderId =
 			// MakeOrderNum.makeOrderNum("tx");//AppGlobals.SP_NAME;
 
+			logger.info("wxOauth2    SERVER_BASE_URL:" + AppGlobals.SERVER_BASE_URL);
+			
 			// 授权后要跳转的链接
 			String backUri = baseUrl + "/wx.do?toIndex";
 			

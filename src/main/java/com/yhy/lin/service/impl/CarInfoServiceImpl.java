@@ -30,10 +30,10 @@ import org.jeecgframework.core.util.StringUtil;
 public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String licencePlate,
+	public JSONObject getDatagrid(DataGrid dataGrid ,String userCar ,String lpId, String carId,
 			String carType, String status, String businessType, String carStatus, String auditStatus) {
 		
-		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, licencePlate, carType, status, businessType, carStatus, auditStatus);
+		String sqlWhere = ((CarInfoServiceI) AopContext.currentProxy()).getWhere(lpId, userCar, carId, carType, status, businessType, carStatus, auditStatus);
 		
 		String sqlCnt = " select count(1) from car_info c left join driversinfo d on c.driver_id = d.id LEFT JOIN t_s_depart t on c.departId=t.ID "
 				+ " LEFT JOIN t_s_base_user u on d.create_user_id = u.id,t_s_depart p "
@@ -138,7 +138,7 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 	
 	@BussAnnotation(orgType = {AppGlobals.TECHNICAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " c.create_user_id ", orgTable="t", technicalSql = " and c.audit_status != '-1' ")
-	public String getWhere(String lpId, String userCar, String licencePlate, String carType, String status, String businessType, String carStatus, String auditStatus) {
+	public String getWhere(String lpId, String userCar, String carId, String carType, String status, String businessType, String carStatus, String auditStatus) {
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -162,8 +162,8 @@ public class CarInfoServiceImpl extends CommonServiceImpl implements CarInfoServ
 			sql.append(" and c.car_status = '0' ");
 		}
 		
-		if(StringUtil.isNotEmpty(licencePlate)){
-			sql.append(" and c.licence_plate like '"+licencePlate+"%' ");
+		if(StringUtil.isNotEmpty(carId)){
+			sql.append(" and c.id = '"+carId+"' ");
 		}
 		
 		if(StringUtil.isNotEmpty(carType)){

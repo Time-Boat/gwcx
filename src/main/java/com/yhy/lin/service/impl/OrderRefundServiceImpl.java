@@ -53,9 +53,9 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 	
 	@Override
 	public JSONObject getDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String fc_begin, String fc_end,
-			String rf_begin, String rf_end, String orderStartingstation, String orderTerminusstation, String departname) {
+			String rf_begin, String rf_end,  String departname,String lineId,String startLocation,String endLocation) {
 		String sqlWhere = ((OrderRefundServiceI) AopContext.currentProxy()).getWhere(
-				transferorder, fc_begin, fc_end,rf_begin,rf_end, orderStartingstation, orderTerminusstation, departname);
+				transferorder, fc_begin, fc_end,rf_begin,rf_end, departname,lineId,startLocation,endLocation);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -70,7 +70,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
-		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status,ca.user_type, ");
+		sql.append(" select u.username as f_audit_user,a.first_audit_status,a.first_audit_date,us.username as l_audit_user,a.last_audit_status,a.order_user_type, ");
 		sql.append(" a.last_audit_date,a.city_name,t.org_code,a.id,a.order_id,a.order_status,a.order_type,a.order_starting_station_name,a.order_terminus_station_name, ");
 		sql.append(" a.order_startime,a.order_numbers,a.order_paytype,a.order_contactsname,a.refund_time,a.refund_price, ");
 		sql.append(" a.order_contactsmobile,a.order_paystatus,a.order_totalPrice,d.name,d.phoneNumber,a.applicationTime, p.departname ");
@@ -101,7 +101,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				new Db2Page("orderTotalPrice", "order_totalPrice", null),
 				new Db2Page("name", "name", null),
 				new Db2Page("phoneNumber", "phoneNumber", null),
-				new Db2Page("userType", "user_type", null),
+				new Db2Page("orderUserType", "order_user_type", null),
 				new Db2Page("applicationTime", "applicationTime", null),
 				new Db2Page("orderStartingstation", "order_starting_station_name", null),
 				new Db2Page("orderTerminusstation", "order_terminus_station_name", null),
@@ -122,8 +122,7 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_REFUND_AUDIT, AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " l.createUserId ", orgTable="t", auditSql = " and a.first_audit_status = '1'" )
-	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end,String orderStartingstation,
-			String orderTerminusstation, String departname) {
+	public String getWhere(TransferorderEntity transferorder, String fc_begin, String fc_end, String rf_begin,String rf_end, String departname,String lineId,String startLocation,String endLocation) {
 
 		StringBuffer sql = new StringBuffer(" where 1=1 ");
 		
@@ -132,6 +131,10 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		// 公司名称
 		if (StringUtil.isNotEmpty(departname)) {
 			sql.append(" and p.departname like '%" + departname + "%'");
+		}
+		//线路
+		if (StringUtil.isNotEmpty(lineId)) {
+			sql.append(" and l.id = '" + lineId + "'");
 		}
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
@@ -149,17 +152,21 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 		if (StringUtil.isNotEmpty(transferorder.getOrderType())) {
 			sql.append(" and  a.order_type ='" + transferorder.getOrderType() + "'");
 		}
+		// 订单类型
+		if (StringUtil.isNotEmpty(transferorder.getOrderUserType())) {
+			sql.append(" and  a.order_user_type ='" + transferorder.getOrderUserType() + "'");
+		}
 		// 订单状态
 		if (StringUtil.isNotEmpty(transferorder.getOrderStatus())) {
 			sql.append(" and  a.order_status ='" + transferorder.getOrderStatus() + "'");
 		}
 		// 起点站id
-		if (StringUtil.isNotEmpty(orderStartingstation)) {
-			sql.append(" and  a.order_starting_station_name like '%" + orderStartingstation + "%'");
+		if (StringUtil.isNotEmpty(startLocation)) {
+			sql.append(" and  a.order_starting_station_id = '" + startLocation + "'");
 		}
 		// 终点站id
-		if (StringUtil.isNotEmpty(orderTerminusstation)) {
-			sql.append(" and  a.order_terminus_station_name like '%" + orderTerminusstation + "%'");
+		if (StringUtil.isNotEmpty(endLocation)) {
+			sql.append(" and  a.order_terminus_station_id = '" + endLocation + "'");
 		}
 
 		// 申请人

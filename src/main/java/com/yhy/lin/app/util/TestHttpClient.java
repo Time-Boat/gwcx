@@ -24,6 +24,9 @@ import com.google.gson.JsonObject;
 
 public class TestHttpClient {  
   
+//	private static String base_apiURL = "www.youngloong.com";
+	private static String base_apiURL = "http://localhost:8080";
+	
     // 接口地址 
 	//登录接口
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
@@ -32,7 +35,7 @@ public class TestHttpClient {
 	//订单所属线路的站点列表接口地址
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getOrderStation";  
     //线路站点信息地址
-    private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
+    //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
     //获取机场站点或者火车站站点信息
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getPTStation";
 	//取消订单
@@ -46,7 +49,9 @@ public class TestHttpClient {
 	//获取用户个人信息
 	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getUserInfo";
 	//订票人数确定总价
-//	private static String apiURL = "http://localhost:8080/gwcx/dealerApp.do?getPeoplesPrice";  
+	//private static String apiURL = "http://localhost:8080/gwcx/dealerApp.do?getPeoplesPrice";  
+	//订单详情
+	private static String apiURL = base_apiURL + "/gwcx/app.do?getOrderDetail";  
 	
     private Log logger = LogFactory.getLog(this.getClass());  
     private static final String pattern = "yyyy-MM-dd HH:mm:ss:SSS";  
@@ -244,6 +249,8 @@ public class TestHttpClient {
         JsonObject j = new JsonObject();
 //        System.out.println(ac.get());
         
+        //订单详情
+        //localhost:8080/gwcx/app.do?getOrderDetail&orderId=ff8080815f89c7a1015f902c8cc102c4&userType=1&token=0d4a01670babfc85b96d5874132402fe
         
         //登录接口
         //j.addProperty("mobile", "15527916902");  

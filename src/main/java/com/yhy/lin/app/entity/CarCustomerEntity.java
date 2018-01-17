@@ -45,6 +45,8 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	private java.lang.String token;
 	/** Token创建日期 */
 	private java.util.Date tokenUpdateTime;
+	/**最近登录时间 */
+	private java.util.Date lastLoginTime;
 	/** 备注信息 */
 	private java.lang.String remark;
 
@@ -421,16 +423,26 @@ public class CarCustomerEntity implements java.io.Serializable, UserInfo {
 	public void setUserId(String userId) {
 		
 	}
-
 	@Override
 	@Transient
 	public String getUserName() {
 		return realName;
 	}
-
 	public void setUserName(String userName) {
 
 	}
 	
+	/**
+	 * 方法: 取得java.util.Date
+	 * @return: java.util.Date 最后登录时间
+	 */
+	@Column(name = "last_login_time", nullable = true)
+	public java.util.Date getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(java.util.Date lastLoginTime) {
+		this.lastLoginTime = lastLoginTime;
+	}
 	
 }

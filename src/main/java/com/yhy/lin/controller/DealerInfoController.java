@@ -45,6 +45,7 @@ import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.service.DealerInfoServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -68,6 +69,9 @@ public class DealerInfoController extends BaseController {
 	private DealerInfoServiceI dealerInfoService;
 	@Autowired
 	private SystemService systemService;
+	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 	/**
 	 * 渠道商信息列表 页面跳转
@@ -81,7 +85,7 @@ public class DealerInfoController extends BaseController {
 		if(checkRole(AppGlobals.XM_ADMIN)){
 			request.setAttribute("ap", "1");
 		}
-		
+		request.setAttribute("accountList",sharingInfoServiceI.getAccount());
 		return new ModelAndView("yhy/dealer/dealerInfoList");
 	}
 
@@ -103,7 +107,8 @@ public class DealerInfoController extends BaseController {
 		 */
 		String username = request.getParameter("username");
 		String departname = request.getParameter("departname");
-		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo, username, departname);
+		String accountId = request.getParameter("accountId");
+		JSONObject jObject = dealerInfoService.getDatagrid(dataGrid, dealerInfo,accountId, username, departname);
 		
 		responseDatagrid(response, jObject);
 	}
@@ -750,6 +755,5 @@ public class DealerInfoController extends BaseController {
 		j.setMsg(message);
 		return j;
 	}
-	
 	
 }

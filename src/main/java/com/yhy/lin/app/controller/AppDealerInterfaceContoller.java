@@ -85,13 +85,13 @@ public class AppDealerInterfaceContoller  extends AppBaseController {
 							// 修改登录状态
 							if (StringUtil.isNotEmpty(user.getToken())) {
 								token = user.getToken();
-								sql = "update car_customer set status = '1', token_update_time = ? where phone = ? ";
-								systemService.executeSql(sql, curTime, mobile);
+								sql = "update car_customer set status = '1', token_update_time = ?,last_login_time = ? where phone = ? ";
+								systemService.executeSql(sql, curTime,curTime, mobile);
 							} else {
 								// 生成token
 								token = AppUtil.generateToken(user.getId(), user.getPhone());
-								sql = "update car_customer set status = '1', token_update_time = ? ,token = ? where phone = ? ";
-								systemService.executeSql(sql, curTime, token, mobile);
+								sql = "update car_customer set status = '1', token_update_time = ? ,last_login_time = ?,token = ? where phone = ? ";
+								systemService.executeSql(sql, curTime, curTime,token, mobile);
 							}
 
 							String message = "app渠道商用户: " + user.getPhone() + "登录成功";

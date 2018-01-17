@@ -28,9 +28,9 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 	private UserService userService;
 	
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid,DriversInfoEntity driversInfo,String cityID) {
+	public JSONObject getDatagrid(DataGrid dataGrid,DriversInfoEntity driversInfo,String cityID,String driverId) {
 		
-		String sqlWhere = getWhere(driversInfo,cityID);
+		String sqlWhere = getWhere(driversInfo,cityID,driverId);
 		
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from driversinfo d left join cities c on c.cityId=d.cityId LEFT JOIN t_s_depart t on d.departId=t.ID";
@@ -150,7 +150,7 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 		return jObject;
 	}
 	
-	public String getWhere(DriversInfoEntity driversInfo,String cityID){
+	public String getWhere(DriversInfoEntity driversInfo,String cityID,String driverId){
 		StringBuffer queryCondition = new StringBuffer(" where d.deleteFlag='0' ");
 		
 		 TSUser user = ResourceUtil.getSessionUserName();
@@ -183,8 +183,8 @@ public class DriversInfoServiceImpl extends CommonServiceImpl implements Drivers
 			queryCondition.append(" and d.sex = '"+driversInfo.getSex()+"' ");
 		}
 		
-		if(StringUtil.isNotEmpty(driversInfo.getName())){
-			queryCondition.append(" and d.name like '%"+driversInfo.getName()+"%' ");
+		if(StringUtil.isNotEmpty(driverId)){
+			queryCondition.append(" and d.id= '"+driverId+"' ");
 		}
 		
 		if(StringUtil.isNotEmpty(driversInfo.getPhoneNumber())){

@@ -8,7 +8,7 @@
 	<t:datagrid name="transferDriverList" title="接送车司机安排" autoLoadData="true" actionUrl="transferOrderController.do?driverdatagrid" 
 			    idField="id" fit="true" queryMode="group" onDblClick="transferOrderList">
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
-		<t:dgCol title="线路订单码" field="lineOrderCode" query="true"></t:dgCol>
+		<t:dgCol title="线路订单码" field="lineOrderCode" ></t:dgCol>
 		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
 		<t:dgCol title="线路类型" field="lineType" dictionary="transferTy" align="center" query="true"></t:dgCol>
 		<t:dgCol title="车票数量" field="orderNumber" align="center"></t:dgCol>
@@ -31,13 +31,13 @@
 		
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
-		var a3 = '<select name="lineId" style="width: 150px">';
+		var a3 = '<select id="lineId" name="lineId" style="width: 150px">';
 		var c1 = '<option value="">选择所属线路</option>';
 		
 		if(json.indexOf("lineId")>0){
 			var obj = eval('(' + json + ')');
-			for (var i = 0; i < obj.data.length; i++) {
-				c1 += '<option value="'+obj.data[i].lineId+'">' + obj.data[i].lineName+ '</option>';
+			for (var i = 0; i < obj.lineinfo.length; i++) {
+				c1 += '<option value="'+obj.lineinfo[i].lineId+'">' + obj.lineinfo[i].lineName+ '</option>';
 			}
 		}
 		
@@ -59,6 +59,35 @@
 		$("#transferDriverListForm").append(a1 + a2 + a3 + c1 + a4 + aa1 + aa2 + aa3 + cc1 + aa4);
 			
 	});
+	
+	$(function() {
+		getLineName();
+	});
+
+	function getLineName() {
+		
+		$("select[name='lineType']").change(
+				function() {
+					var ordertype = $(this).children('option:selected').val(); //当前选择项的值
+					var url = "transferStatisticsController.do?getLineName&ordertype="+ ordertype;
+					$.ajax({
+						type : 'POST',
+						url : url,
+						success : function(ds) {
+							var d1 = '<option value="">选择线路</option>';
+							var obj = eval('(' + ds + ')');
+							if(obj.indexOf("lineId")>0){
+								var objs = eval('(' + obj + ')');
+								for (var i = 0; i < objs.lineinfo.length; i++) {
+									d1 += '<option value="'+objs.lineinfo[i].lineId+'">' + objs.lineinfo[i].lineName+ '</option>';
+								}
+							}
+							$("#lineId").empty();//先置空 
+							$("#lineId").append(d1);
+						}
+					});
+				});
+	}
 
 	// 安排车辆司机 
 	function editCarAndDriver(title,url,id,width,height){

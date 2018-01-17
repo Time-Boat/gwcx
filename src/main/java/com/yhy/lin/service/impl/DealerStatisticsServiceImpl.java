@@ -253,7 +253,7 @@ public class DealerStatisticsServiceImpl extends CommonServiceImpl implements De
 		}
 		// 线路名称
 		if (StringUtil.isNotEmpty(lineName)) {
-			sql.append(" and  l.name like '%" + lineName + "%'");
+			sql.append(" and  l.id like '%" + lineName + "%'");
 		}
 		sql.append(" and t.applicationTime<f.audit_pass_time ");
 		

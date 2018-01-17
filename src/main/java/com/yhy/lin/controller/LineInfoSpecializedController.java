@@ -41,6 +41,7 @@ import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.CarTSTypeLineServiceI;
 import com.yhy.lin.service.LineInfoServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -62,23 +63,28 @@ public class LineInfoSpecializedController extends BaseController {
 
 	@Autowired
 	private CarTSTypeLineServiceI carTSTypeLineServiceI;
+	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 	/**
 	 * 接送机线路管理跳转页面
 	 */
 	@RequestMapping(params = "lineList")
 	public ModelAndView lineList(HttpServletRequest request) {
-		request.setAttribute("cityList", getOpencity());
-
-		/*TSUser user = ResourceUtil.getSessionUserName();
-		boolean hasPermission = checkRole(user, AppGlobals.PLATFORM_LINE_AUDIT);
-		if (hasPermission) {
-			String oc = user.getOrgCompany();
-			if(StringUtil.isNotEmpty(oc)){
-				String json = getCompany(oc);
-				request.setAttribute("companyList", json);
-			}
-		}*/
+		request.setAttribute("cityList", sharingInfoServiceI.getOpencity());
+		String lineId = request.getParameter("lineId");
+		String lineType =  request.getParameter("lineType");
+		String userType = request.getParameter("userType");
+		String cityid = request.getParameter("cityid");
+		request.setAttribute("linelist", sharingInfoServiceI.getLine(userType,cityid));
+		request.setAttribute("companylist",sharingInfoServiceI.getCompany());
+		request.setAttribute("createPeoplelist",sharingInfoServiceI.getCreatePeople());
+		
+		request.setAttribute("startlist",sharingInfoServiceI.getStartStaion(lineId,lineType,userType));
+		request.setAttribute("endlist",sharingInfoServiceI.getEndStaion(lineId,lineType,userType));
+		
+		
 		return new ModelAndView("yhy/linesSpecial/lineList");
 	}
 
@@ -87,7 +93,7 @@ public class LineInfoSpecializedController extends BaseController {
 	 */
 	@RequestMapping(params = "applyEditList")
 	public ModelAndView applyEditList(HttpServletRequest request) {
-		request.setAttribute("cityList", getOpencity());
+		request.setAttribute("cityList", sharingInfoServiceI.getOpencity());
 
 		return new ModelAndView("yhy/linesSpecial/applyEditList");
 	}
@@ -130,7 +136,11 @@ public class LineInfoSpecializedController extends BaseController {
 	public void datagrid(LineInfoEntity lineInfos, HttpServletRequest request, HttpServletResponse response,
 			DataGrid dataGrid) {
 		String departname = request.getParameter("departname");
-		String username = request.getParameter("username");
+		String userId = request.getParameter("userId");
+		String lineId = request.getParameter("lineId");
+		String startLocation = request.getParameter("startLocation");
+		String endLocation = request.getParameter("endLocation");
+		
 		String cityid = request.getParameter("cityID");
 		String linetype = request.getParameter("linetype");// 线路类型
 		String beginTime = request.getParameter("createTime_begin");// 线路创建开始查询时间
@@ -144,8 +154,8 @@ public class LineInfoSpecializedController extends BaseController {
 
 		// 因为调用的方法一样，所以在外层来处理... 忘记是啥意思了。。。
 		linetype = " >='" + linetype + "' ";
-		JSONObject jObject = lineInfoService.getDatagrid3(lineInfos, cityid, beginTime, endTime, dataGrid,
-				lstartTime_begin, lstartTime_end, lendTime_begin, lendTime_end, linetype, username, departname,
+		JSONObject jObject = lineInfoService.getDatagrid3(lineInfos,lineId, startLocation,endLocation,cityid, beginTime, endTime, dataGrid,
+				lstartTime_begin, lstartTime_end, lendTime_begin, lendTime_end, linetype, userId, departname,
 				null);
 		responseDatagrid(response, jObject);
 	}
@@ -451,7 +461,7 @@ public class LineInfoSpecializedController extends BaseController {
 				"select b.name,b.x,b.y,b.stopLocation,lb.siteOrder,lb.busStopsId from line_busstop lb join busstopinfo b on b.id = lb.busStopsId "
 						+ "where lineId = '" + lineId + "' order by siteOrder ");
 		
-		if("1".equals(isDealerLine)){
+//		if("1".equals(isDealerLine)){
 			
 			String sId = "";
 			
@@ -486,7 +496,7 @@ public class LineInfoSpecializedController extends BaseController {
 			}
 			
 			req.setAttribute("lineAreaStation", lineAreaStation);
-		}
+//		}
 		
 		String json = JSONArray.fromObject(lbs).toString().replaceAll("\"", "'");
 		req.setAttribute("stations", json);
@@ -1467,5 +1477,83 @@ public class LineInfoSpecializedController extends BaseController {
 		j.setMsg(message);
 
 		return j;
+	}
+	
+	/**
+	 * 获取起点站
+	 */
+	@RequestMapping(params = "getStartLocation")
+	@ResponseBody
+	public String getStartLocation(HttpServletRequest request){
+		
+		String lineId = request.getParameter("lineId");
+		String lineType = request.getParameter("lineType");
+		String userType = request.getParameter("userType");
+		String linelist = sharingInfoServiceI.getStartStaion(lineId,lineType,userType);
+		request.setAttribute("lineslist", linelist);
+		return linelist;
+	}
+	
+	/**
+	 * 获取终点站
+	 */
+	@RequestMapping(params = "getEndLocation")
+	@ResponseBody
+	public String getEndLocation(HttpServletRequest request){
+		
+		String lineId = request.getParameter("lineId");
+		String lineType = request.getParameter("lineType");
+		String userType = request.getParameter("userType");
+		String linelist = sharingInfoServiceI.getEndStaion(lineId,lineType,userType);
+		request.setAttribute("lineslist", linelist);
+		return linelist;
+	}
+	
+	/**
+	 * 获取线路
+	 */
+	@RequestMapping(params = "getLineName")
+	@ResponseBody
+	public JSONObject getLineName(HttpServletRequest request){
+		
+		JSONObject json = new JSONObject();
+		String lineType = request.getParameter("ordertype");
+		String userType = request.getParameter("userType");
+		String lineId = request.getParameter("lineId");
+		String linelist = sharingInfoServiceI.getLine(lineType,userType);
+		String startlist = sharingInfoServiceI.getStartStaion(lineId, lineType, userType);
+		String endlist = sharingInfoServiceI.getEndStaion(lineId, lineType, userType);
+		json.put("lineinfo", linelist);
+		json.put("startStation", startlist);
+		json.put("endStation", endlist);
+		
+		return json;
+	}
+	/**
+	 * 获取起点站
+	 */
+	@RequestMapping(params = "getTypeStartLocation")
+	@ResponseBody
+	public String getTypeStartLocation(HttpServletRequest request){
+		
+		String lineType = request.getParameter("ordertype");
+		String userType = request.getParameter("userType");
+		String lineId = request.getParameter("lineId");
+		String linelist = sharingInfoServiceI.getStartStaion(lineId, lineType, userType);
+		return linelist;
+	}
+	
+	/**
+	 * 获取起点站
+	 */
+	@RequestMapping(params = "getTypeEndLocation")
+	@ResponseBody
+	public String getTypeEndLocation(HttpServletRequest request){
+		
+		String lineType = request.getParameter("ordertype");
+		String userType = request.getParameter("userType");
+		String lineId = request.getParameter("lineId");
+		String linelist = sharingInfoServiceI.getEndStaion(lineId, lineType, userType);
+		return linelist;
 	}
 }

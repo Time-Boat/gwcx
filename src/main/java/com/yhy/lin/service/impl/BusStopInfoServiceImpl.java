@@ -31,13 +31,13 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 	public JSONObject getDatagrid(BusStopInfoEntity busStopInfo, DataGrid dataGrid,String cityID,String createTime_begin,String createTime_end){
 		String sqlWhere = getBusSqlWhere(busStopInfo,cityID,createTime_begin,createTime_end);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
-		String sqlCnt = "select count(*) from busstopinfo a ";
+		String sqlCnt = "select count(*) from busstopinfo a LEFT JOIN t_s_base_user u on a.create_user_id=u.ID";
 		if (!sqlWhere.isEmpty()) {
 			sqlCnt += " where" + sqlWhere;
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt, null);
 		// 取出当前页的数据 
-		String sql = "select * from busstopinfo a ";
+		String sql = "select a.*,u.username from busstopinfo a LEFT JOIN t_s_base_user u on a.create_user_id=u.ID";
 		if (!sqlWhere.isEmpty()) {
 			sql += " where" + sqlWhere;
 		}
@@ -55,7 +55,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 						,new Db2Page("remark", "remark", null)
 						,new Db2Page("status", "status", null)	
 						,new Db2Page("createTime", "createTime", null)
-						,new Db2Page("createPeople", "createPeople", null)
+						,new Db2Page("createPeople", "username", null)
 						,new Db2Page("stopLocation", "stopLocation", null)
 						,new Db2Page("stationType", "station_type", null)
 						,new Db2Page("cityId", "cityId", null)
@@ -140,7 +140,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		//where c.lineId is NULL 这个条件是为了不重复添加站点
 		StringBuffer sqlCnt = new StringBuffer();
-		sqlCnt.append("select count(*) from busstopinfo a where 1=1 ");
+		sqlCnt.append("select count(*) from busstopinfo a LEFT JOIN t_s_base_user t on a.create_user_id=t.ID where 1=1 ");
 		if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
 			sqlCnt.append(" and a.id not in(select se.endId from start_end se where se.station_status='1' and se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 			sqlCnt.append(" and a.id not in(select se.endId from start_end se where se.line_id='"+lineInfo.getId()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
@@ -163,7 +163,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 		
 		// 取出当前页的数据 
 		StringBuffer sql = new StringBuffer();
-		sql.append("select a.id,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from busstopinfo a where 1=1 ");
+		sql.append("select a.id,a.name,a.stopLocation,a.createTime,a.create_user_id,t.username,a.remark from busstopinfo a LEFT JOIN t_s_base_user t on a.create_user_id=t.ID where 1=1 ");
 		if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
 			sql.append("and a.id not in(select se.endId from start_end se where se.station_status='1' and se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 			sql.append(" and a.id not in(select se.endId from start_end se where se.line_id='"+lineInfo.getId()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
@@ -190,7 +190,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 				,new Db2Page("name", "name", null)
 				,new Db2Page("stopLocation", "stopLocation", null)
 				,new Db2Page("createTime", "createTime", null)
-				,new Db2Page("createPeople", "createPeople", null)
+				,new Db2Page("createPeople", "username", null)
 				,new Db2Page("remark", "remark", null)
 		};
 		JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);
@@ -279,7 +279,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 			// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 			//where c.lineId is NULL 这个条件是为了不重复添加站点
 			StringBuffer sqlCnt = new StringBuffer();
-			sqlCnt.append("select count(*) from busstopinfo a where 1=1 ");
+			sqlCnt.append("select count(*) from busstopinfo a LEFT JOIN t_s_base_user t on a.create_user_id=t.ID where 1=1 ");
 			if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
 				sqlCnt.append(" and a.id not in(select se.endId from start_end se where se.station_status='1' and se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 				sqlCnt.append(" and a.id not in(select se.endId from start_end se where se.line_id='"+lineInfo.getId()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
@@ -302,7 +302,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 			
 			// 取出当前页的数据 
 			StringBuffer sql = new StringBuffer();
-			sql.append("select a.id,a.name,a.stopLocation,a.createTime,a.createPeople,a.remark from busstopinfo a where 1=1 ");
+			sql.append("select a.id,a.name,a.stopLocation,a.createTime,a.create_user_id,t.username,a.remark from busstopinfo a LEFT JOIN t_s_base_user t on a.create_user_id=t.ID where 1=1 ");
 			if("2".equals(lineInfo.getType()) || "4".equals(lineInfo.getType())){
 				sql.append("and a.id not in(select se.endId from start_end se where se.station_status='1' and se.startId='"+lineInfo.getStartLocation()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
 				sql.append(" and a.id not in(select se.endId from start_end se where se.line_id='"+lineInfo.getId()+"' and se.lineType like '%"+lineInfo.getType()+"%')");
@@ -329,7 +329,7 @@ public class BusStopInfoServiceImpl extends CommonServiceImpl implements BusStop
 					,new Db2Page("name", "name", null)
 					,new Db2Page("stopLocation", "stopLocation", null)
 					,new Db2Page("createTime", "createTime", null)
-					,new Db2Page("createPeople", "createPeople", null)
+					,new Db2Page("createPeople", "username", null)
 					,new Db2Page("remark", "remark", null)
 			};
 			JSONObject jObject = getJsonDatagridEasyUI(mapList, iCount.intValue(), db2Pages);

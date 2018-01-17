@@ -11,7 +11,7 @@ import net.sf.json.JSONObject;
 
 public interface CarInfoServiceI extends CommonService{
 
-	JSONObject getDatagrid(DataGrid dataGrid, String userCar, String lpId, String licencePlate,
+	JSONObject getDatagrid(DataGrid dataGrid, String userCar, String lpId, String carId,
 			String carType, String status, String businessType, String carStatus, String auditStatus);
 
 	List<DriversInfoEntity> getDriverList(String driverId);

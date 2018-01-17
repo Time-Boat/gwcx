@@ -321,7 +321,7 @@ public class BusStopInfoController extends BaseController {
 		String areaStations = request.getParameter("areaStations");
 		
 		busStopInfo.setDeleteFlag((short)0);
-		busStopInfo.setCreatePeople(ResourceUtil.getSessionUserName().getUserName());
+		busStopInfo.setCreateUserId(ResourceUtil.getSessionUserName().getId());
 		String cityId = request.getParameter("city");
 		if(StringUtil.isNotEmpty(cityId)){
 			CitiesEntity listCity = systemService.findUniqueByProperty(CitiesEntity.class, "cityId", cityId);

@@ -77,6 +77,7 @@ public class WeixinPayUtil {
 	    		response = httpclient.execute(httpost);
                 entity = response.getEntity();
                 jsonStr = EntityUtils.toString(entity, "UTF-8");
+                logger.error("支付返回消息  jsonStr: " + jsonStr);
                 EntityUtils.consume(entity);
 		    }
 			

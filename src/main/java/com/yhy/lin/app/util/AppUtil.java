@@ -20,6 +20,8 @@ import net.sf.json.JSONObject;
 
 public class AppUtil {
 	
+	public static final String DATE_ABS = "abs";
+	
 	// 生成token
 	public static String generateToken(String customerId, String phone) {
 		return md5(customerId + phone + System.currentTimeMillis());

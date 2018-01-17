@@ -231,14 +231,14 @@
 			createdetailwindow("选择文件","dealerInfoController.do?dealerUploadFile&id="+id,"800px","500px");
 		}
 		
-		/* //初始化查询条件
+		 //初始化查询条件
 		$(function() {
 			var json = $("#accounts").val();
 			
 			var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
-	 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="渠道商名称">渠道商名称：</span>';
+	 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="渠道商名称">渠道商名称</span>';
 			var a3 = '<select name="accountId" style="width: 150px">';
-			var c1 = '<option value="">选择渠道商</option>';
+			var c1 = '<option value="">--选择渠道商--</option>';
 			if(json.indexOf("account")>0){
 				var obj = eval('(' + json + ')');
 				for (var i = 0; i < obj.data.length; i++) {
@@ -248,7 +248,7 @@
 			var a4 = '</select></span>';
 			
 			$("#dealerInfoListForm").append(a1 + a2 + a3 + c1 + a4);
-		}); */
+		}); 
 		
 		
 	</script>
@@ -258,7 +258,7 @@
    <t:dgCol title="编号" field="id" hidden="true" ></t:dgCol>
    <t:dgCol title="二维码地址" field="qrCodeUrl" hidden="true" width="120"></t:dgCol>
    <t:dgCol title="附件地址" field="dealerFilePath" hidden="true" width="120"></t:dgCol>
-   <t:dgCol title="渠道商名称" field="account" query="true" align="center" width="120"></t:dgCol>
+   <t:dgCol title="渠道商名称" field="account" align="center" width="120"></t:dgCol>
    <t:dgCol title="合作状态" field="status" query="true" align="center" dictionary="dealerStatus" width="80"></t:dgCol>
    <t:dgCol title="所属公司" field="departname" query="true" align="center" width="120"></t:dgCol>
    <t:dgCol title="创建日期" field="createDate" editor="datebox" formatter="yyyy-MM-dd hh:mm:ss" queryMode="group" align="center" width="120"></t:dgCol>
@@ -321,4 +321,5 @@
   <div id="dealerWin" class="easyui-window" title="拒绝原因" style="width:400px;height:300px"
     data-options="modal:true" closed="true" >
   </div>
+  <input type="text" value="${accountList}" id="accounts" type="hidden" />
  </div>

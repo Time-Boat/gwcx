@@ -33,6 +33,7 @@ import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.service.CarInfoServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -58,6 +59,8 @@ public class CarInfoController extends BaseController {
 	private SystemService systemService;
 	@Autowired
 	private Validator validator;
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 
 	/**
@@ -72,7 +75,7 @@ public class CarInfoController extends BaseController {
 		if(checkRole(AppGlobals.XM_ADMIN)){
 			request.setAttribute("ap", "1");
 		}
-				
+		request.setAttribute("carPlateList",sharingInfoServiceI.getCarPlate());
 		return new ModelAndView("yhy/car/carInfoList");
 	}
 
@@ -92,7 +95,7 @@ public class CarInfoController extends BaseController {
 		String lpId = request.getParameter("lpId");
 		String operation = request.getParameter("operation");
 		
-		String licencePlate = request.getParameter("licencePlate");
+		String carId = request.getParameter("carId");
 		String carType = request.getParameter("carType");
 		String status = request.getParameter("status");
 		String businessType = request.getParameter("businessType");
@@ -104,7 +107,7 @@ public class CarInfoController extends BaseController {
 			businessType = operation;
 		}
 		
-		JSONObject jObject = carInfoService.getDatagrid(dataGrid, userCar, lpId, licencePlate
+		JSONObject jObject = carInfoService.getDatagrid(dataGrid, userCar, lpId, carId
 				, carType, status, businessType, carStatus, auditStatus);
 		
 		responseDatagrid(response, jObject);
@@ -240,7 +243,7 @@ public class CarInfoController extends BaseController {
 		String lpId = req.getParameter("lpId");
 		req.setAttribute("lpId", lpId);
 		req.setAttribute("fromPage", req.getParameter("fromPage"));
-		req.setAttribute("cityList",getOpencity());
+		req.setAttribute("cityList",sharingInfoServiceI.getOpencity());
 		return new ModelAndView("/yhy/car/driverAndCity");
 	}
 	

@@ -1,5 +1,7 @@
 package com.yhy.lin.service;
 
+import java.util.List;
+
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.CommonService;
 
@@ -11,10 +13,10 @@ import net.sf.json.JSONObject;
 public interface TransferStatisticsServiceI extends CommonService {
 
 	public JSONObject getUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String fc_begin,
-			String fc_end);
+			String fc_end,String userType,String phone);
 
 	public JSONObject getOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid, String orderId,String orderStatus,String lineName,
-			String orderType,String driverName, String fc_begin, String fc_end,String departname);
+			String orderType,String driverId, String fc_begin, String fc_end,String departname);
 
 	public JSONObject getrefundDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,
 			String orderStartingstation, String orderTerminusstation, String lineName, String orderType,String departname);
@@ -24,6 +26,6 @@ public interface TransferStatisticsServiceI extends CommonService {
 
 	public String getWhere1(String orderId,String orderStartingstation, String orderTerminusstation, String lineName,
 			String orderType,String departname);
-	public String getWhere(String fc_begin,String fc_end);
+	public String getWhere(CarCustomerEntity carcustomer,String fc_begin,String fc_end,String userType,String phone);
 	
 }

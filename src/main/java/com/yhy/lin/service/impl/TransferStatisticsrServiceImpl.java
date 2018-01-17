@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.common.service.impl.CommonServiceImpl;
-import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.core.util.StringUtil;
 import org.jeecgframework.web.system.service.SystemService;
 import org.springframework.aop.framework.AopContext;
@@ -31,8 +30,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 	
 	@Override
 	public JSONObject getUserDatagrid(CarCustomerEntity carcustomer, DataGrid dataGrid, String fc_begin,
-			String fc_end) {
-		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere(fc_begin, fc_end);
+			String fc_end,String userType,String phone) {
+		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere(carcustomer,fc_begin, fc_end,userType,phone);
 		sqlWhere+=" ORDER BY s.create_time desc";
 		StringBuffer sql = new StringBuffer();
 		String sqlCnt = "select DISTINCT s.id from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id LEFT JOIN t_s_depart t on l.departId=t.ID  ";
@@ -43,7 +42,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		
 		Long iCount = (long) list.size();
 
-		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,s.user_type,f.account"
+		sql.append("select DISTINCT s.id,s.create_time,s.real_name,s.phone,s.card_number,s.address,s.common_addr,s.login_count,s.user_type,s.last_login_time,f.account"
 				+ " from car_customer s LEFT JOIN dealer_customer d on s.open_id = d.open_id LEFT JOIN dealer_info f on"
 				+ " f.id=d.dealer_id  LEFT JOIN transferorder a on a.user_id=s.id LEFT JOIN lineinfo l on a.line_id=l.id  "
 				+ "LEFT JOIN t_s_depart t on l.departId=t.ID");
@@ -53,16 +52,16 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 		List<Map<String, Object>> mapList = findForJdbc(sql.toString(), dataGrid.getPage(), dataGrid.getRows());
 		
-		//合计登录次数
-		/*int count = 0;
+		/*//合计登录次数
+		int count = 0;
 		if (mapList.size() > 0) {
 			for (int i = 0; i < mapList.size(); i++) {
 				int orderNumber = (int) mapList.get(i).get("login_count");
 				count = orderNumber + count;
-				if (orderNumber != null) {
+				if (orderNumber >0) {
 					String order = orderNumber + "";
 					int t = Integer.parseInt(order);
-					orderNumbers = t + orderNumbers;
+					//int orderNumbers = t + orderNumbers;
 				}
 				
 			}
@@ -79,6 +78,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 				new Db2Page("commonAddr", "common_addr", null),
 				new Db2Page("userType", "user_type", null),
 				new Db2Page("loginCount", "login_count", null),
+				new Db2Page("lastLoginTime", "last_login_time", null),
 				new Db2Page("account", "account", null)
 
 		};
@@ -88,9 +88,9 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	@Override
 	public JSONObject getOrderDatagrid(TransferorderEntity transferorder, DataGrid dataGrid,String orderId,String orderStatus, String lineName,
-			String orderType, String driverName, String fc_begin, String fc_end,String departname) {
+			String orderType, String driverId, String fc_begin, String fc_end,String departname) {
 
-		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere2(orderId,orderStatus,lineName, orderType, driverName, fc_begin, fc_end,departname);
+		String sqlWhere = ((TransferStatisticsServiceI) AopContext.currentProxy()).getWhere2(orderId,orderStatus,lineName, orderType, driverId, fc_begin, fc_end,departname);
 		sqlWhere+=" order by a.applicationTime desc";
 		StringBuffer sql = new StringBuffer();
 
@@ -233,7 +233,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	@BussAnnotation(orgType = { AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " l.createUserId ", orgTable="t")
-	public String getWhere2(String OrderId,String OrderStatus,String lineName, String orderType, String driverName, String fc_begin,
+	public String getWhere2(String OrderId,String OrderStatus,String lineName, String orderType, String driverId, String fc_begin,
 			String fc_end,String departname) {
 		
 		//String orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -260,7 +260,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		}
 		// 线路名称
 		if (StringUtil.isNotEmpty(lineName)) {
-			sql.append(" and  l.name like '%" + lineName + "%'");
+			sql.append(" and  l.id like '%" + lineName + "%'");
 		}
 
 		// 订单状态
@@ -268,8 +268,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 			sql.append(" and  a.order_status ='" + OrderStatus + "'");
 		}
 		// 司机
-		if (StringUtil.isNotEmpty(driverName)) {
-			sql.append(" and  d.name like '%" + driverName + "%'");
+		if (StringUtil.isNotEmpty(driverId)) {
+			sql.append(" and  d.id = '" + driverId + "'");
 		}
 		//所属公司
 		if (StringUtil.isNotEmpty(departname)) {
@@ -281,7 +281,8 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 
 	@BussAnnotation(orgType = { AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " l.createUserId ", orgTable="t")
-	public String getWhere(String fc_begin, String fc_end) {
+	public String getWhere(CarCustomerEntity carcustomer,String fc_begin, String fc_end,String userType,String phone) {
+		
 		StringBuffer sql = new StringBuffer();
 
 		//sString orgCode = ResourceUtil.getSessionUserName().getCurrentDepart().getOrgCode();
@@ -294,11 +295,17 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 			
 		}*/
 		
+		if (StringUtil.isNotEmpty(userType)){
+			sql.append(" and s.user_type= "+userType);
+		}
+		if (StringUtil.isNotEmpty(phone)){
+			sql.append(" and s.phone like '%"+phone+"%'");
+		}
+		
 		// 发车时间
 		if (StringUtil.isNotEmpty(fc_begin) && StringUtil.isNotEmpty(fc_end)) {
 			sql.append(" and s.create_time between '" + fc_begin + "' and '" + fc_end + "'");
 		}
-//		sql.append(" ORDER BY s.create_time desc");
 		return sql.toString();
 	}
 
@@ -331,7 +338,7 @@ public class TransferStatisticsrServiceImpl extends CommonServiceImpl implements
 		}
 		// 线路名称
 		if (StringUtil.isNotEmpty(lineName)) {
-			sql.append(" and  l.name like '%" + lineName + "%'");
+			sql.append(" and  l.id like '%" + lineName + "%'");
 		}
 		if (StringUtil.isNotEmpty(departname)) {
 			sql.append(" and p.departname like '%" + departname + "%'");

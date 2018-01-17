@@ -83,11 +83,23 @@ public class TransferorderEntity extends IdEntity implements java.io.Serializabl
 	
 	private String orderUserType;//用户订单类型    0：普通用户订单     1：渠道商用户订单
 	
+	/**是否是异常订单*/
+	private java.lang.String isException;
+	
 	/**x坐标  渠道商用户才有*/
 	private java.lang.String stationX;
 	/**y坐标 渠道商用户才有*/
 	private java.lang.String stationY;
 	
+	@Column(name ="IS_EXCEPTION",nullable=true,length=1)
+	public java.lang.String getIsException() {
+		return isException;
+	}
+
+	public void setIsException(java.lang.String isException) {
+		this.isException = isException;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  x坐标

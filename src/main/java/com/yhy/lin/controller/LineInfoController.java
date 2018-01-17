@@ -37,6 +37,7 @@ import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.entity.StartOrEndEntity;
 import com.yhy.lin.service.BusStopInfoServiceI;
 import com.yhy.lin.service.LineInfoServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 import com.yhy.lin.service.StartOrEndServiceI;
 
 import net.sf.json.JSONArray;
@@ -65,6 +66,9 @@ public class LineInfoController extends BaseController {
 
 	@Autowired
 	private StartOrEndServiceI startOrEndService;
+	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 	/**
 	 * 线路管理跳转页面
@@ -96,12 +100,16 @@ public class LineInfoController extends BaseController {
 		String search = request.getParameter("search");// 用于区分线路查询页面，线路查询页面是给企业管理员使用
 		String username = request.getParameter("username");
 		String departname = request.getParameter("departname");
+		String lineId = request.getParameter("lineId");
+		String startLocation = request.getParameter("startLocation");
+		String endLocation = request.getParameter("endLocation");
+		
 		JSONObject jObject = null;
 		if (StringUtil.isNotEmpty(search)) {
 			jObject = lineInfoService.getDatagrid(lineInfos, beginTime, endTime, dataGrid, lstartTime_begin,
 					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ");
 		} else {
-			jObject = lineInfoService.getDatagrid3(lineInfos, cityID, beginTime, endTime, dataGrid, lstartTime_begin,
+			jObject = lineInfoService.getDatagrid3(lineInfos, lineId, startLocation, endLocation, cityID, beginTime, endTime, dataGrid, lstartTime_begin,
 					lstartTime_end, lendTime_begin, lendTime_end, " < '2' ",username,departname,null);   //最后一个参数平台审核员的问题，这个业务暂时不做，先放着
 		}
 		responseDatagrid(response, jObject);

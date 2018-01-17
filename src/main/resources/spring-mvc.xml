@@ -150,6 +150,11 @@
 						<value>app.do?hasNewMessage</value>
 						<value>app.do?tokenLogin</value>
 						
+						<!-- 包车接口 -->
+						<value>charteredApp.do?getCharteredPackage</value>
+						<value>charteredApp.do?getCharteredCarType</value>
+						<value>charteredApp.do?getChargesDetails</value>
+						
 						<!-- 渠道商用户接口 -->
 						<value>dealerApp.do?appDealerLogin</value>
 						<value>dealerApp.do?modifyPassword</value>

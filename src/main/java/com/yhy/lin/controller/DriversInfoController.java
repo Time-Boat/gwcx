@@ -40,6 +40,7 @@ import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
 import com.yhy.lin.entity.OpenCityEntity;
 import com.yhy.lin.service.DriversInfoServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -63,6 +64,9 @@ public class DriversInfoController extends BaseController {
 	private DriversInfoServiceI driversInfoService;
 	@Autowired
 	private SystemService systemService;
+	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
 
 	/**
 	 * 司机信息表列表 页面跳转
@@ -71,7 +75,9 @@ public class DriversInfoController extends BaseController {
 	 */
 	@RequestMapping(params = "driversInfoList")
 	public ModelAndView list(HttpServletRequest request) {
-		request.setAttribute("cityList",getOpencity());
+		request.setAttribute("cityList",sharingInfoServiceI.getOpencity());
+		request.setAttribute("driverList",sharingInfoServiceI.getDriver());
+		
 		return new ModelAndView("yhy/drivers/driversInfoList");
 	}
 	
@@ -87,12 +93,12 @@ public class DriversInfoController extends BaseController {
 	public void datagrid(DriversInfoEntity driversInfo,HttpServletRequest request, HttpServletResponse response, DataGrid dataGrid) {
 		
 		String sex = request.getParameter("sex");
-		String name = request.getParameter("name");
+		String driverId = request.getParameter("driverId");
 		String phoneNumber = request.getParameter("phoneNumber");
 		String status = request.getParameter("status");
 		String cityID= request.getParameter("cityID");
 		
-		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,driversInfo,cityID);
+		JSONObject jObject = driversInfoService.getDatagrid(dataGrid ,driversInfo,cityID,driverId);
 		
 		responseDatagrid(response, jObject);
 	}

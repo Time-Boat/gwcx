@@ -9,18 +9,23 @@
 			fit="true" queryMode="group">
 
 			<t:dgCol title="注册时间" field="createTime" editor="datebox"
-				formatter="yyyy-MM-dd hh:mm:ss" query="true" width="120" queryMode="group"
-				align="center"></t:dgCol>
+				formatter="yyyy-MM-dd hh:mm:ss" query="true" width="120"
+				queryMode="group" align="center"></t:dgCol>
 			<t:dgCol title="用户名" field="realName" width="80" align="center"></t:dgCol>
-			<t:dgCol title="用户类型" field="userType" dictionary="userType" width="80" align="center"></t:dgCol>
-			<t:dgCol title="手机号" field="phone" width="80" align="center"></t:dgCol>
+			<t:dgCol title="用户类型" field="userType" query="true"
+				dictionary="userType" width="80" align="center"></t:dgCol>
+			<t:dgCol title="手机号" field="phone" query="true" width="80"
+				align="center"></t:dgCol>
 			<t:dgCol title="身份证号" field="cardNumber" width="120" align="center"></t:dgCol>
 			<t:dgCol title="居住地" field="address" width="120" align="center"></t:dgCol>
-			<t:dgCol title="用户来源渠道" field="account" width="120" align="center"></t:dgCol>
+			<t:dgCol title="用户来源渠道" field="account" width="80" align="center"></t:dgCol>
 			<t:dgCol title="常用地址" field="commonAddr" width="120" align="center"></t:dgCol>
+			<t:dgCol title="上次登录时间" field="lastLoginTime" width="120" align="center"></t:dgCol>
 			<t:dgCol title="登录次数" field="loginCount" width="40" align="center"></t:dgCol>
 		</t:datagrid>
 	</div>
+
+	<input type="hidden" value="${cityList}" id="citylie" />
 </div>
 <script type="text/javascript">
 	$(document).ready(
@@ -45,16 +50,20 @@
 				.append(
 						"<div id='total' hidden='true'><label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;累计用户量：</label><label id='orderTotal'></label> </div>");
 		$("#total").show();
-		gettotal();
+		var userType = $("select[name='userType']").val();;
+		var phone = $("input[name='phone']").val();
+		//用户汇总统计
+		gettotal(userType,phone);
 	});
 
-	function gettotal() {
+	function gettotal(userType,phone) {
+
 		var createTime_begin = $("input[name='createTime_begin']").val();
 		var createTime_end = $("input[name='createTime_end']").val();
-
-		//用户汇总统计
-		$
-				.ajax({
+		 userType = $("select[name='userType']").val();;
+		 phone = $("input[name='phone']").val();
+		/* //用户汇总统计
+		$.ajax({
 					url : "transferStatisticsController.do?getUserTotal&createTime_begin="
 							+ createTime_begin
 							+ "&createTime_end="
@@ -67,11 +76,24 @@
 						//刷新当前窗体
 						reloadTable();
 					}
-				});
+				}); */
+
+		$.ajax({
+			url : "transferStatisticsController.do?userdatagrid&createTime_begin="
+				+ createTime_begin+ "&createTime_end="+ createTime_end+"&userType="+userType+"&phone="+phone,
+			dataType : 'json',
+			complete : function(data) {
+				var message = data.responseText;
+				var obj = eval('(' + message + ')');
+				$("#orderTotal").html(obj.total + "人");
+				//刷新当前窗体
+				reloadTable();
+			}
+		});
 	}
 
 	function userStatListsearch() {
-		try {
+		/* try {
 			if (!$("#userStatListForm").Validform({
 				tiptype : 3
 			}).check()) {
@@ -90,8 +112,33 @@
 								url : 'transferStatisticsController.do?userdatagrid&field=createTime,createTime_begin,createTime_end,realName,phone,cardNumber,address,wwwww,commonAddr,loginCount,',
 								pageNumber : 1
 							});
+		} */
+		//gettotal();
+		try {
+			if (!$("#userStatListForm").Validform({
+				tiptype : 3
+			}).check()) {
+				return false;
+			}
+		} catch (e) {
 		}
-		gettotal();
+		if (true) {
+			var queryParams = $('#userStatList').datagrid('options').queryParams;
+			
+			$('#userStatListtb').find('*').each(function() {
+				queryParams[$(this).attr('name')] = $(this).val();
+			});
+			$('#userStatList').datagrid(
+				{
+					url : 'transferStatisticsController.do?userdatagrid&field=createTime,createTime_begin,createTime_end,realName,userType,phone,cardNumber,address,account,commonAddr,loginCount,',
+					pageNumber : 1
+				});
+		}
+		$("#orderTotal").html("");
+		
+		var userType = $("select[name='userType']").val();
+		var phone = $("input[name='phone']").val();
+		gettotal(userType,phone);
 	}
 
 	function searchReset(name) {
@@ -100,14 +147,16 @@
 		$('#userStatListtb').find('*').each(function() {
 			queryParams[$(this).attr('name')] = $(this).val();
 		});
+		
 		$('#userStatList')
 				.datagrid(
 						{
 							url : 'transferStatisticsController.do?userdatagrid&field=createTime,createTime_begin,createTime_end,realName,phone,cardNumber,address,wwwww,commonAddr,loginCount,',
 							pageNumber : 1
 						});
-		gettotal();
+		
+		var userType = $("select[name='userType']").val();;
+		var phone = $("input[name='phone']").val();
+		gettotal(userType,phone);
 	}
 </script>
-
-

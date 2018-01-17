@@ -10,11 +10,11 @@
 		<t:dgCol title="id" field="id" hidden="true"></t:dgCol>
 		<t:dgCol title="createUserId" field="createUserId" hidden="true"></t:dgCol>
 		
-		<t:dgCol title="订单编号" field="orderId" query="true"></t:dgCol>
-		<t:dgCol title="起点站" field="orderStartingstation" query="true" align="center"></t:dgCol>
+		<t:dgCol title="订单编号" field="orderId" ></t:dgCol>
+		<t:dgCol title="起点站" field="orderStartingstation" align="center"></t:dgCol>
 		<t:dgCol title="出发时间" field="orderStartime" editor="datebox" formatter="yyyy-MM-dd hh:mm" query="true" queryMode="group" align="center"></t:dgCol>
 		
-		<t:dgCol title="订单用户类型" field="orderUserType" dictionary="userType" align="center"></t:dgCol>
+		<t:dgCol title="订单用户类型" field="orderUserType" dictionary="userType" query="true" defaultVal="1" align="center"></t:dgCol>
 		
 		<t:dgCol title="司机姓名" field="name" align="center"></t:dgCol>
 		<t:dgCol title="司机联系电话" field="phoneNumber" align="center"></t:dgCol>
@@ -22,7 +22,7 @@
 		<t:dgCol title="联系人" field="orderContactsname" align="center"></t:dgCol>
 		<t:dgCol title="联系人手机号" field="orderContactsmobile" align="center"></t:dgCol>
 		<t:dgCol title="所属线路名称" field="lineName" align="center"></t:dgCol>
-		<t:dgCol title="终点站" field="orderTerminusstation" query="true" align="center"></t:dgCol>
+		<t:dgCol title="终点站" field="orderTerminusstation" align="center"></t:dgCol>
 		<t:dgCol title="订单类型" field="orderType" replace="接机_2,送机_3" query="true" align="center"></t:dgCol>
 		<t:dgCol title="订单状态" field="orderStatus" replace="订单已完成_0,待派车_1,待出行_2,未支付_6" dictionary="orderStatus" query="true" align="center"></t:dgCol>
 		<t:dgCol title="下单时间" field="applicationTime" formatter="yyyy-MM-dd hh:mm:ss" align="center"></t:dgCol>
@@ -49,9 +49,24 @@
 	</t:datagrid>
 </div>
 </div>
+
+<input type="hidden" value="${busStartinfoList}" id="busStartinfoLies" />
+<input type="hidden" value="${busEndinfoList}" id="busEndinfoLies" />
 <input type="hidden" value="${carplateList}" id="carpaltes" />
 <input type="hidden" value="${driverList}" id="driverNames" />
 <input type="hidden" value="${lineNameList}" id="lineNames" />
+<div id = "showStation" hidden="true">
+	<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;
+		width: 80px; text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap;" title="选择起点站">选择起点站：</span>
+		<select id ="startLocation" name="startLocation" style="width: 150px">
+			<option value="">选择起点站</option></select>
+		</span>
+	<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;
+		width: 80px; text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap;" title="选择终点站">选择终点站：</span>
+		<select id ="orderTerminusstation" name="orderTerminusstation" style="width: 150px">
+			<option value="">选择终点站</option></select>
+		</span>
+</div>
 <script type="text/javascript">
 
 	function ariExportXls(){
@@ -79,7 +94,7 @@
 		
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="所属线路">所属线路：</span>';
-		var a3 = '<select name="lineId" style="width: 150px">';
+		var a3 = '<select id="lineId" name="lineId" style="width: 150px">';
 		var c1 = '<option value="">选择所属线路</option>';
 		
 		if(json.indexOf("lineId")>0){
@@ -91,7 +106,7 @@
 		
 		var a4 = '</select></span>';
 		
-		/*var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		var aa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var aa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
 		var aa3 = '<select name="driverId" style="width: 150px">';
 		var cc1 = '<option value="">选择司机</option>';
@@ -103,9 +118,9 @@
 			}
 		}
 		
-		var aa4 = '</select></span>'; */
+		var aa4 = '</select></span>'; 
 		
-		/*var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		var aaa1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var aaa2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车票号">车牌号：</span>';
 		var aaa3 = '<select name="carId" style="width: 150px">';
 		var ccc1 = '<option value="">选择车牌号</option>';
@@ -116,18 +131,26 @@
 				ccc1 += '<option value="'+obj1.data[i].carId+'">' + obj1.data[i].licencePlate+ '</option>';
 			}
 		}
-		var aaa4 = '</select></span>'; */
+		var aaa4 = '</select></span>'; 
 		
 		
-		var d1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		/* var d1 = '<span style="display:-moz-inline-box;display:inline-block; padding:0px 10px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var d2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="司机">司机：</span>';
 		var d3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="driverName" class="inuptxt" style="width: 100px"></span>';
 		
 		var car1 = '<span style="display:-moz-inline-box;display:inline-block"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
  		var car2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="车牌号">车牌号：</span>';
 		var car3 = '<input onkeypress="EnterPress(event)" onkeydown="EnterPress()" type="text" name="plate" class="inuptxt" style="width: 100px"></span>';
-		
-		$("#transferOrderAirListForm").append(a1 + a2 + a3 + c1 + a4 + d1 + d2 + d3 + car1 + car2 +car3);
+		 */
+		$("#transferOrderAirListForm").append(a1 + a2 + a3 + c1 + a4 +aa1 + aa2 + aa3 + cc1 + aa4 + aaa1 + aaa2 + aaa3 + ccc1 + aaa4);
+		 
+		getLineName();
+		getUserLineName();
+		getStartAndEndStartion();
+		//getTypeStartLocation();
+		//getTypeEndLocation();
+		getStartLocation();
+		getEndLocation();
 	});
 
 	$(document).ready(function(){
@@ -136,6 +159,264 @@
 		$("input[name='orderExpectedarrival_begin']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});
 		$("input[name='orderExpectedarrival_end']").attr("class","Wdate").click(function(){WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'});});			 
 	});
+	
+	//根据线路类型获取线路和起点站、终点站
+	function getLineName() {
+
+		$("select[name='orderType']")
+				.change(
+						function() {
+							var userType = $("select[name='orderUserType']").val();
+							var ordertype = $(this).children('option:selected').val(); //当前选择项的值
+							var url = "lineInfoSpecializedController.do?getLineName&ordertype="
+									+ ordertype + "&userType=" + userType;
+							$.ajax({
+										type : 'POST',
+										url : url,
+										success : function(ds) {
+											
+											var d1 = '<option value="">选择线路</option>';
+											var obj = eval('(' + ds + ')');
+											var objLine = obj.lineinfo.lineinfo;
+											if (objLine.length > 0) {
+												
+												for (var i = 0; i < objLine.length; i++) {
+													d1 += '<option value="'+objLine[i].lineId+'">'+objLine[i].lineName+ '</option>';
+												}
+											}
+											$("#lineId").empty();//先置空 
+											$("#lineId").append(d1);
+											
+											var d2 = '<option value="">选择起点站</option>';
+											var startstation = obj.startStation.data;
+											if (startstation.length > 0) {
+												for (var i = 0; i < startstation.length; i++) {
+													d2 += '<option value="'+startstation[i].busid+'">'+ startstation[i].busName+ '</option>';
+												}
+											}
+											$("#startLocation").empty();//先置空 
+											$("#startLocation").append(d2);
+											
+											var d3 = '<option value="">选择终点站</option>';
+											var endStation = obj.endStation.data;
+											if (endStation.length > 0) {
+												for (var i = 0; i < endStation.length; i++) {
+													d3 += '<option value="'+endStation[i].busid+'">'+ endStation[i].busName+ '</option>';
+												}
+											}
+											$("#orderTerminusstation").empty();//先置空 
+											$("#orderTerminusstation").append(d3);
+											
+										}
+									});
+						});
+	}
+
+	//根据用户类型获取线路和起点站、终点站
+	function getUserLineName() {
+
+		$("select[name='orderUserType']")
+				.change(
+						function() {
+							var ordertype = $("select[name='orderType']")
+									.val();
+							var isDealerLine = $(this).children(
+									'option:selected').val(); //当前选择项的值
+							var url = "lineInfoSpecializedController.do?getLineName&userType="
+									+ isDealerLine
+									+ "&ordertype="
+									+ ordertype;
+							$.ajax({
+										type : 'POST',
+										url : url,
+										success : function(ds) {
+											var d1 = '<option value="">选择线路</option>';
+											var obj = eval('(' + ds + ')');
+											var objLine = obj.lineinfo.lineinfo;
+											if (objLine.length > 0) {
+												
+												for (var i = 0; i < objLine.length; i++) {
+													d1 += '<option value="'+objLine[i].lineId+'">'+objLine[i].lineName+ '</option>';
+												}
+											}
+											$("#lineId").empty();//先置空 
+											$("#lineId").append(d1);
+											
+											var d2 = '<option value="">选择起点站</option>';
+											var startstation = obj.startStation.data;
+											if (startstation.length > 0) {
+												for (var i = 0; i < startstation.length; i++) {
+													d2 += '<option value="'+startstation[i].busid+'">'+ startstation[i].busName+ '</option>';
+												}
+											}
+											$("#startLocation").empty();//先置空 
+											$("#startLocation").append(d2);
+											
+											var d3 = '<option value="">选择终点站</option>';
+											var endStation = obj.endStation.data;
+											if (endStation.length > 0) {
+												for (var i = 0; i < endStation.length; i++) {
+													d3 += '<option value="'+endStation[i].busid+'">'+ endStation[i].busName+ '</option>';
+												}
+											}
+											$("#orderTerminusstation").empty();//先置空 
+											$("#orderTerminusstation").append(d3);
+											
+											
+										}
+									});
+						});
+	}
+	
+	function getStartLocation() {
+
+		$("select[name='lineId']")
+				.change(
+						function() {
+							var lineType = $("select[name='type']").val();
+							var lineId = $(this).children('option:selected')
+									.val(); //当前选择项的值
+							var url = "lineInfoSpecializedController.do?getStartLocation&lineId="
+									+ lineId + "&lineType=" + lineType;
+							$
+									.ajax({
+										type : 'POST',
+										url : url,
+										success : function(ds) {
+											var d1 = '<option value="">选择起点站</option>';
+											var obj = eval('(' + ds + ')');
+											if (obj.indexOf("busid") > 0) {
+												var objs = eval('(' + obj + ')');
+												for (var i = 0; i < objs.data.length; i++) {
+													d1 += '<option value="'+objs.data[i].busid+'">'
+															+ objs.data[i].busName
+															+ '</option>';
+												}
+											}
+											$("#startLocation").empty();//先置空 
+											$("#startLocation").append(d1);
+										}
+									});
+						});
+	}
+
+	function getEndLocation() {
+
+		$("select[name='lineId']")
+				.change(
+						function() {
+							
+							var lineType = $("select[name='type']").val();
+							var lineId = $(this).children('option:selected')
+									.val(); //当前选择项的值
+							var url = "lineInfoSpecializedController.do?getEndLocation&lineId="
+									+ lineId + "&lineType=" + lineType;
+							$
+									.ajax({
+										type : 'POST',
+										url : url,
+										success : function(ds) {
+											var d1 = '<option value="">选择终点站</option>';
+											var obj = eval('(' + ds + ')');
+											if (obj.indexOf("busid") > 0) {
+												var objs = eval('(' + obj + ')');
+												for (var i = 0; i < objs.data.length; i++) {
+													d1 += '<option value="'+objs.data[i].busid+'">'
+															+ objs.data[i].busName
+															+ '</option>';
+												}
+											}
+											$("#orderTerminusstation").empty();//先置空 
+											$("#orderTerminusstation").append(d1);
+										}
+									});
+						});
+	}
+	
+	//添加起点和终点查询 
+	function getStartAndEndStartion(){
+		
+		$("select[name='orderUserType']").change(function() {
+		var orderUserType = $("select[name='orderUserType']").val();
+		if(orderUserType=='0'){
+			var json1= $("#busStartinfoLies").val();
+			var json2= $("#busEndinfoLies").val();
+			
+			if(json1.indexOf("busid")>0){
+				var obj = eval('(' + json1 + ')');
+				var b1 = '<option value="">选择起点站</option>';
+				for (var i = 0; i < obj.data.length; i++) {
+					b1 += '<option value="'+obj.data[i].busid+'">' + obj.data[i].busName+ '</option>';
+				}
+			}
+			$("#startLocation").empty();//先置空 
+			$("#startLocation").append(b1);
+			if(json2.indexOf("busid")>0){
+				var obj = eval('(' + json2 + ')');
+				var e1 = '<option value="">选择终点站</option>';
+				for (var i = 0; i < obj.data.length; i++) {
+					e1 += '<option value="'+obj.data[i].busid+'">' + obj.data[i].busName+ '</option>';
+				}
+			}
+			$("#orderTerminusstation").empty();//先置空 
+			$("#orderTerminusstation").append(e1);
+			$("#transferOrderAirListForm").append($("#showStation"));
+			$("#showStation").show();
+		}else{
+			$("#showStation").hide();
+		}
+		});
+	}
+	
+	 /* function getTypeStartLocation(){
+			$("select[name='orderType']").change(
+					function() {
+						var lineType = $(this).children('option:selected').val(); //当前选择项的值
+						var url = "lineInfoSpecializedController.do?getStartLocation&lineType="+ lineType;
+						$.ajax({
+							type : 'POST',
+							url : url,
+							success : function(ds) {
+								var d1 = '<option value="">选择起点站</option>';
+								var obj = eval('(' + ds + ')');
+								if(obj.indexOf("busid")>0){
+									var objs = eval('(' + obj + ')');
+									for (var i = 0; i < objs.data.length; i++) {
+										d1 += '<option value="'+objs.data[i].busid+'">' + objs.data[i].busName+ '</option>';
+									}
+								}
+								$("#startLocation").empty();//先置空 
+								$("#startLocation").append(d1);
+								
+							}
+						});
+					});
+		}
+		
+		function getTypeEndLocation(){
+			
+			$("select[name='orderType']").change(
+					function() {
+						var lineType = $(this).children('option:selected').val(); //当前选择项的值
+						var url = "lineInfoSpecializedController.do?getEndLocation&lineType="+ lineType;
+						$.ajax({
+							type : 'POST',
+							url : url,
+							success : function(ds) {
+								var d1 = '<option value="">选择终点站</option>';
+								var obj = eval('(' + ds + ')');
+								if(obj.indexOf("busid")>0){
+									var objs = eval('(' + obj + ')');
+									for (var i = 0; i < objs.data.length; i++) {
+										d1 += '<option value="'+objs.data[i].busid+'">' + objs.data[i].busName+ '</option>';
+									}
+								}
+								$("#orderTerminusstation").empty();//先置空 
+								$("#orderTerminusstation").append(d1);
+							}
+						});
+					});
+		} */
 
 	//安排车辆司机 
 	function editCarAndDriver(title,url,id,width,height){

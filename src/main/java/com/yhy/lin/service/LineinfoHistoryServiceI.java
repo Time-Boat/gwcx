@@ -11,8 +11,8 @@ public interface LineinfoHistoryServiceI extends CommonService{
 
 	public JSONObject getDatagrid(LineinfoHistoryEntity lineInfo,String cityid,String startTime ,String endTime ,
 			DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,
-			String lineType,String username,String departname, String company);
+			String lineId,String lineType,String username,String departname, String company);
 	public String getSqlWhere(LineinfoHistoryEntity lineInfo,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
-			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company);
+			String lendTime_begin,String lendTime_end,String lineId, String lineType,String username,String departname,String company);
 }

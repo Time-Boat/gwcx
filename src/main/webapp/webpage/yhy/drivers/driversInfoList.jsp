@@ -10,7 +10,7 @@
 	idField="id" fit="true" queryMode="group" >
 	<t:dgCol title="编号" field="id" hidden="true"></t:dgCol>
 	<t:dgCol title="图片地址" field="driverImgUrl" hidden="true" ></t:dgCol>
-	<t:dgCol title="司机姓名" field="name" query="true" frozenColumn="true" align="center" width="80"></t:dgCol>
+	<t:dgCol title="司机姓名" field="name" frozenColumn="true" align="center" width="80"></t:dgCol>
 	<t:dgCol title="性别" sortable="true" field="sex" dictionary="sex" query="true" align="center" width="60"></t:dgCol>
 	<t:dgCol title="所在城市" sortable="true" field="cityName" align="center" width="60"></t:dgCol>
 	<t:dgCol title="年龄" sortable="true" editor="numberbox" field="age" align="center" width="50"></t:dgCol>
@@ -61,6 +61,7 @@
   </div>
 </div>
 <input type="hidden" value="${cityList}" id="citylie" />
+<input type="hidden" value="${driverList}" id="driverlie" />
 <script type="text/javascript">
 
 	function update(title,url,id,width,height,isRestful) {
@@ -95,6 +96,7 @@
 
 	$(function() {
 		var json = $("#citylie").val();
+		var json1 = $("#driverlie").val();
 		var a1 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
 		var a2 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择城市">选择城市：</span>';
 		var a3 = '<select name="cityID" style="width: 150px">';
@@ -106,7 +108,20 @@
 			}
 		}
 		var a4 = '</select></span>';
-		$("#driversInfoListForm").append(a1 + a2 + a3 + c1 + a4);
+		
+		var a11 = '<span style="display:-moz-inline-box;display:inline-block; padding:10px 2px;"><span style="vertical-align:middle;display:-moz-inline-box;display:inline-block;width: 80px;';
+		var a21 = 'text-align:right;text-overflow:ellipsis;-o-text-overflow:ellipsis; overflow: hidden;white-space:nowrap; "title="选择司机">选择司机：</span>';
+		var a31 = '<select name="driverId" style="width: 150px">';
+		var c11 = '<option value="">--选择司机--</option>';
+		if(json1.indexOf("driverId")>0){
+			var obj1 = eval('(' + json1 + ')');
+			for (var i = 0; i < obj1.data.length; i++) {
+				c11 += '<option value="'+obj1.data[i].driverId+'">' + obj1.data[i].driverName+ '</option>';
+			}
+		}
+		var a41 = '</select></span>';
+		
+		$("#driversInfoListForm").append(a1 + a2 + a3 + c1 + a4 +a11 + a21 + a31 + c11 + a41);
 	});
 	
 	//删除调用函数

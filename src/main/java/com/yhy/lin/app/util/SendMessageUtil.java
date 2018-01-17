@@ -147,7 +147,7 @@ public class SendMessageUtil {
 	 * @return boolean		用于判断短信是否发送成功
 	 */
 	public static boolean sendMessage(String mobile, String[] paramKey, String[] paramValue, String templateCode , String signName) {
-
+		logger.info("发送短信    sendMessage");
 		boolean b = false;
 		
 		if("1".equals(AppGlobals.IS_TEST_ENVIRONMENT)){

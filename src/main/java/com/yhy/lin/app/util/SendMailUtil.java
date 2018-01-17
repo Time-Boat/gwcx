@@ -142,9 +142,9 @@ public class SendMailUtil {
 
 		// 7. 关闭连接
 		transport.close();
-
+		
 	}
-
+	
 	/**
 	 * 创建一封只包含文本的简单邮件
 	 *
@@ -183,19 +183,19 @@ public class SendMailUtil {
 		
 		// 4. Subject: 邮件主题（标题有广告嫌疑，避免被邮件服务器误认为是滥发广告以至返回失败，请修改标题）
 		message.setSubject(subject, "UTF-8");
-
+		
 		// 5. Content: 邮件正文（可以使用html标签）（内容有广告嫌疑，避免被邮件服务器误认为是滥发广告以至返回失败，请修改发送内容）
 		message.setContent(content, "text/html;charset=UTF-8");
-
+		
 		// 6. 设置发件时间
 		message.setSentDate(new Date());
-
+		
 		// 7. 保存设置
 		message.saveChanges();
-
+		
 		return message;
 	}
-
+	
 	public static void main(String[] args) throws Exception {
 		sendMail("司机待审核", "您有一个司机待审核，请尽快处理。", new String[]{"2806234016@qq.com"});
 	}

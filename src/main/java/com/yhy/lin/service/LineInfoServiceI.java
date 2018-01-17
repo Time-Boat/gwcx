@@ -12,9 +12,9 @@ public interface LineInfoServiceI extends CommonService{
 	public JSONObject getDatagrid(LineInfoEntity lineInfo,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType);
 	public JSONObject getDatagrid2(LineInfoEntity lineInfo,DataGrid dataGrid, String ywlx);
 	
-	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,
+	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String lineId,String startLocation,String endLocation,String cityid,String startTime ,String endTime ,
 			DataGrid dataGrid,String lstartTime_begin,String lstartTime_end,String lendTime_begin,String lendTime_end,
-			String lineType,String username,String departname, String company);
+			String lineType,String userId,String departname, String company);
 	
 	public JSONObject getDatagrid4(LineInfoEntity lineInfo,DataGrid dataGrid);
 	
@@ -23,7 +23,7 @@ public interface LineInfoServiceI extends CommonService{
 	// 根据id查询线路详细信息
 	public LineInfoView getDetailHistory(String id);
 	
-	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
+	public String getSqlWhere(LineInfoEntity lineInfo,String lineId,String startLocation,String endLocation,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
 			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company);
 	

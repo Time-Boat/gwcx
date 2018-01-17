@@ -31,9 +31,9 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	private UserService userService;
 	
 	@Override
-	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,
-			String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String username,String departname, String company){
-		String sqlWhere = ((LineInfoServiceI) AopContext.currentProxy()).getSqlWhere(lineInfo,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,username,departname,company);
+	public JSONObject getDatagrid3(LineInfoEntity lineInfo,String lineId,String startLocation,String endLocation,String cityid,String startTime ,String endTime ,DataGrid dataGrid,String lstartTime_begin,
+			String lstartTime_end,String lendTime_begin,String lendTime_end,String lineType,String userId,String departname, String company){
+		String sqlWhere = ((LineInfoServiceI) AopContext.currentProxy()).getSqlWhere(lineInfo,lineId,startLocation,endLocation,cityid,startTime,endTime,lstartTime_begin,lstartTime_end,lendTime_begin,lendTime_end,lineType,userId,departname,company);
 		StringBuffer sql = new StringBuffer();
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = " select count(*) from lineinfo a inner join t_s_depart b on a.departId =b.ID left join cities c on a.cityId = c.cityId left join busstopinfo d on d.id= "
@@ -94,59 +94,11 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_LINE_AUDIT, AppGlobals.OPERATION_MANAGER , AppGlobals.ORG_JOB_TYPE}, objTableUserId = " a.createUserId ", orgTable="b"
 			, auditSql = " and  CASE WHEN a.status ='1' then a.application_status in('2','3','4','6') ELSE a.application_status in('1','2','3','4','5','6') END "
 			, operationSql = " and a.application_status in('1','2','3','4','5','6') ")
-	public String getSqlWhere(LineInfoEntity lineInfo,String cityid,String startTime,
+	public String getSqlWhere(LineInfoEntity lineInfo,String lineId,String startLocation,String endLocation,String cityid,String startTime,
 			String endTime,String lstartTime_begin,String lstartTime_end,
-			String lendTime_begin,String lendTime_end,String lineType,String username,String departname,String company){
+			String lendTime_begin,String lendTime_end,String lineType,String userId,String departname,String company){
 
 		StringBuffer sqlWhere = new StringBuffer();
-
-//		TSUser user = ResourceUtil.getSessionUserName();
-//		String roles = userService.getUserRole(user);
-//		TSDepart depart = user.getCurrentDepart();
-//		
-//		String orgCode = depart.getOrgCode();
-//		String orgType = depart.getOrgType();
-//		String userId = user.getId();
-//		
-//		String oc = user.getOrgCompany();
-//
-//		//是否有平台线路审核员权限
-//		boolean hasPLA = false;
-//		//循环用户角色列表
-//		String a[] = roles.split(",");
-//		for (int i = 0; i < a.length; i++) {
-//			String role = a[i];
-//			if(AppGlobals.PLATFORM_LINE_AUDIT.equals(role)){
-//				sqlWhere.append(" and a.application_status in('2','3','4','6') ");
-//				hasPLA = true;
-//			}
-//			if(AppGlobals.OPERATION_MANAGER.equals(role)){
-//				sqlWhere.append(" and a.application_status in('1','2','3','4','5','6') ");
-//			}
-//		}
-//		
-//		//如果是平台线路审核员权限，则根据其选择的子公司来过滤筛选
-//		if(hasPLA){
-//			if(StringUtil.isNotEmpty(company) && StringUtil.isNotEmpty(oc)){
-//				sqlWhere.append(" and b.org_code like '" + company + "%' ");
-//			}else{
-//				sqlWhere.append("and ( 1=2 ");
-//				
-//				String[] ocArr = oc.split(",");
-//				
-//				for (int i = 0; i < ocArr.length; i++) {
-//					sqlWhere.append(" or b.org_code like '"+ocArr[i]+"%' ");
-//				}
-//				sqlWhere.append(")");
-//			}
-//		} else {
-//			sqlWhere.append(" and b.org_code like '"+orgCode+"%'");
-//		}
-//		
-//		//判断当前的机构类型，如果是"岗位"类型，就需要加个userId等于当前用户的条件，确保各个专员之间只能看到自己的数据
-//		if(AppGlobals.ORG_JOB_TYPE.equals(orgType)){
-//			sqlWhere.append(" and a.createUserId = '" + userId + "' ");
-//		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getCreateUserId())){
 			sqlWhere.append(" and a.createUserId = '"+lineInfo.getCreateUserId()+"' ");
@@ -157,15 +109,15 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			sqlWhere.append(" and a.cityId = '"+cityid+"'");
 		}
 		sqlWhere.append(" and a.deleteFlag='0'");
-		if(StringUtil.isNotEmpty(lineInfo.getName())){
-			sqlWhere.append(" and  a.name like '%"+lineInfo.getName()+"%'");
+		if(StringUtil.isNotEmpty(lineId)){
+			sqlWhere.append(" and  a.id = '"+lineId+"'");
 		}
 		
 		if(StringUtil.isNotEmpty(lineInfo.getIsDealerLine())){
 			sqlWhere.append(" and  a.is_dealer_line like '%"+lineInfo.getIsDealerLine()+"%'");
 		}
-		if(StringUtil.isNotEmpty(username)){
-			sqlWhere.append(" and u.username like '%"+username+"%'");
+		if(StringUtil.isNotEmpty(userId)){
+			sqlWhere.append(" and a.createUserId = '"+userId+"'");
 		}
 		if(StringUtil.isNotEmpty(lineInfo.getType())){
 			sqlWhere.append(" and a.type= '"+lineInfo.getType()+"'");
@@ -183,11 +135,11 @@ public class LineInfoServiceImpl extends CommonServiceImpl implements LineInfoSe
 			sqlWhere.append(" and  p.departname like '%"+departname+"%'");
 		}
 		
-		if(StringUtil.isNotEmpty(lineInfo.getStartLocation())){
-			sqlWhere.append(" and d.name like '%"+lineInfo.getStartLocation()+"%'");
+		if(StringUtil.isNotEmpty(startLocation)){
+			sqlWhere.append(" and a.startLocation ='"+startLocation+"'");
 		}
-		if(StringUtil.isNotEmpty(lineInfo.getEndLocation())){
-			sqlWhere.append(" and  e.name like '%"+lineInfo.getEndLocation()+"%'");
+		if(StringUtil.isNotEmpty(endLocation)){
+			sqlWhere.append(" and a.endLocation = '"+endLocation+"'");
 		}
 		if(StringUtil.isNotEmpty(startTime)&&StringUtil.isNotEmpty(endTime)){
 			sqlWhere.append(" and a.createTime between '"+startTime+"' and '"+endTime+"'");

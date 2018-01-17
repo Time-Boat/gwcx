@@ -91,19 +91,21 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		t.setLineOrderCode(lineOrderCodel);
-		
-//		// 如果是一个批次只需要安排一辆车，然后由调度员去处理，那安排车辆有什么意义呢。。。
-//		List<Map<String, Object>> list = systemService.findForJdbc(
-//				"select o.driverId,o.licencePlateId from transferorder t join order_linecardiver o on t.id = o.id where lineOrderCodel = ? ",lineOrderCodel);
-//		// 只需要拿第一个数据就行了
-//		if (list != null && list.size() > 0) {
-//			Map<String, Object> map = list.get(0);
-//			String driverId = map.get("driverId") + "";
-//			String licencePlateId = map.get("licencePlateId") + "";
-//			Order_LineCarDiverEntity olc = new Order_LineCarDiverEntity();
-//		}
+
+		// // 如果是一个批次只需要安排一辆车，然后由调度员去处理，那安排车辆有什么意义呢。。。
+		// List<Map<String, Object>> list = systemService.findForJdbc(
+		// "select o.driverId,o.licencePlateId from transferorder t join
+		// order_linecardiver o on t.id = o.id where lineOrderCodel = ?
+		// ",lineOrderCodel);
+		// // 只需要拿第一个数据就行了
+		// if (list != null && list.size() > 0) {
+		// Map<String, Object> map = list.get(0);
+		// String driverId = map.get("driverId") + "";
+		// String licencePlateId = map.get("licencePlateId") + "";
+		// Order_LineCarDiverEntity olc = new Order_LineCarDiverEntity();
+		// }
 
 		t.setApplicationTime(AppUtil.getDate());
 		// t.setOrderType(1);
@@ -133,18 +135,21 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 	public List<AppStationInfoEntity> getPTStation(String serveType, String cityId, String userType) {
 
 		List<AppStationInfoEntity> lList = new ArrayList<>();
-		
+
 		StringBuffer sql = new StringBuffer();
 		sql.append(" select bi.id,bi.name,lb.lineId,bi.stopLocation,bi.x,bi.y ");
-		sql.append(" from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId ");
-		sql.append(" where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 and lf.status=0 ");
-		if(userType.equals("1")){
+		sql.append(
+				" from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id INNER JOIN busstopinfo bi on bi.id=lb.busStopsId ");
+		sql.append(
+				" where lf.cityId=? and lf.type=? and bi.station_type=? and lf.deleteFlag=0 and bi.deleteFlag=0 and lf.status=0 ");
+		if (userType.equals("1")) {
 			sql.append(" and lf.is_dealer_line=1 ");
 		}
 		sql.append(" group by lb.busStopsId ");
-		
+
 		// 查找指定类型的线路
-		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), cityId, serveType, AppUtil.getStationType(serveType));
+		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), cityId, serveType,
+				AppUtil.getStationType(serveType));
 
 		for (Map<String, Object> a : lineList) {
 			AppStationInfoEntity asi = new AppStationInfoEntity();
@@ -171,13 +176,13 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		sql.append(" select lf.id,lf.name,lf.price,lf.lineTimes,lf.dispath ");
 		sql.append(" from Line_busStop lb INNER JOIN lineinfo lf on lb.lineId = lf.id ");
 		sql.append(" where busStopsId=? and lf.cityId=? and lf.type=? and lf.deleteFlag=0 and lf.status=0 ");
-		
-		if(userType.equals("1")){
+
+		if (userType.equals("1")) {
 			sql.append(" and lf.is_dealer_line like '%1%' ");
-		}else if(userType.equals("0")){
+		} else if (userType.equals("0")) {
 			sql.append(" and lf.is_dealer_line like '%0%' ");
 		}
-		
+
 		// 根据起点id城市查找线路信息
 		List<Map<String, Object>> lineList = findForJdbc(sql.toString(), stationId, cityId, serveType);
 
@@ -185,7 +190,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			return;
 		}
 
-		//线路id的集合
+		// 线路id的集合
 		StringBuffer sbf = new StringBuffer();
 		for (Map<String, Object> a : lineList) {
 
@@ -207,57 +212,59 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			sbf.deleteCharAt(sbf.length() - 1);
 
 		String ssql = "from AppStationInfoEntity where lineId in (" + sbf.toString() + ") and station_type=? ";
-		if(StringUtil.isNotEmpty(likeStation)){
+		if (StringUtil.isNotEmpty(likeStation)) {
 			ssql += " and name like '%" + likeStation + "%' ";
 		}
-		
+
 		// 普通用户查找普通站点，渠道商用户查找区域站点
-		if("1".equals(userType)){
+		if ("1".equals(userType)) {
 			List<AppStationInfoEntity> stationList1 = findHql(ssql, "3");
-			for(AppStationInfoEntity aInfo : stationList1){
-				
+			for (AppStationInfoEntity aInfo : stationList1) {
+
 				AppStationInfoEntity asi = new AppStationInfoEntity();
-				
+
 				try {
-					//直接修改查出来的值会报错，克隆一个实体出来，性能需要优化
+					// 直接修改查出来的值会报错，克隆一个实体出来，性能需要优化
 					MyBeanUtils.copyBeanNotNull2Bean(aInfo, asi);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				
-				List<Map<String,Object>> mList = findForJdbc(
-						"select area_x,area_y,xy_seq from area_station_middle where station_id = ? order by xy_seq asc", asi.getId());
-				
-//				String[][] path = new String[mList.size()][];
-//				for(int i=0;i<mList.size();i++){
-//					path[i] = new String[]{mList.get(i).get("area_x") + "", mList.get(i).get("area_y") + ""};
-//				}
-				
-				//查出来的结果是无序的，拍个序，不然会有问题
+
+				List<Map<String, Object>> mList = findForJdbc(
+						"select area_x,area_y,xy_seq from area_station_middle where station_id = ? order by xy_seq asc",
+						asi.getId());
+
+				// String[][] path = new String[mList.size()][];
+				// for(int i=0;i<mList.size();i++){
+				// path[i] = new String[]{mList.get(i).get("area_x") + "",
+				// mList.get(i).get("area_y") + ""};
+				// }
+
+				// 查出来的结果是无序的，拍个序，不然会有问题
 				Collections.sort(mList, new SortBySeq());
-				
+
 				StringBuffer sbfX = new StringBuffer();
 				StringBuffer sbfY = new StringBuffer();
-				for(Map<String,Object> map : mList){
+				for (Map<String, Object> map : mList) {
 					sbfX.append(map.get("area_x"));
 					sbfX.append("&");
 					sbfY.append(map.get("area_y"));
 					sbfY.append("&");
 				}
-				
-				if(sbfX.length() > 0){
-					asi.setX(sbfX.deleteCharAt(sbfX.length()-1).toString());
-					asi.setY(sbfY.deleteCharAt(sbfY.length()-1).toString());
+
+				if (sbfX.length() > 0) {
+					asi.setX(sbfX.deleteCharAt(sbfX.length() - 1).toString());
+					asi.setY(sbfY.deleteCharAt(sbfY.length() - 1).toString());
 				}
-//				asi.setPath(path);
+				// asi.setPath(path);
 				stationList.add(asi);
 			}
-		}else{
+		} else {
 			// 查询指定id线路中的所有普通站点
 			List<AppStationInfoEntity> stationList1 = findHql(ssql, "0");
 			stationList.addAll(stationList1);
 		}
-		
+
 		// 常用站点列表
 		// List<CustomerCommonAddrEntity> c =
 		// systemService.findHql("from CustomerCommonAddrEntity where
@@ -331,7 +338,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 		// 为了通用这个详情页，把几个订单详情页的属性都拿出来了
 		list = findForJdbc(
-				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name,a.order_expectedarrival, "
+				"select a.id,a.order_type,a.order_status,a.order_id,a.order_starting_station_name,a.order_expectedarrival,a.is_exception, "
 						+ "	a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime,a.order_contactsname,a.order_contactsmobile,a.remark, "
 						+ " a.applicationTime,c.licence_plate,c.car_type,d.name as driver_name,d.phoneNumber as driver_phone,l.lineTimes,u.mobilePhone,u.officePhone "
 						+ " from transferorder a left join order_linecardiver b on a.id = b .id left join car_info c on b.licencePlateId =c.id "
@@ -359,25 +366,38 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			aod.setOrderContactsmobile(map.get("order_contactsmobile") + "");
 			aod.setLicencePlate(AppUtil.Null2Blank(map.get("licence_plate") + ""));
 			aod.setCarType(AppUtil.Null2Blank(map.get("car_type") + ""));
-			
+
 			aod.setDriver(AppUtil.Null2Blank(map.get("driver_name") + ""));
 			
+			aod.setIsException(AppUtil.Null2Blank(map.get("is_exception") + ""));
+
 			aod.setRemark(AppUtil.Null2Blank(map.get("remark") + ""));
 			
 			String officePhone = AppUtil.Null2Blank(map.get("officePhone") + "");
+			String mobile = AppUtil.Null2Blank(map.get("mobilePhone") + "");
 			
-			if(StringUtil.isNotEmpty(userType) && userType.equals("1")){
-				aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
-			}else{
-				if(StringUtil.isNotEmpty(officePhone)){
-					aod.setDriverPhone(officePhone);
-				}else{
-					aod.setDriverPhone(AppUtil.Null2Blank(map.get("mobilePhone") + ""));
-				}
+			//之前就是用driverPhone字段装的客服电话，为了不影响之前的业务，这边就不变了
+			if (StringUtil.isNotEmpty(officePhone)) {
+				aod.setServicePhone(officePhone);
+			} else {
+				aod.setServicePhone(mobile);
 			}
 			
+			if (StringUtil.isNotEmpty(userType) && userType.equals("1")) {
+				aod.setDriverPhone(AppUtil.Null2Blank(map.get("driver_phone") + ""));
+			}
+
+			int h = AppUtil.compareDate(new Date(), AppUtil.str2Date(date), 'h', AppUtil.DATE_ABS);
+
+			//待派车订单，并且是在距离发车12个小时之内，就显示客服电话
+			if (h < 12 && "2".equals(aod.getOrderStatus())) {
+				aod.setIsShowPhone("1");
+			} else {
+				aod.setIsShowPhone("0");
+			}
+
 			// 发车时间
-			aod.setStationStartTime(date.substring(date.indexOf(":")-2, date.lastIndexOf(":")));
+			aod.setStationStartTime(date.substring(date.indexOf(":") - 2, date.lastIndexOf(":")));
 
 			// // 线路时长
 			// String lineTime = map.get("lineTimes") + "";
@@ -471,50 +491,57 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 	@Override
 	public String getCarTypePrice(String sumPeople, String lineId, String phone, BigDecimal discount) {
-		
-		String tPrice = "";
-		List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId", lineId);
-		Object ca = null;//版本号
-		if(carlist.size()>0){
 
-			List<Object> calist = this.systemService.findListbySql("select c.version from car_t_s_type_line c where c.line_id='"+lineId+"' ORDER BY c.version desc");
-			
-			if(calist.size()>0){
+		String tPrice = "";
+		List<CarTSTypeLineEntity> carlist = this.systemService.findByProperty(CarTSTypeLineEntity.class, "lineId",
+				lineId);
+		Object ca = null;// 版本号
+		if (carlist.size() > 0) {
+
+			List<Object> calist = this.systemService
+					.findListbySql("select c.version from car_t_s_type_line c where c.line_id='" + lineId
+							+ "' ORDER BY c.version desc");
+
+			if (calist.size() > 0) {
 				ca = calist.get(0);
 			}
-			if(!StringUtil.isNotEmpty(ca)){
-				ca="0";
+			if (!StringUtil.isNotEmpty(ca)) {
+				ca = "0";
 			}
 		}
-		List<Map<String,Object>> lm = systemService.findForJdbc(" select c.car_type_price,t.typename "
-				+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? and version = ? and apply_status = ? ", lineId,ca,"1");
-		
-		for(Map<String,Object> map : lm){
+		List<Map<String, Object>> lm = systemService.findForJdbc(
+				" select c.car_type_price,t.typename "
+						+ "from car_t_s_type_line c join t_s_type t on t.id = c.car_type_id where c.line_id = ? and version = ? and apply_status = ? ",
+				lineId, ca, "1");
+
+		for (Map<String, Object> map : lm) {
 			String p = AppUtil.Null2Blank(map.get("typename") + "");
-			
-			if(!StringUtil.isNotEmpty(p))
+
+			if (!StringUtil.isNotEmpty(p))
 				continue;
-			
-			//切字符串做比较
+
+			// 切字符串做比较    (这个方法有点蠢...)
 			int start = p.indexOf("-");
 			int end = p.lastIndexOf("座");
-			if(-1 == start){
+			if (-1 == start) {
 				start = 0;
-			}else{
+			} else {
 				start += 1;
 			}
 			String maxNum = p.substring(start, end);
-			
+
 			int sp = Integer.parseInt(sumPeople);
 			int mn = Integer.parseInt(maxNum) - 1;
-			
-			if(sp <= mn){
+
+			if (sp <= mn) {
 				tPrice = map.get("car_type_price") + "";
 				double dis = discount.doubleValue();
-				dis = dis/10;
+				dis = dis / 10;
 				double tp = Double.parseDouble(tPrice);
 				tPrice = String.valueOf(tp * dis);
-//				tPrice = discount.divide(new BigDecimal("10"), 2, BigDecimal.ROUND_UP).multiply(new BigDecimal(tPrice)).toString();
+				// tPrice = discount.divide(new BigDecimal("10"), 2,
+				// BigDecimal.ROUND_UP).multiply(new
+				// BigDecimal(tPrice)).toString();
 				break;
 			}
 		}

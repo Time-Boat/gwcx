@@ -8,14 +8,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.poi.ss.formula.CollaboratingWorkbooksEnvironment;
 import org.jeecgframework.core.common.controller.BaseController;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.ResourceUtil;
 import org.jeecgframework.web.system.service.SystemService;
-import org.jeecgframework.web.system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +26,7 @@ import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.RequestHandler;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.service.OrderRefundServiceI;
+import com.yhy.lin.service.SharingInfoServiceI;
 
 import net.sf.json.JSONObject;
 
@@ -47,9 +46,21 @@ public class OrderRefundController extends BaseController {
 	@Autowired
 	private OrderRefundServiceI orderRefundService;
 	
+	@Autowired
+	private SharingInfoServiceI sharingInfoServiceI;
+	
 	//退款管理
 	@RequestMapping(params = "orderRefundList")
 	public ModelAndView orderRefundOrderList(HttpServletRequest request, HttpServletResponse response) {
+		String userType = request.getParameter("userType");
+		String cityid = request.getParameter("cityid");
+		String lineId = request.getParameter("lineId");
+		String lineType =  request.getParameter("lineType");
+		request.setAttribute("linelist", sharingInfoServiceI.getLine(userType,cityid));
+		request.setAttribute("companylist",sharingInfoServiceI.getCompany());
+		request.setAttribute("startlist",sharingInfoServiceI.getStartStaion(lineId,lineType,userType));
+		request.setAttribute("endlist",sharingInfoServiceI.getEndStaion(lineId,lineType,userType));
+		
 		return new ModelAndView("yhy/transferOrder/orderRefundList");
 	}
 
@@ -61,16 +72,18 @@ public class OrderRefundController extends BaseController {
 		String rf_begin = request.getParameter("refundTime_begin");
 		String rf_end = request.getParameter("refundTime_end");
 		
-		String orderStartingstation = request.getParameter("orderStartingstation");
-		String orderTerminusstation = request.getParameter("orderTerminusstation");
+		//String orderStartingstation = request.getParameter("orderStartingstation");
+		//String orderTerminusstation = request.getParameter("orderTerminusstation");
+		String lineId = request.getParameter("lineId");// 线路
+		String departname = request.getParameter("departname");//所属公司
+		String startLocation = request.getParameter("startLocation");
+		String endLocation = request.getParameter("endLocation");
 		
-		String departname = request.getParameter("departname");
 		
 		//有没有平台退款的权限
 //		boolean hasPermission = checkRole(AppGlobals.PLATFORM_REFUND_AUDIT);
 		
-		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end,rf_begin,rf_end,orderStartingstation,
-				orderTerminusstation, departname);
+		JSONObject jObject = orderRefundService.getDatagrid(transferorder, dataGrid, fc_begin, fc_end,rf_begin,rf_end,departname,lineId,startLocation,endLocation);
 		
 		responseDatagrid(response, jObject);
 	}

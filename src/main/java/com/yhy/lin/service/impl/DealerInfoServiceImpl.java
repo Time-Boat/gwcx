@@ -32,9 +32,9 @@ import org.jeecgframework.core.util.StringUtil;
 public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerInfoServiceI {
 
 	@Override
-	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String username, String departname) {
+	public JSONObject getDatagrid(DataGrid dataGrid, DealerInfoEntity dealerInfo, String accountId,String username, String departname) {
 		//通过AOP代理调用getWhere方法即可走事务切面              必须得通过接口调用getWhere
-		String sqlWhere = ((DealerInfoServiceI) AopContext.currentProxy()).getWhere(dealerInfo, username, departname);
+		String sqlWhere = ((DealerInfoServiceI) AopContext.currentProxy()).getWhere(dealerInfo,accountId, username, departname);
 		// 取出总数据条数（为了分页处理, 如果不用分页，取iCount值的这个处理可以不要）
 		String sqlCnt = "select count(*) from dealer_info d left join t_s_base_user u on d.create_user_id = u.id join t_s_depart b on b.id = d.departId "
 				+ " LEFT JOIN t_s_user_org o on o.user_id=u.ID LEFT JOIN  t_s_depart t on o.org_id=t.ID,t_s_depart p "
@@ -91,7 +91,7 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 	
 	@BussAnnotation(orgType = {AppGlobals.PLATFORM_DEALER_AUDIT, AppGlobals.COMMERCIAL_MANAGER , AppGlobals.ORG_JOB_TYPE}, 
 			objTableUserId = " d.create_user_id ", orgTable="b", auditSql = " and d.audit_status = '1' ", commercialSql = " and (d.audit_status != '-1' or d.status = '2') ")
-	public String getWhere(DealerInfoEntity dealerInfo,String username, String departname) {
+	public String getWhere(DealerInfoEntity dealerInfo,String accountId,String username, String departname) {
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -99,8 +99,8 @@ public class DealerInfoServiceImpl extends CommonServiceImpl implements DealerIn
 			sql.append(" and  p.departname like '%" + departname + "%'");
 		}
 		
-		if(StringUtil.isNotEmpty(dealerInfo.getAccount())){
-			sql.append(" and d.account like '%" + dealerInfo.getAccount() + "%' ");
+		if(StringUtil.isNotEmpty(accountId)){
+			sql.append(" and d.id = '" + accountId + "' ");
 		}
 		if(StringUtil.isNotEmpty(username)){
 			sql.append(" and u.username like '%" + username + "%' ");

@@ -59,7 +59,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 				+ "driversinfo d on c.driver_id =d.id left join lineinfo l on l.id = a.line_id left join t_s_depart t on t.id = l.departId LEFT JOIN t_s_base_user ur "
 				+ "on l.createUserId=ur.ID LEFT JOIN line_busstop lb on lb.busStopsId=a.order_starting_station_id where 1=1");
 		if (!sqlWhere.isEmpty()) {
-			sqlCnt.append(sqlWhere);
+			sqlCnt.append(sqlWhere);                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
 		}
 		Long iCount = getCountForJdbcParam(sqlCnt.toString(), null);
 		sql.append(
@@ -109,14 +109,14 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation
-			,String orderTerminusstation,String lineId, String driverName,String plate, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
+	public JSONObject getDatagrid1(TransferorderEntity transferorder, DataGrid dataGrid,String userType,String orderTypes,String orderStartingstation
+			,String orderTerminusstation,String lineId, String driverId,String carId, String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
 		
 		//订单类型
 		if (StringUtil.isNotEmpty(orderTypes)) {
 			transferorder.setOrderType(Integer.parseInt(orderTypes));
 		}
-		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation, orderTerminusstation,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,userType,orderStartingstation, orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 
 		StringBuffer sql = new StringBuffer();
 
@@ -186,7 +186,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 	}
 	
 	@Override
-	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String lineOrderCode,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverName,String plate, String fc_begin, String fc_end,
+	public JSONObject getDatagrid2(TransferorderEntity transferorder, DataGrid dataGrid,String userType,String orderTypes,String orderStartingstation,String orderTerminusstation,String lineId,String driverId,String carId, String fc_begin, String fc_end,
 			String ddTime_begin, String ddTime_end) {
 		
 		//订单类型
@@ -194,7 +194,7 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			transferorder.setOrderType(Integer.parseInt(orderTypes));
 		}
 		
-		String sqlWhere = getWhere(transferorder,lineOrderCode,orderStartingstation ,orderTerminusstation,lineId,driverName,plate,fc_begin, fc_end, ddTime_begin, ddTime_end);
+		String sqlWhere = getWhere(transferorder,userType,orderStartingstation ,orderTerminusstation,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin, ddTime_end);
 		
 		StringBuffer sql = new StringBuffer();
 		
@@ -308,8 +308,8 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			}
 		}
 	
-	public String getWhere(TransferorderEntity transferorder,String lineOrderCode,String orderStartingstation,String orderTerminusstation,String lineId,
-			String driverName,String plate ,String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
+	public String getWhere(TransferorderEntity transferorder,String userType,String orderStartingstation,String orderTerminusstation,String lineId,
+			String driverId,String carId ,String fc_begin, String fc_end, String ddTime_begin, String ddTime_end) {
 		StringBuffer sql = new StringBuffer();// 不需要显示退款状态的订单
 		
 		TSDepart depart = ResourceUtil.getSessionUserName().getCurrentDepart();
@@ -342,13 +342,13 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and  a.line_id = '" + lineId + "'");
 		}
 		// 司机
-		if (StringUtil.isNotEmpty(driverName)) {
-			sql.append(" and  d.name like '%" + driverName + "%'");
+		if (StringUtil.isNotEmpty(driverId)) {
+			sql.append(" and  d.id = '" + driverId + "'");
 		}
 				
 		// 车牌号
-		if (StringUtil.isNotEmpty(plate)) {
-			sql.append(" and  c.licence_plate like '%" + plate + "%'");
+		if (StringUtil.isNotEmpty(carId)) {
+			sql.append(" and  c.id = '" + carId + "'");
 		}
 		
 		// 订单类型
@@ -361,11 +361,11 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		}
 		// 起点站id
 		if (StringUtil.isNotEmpty(orderStartingstation)) {
-			sql.append(" and  a.order_starting_station_name like '%" +orderStartingstation+ "%'");
+			sql.append(" and  a.order_starting_station_id= '" +orderStartingstation+ "'");
 		}
 		// 终点站id
 		if (StringUtil.isNotEmpty(orderTerminusstation)) {
-			sql.append(" and  a.order_terminus_station_name like '%" + orderTerminusstation + "%'");
+			sql.append(" and  a.order_terminus_station_id= '" + orderTerminusstation + "'");
 		}
 
 		// 申请人
@@ -373,18 +373,18 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 			sql.append(" and  a.order_contactsname like '%" + transferorder.getOrderContactsname() + "%'");
 		}
 		// 订单编号
-		if (StringUtil.isNotEmpty(lineOrderCode)) {
-			sql.append(" and  a.lineOrderCode= '" + lineOrderCode+ "'");
+		if (StringUtil.isNotEmpty(userType)) {
+			sql.append(" and  a.order_user_type= '" + userType+ "'");
 		}
 		// 不需要显示退款状态的订单
 		
 		
 		//如果是从接送司机安排页面跳转过来的则不显示未付款订单
-		if(StringUtil.isNotEmpty(lineOrderCode)){
+		/*if(StringUtil.isNotEmpty(lineOrderCode)){
 			sql.append(" and order_status in('1', '2')");
 		}else{
 			sql.append(" and order_status in('1', '2', '6', '0')");
-		}
+		}*/
 		
 		sql.append(" and lb.lineId=l.id ");
 		
@@ -772,6 +772,5 @@ public class TransferServiceImpl extends CommonServiceImpl implements TransferSe
 		
 		return sql.toString();
 	}
-	public static void main(String[] args) {
-}
+
 }
