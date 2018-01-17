@@ -150,6 +150,9 @@
 						<value>app.do?hasNewMessage</value>
 						<value>app.do?tokenLogin</value>
 						
+						<value>app.do?submitComplaint</value>
+						<value>app.do?getComplaintDetail</value>
+						
 						<!-- 包车接口 -->
 						<value>charteredApp.do?getCharteredPackage</value>
 						<value>charteredApp.do?getCharteredCarType</value>

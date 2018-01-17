@@ -27,12 +27,14 @@ import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
+import com.yhy.lin.app.entity.ComplaintOrderDetailViewEntity;
 import com.yhy.lin.app.entity.CustomerCommonAddrEntity;
 import com.yhy.lin.app.service.AppInterfaceService;
 import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.comparators.SortBySeq;
 import com.yhy.lin.entity.CarTSTypeLineEntity;
+import com.yhy.lin.entity.ComplaintOrderEntity;
 import com.yhy.lin.entity.LineInfoEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
@@ -548,4 +550,50 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		return tPrice;
 	}
 
+	@Override
+	@Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
+	public void saveComplaint(String complaintReason, String complaintContent, String orderId) {
+		ComplaintOrderEntity c = new ComplaintOrderEntity();
+		c.setComplaintReason(complaintReason);
+		c.setComplaintContent(complaintContent);
+		c.setTransferId(orderId);
+		c.setComplaintTime(AppUtil.getDate());
+		
+		systemService.save(c);
+		
+		String uSql = "update transferorder set order_status = 8 where user_id = ? ";    //8：申诉中
+		
+		executeSql(uSql, orderId);
+	}
+
+	@Override
+	public ComplaintOrderDetailViewEntity getComplaintDetail(String orderId) {
+		return findUniqueByProperty(ComplaintOrderDetailViewEntity.class, "id", orderId);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

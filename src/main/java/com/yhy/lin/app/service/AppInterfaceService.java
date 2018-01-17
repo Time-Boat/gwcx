@@ -11,6 +11,7 @@ import com.yhy.lin.app.entity.AppMessageListEntity;
 import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
+import com.yhy.lin.app.entity.ComplaintOrderDetailViewEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 
 /**
@@ -45,11 +46,14 @@ public interface AppInterfaceService extends CommonService{
 	/** 获取消息通知列表 */
 	List<AppMessageListEntity> getMessageListById(String userId, String pageNo, String maxPageItem);
 
-	/** 根据人数计算总价 
-	 * @param discount */
+	/** 根据人数计算总价 */
 	String getCarTypePrice(String sumPeople, String lineId, String phone, BigDecimal discount);
 
-	
+	/** 存储申诉信息并修改订单状态 */
+	void saveComplaint(String complaintReason, String complaintContent, String orderId);
+
+	/** 获取申诉订单详情 */
+	ComplaintOrderDetailViewEntity getComplaintDetail(String orderId);
 	
 	
 }

@@ -380,13 +380,12 @@ public class SharingInfoServiceImpl extends CommonServiceImpl implements Sharing
 					Object[] ob = (Object[]) list.get(i);
 					busid = ob[0]+"";
 					busName= ob[1]+"";
-						json.append("{");
-						json.append("'busid':'" +busid + "',");
-						json.append("'busName':'"+ busName + "'");
-						json.append("},");
+					json.append("{");
+					json.append("'busid':'" +busid + "',");
+					json.append("'busName':'"+ busName + "'");
+					json.append("},");
 				}
 			}
-			
 		}
 		
 		json.delete(json.length()-1, json.length());

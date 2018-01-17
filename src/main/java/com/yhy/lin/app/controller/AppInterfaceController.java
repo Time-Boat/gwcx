@@ -36,6 +36,7 @@ import com.yhy.lin.app.entity.AppStationInfoEntity;
 import com.yhy.lin.app.entity.AppUserOrderDetailEntity;
 import com.yhy.lin.app.entity.AppUserOrderEntity;
 import com.yhy.lin.app.entity.CarCustomerEntity;
+import com.yhy.lin.app.entity.ComplaintOrderDetailViewEntity;
 import com.yhy.lin.app.entity.FeedbackEntity;
 import com.yhy.lin.app.entity.MessageCodeEntity;
 import com.yhy.lin.app.exception.ParameterException;
@@ -1722,6 +1723,112 @@ public class AppInterfaceController extends AppBaseController {
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", data.toString());
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	/** 提交申诉接口 */
+	@RequestMapping(params = "submitComplaint")
+	public void submitComplaint(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		JSONObject data = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		boolean success = false;
+		
+		String param = "";
+
+		try {
+			param = AppUtil.inputToStr(request);
+			// logger.info("前端传递参数：" + param);
+
+			// 验证参数
+			JSONObject jsondata = checkParam(param);
+
+			String token = jsondata.getString("token");
+			// 验证token
+			checkToken(token);
+
+			String orderId = jsondata.getString("orderId");
+
+			String complaintReason = jsondata.getString("complaintReason");
+			String complaintContent = jsondata.getString("complaintContent");
+			
+			logger.info("submitComplaint   前端传递参数：  orderId=" + orderId + "    complaintReason=" + complaintReason + "    complaintContent=" + complaintContent);
+			
+			//存储申诉信息并修改订单状态
+			appService.saveComplaint(complaintReason, complaintContent, orderId);
+			
+			success = true;
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		data.put("success", success);
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data);
+
+		responseOutWrite(response, returnJsonObj);
+	}
+	
+	/** 获取申诉订单详情 */
+	@RequestMapping(params = "getComplaintDetail")
+	public void getComplaintDetail(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		JSONObject data = new JSONObject();
+
+		String msg = "";
+		String statusCode = "";
+		
+		String param = "";
+
+		try {
+			param = AppUtil.inputToStr(request);
+			// logger.info("前端传递参数：" + param);
+
+			// 验证参数
+			JSONObject jsondata = checkParam(param);
+
+			String token = jsondata.getString("token");
+			// 验证token
+			checkToken(token);
+
+			String orderId = jsondata.getString("orderId");
+
+			logger.info("getComplaintDetail   前端传递参数：  orderId=" + orderId);
+			
+			//存储申诉信息并修改订单状态
+			ComplaintOrderDetailViewEntity cod = appService.getComplaintDetail(orderId);
+			
+			data.put("orderDetail", cod);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data);
 
 		responseOutWrite(response, returnJsonObj);
 	}

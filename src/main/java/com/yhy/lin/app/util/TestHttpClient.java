@@ -27,31 +27,33 @@ public class TestHttpClient {
 //	private static String base_apiURL = "www.youngloong.com";
 	private static String base_apiURL = "http://localhost:8080";
 	
-    // 接口地址 
-	//登录接口
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
-	//上传订单接口地址
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
-	//订单所属线路的站点列表接口地址
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getOrderStation";  
-    //线路站点信息地址
-    //private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
-    //获取机场站点或者火车站站点信息
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getPTStation";
-	//取消订单
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?cancelOrder";
-	//完成订单
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?completeOrder";
-	//用户意见反馈  
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?feedback";
-	//修改用户个人信息
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?updateUserInfo";
-	//获取用户个人信息
-	//private static String apiURL = "http://localhost:8080/gwcx/app.do?getUserInfo";
-	//订票人数确定总价
-	//private static String apiURL = "http://localhost:8080/gwcx/dealerApp.do?getPeoplesPrice";  
-	//订单详情
-	private static String apiURL = base_apiURL + "/gwcx/app.do?getOrderDetail";  
+//  接口地址 
+//	登录接口
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?appLogin";
+//	上传订单接口地址
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?createOrder";  
+//	订单所属线路的站点列表接口地址
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?getOrderStation";  
+//  线路站点信息地址
+//  private static String apiURL = "http://localhost:8080/gwcx/app.do?getStationList";  
+//  获取机场站点或者火车站站点信息
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?getPTStation";
+//	取消订单
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?cancelOrder";
+//	完成订单
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?completeOrder";
+//	用户意见反馈  
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?feedback";
+//	修改用户个人信息
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?updateUserInfo";
+//	获取用户个人信息
+//	private static String apiURL = "http://localhost:8080/gwcx/app.do?getUserInfo";
+//	订票人数确定总价
+//	private static String apiURL = "http://localhost:8080/gwcx/dealerApp.do?getPeoplesPrice";  
+//	订单详情
+//	private static String apiURL = base_apiURL + "/gwcx/app.do?getOrderDetail";  
+//	订单详情
+	private static String apiURL = base_apiURL + "/gwcx/app.do?getComplaintDetail";  
 	
     private Log logger = LogFactory.getLog(this.getClass());  
     private static final String pattern = "yyyy-MM-dd HH:mm:ss:SSS";  
@@ -251,6 +253,10 @@ public class TestHttpClient {
         
         //订单详情
         //localhost:8080/gwcx/app.do?getOrderDetail&orderId=ff8080815f89c7a1015f902c8cc102c4&userType=1&token=0d4a01670babfc85b96d5874132402fe
+        
+        //登录接口
+        j.addProperty("orderId", "40281081604320720160435171cb000c");  
+        j.addProperty("token", "26b76e7d23fd794991c9f7260525925a");  
         
         //登录接口
         //j.addProperty("mobile", "15527916902");  
