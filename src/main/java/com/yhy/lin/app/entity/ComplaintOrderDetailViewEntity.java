@@ -53,12 +53,22 @@ public class ComplaintOrderDetailViewEntity implements java.io.Serializable {
 	private java.lang.String handleContent;
 	/**mobilephone*/
 	private java.lang.String mobilephone;
+	/**处理时间*/
+	private java.util.Date handleTime;
 	
+	@Column(name ="HANDLE_TIME",nullable=true)
+	public java.util.Date getHandleTime() {
+		return handleTime;
+	}
+
+	public void setHandleTime(java.util.Date handleTime) {
+		this.handleTime = handleTime;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  主键
 	 */
-	
 	@Id
 	@GeneratedValue(generator = "paymentableGenerator")
 	@GenericGenerator(name = "paymentableGenerator", strategy = "uuid")

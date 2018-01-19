@@ -51,14 +51,13 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 		}
 
 		// 可以添加一个token过期的定时器，每天定时清空过期的token 不要清空token时间，用token更新时间来判断是不是新注册用户
+		// token可以用redis去做
 
 		// 定时删除未支付订单
-		
-//		String delOrder = "delete from transferorder where to_days(order_startime) = to_days(now()) and order_status = '6' ";
-//		int delSum = executeSql(delOrder);
-//		logger.info("时间：" + curTime + "，已删除" + delSum + "条未支付的订单");
+		String delOrder = "delete from transferorder where TIMESTAMPDIFF(MINUTE,order_startime,now()) >= 30 and order_status = '6' ";
+		int delSum = executeSql(delOrder);
+		logger.info("时间：" + curTime + "，已删除" + delSum + "条未支付的订单");
 
-		// 定时清空未支付的订单
 
 	}
 

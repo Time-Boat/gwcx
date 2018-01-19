@@ -1,21 +1,14 @@
 package com.yhy.lin.entity;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
 import org.jeecgframework.core.common.entity.IdEntity;
-
-import javax.persistence.SequenceGenerator;
 
 /**   
  * @Title: Entity
@@ -42,6 +35,8 @@ public class ComplaintOrderEntity extends IdEntity implements java.io.Serializab
 	private Date complaintTime;
 	/**处理意见   0：发起退款   1：拒绝退款*/
 	private String handleResult;
+	/**处理时间*/
+	private Date handleTime;
 	/**处理内容*/
 	private String handleContent;
 	/**备注*/
@@ -127,6 +122,20 @@ public class ComplaintOrderEntity extends IdEntity implements java.io.Serializab
 	public void setHandleResult(java.lang.String handleResult){
 		this.handleResult = handleResult;
 	}
+	
+	/**
+	 * 处理时间
+	 * @return
+	 */
+	@Column(name ="handle_time",nullable=true,length=1)
+	public Date getHandleTime() {
+		return handleTime;
+	}
+
+	public void setHandleTime(Date handleTime) {
+		this.handleTime = handleTime;
+	}
+
 	/**
 	 *方法: 取得java.lang.String
 	 *@return: java.lang.String  处理内容

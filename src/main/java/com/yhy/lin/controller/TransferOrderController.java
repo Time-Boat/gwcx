@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jeecgframework.core.common.controller.BaseController;
-import org.jeecgframework.core.common.hibernate.qbc.CriteriaQuery;
 import org.jeecgframework.core.common.model.json.AjaxJson;
 import org.jeecgframework.core.common.model.json.DataGrid;
 import org.jeecgframework.core.util.DateUtils;
@@ -30,15 +29,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.yhy.lin.app.util.AppGlobals;
+import com.yhy.lin.app.util.AppUtil;
 import com.yhy.lin.app.util.SendMessageUtil;
+import com.yhy.lin.entity.ComplaintOrderView;
 import com.yhy.lin.entity.CarInfoEntity;
 import com.yhy.lin.entity.DriversInfoEntity;
+import com.yhy.lin.entity.ComplaintOrderEntity;
 import com.yhy.lin.entity.ExportTransferorderEntity;
 import com.yhy.lin.entity.TransferorderEntity;
 import com.yhy.lin.entity.TransferorderView;
+import com.yhy.lin.service.ComplaintOrderServiceI;
 import com.yhy.lin.service.SharingInfoServiceI;
 import com.yhy.lin.service.TransferServiceI;
-import com.yhy.lin.service.TransferStatisticsServiceI;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -62,19 +64,36 @@ public class TransferOrderController extends BaseController {
 	private TransferServiceI transferService;
 	
 	@Autowired
-	private SharingInfoServiceI sharingInfoServiceI;
+	private SharingInfoServiceI sharingInfoService;
 	
 	@Autowired
-	private TransferStatisticsServiceI transferStatisticsServiceI;
+	private ComplaintOrderServiceI complaintOrderService;
+	
 	// 接送车司机安排
 	@RequestMapping(params = "transferDriverList")
 	public ModelAndView transferDriverList(HttpServletRequest request, HttpServletResponse response) {
 		String userType = request.getParameter("userType");
 		String cityid = request.getParameter("cityid");
-		request.setAttribute("cityList",sharingInfoServiceI.getOpencity());
-		String linelist = sharingInfoServiceI.getLine(userType,cityid);
+		request.setAttribute("cityList",sharingInfoService.getOpencity());
+		String linelist = sharingInfoService.getLine(userType,cityid);
 		request.setAttribute("lineNameList",linelist);
 		return new ModelAndView("yhy/transferOrder/transferDriverList");
+	}
+	
+	
+	//订单异常处理
+	@RequestMapping(params = "transferOrderComplaintList")
+	public ModelAndView transferOrderAppealList(HttpServletRequest request, HttpServletResponse response) {
+		
+		if(checkRole(AppGlobals.OPERATION_MANAGER)){
+			request.setAttribute("permission", "1");
+		}
+		String userType = request.getParameter("userType");
+		String cityid = request.getParameter("cityid");
+		request.setAttribute("cityList",sharingInfoService.getOpencity());
+		String linelist = sharingInfoService.getLine(userType,cityid);
+		request.setAttribute("lineNameList",linelist);
+		return new ModelAndView("yhy/transferOrder/transferOrderComplaintList");
 	}
 	
 	//订单详细
@@ -113,11 +132,11 @@ public class TransferOrderController extends BaseController {
 		String lineId =  request.getParameter("lineId");
 		request.setAttribute("orderType",orderType);
 		request.setAttribute("lineOrderCode",lineOrderCode);	
-		request.setAttribute("carplateList",sharingInfoServiceI.getCarPlate());	
-		request.setAttribute("driverList",sharingInfoServiceI.getDriver());	
+		request.setAttribute("carplateList",sharingInfoService.getCarPlate());	
+		request.setAttribute("driverList",sharingInfoService.getDriver());	
 		request.setAttribute("lineNameList",getLine1());
-		request.setAttribute("busStartinfoList",sharingInfoServiceI.getStartStaion(lineId,orderType,userType));
-		request.setAttribute("busEndinfoList",sharingInfoServiceI.getEndStaion(lineId,orderType,userType));
+		request.setAttribute("busStartinfoList",sharingInfoService.getStartStaion(lineId,orderType,userType));
+		request.setAttribute("busEndinfoList",sharingInfoService.getEndStaion(lineId,orderType,userType));
 		
 		return new ModelAndView("yhy/transferOrder/transferOrderList");
 	}
@@ -135,11 +154,11 @@ public class TransferOrderController extends BaseController {
 		String lineId =  request.getParameter("lineId");
 		request.setAttribute("orderType",orderType);
 		request.setAttribute("lineOrderCode",lineOrderCode);
-		request.setAttribute("carplateList",sharingInfoServiceI.getCarPlate());	
-		request.setAttribute("driverList",sharingInfoServiceI.getDriver());	
+		request.setAttribute("carplateList",sharingInfoService.getCarPlate());	
+		request.setAttribute("driverList",sharingInfoService.getDriver());	
 		request.setAttribute("lineNameList",getLine2());
-		request.setAttribute("busStartinfoList",sharingInfoServiceI.getStartStaion(lineId,orderType,userType));
-		request.setAttribute("busEndinfoList",sharingInfoServiceI.getEndStaion(lineId,orderType,userType));
+		request.setAttribute("busStartinfoList",sharingInfoService.getStartStaion(lineId,orderType,userType));
+		request.setAttribute("busEndinfoList",sharingInfoService.getEndStaion(lineId,orderType,userType));
 		return new ModelAndView("yhy/transferOrder/transferOrderAirList");
 	}
 	
@@ -330,6 +349,21 @@ public class TransferOrderController extends BaseController {
 		JSONObject jObject = transferService.getDatagrid2(transferorder, dataGrid,userType,orderTypes,orderStartingstation, orderTerminusstation
 				,lineId,driverId,carId,fc_begin, fc_end, ddTime_begin,ddTime_end);
 		//long endTime=System.currentTimeMillis(); //获取结束时间
+		responseDatagrid(response, jObject);
+		
+	}
+	
+	@RequestMapping(params = "complaintdatagrid")
+	public void complaintdatagrid(ComplaintOrderEntity complaintOrder, HttpServletRequest request, HttpServletResponse response,
+			DataGrid dataGrid) {
+		String complaintTime_begin = request.getParameter("complaintTime_begin");
+		String complaintTime_end = request.getParameter("complaintTime_end");
+		String orderContactsname = request.getParameter("orderContactsname");
+		String orderContactsmobile = request.getParameter("orderContactsmobile");
+		String orderStatus = request.getParameter("orderStatus");
+		String userType = request.getParameter("orderUserType");
+		
+		JSONObject jObject = complaintOrderService.getComplaintDatagrid(complaintOrder, dataGrid, userType, complaintTime_begin, complaintTime_end, orderContactsname, orderContactsmobile, orderStatus);
 		responseDatagrid(response, jObject);
 		
 	}
@@ -694,5 +728,84 @@ public class TransferOrderController extends BaseController {
 		modelMap.put(NormalExcelConstants.DATA_LIST,tranfers);
 		return NormalExcelConstants.JEECG_EXCEL_VIEW;
 	}
+	/**
+	 * 接送机订单查询详情查看页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getComplaintDetail")
+	public ModelAndView getComplaintDetail(HttpServletRequest request) {
+		// 获取部门信息
+		String id = request.getParameter("id");
+		if (StringUtil.isNotEmpty(id)) {
+			ComplaintOrderView tView = complaintOrderService.getDetail(id);
+			if (tView != null) {
+				request.setAttribute("tView", tView);
+			}
+		}
+		return new ModelAndView("yhy/transferOrder/complaintDetial");
+	}
 	
+	/**
+	 * 接送机订单查询详情查看页面
+	 * 
+	 * @return
+	 */
+	@RequestMapping(params = "getComplaintOrder")
+	public ModelAndView getComplaintOrder(HttpServletRequest request) {
+		// 获取部门信息
+		String id = request.getParameter("id");
+		if (StringUtil.isNotEmpty(id)) {
+			ComplaintOrderEntity complaint = this.systemService.getEntity(ComplaintOrderEntity.class, id);
+			request.setAttribute("complaint", complaint);
+		}
+		
+		return new ModelAndView("yhy/transferOrder/complaintOrder");
+	}
+	
+	/**
+	 * 保存接送订单的司机车辆安排
+	 */
+	@RequestMapping(params = "saveComplaint")
+	@ResponseBody
+	public AjaxJson saveComplaint(HttpServletRequest request, HttpServletResponse response) {
+		String message = null;
+		boolean success = false;
+		AjaxJson j = new AjaxJson();
+		String id = request.getParameter("id");//订单id
+		String handleResult = request.getParameter("handleResult");//处理意见
+		String handleContent = request.getParameter("handleContent");//处理详情
+		
+		try {
+			if (StringUtil.isNotEmpty(id)) {
+				
+				ComplaintOrderEntity complaint = this.systemService.getEntity(ComplaintOrderEntity.class, id);
+				if (StringUtil.isNotEmpty(complaint.getTransferId())) {
+					TransferorderEntity trans = systemService.getEntity(TransferorderEntity.class, complaint.getTransferId());
+					if("0".equals(handleResult)){
+						trans.setOrderStatus(3);
+					}else if("1".equals(handleResult)){
+						trans.setOrderStatus(0);
+					}
+				}
+				
+				complaint.setHandleResult(handleResult);
+				complaint.setHandleContent(handleContent);
+				complaint.setHandleTime(AppUtil.getDate());
+				complaintOrderService.saveOrUpdate(complaint);
+				
+				success = true;
+				message = "处理异常订单成功";
+			} else {
+				message = "没有需要处理的异常订单";
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			message = "服务器异常";
+		}
+
+		j.setSuccess(success);
+		j.setMsg(message);
+		return j;
+	}
 }

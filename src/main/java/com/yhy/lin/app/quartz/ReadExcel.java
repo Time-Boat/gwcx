@@ -13,6 +13,8 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
+import jodd.util.StringUtil;
+
 /**
  * Description :
  * 
@@ -21,10 +23,10 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  */
 public class ReadExcel {
 
-	static int rNum = -1; // 行
+	static int rNum = 0; // 行
 	static int cNum = -1; // 列
 
-	static boolean isRefund = false;
+	static boolean isNextRol = false;
 
 	static String path = "C:\\Users\\Administrator\\Desktop\\a.xlsx";
 	static String wPath = "C:\\Users\\Administrator\\Desktop\\b.xlsx";
@@ -51,20 +53,26 @@ public class ReadExcel {
 		DataFormatter formatter = new DataFormatter();
 		for (Row row : sheet) {
 			cNum = -1;
-			rNum++;
-			if (rNum == 1000) {
-				wr(wWorkbook);
-				return;
+			if (isNextRol) {
+				rNum++;
 			}
+			isNextRol = false;
 			for (Cell cell : row) {
 				if (rNum == 0) {
+					rNum++;
 					break;
 				}
-				cNum++;
 
 				CellReference cellRef = new CellReference(row.getRowNum(), cell.getColumnIndex());
 				// 单元格名称
 				String cellName = cellRef.formatAsString();
+
+				if (cellName.contains("C") || cellName.contains("D") || cellName.contains("E")) {
+					cNum++;
+				} else {
+					continue;
+				}
+
 				System.out.print(cellRef.formatAsString());
 				System.out.print(" - ");
 
@@ -74,31 +82,64 @@ public class ReadExcel {
 
 				String v = getCellValue(cell);
 
-				if (cellName.contains("C") || cellName.contains("D") || cellName.contains("E")) {
-				} else {
-					continue;
-				}
+				System.out.println("row:" + rNum + "  col:" + cNum);
 
+				boolean a = false;
+				
 				String[] sArr = null;
-				if (v.indexOf("(") <= 1 || v.indexOf("（") <= 1) {
+				if (cellName.contains("D") || cellName.contains("E")) {
+				} else if (compareVal(v, "（", 1)) {
 					sArr = parse1(v);
-				} else if (v.indexOf("收") <= 1 && (v.indexOf("(") <= 2 || v.indexOf("（") <= 2)) {
+					a = true;
+				} else if (compareVal(v, "收", 1) && (compareVal(v, "（", 2))) {
 					sArr = parse2(v);
-				} else if (v.indexOf("收") <= 1 && (v.indexOf("(") >= 2 || v.indexOf("（") >= 2)) {
-					sArr = parse2(v);
-				} else {
-					continue;
+					a = true;
+				} else if (compareVal(v, "收", 1) && !isNumber(v) && v.indexOf("（") != -1) {
+					sArr = parse3(v);
+					a = true;
 				}
 
 				if (cellName.contains("C")) {
-					for (int i = 0; i < sArr.length; i++) {
-						modifyCell(sArr[i], rNum, cNum + i);
+					if(a){
+						for (int i = 0; i < sArr.length; i++) {
+							modifyCell(sArr[i], rNum, cNum + i);
+						}
+					} else {
+						modifyCell(v, rNum, cNum);
 					}
+					
 				} else if (cellName.contains("D") || cellName.contains("E")) {
-					modifyCell(v, rNum, cNum + 1);
+					if (cellName.contains("D")) {
+						modifyCell(v, rNum, cNum + 6);
+					} else {
+						modifyCell(v, rNum, cNum + 7);
+					}
 				}
+				a = false;
+				isNextRol = true;
 			}
 		}
+		wr(wWorkbook);
+	}
+
+	private static boolean isNumber(String v) {
+		String str = v.substring(v.indexOf("（") + 2, v.indexOf("（") + 3);
+		try {
+			int num = Integer.valueOf(str);// 把字符串强制转换为数字
+			return true;// 如果是数字，返回True
+		} catch (Exception e) {
+			return false;// 如果抛出异常，返回False
+		}
+	}
+	
+	public static boolean compareVal(String val, String sVal, int index) {
+		if (!StringUtil.isNotEmpty(val) || val.indexOf(sVal) == -1) {
+			return false;
+		}
+		if (val.indexOf(sVal) <= index) {
+			return true;
+		}
+		return false;
 	}
 
 	public static String getCellValue(Cell cell) throws Exception {
@@ -140,50 +181,54 @@ public class ReadExcel {
 		return v;
 	}
 
-	public static void modifyCell(String val, int rNum, int cNum) throws Exception {
+	public static void modifyCell(String val, int rNumt, int cNumt) throws Exception {
 		// InputStream inp = new FileInputStream("workbook.xlsx");
 
 		Sheet sheet = wWorkbook.getSheetAt(1);
 
-		Row row = sheet.getRow(rNum);
+		Row row = sheet.getRow(rNumt);
 		Cell cell = null;
 		if (row != null) {
-			cell = row.getCell(cNum);
+			cell = row.getCell(cNumt);
 		} else {
-			row = sheet.createRow(rNum);
-			cell = row.createCell(cNum);
+			row = sheet.createRow(rNumt);
+			cell = row.createCell(cNumt);
 		}
 
 		if (cell == null) {
-			cell = row.createCell(cNum);
+			cell = row.createCell(cNumt);
 		}
 		cell.setCellType(Cell.CELL_TYPE_STRING);
 		cell.setCellValue(val);
+
 	}
 
 	public static String[] parse1(String val) {
 		String name1 = "";
 		String name2 = "";
-		int a = val.indexOf("(") == -1 ? val.indexOf("（") : val.indexOf("(");
-		int b = val.indexOf(")") == -1 ? val.indexOf("）") : val.indexOf(")");
-		name1 = val.substring(a + 1, b);
+		int a = val.indexOf("（");
+		int b = val.indexOf("）");
+
+		if (a > b) {
+			a = val.indexOf("（");
+		}
+
+		try {
+			name1 = val.substring(a + 1, b);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		int c = val.indexOf("收");
 		if (c == -1) {
-			c = val.indexOf(")");
-			if (c == -1) {
-				c = val.indexOf("）");
-			}
+			c = val.indexOf("）");
 		}
 
 		int d = val.indexOf("保证金", a + 1);
 		if (d == -1) {
-			d = val.indexOf("(", a + 1);
+			d = val.indexOf("（", a + 1);
 			if (d == -1) {
-				d = val.indexOf("（", a + 1);
-				if (d == -1) {
-					d = val.indexOf(" ", a + 1);
-				}
+				d = val.indexOf(" ", a + 1);
 			}
 		}
 		// int d = val.indexOf("(") == -1 ? val.indexOf("（") :
@@ -200,29 +245,40 @@ public class ReadExcel {
 	public static String[] parse2(String val) {
 		String name1 = "";
 		String name2 = "";
-		int a = val.indexOf("(") == -1 ? val.indexOf("（") : val.indexOf("(");
-		int b = val.indexOf(")") == -1 ? val.indexOf("）") : val.indexOf(")");
+		int a = val.indexOf("（");
+		int b = val.indexOf("）");
 		name1 = val.substring(a + 1, b);
 
-		int c = val.indexOf(")");
-		if (c == -1) {
-			c = val.indexOf("）");
-		}
+		int c = val.indexOf("）");
 
 		int d = val.indexOf("保证金", a + 1);
 		if (d == -1) {
-			d = val.indexOf("(", a + 1);
+			d = val.indexOf("（", a + 1);
 			if (d == -1) {
-				d = val.indexOf("（", a + 1);
-				if (d == -1) {
-					d = val.indexOf(" ", a + 1);
-				}
+				d = val.indexOf(" ", a + 1);
 			}
 		}
 		// int d = val.indexOf("(") == -1 ? val.indexOf("（") :
 		// val.indexOf("(");
 		try {
 			name2 = val.substring(c + 1, d);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return new String[] { name1, name2 };
+	}
+	
+	public static String[] parse3(String val) {
+		String name1 = "";
+		String name2 = "";
+		int a = val.indexOf("（");
+		int b = val.indexOf("）");
+		name2 = val.substring(a + 1, b);
+
+		int c = val.indexOf("收");
+		try {
+			name1 = val.substring(c + 1, b);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

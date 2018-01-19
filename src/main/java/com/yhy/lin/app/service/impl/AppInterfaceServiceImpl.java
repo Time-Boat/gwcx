@@ -323,12 +323,13 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			auo.setOrderStartime(map.get("order_startime") + ""); // 使用用户的发车时间
 			auo.setOrderStartingStationName(map.get("order_starting_station_name") + "");
 			// 要做一下为空的判断，这个字段不会为空
-			auo.setOrderStatus(map.get("order_status") + "");
+			String status = map.get("order_status") + "";
+			auo.setOrderStatus(status);
 			auo.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
 			auo.setOrderTotalPrice(map.get("order_totalPrice") + "");
 			
 			String id = map.get("complaintId") + "";
-			if(StringUtil.isNotEmpty(id)){
+			if(StringUtil.isNotEmpty(id) && "3".equals(status) && "5".equals(status)){
 				auo.setWhichOrderPage("1");
 			} else {
 				auo.setWhichOrderPage("0");
@@ -568,7 +569,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 		
 		systemService.save(c);
 		
-		String uSql = "update transferorder set order_status = 8 where user_id = ? ";    //8：申诉中
+		String uSql = "update transferorder set order_status = 8 where id = ? ";    //8：申诉中
 		
 		executeSql(uSql, orderId);
 	}

@@ -52,10 +52,8 @@ public class TestHttpClient {
 //	private static String apiURL = "http://localhost:8080/gwcx/dealerApp.do?getPeoplesPrice";  
 //	订单详情
 //	private static String apiURL = base_apiURL + "/gwcx/app.do?getOrderDetail";  
-//	订单详情
-//	private static String apiURL = base_apiURL + "/gwcx/app.do?getComplaintDetail";  
-//	订单详情
-	private static String apiURL = base_apiURL + "/gwcx/app.do?getOrderList";  
+//	申诉订单详情
+	private static String apiURL = base_apiURL + "/gwcx/app.do?getComplaintDetail";  
 	
     private Log logger = LogFactory.getLog(this.getClass());  
     private static final String pattern = "yyyy-MM-dd HH:mm:ss:SSS";  
@@ -257,7 +255,7 @@ public class TestHttpClient {
         //localhost:8080/gwcx/app.do?getOrderDetail&orderId=ff8080815f89c7a1015f902c8cc102c4&userType=1&token=0d4a01670babfc85b96d5874132402fe
         
         //登录接口
-        j.addProperty("userId", "ff8080815f89f16d015f8b992e710007");  
+        j.addProperty("orderId", "40281081610805f20161080cdd980008");  
         j.addProperty("token", "26b76e7d23fd794991c9f7260525925a");  
         
         //登录接口

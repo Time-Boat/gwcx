@@ -7,12 +7,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.sf.json.JSONObject;
+import net.sf.json.JsonConfig;
+import net.sf.json.processors.JsonValueProcessor;
 
 import org.jeecgframework.core.constant.Globals;
 import org.jeecgframework.core.util.DateUtils;
@@ -48,6 +51,7 @@ import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.ComplaintOrderEntity;
 import com.yhy.lin.entity.DealerApplyEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
 import com.yhy.lin.entity.LineInfoEntity;
@@ -1756,7 +1760,13 @@ public class AppInterfaceController extends AppBaseController {
 			String complaintReason = jsondata.getString("complaintReason");
 			String complaintContent = jsondata.getString("complaintContent");
 			
-			logger.info("submitComplaint   前端传递参数：  orderId=" + orderId + "    complaintReason=" + complaintReason + "    complaintContent=" + complaintContent);
+			logger.info("submitComplaint   前端传递参数：  orderoId=" + orderId + "    complaintReason=" + complaintReason + "    complaintContent=" + complaintContent);
+			
+			//防止重复提交申诉
+			List<ComplaintOrderEntity> list = systemService.findByProperty(ComplaintOrderEntity.class, "transferId", orderId);
+			if(list.size() > 0){
+				throw new ParameterException("已经提交申诉的订单不能二次提交！", "589");
+			}
 			
 			//存储申诉信息并修改订单状态
 			appService.saveComplaint(complaintReason, complaintContent, orderId);
@@ -1788,19 +1798,19 @@ public class AppInterfaceController extends AppBaseController {
 		AppUtil.responseUTF8(response);
 		JSONObject returnJsonObj = new JSONObject();
 		JSONObject data = new JSONObject();
-
+		
 		String msg = "";
 		String statusCode = "";
 		
 		String param = "";
-
+		
 		try {
 			param = AppUtil.inputToStr(request);
 			// logger.info("前端传递参数：" + param);
-
+			
 			// 验证参数
-			JSONObject jsondata = checkParam(param);
-
+			JSONObject jsondata =checkParam(param);
+			
 			String token = jsondata.getString("token");
 			// 验证token
 			checkToken(token);
@@ -1812,7 +1822,11 @@ public class AppInterfaceController extends AppBaseController {
 			//存储申诉信息并修改订单状态
 			ComplaintOrderDetailViewEntity cod = appService.getComplaintDetail(orderId);
 			
-			data.put("orderDetail", cod);
+			JsonConfig jsonConfig = new JsonConfig();  
+			jsonConfig.registerJsonValueProcessor(Date.class , new JsonDateValueProcessor());  
+			JSONObject signalJson = JSONObject.fromObject(cod,jsonConfig); 
+			
+			data.put("orderDetail", signalJson);
 			
 			statusCode = AppGlobals.APP_SUCCESS;
 			msg = AppGlobals.APP_SUCCESS_MSG;
@@ -1833,4 +1847,29 @@ public class AppInterfaceController extends AppBaseController {
 		responseOutWrite(response, returnJsonObj);
 	}
 
+	public class JsonDateValueProcessor implements JsonValueProcessor {  
+		  
+	    private String format = "yyyy-MM-dd HH:mm:ss";     
+	      
+	    @Override  
+	    public Object processArrayValue(Object value, JsonConfig config) {  
+	        return process(value);   
+	    }  
+	  
+	    @Override  
+	    public Object processObjectValue(String arg0, Object value, JsonConfig config) {  
+	         return process(value);    
+	    }  
+	      
+	    private Object process(Object value){     
+	  
+	        //遇到类型为日期的，就自动转换成“yyyy-MM-dd HH:mm:ss”格式的字符串  
+	        if(value instanceof Date){     
+	            SimpleDateFormat sdf = new SimpleDateFormat(format,Locale.UK);     
+	            return sdf.format(value);     
+	        }     
+	        return value == null ? "" : value.toString();     
+	    }     
+	}  
+	
 }
