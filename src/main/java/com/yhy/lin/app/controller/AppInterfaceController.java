@@ -804,12 +804,12 @@ public class AppInterfaceController extends AppBaseController {
 			if (!StringUtil.isNotEmpty(pageNo)) {
 				pageNo = "1";
 			}
-
+			
 			String maxPageItem = request.getParameter("maxPageItem");
 			if (!StringUtil.isNotEmpty(maxPageItem)) {
 				maxPageItem = "150";
 			}
-
+			
 			auoList = appService.getUserOrders(userId, null, pageNo, maxPageItem);
 
 			statusCode = AppGlobals.APP_SUCCESS;
@@ -1742,7 +1742,7 @@ public class AppInterfaceController extends AppBaseController {
 
 		try {
 			param = AppUtil.inputToStr(request);
-			// logger.info("前端传递参数：" + param);
+			logger.info("前端传递参数：" + param);
 
 			// 验证参数
 			JSONObject jsondata = checkParam(param);

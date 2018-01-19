@@ -15,6 +15,14 @@ public class AppBaseOrderEntity {
 	private String orderTotalPrice;// 总价
 	private String orderStartime;// 发车时间
 	
+	private String whichOrderPage;// 跳转页面    0：跳转订单详情    1：跳转申诉详情
+	
+	public String getWhichOrderPage() {
+		return whichOrderPage;
+	}
+	public void setWhichOrderPage(String whichOrderPage) {
+		this.whichOrderPage = whichOrderPage;
+	}
 	public String getOrderStartingStationName() {
 		return orderStartingStationName;
 	}

@@ -303,9 +303,9 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 		StringBuffer sql = new StringBuffer();
 		sql.append(
-				"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime "
-						+ " from transferorder a left join order_linecardiver b on a.id = b.id where user_id=? "
-						+ "and delete_flag='0' ORDER BY INSTR('2,1,3,4,6,5,0',order_status),a.order_startime asc ");
+				"select a.id,a.order_status,order_id,a.order_starting_station_name,a.order_terminus_station_name,a.order_totalPrice,a.order_numbers,a.order_startime, "
+						+ " c.id as complaintId from transferorder a left join order_linecardiver b on a.id = b.id left join complaint_order c on a.id = c.transfer_id "
+						+ " where user_id=? and delete_flag='0' ORDER BY INSTR('2,1,3,4,6,5,0',order_status),a.order_startime asc ");
 
 		// if (StringUtil.isNotEmpty(orderStatus)) {
 		// sql.append(" and order_paystatus = '" + orderStatus + "'");
@@ -326,6 +326,14 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			auo.setOrderStatus(map.get("order_status") + "");
 			auo.setOrderTerminusStationName(map.get("order_terminus_station_name") + "");
 			auo.setOrderTotalPrice(map.get("order_totalPrice") + "");
+			
+			String id = map.get("complaintId") + "";
+			if(StringUtil.isNotEmpty(id)){
+				auo.setWhichOrderPage("1");
+			} else {
+				auo.setWhichOrderPage("0");
+			}
+			
 			auoList.add(auo);
 		}
 
@@ -378,7 +386,6 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			String officePhone = AppUtil.Null2Blank(map.get("officePhone") + "");
 			String mobile = AppUtil.Null2Blank(map.get("mobilePhone") + "");
 			
-			//之前就是用driverPhone字段装的客服电话，为了不影响之前的业务，这边就不变了
 			if (StringUtil.isNotEmpty(officePhone)) {
 				aod.setServicePhone(officePhone);
 			} else {
@@ -392,7 +399,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 			int h = AppUtil.compareDate(new Date(), AppUtil.str2Date(date), 'h', AppUtil.DATE_ABS);
 
 			//待派车订单，并且是在距离发车12个小时之内，就显示客服电话
-			if (h < 12 && "2".equals(aod.getOrderStatus())) {
+			if (h < 12 && ("2".equals(aod.getOrderStatus()) || "1".equals(aod.getOrderStatus()))) {
 				aod.setIsShowPhone("1");
 			} else {
 				aod.setIsShowPhone("0");
@@ -568,7 +575,7 @@ public class AppInterfaceServiceImpl extends CommonServiceImpl implements AppInt
 
 	@Override
 	public ComplaintOrderDetailViewEntity getComplaintDetail(String orderId) {
-		return findUniqueByProperty(ComplaintOrderDetailViewEntity.class, "id", orderId);
+		return findByProperty(ComplaintOrderDetailViewEntity.class, "id", orderId).get(0);
 	}
 
 	

@@ -54,8 +54,8 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 
 		// 定时删除未支付订单
 		
-//		String delOrder = "delete from transferorder where to_days(order_startime) = to_days(now()) and order_status = ? ";
-//		int delSum = executeSql(delOrder, 6);
+//		String delOrder = "delete from transferorder where to_days(order_startime) = to_days(now()) and order_status = '6' ";
+//		int delSum = executeSql(delOrder);
 //		logger.info("时间：" + curTime + "，已删除" + delSum + "条未支付的订单");
 
 		// 定时清空未支付的订单
