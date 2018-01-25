@@ -152,11 +152,14 @@
 						
 						<value>app.do?submitComplaint</value>
 						<value>app.do?getComplaintDetail</value>
+						<value>app.do?getCarNumber</value>
 						
 						<!-- 包车接口 -->
 						<value>charteredApp.do?getCharteredPackage</value>
 						<value>charteredApp.do?getCharteredCarType</value>
 						<value>charteredApp.do?getChargesDetails</value>
+						<value>charteredApp.do?getCharteredCarDetail</value>
+						<value>charteredApp.do?createCharteredOrder</value>
 						
 						<!-- 渠道商用户接口 -->
 						<value>dealerApp.do?appDealerLogin</value>

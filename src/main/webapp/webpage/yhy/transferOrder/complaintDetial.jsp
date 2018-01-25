@@ -143,14 +143,16 @@
 			</tr>
 			<tr>
 				<td align="right"><label class="Validform_label">处理意见：</label></td>
-				<td class="value">						  
+				<td class="value" colspan="3">						  
 					<t:dictSelect field="handleResult" typeGroupCode="handle_result" hasLabel="false" defaultVal="${tView.handleResult}"></t:dictSelect>
 					<span class="Validform_checktip"></span>
 				</td>
+			</tr>
+			<tr>
 				<td align="right">
 					<label class="Validform_label">处理时间：</label>
 				</td>
-				<td class="value">
+				<td class="value" colspan="3">
 					<input class="Wdate" onClick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss'})" style="width: 150px" id="handleTime" name="handleTime"
 						value="<fmt:formatDate value='${tView.handleTime}' type="date" pattern="yyyy-MM-dd HH:mm:ss"/>"> 
 					<span class="Validform_checktip"></span>

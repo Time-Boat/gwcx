@@ -25,9 +25,9 @@ import org.jeecgframework.core.common.entity.IdEntity;
 @SuppressWarnings("serial")
 public class CharteredOrderEntity extends IdEntity implements java.io.Serializable {
 	
-	/**订单id*/
+	/**订单编号*/
 	private String orderId;
-	/**订单状态 0：订单已完成。1：待派车。2：待出行。3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付。7：已审核。*/
+	/**订单状态 0：订单已完成。1：待派车。2：待出行。3：取消订单待退款。4：取消订单完成退款。5：拒绝退款。6：未支付。7：已审核。8：申述中。9：进行中*/
 	private Integer orderStatus;
 	/**起点站*/
 	private String startingStationName;
@@ -56,13 +56,15 @@ public class CharteredOrderEntity extends IdEntity implements java.io.Serializab
 	/**包车类型  0：单程   1：往返*/
 	private String orderType;
 	/**用户订单类型    0：普通用户订单    1：渠道商用户订单*/
-	private  String orderUserType;
+	private String orderUserType;
 	/**订单备注*/
 	private String remark;
 	/**下达订单时间*/
 	private java.util.Date applicationtime;
 	/**客户id*/
 	private String userId;
+	/**用户手机号*/
+	private String phone;
 	/**申请退款时间*/
 	private Date refundTime;
 	/**拒绝退款原因*/
@@ -77,8 +79,7 @@ public class CharteredOrderEntity extends IdEntity implements java.io.Serializab
 	private Date orderCompletedTime;
 	/**是否已经被删除   0：未删除    1：删除*/
 	private String deleteFlag;
-	/**线路订单码*/
-	private String lineordercode;
+	
 	/**初审审核状态   0：初审待审核     1：初审通过    2：初审未通过*/
 	private String firstAuditStatus;
 	/**复审审核状态   0：复审待审核     1：复审通过    2：复审未通过*/
@@ -512,22 +513,6 @@ public class CharteredOrderEntity extends IdEntity implements java.io.Serializab
 	}
 	/**
 	 *方法: 取得 String
-	 *@return:  String  线路订单码
-	 */
-	@Column(name ="LINEORDERCODE",nullable=true,length=255)
-	public String getLineordercode(){
-		return this.lineordercode;
-	}
-
-	/**
-	 *方法: 设置 String
-	 *@param:  String  线路订单码
-	 */
-	public void setLineordercode(String lineordercode){
-		this.lineordercode = lineordercode;
-	}
-	/**
-	 *方法: 取得 String
 	 *@return:  String  初审审核状态   0：初审待审核     1：初审通过    2：初审未通过
 	 */
 	@Column(name ="FIRST_AUDIT_STATUS",nullable=true,length=1)
@@ -638,4 +623,18 @@ public class CharteredOrderEntity extends IdEntity implements java.io.Serializab
 	public void setOrderHistory(String orderHistory){
 		this.orderHistory = orderHistory;
 	}
+
+	/**
+	 * 用户手机号
+	 * @return
+	 */
+	@Column(name ="phone",nullable=true,length=11)
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+	
 }

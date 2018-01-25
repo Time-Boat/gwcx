@@ -57,8 +57,6 @@ public class TaskDemoServiceImpl extends CommonServiceImpl implements TaskDemoSe
 		String delOrder = "delete from transferorder where TIMESTAMPDIFF(MINUTE,order_startime,now()) >= 30 and order_status = '6' ";
 		int delSum = executeSql(delOrder);
 		logger.info("时间：" + curTime + "，已删除" + delSum + "条未支付的订单");
-
-
 	}
 
 }

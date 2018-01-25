@@ -51,6 +51,7 @@ import com.yhy.lin.app.util.MakeOrderNum;
 import com.yhy.lin.app.util.SendMessageUtil;
 import com.yhy.lin.app.util.SystemMessage;
 import com.yhy.lin.app.wechat.WeixinPayUtil;
+import com.yhy.lin.entity.CarNumberEntity;
 import com.yhy.lin.entity.ComplaintOrderEntity;
 import com.yhy.lin.entity.DealerApplyEntity;
 import com.yhy.lin.entity.DealerInfoEntity;
@@ -576,7 +577,7 @@ public class AppInterfaceController extends AppBaseController {
 			e.printStackTrace();
 		}
 
-		logger.info("createOrder    orderId:" + data.toString());
+		logger.info("createOrder orderId:" + data.toString());
 
 		data.put("success", success);
 
@@ -1870,6 +1871,56 @@ public class AppInterfaceController extends AppBaseController {
 	        }     
 	        return value == null ? "" : value.toString();     
 	    }     
-	}  
+	} 
+	
+	/** 获取最大乘车人数 */
+	@RequestMapping(params = "getCarNumber")
+	public void getCarNumber(HttpServletRequest request, HttpServletResponse response) {
+		AppUtil.responseUTF8(response);
+		JSONObject returnJsonObj = new JSONObject();
+		JSONObject data = new JSONObject();
+		
+		String msg = "";
+		String statusCode = "";
+		
+		String param = "";
+		
+		try {
+			param = AppUtil.inputToStr(request);
+			// logger.info("前端传递参数：" + param);
+			
+			// 验证参数
+			JSONObject jsondata =checkParam(param);
+			
+			String token = jsondata.getString("token");
+			// 验证token
+			checkToken(token);
+
+			List<CarNumberEntity> carnumberlist = systemService.getList(CarNumberEntity.class);
+			int num = 0;
+			if(carnumberlist.size()>0){
+				num=carnumberlist.get(0).getNumber();
+			}
+			
+			data.put("number", num);
+			
+			statusCode = AppGlobals.APP_SUCCESS;
+			msg = AppGlobals.APP_SUCCESS_MSG;
+		} catch (ParameterException e) {
+			statusCode = e.getCode();
+			msg = e.getErrorMessage();
+			logger.error(e.getErrorMessage());
+		} catch (Exception e) {
+			statusCode = AppGlobals.SYSTEM_ERROR;
+			msg = AppGlobals.SYSTEM_ERROR_MSG;
+			e.printStackTrace();
+		}
+
+		returnJsonObj.put("msg", msg);
+		returnJsonObj.put("code", statusCode);
+		returnJsonObj.put("data", data);
+
+		responseOutWrite(response, returnJsonObj);
+	}
 	
 }

@@ -280,19 +280,20 @@ public class OrderRefundServiceImpl extends CommonServiceImpl implements OrderRe
 				
 				TransferorderEntity t = get(TransferorderEntity.class, outTradeNo);
 				
-				//计算订单的发车时间距离退款的时间在24小时之内，则只能退还50%的款项
-				String startTime = t.getOrderStartime();
-				String refundTime = t.getRefundTime();
-				int m = AppUtil.compareDate(AppUtil.str2Date(startTime), AppUtil.str2Date(refundTime), 'h', "");
-				
 				int totalFee = (int) ((Double.parseDouble(arrFee[i]) * 100));
-				int refundFee = 0;
+				int refundFee = totalFee;
 				
-				//可以用策略模式    需要改进
-				if (m < 10) {
-					refundFee = totalFee/2;
-				} else {
-					refundFee = totalFee;
+				//如果是异常订单，就全额退款      不是的话就走普通退款流程      0：不是     1：是
+				if("0".equals(t.getIsException())){
+					//计算订单的发车时间距离退款的时间在24小时之内，则只能退还50%的款项
+					String startTime = t.getOrderStartime();
+					String refundTime = t.getRefundTime();
+					int m = AppUtil.compareDate(AppUtil.str2Date(startTime), AppUtil.str2Date(refundTime), 'h', "");
+					
+					//可以用策略模式    需要改进
+					if (m < 10) {
+						refundFee = totalFee/2;
+					}
 				}
 				
 				logger.info("总金额：" + totalFee);
