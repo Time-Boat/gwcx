@@ -1156,36 +1156,36 @@ public class AppInterfaceController extends AppBaseController {
 			String sTime = t.getOrderStartime();
 			Date departTime = DateUtils.str2Date(sTime, DateUtils.datetimeFormat);
 			int m = AppUtil.compareDate(departTime, curDate, 'm', "");
-
-			if (m < 240) {
+			
+			if (m < 240 && !"1".equals(t.getOrderStatus())) {
 				msg = "距离发车时间不到4个小时，无法取消订单";
 				success = false;
 			} else {
 				// 记录取消订单之前的状态
 				t.setBeforeStatus(t.getOrderStatus() + "");
 				System.out.println("取消订单之前的状态:" + t.getOrderStatus());
-
+				
 				// 0：订单已完成。1：已付款待审核。2：审核通过待发车3：取消订单待退款。4：取消订单完成退款。
 				t.setOrderStatus(3);
 				// 支付状态 0：已付款，1：退款中 2：已退款 3：未付款
 				t.setOrderPaystatus("1");
-
+				
 				t.setRefundTime(AppUtil.getCurTime());
-
+				
 				systemService.updateEntitie(t);
-
+				
 				LineInfoEntity line = systemService.getEntity(LineInfoEntity.class, t.getLineId());
-
+				
 				// 消息提醒
 				SystemMessage.getInstance().saveMessage(systemService, "退款订单待处理", "您有一条退款订单待审核，请尽快处理。",
 						new String[] { AppGlobals.OPERATION_SPECIALIST }, new String[] { "1", "2" },
 						new String[] { line.getCreateUserId() });
-
+				
 				msg = AppGlobals.APP_SUCCESS_MSG;
 				success = true;
 			}
 			statusCode = AppGlobals.APP_SUCCESS;
-
+			
 		} catch (ParameterException e) {
 			statusCode = e.getCode();
 			msg = e.getErrorMessage();
@@ -1195,16 +1195,16 @@ public class AppInterfaceController extends AppBaseController {
 			msg = AppGlobals.SYSTEM_ERROR_MSG;
 			e.printStackTrace();
 		}
-
+		
 		obj.put("success", success);
-
+		
 		returnJsonObj.put("msg", msg);
 		returnJsonObj.put("code", statusCode);
 		returnJsonObj.put("data", obj);
-
+		
 		responseOutWrite(response, returnJsonObj);
 	}
-
+	
 	/** 确认完成 */
 	@RequestMapping(params = "completeOrder")
 	public void completeOrder(HttpServletRequest request, HttpServletResponse response) {

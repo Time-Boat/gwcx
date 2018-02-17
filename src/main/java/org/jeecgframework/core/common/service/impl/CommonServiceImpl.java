@@ -32,12 +32,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import net.sf.json.JSONObject;
 
-
 @Service("commonService")
 @Transactional
 public class CommonServiceImpl implements CommonService {
 	public ICommonDao commonDao = null;
-	
+
 	/**
 	 * 获取所有数据库表
 	 * 
@@ -58,20 +57,17 @@ public class CommonServiceImpl implements CommonService {
 		this.commonDao = commonDao;
 	}
 
-	
 	@Override
 	public <T> Serializable save(T entity) {
 		return commonDao.save(entity);
 	}
 
-	
 	@Override
 	public <T> void saveOrUpdate(T entity) {
 		commonDao.saveOrUpdate(entity);
 
 	}
 
-	
 	@Override
 	public <T> void delete(T entity) {
 		commonDao.delete(entity);
@@ -88,27 +84,28 @@ public class CommonServiceImpl implements CommonService {
 	public <T> void deleteAllEntitie(Collection<T> entities) {
 		commonDao.deleteAllEntitie(entities);
 	}
-	
+
 	/**
 	 * 更新实体集合，用于批量逻辑删除 create linj
+	 * 
 	 * @param <T>
 	 * @param entities
 	 */
 	@Override
-	public <T> void updateAllEntitie(Collection<T> entities){
+	public <T> void updateAllEntitie(Collection<T> entities) {
 		commonDao.updateAllEntitie(entities);
 	}
+
 	/**
 	 * 保存实体集合，用于批量保存 create linj
+	 * 
 	 * @param <T>
 	 * @param entities
 	 */
 	@Override
-	public <T> void saveAllEntitie(Collection<T> entities){
+	public <T> void saveAllEntitie(Collection<T> entities) {
 		commonDao.saveAllEntitie(entities);
 	}
-	
-	
 
 	/**
 	 * 根据实体名获取对象
@@ -149,8 +146,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public <T> T findUniqueByProperty(Class<T> entityClass,
-			String propertyName, Object value) {
+	public <T> T findUniqueByProperty(Class<T> entityClass, String propertyName, Object value) {
 		return commonDao.findUniqueByProperty(entityClass, propertyName, value);
 	}
 
@@ -158,8 +154,7 @@ public class CommonServiceImpl implements CommonService {
 	 * 按属性查找对象列表.
 	 */
 	@Override
-	public <T> List<T> findByProperty(Class<T> entityClass,
-			String propertyName, Object value) {
+	public <T> List<T> findByProperty(Class<T> entityClass, String propertyName, Object value) {
 
 		return commonDao.findByProperty(entityClass, propertyName, value);
 	}
@@ -226,7 +221,7 @@ public class CommonServiceImpl implements CommonService {
 	public int updateBySqlString(String sql) {
 		return commonDao.updateBySqlString(sql);
 	}
-	
+
 	/**
 	 * 根据sql查找List
 	 * 
@@ -247,10 +242,8 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public <T> List<T> findByPropertyisOrder(Class<T> entityClass,
-			String propertyName, Object value, boolean isAsc) {
-		return commonDao.findByPropertyisOrder(entityClass, propertyName,
-				value, isAsc);
+	public <T> List<T> findByPropertyisOrder(Class<T> entityClass, String propertyName, Object value, boolean isAsc) {
+		return commonDao.findByPropertyisOrder(entityClass, propertyName, value, isAsc);
 	}
 
 	/**
@@ -274,8 +267,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public DataTableReturn getDataTableReturn(final CriteriaQuery cq,
-			final boolean isOffset) {
+	public DataTableReturn getDataTableReturn(final CriteriaQuery cq, final boolean isOffset) {
 		return commonDao.getDataTableReturn(cq, isOffset);
 	}
 
@@ -287,8 +279,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public DataGridReturn getDataGridReturn(final CriteriaQuery cq,
-			final boolean isOffset) {
+	public DataGridReturn getDataGridReturn(final CriteriaQuery cq, final boolean isOffset) {
 		return commonDao.getDataGridReturn(cq, isOffset);
 	}
 
@@ -301,8 +292,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public PageList getPageList(final HqlQuery hqlQuery,
-			final boolean needParameter) {
+	public PageList getPageList(final HqlQuery hqlQuery, final boolean needParameter) {
 		return commonDao.getPageList(hqlQuery, needParameter);
 	}
 
@@ -315,8 +305,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public PageList getPageListBySql(final HqlQuery hqlQuery,
-			final boolean isToEntity) {
+	public PageList getPageListBySql(final HqlQuery hqlQuery, final boolean isToEntity) {
 		return commonDao.getPageListBySql(hqlQuery, isToEntity);
 	}
 
@@ -328,8 +317,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public List findByExample(final String entityName,
-			final Object exampleEntity) {
+	public List findByExample(final String entityName, final Object exampleEntity) {
 		return commonDao.findByExample(entityName, exampleEntity);
 	}
 
@@ -341,8 +329,7 @@ public class CommonServiceImpl implements CommonService {
 	 * @return
 	 */
 	@Override
-	public <T> List<T> getListByCriteriaQuery(final CriteriaQuery cq,
-			Boolean ispage) {
+	public <T> List<T> getListByCriteriaQuery(final CriteriaQuery cq, Boolean ispage) {
 		return commonDao.getListByCriteriaQuery(cq, ispage);
 	}
 
@@ -393,7 +380,7 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public List<ComboTree> ComboTree(List all, ComboTreeModel comboTreeModel, List in, boolean recursive) {
-        return commonDao.ComboTree(all, comboTreeModel, in, recursive);
+		return commonDao.ComboTree(all, comboTreeModel, in, recursive);
 	}
 
 	/**
@@ -414,71 +401,58 @@ public class CommonServiceImpl implements CommonService {
 	public <T> List<T> getAutoList(Autocomplete autocomplete) {
 		StringBuffer sb = new StringBuffer("");
 		for (String searchField : autocomplete.getSearchField().split(",")) {
-			sb.append("  or " + searchField + " like '%"
-					+ autocomplete.getTrem() + "%' ");
+			sb.append("  or " + searchField + " like '%" + autocomplete.getTrem() + "%' ");
 		}
-		String hql = "from " + autocomplete.getEntityName() + " where 1!=1 "
-				+ sb.toString();
-		return commonDao.getSession().createQuery(hql)
-				.setFirstResult(autocomplete.getCurPage() - 1)
+		String hql = "from " + autocomplete.getEntityName() + " where 1!=1 " + sb.toString();
+		return commonDao.getSession().createQuery(hql).setFirstResult(autocomplete.getCurPage() - 1)
 				.setMaxResults(autocomplete.getMaxRows()).list();
 	}
 
-	
 	@Override
 	public Integer executeSql(String sql, List<Object> param) {
 		return commonDao.executeSql(sql, param);
 	}
 
-	
 	@Override
 	public Integer executeSql(String sql, Object... param) {
 		return commonDao.executeSql(sql, param);
 	}
 
-	
 	@Override
 	public Integer executeSql(String sql, Map<String, Object> param) {
 		return commonDao.executeSql(sql, param);
 	}
-	
+
 	@Override
 	public Object executeSqlReturnKey(String sql, Map<String, Object> param) {
 		return commonDao.executeSqlReturnKey(sql, param);
 	}
-	
+
 	@Override
 	public List<Map<String, Object>> findForJdbc(String sql, int page, int rows) {
 		return commonDao.findForJdbc(sql, page, rows);
 	}
 
-	
 	@Override
 	public List<Map<String, Object>> findForJdbc(String sql, Object... objs) {
 		return commonDao.findForJdbc(sql, objs);
 	}
 
-	
 	@Override
-	public List<Map<String, Object>> findForJdbcParam(String sql, int page,
-			int rows, Object... objs) {
+	public List<Map<String, Object>> findForJdbcParam(String sql, int page, int rows, Object... objs) {
 		return commonDao.findForJdbcParam(sql, page, rows, objs);
 	}
 
-	
 	@Override
-	public <T> List<T> findObjForJdbc(String sql, int page, int rows,
-			Class<T> clazz) {
+	public <T> List<T> findObjForJdbc(String sql, int page, int rows, Class<T> clazz) {
 		return commonDao.findObjForJdbc(sql, page, rows, clazz);
 	}
 
-	
 	@Override
 	public Map<String, Object> findOneForJdbc(String sql, Object... objs) {
 		return commonDao.findOneForJdbc(sql, objs);
 	}
 
-	
 	@Override
 	public Long getCountForJdbc(String sql) {
 		return commonDao.getCountForJdbc(sql);
@@ -486,11 +460,9 @@ public class CommonServiceImpl implements CommonService {
 
 	@Override
 	public Long getCountForJdbcParam(String sql, Object[] objs) {
-		return commonDao.getCountForJdbcParam(sql,objs);
+		return commonDao.getCountForJdbcParam(sql, objs);
 	}
 
-
-	
 	@Override
 	public <T> void batchSave(List<T> entitys) {
 		this.commonDao.batchSave(entitys);
@@ -507,7 +479,7 @@ public class CommonServiceImpl implements CommonService {
 	public <T> List<T> findHql(String hql, Object... param) {
 		return this.commonDao.findHql(hql, param);
 	}
-	
+
 	/**
 	 * 通过hql 修改对象
 	 * 
@@ -521,8 +493,7 @@ public class CommonServiceImpl implements CommonService {
 	}
 
 	@Override
-	public <T> List<T> pageList(DetachedCriteria dc, int firstResult,
-			int maxResult) {
+	public <T> List<T> pageList(DetachedCriteria dc, int firstResult, int maxResult) {
 		return this.commonDao.pageList(dc, firstResult, maxResult);
 	}
 
@@ -535,126 +506,135 @@ public class CommonServiceImpl implements CommonService {
 	 * 调用存储过程
 	 */
 	@Override
-	public <T> List<T> executeProcedure(String procedureSql,Object... params) {
+	public <T> List<T> executeProcedure(String procedureSql, Object... params) {
 		return this.commonDao.executeProcedure(procedureSql, params);
 	}
 
 	// 数据变换的统一接口
-		public interface IMyDataExchanger {
-			public Object exchange(Object value);
+	public interface IMyDataExchanger {
+		public Object exchange(Object value);
+	}
+
+	// 页面表示数据与数据库字段的对应关系
+	public class Db2Page {
+		String fieldPage; // 页面的fieldID
+		String columnDB; // 数据库的字段名
+		IMyDataExchanger dataExchanger; // 数据变换
+
+		// 构造函数1：当页面的fieldID与数据库字段一致时（数据也不用变换）
+		public Db2Page(String fieldPage) {
+			this.fieldPage = fieldPage;
+			this.columnDB = fieldPage;
+			this.dataExchanger = null;
 		}
-		
-		// 页面表示数据与数据库字段的对应关系
-		public class Db2Page {
-			String fieldPage;		// 页面的fieldID
-			String columnDB;		// 数据库的字段名
-			IMyDataExchanger dataExchanger;		// 数据变换
-			
-			// 构造函数1：当页面的fieldID与数据库字段一致时（数据也不用变换）
-			public Db2Page(String fieldPage) {
-				this.fieldPage = fieldPage;
+
+		// 构造函数2：当页面的fieldID与数据库字段不一致时（数据不用变换）
+		public Db2Page(String fieldPage, String columnDB) {
+			this.fieldPage = fieldPage;
+			if (columnDB == null) {// 与fieldPage相同
 				this.columnDB = fieldPage;
-				this.dataExchanger = null;
+			} else {
+				this.columnDB = columnDB;
 			}
-			// 构造函数2：当页面的fieldID与数据库字段不一致时（数据不用变换）
-			public Db2Page(String fieldPage, String columnDB) {
-				this.fieldPage = fieldPage;
-				if (columnDB == null) {// 与fieldPage相同
-					this.columnDB = fieldPage;
-				} else {
-					this.columnDB = columnDB;
-				}
-				this.dataExchanger = null;
-			}
-			// 构造函数3：当页面的fieldID与数据库字段不一致，且数据要进行变换（当然都用这个构造函数也行）
-			public Db2Page(String fieldPage, String columnDB, IMyDataExchanger dataExchanger) {
-				this.fieldPage = fieldPage;
-				if (columnDB == null) {// 与fieldPage相同
-					this.columnDB = fieldPage;
-				} else {
-					this.columnDB = columnDB;
-				}
-				this.dataExchanger = dataExchanger;
-			}
-			
-			/**
-			 * 取页面表示绑定的fieldID
-			 */
-			public String getKey() {
-				return fieldPage;
-			}
-			
-			/**
-			 * 取页面表示对应的值
-			 * @param mapDB : 从数据库直接取得的结果集(一条数据的MAP)
-			 * @return Object : 页面表示对应的值
-			 */
-			public Object getData(Map mapDB) {
-				Object objValue = mapDB.get(columnDB);
-				
-				//新增的
-				if (objValue == null && dataExchanger != null){
-					return dataExchanger.exchange(objValue);
-				}
-				
-				if (objValue == null) {
-					return null;
-				} else {
-					if (dataExchanger != null) {
-						return dataExchanger.exchange(objValue);
-					} else {
-						return objValue;
-					}
-				}
-			}
+			this.dataExchanger = null;
 		}
-		
-		// 性别的数据变换实体
-		public class MyDataExchangerSex implements IMyDataExchanger {
-			@Override
-			public Object exchange(Object value) {
-				if (value == null) {
-					return "";
-				} else if ("0".equals(value.toString())) {
-					return "男";
-				} else {
-					return "女";
-				}
+
+		// 构造函数3：当页面的fieldID与数据库字段不一致，且数据要进行变换（当然都用这个构造函数也行）
+		public Db2Page(String fieldPage, String columnDB, IMyDataExchanger dataExchanger) {
+			this.fieldPage = fieldPage;
+			if (columnDB == null) {// 与fieldPage相同
+				this.columnDB = fieldPage;
+			} else {
+				this.columnDB = columnDB;
 			}
+			this.dataExchanger = dataExchanger;
 		}
+
 		/**
-		 * 返回easyUI的DataGrid数据格式的JSONObject对象
-		 * @param mapList : 从数据库直接取得的结果集列表
-		 * @param iTotalCnt : 从数据库直接取得的结果集总数据条数
-		 * @param dataExchanger : 页面表示数据与数据库字段的对应关系列表
-		 * @return JSONObject
+		 * 取页面表示绑定的fieldID
 		 */
-		public JSONObject getJsonDatagridEasyUI(List<Map<String, Object>> mapList, int iTotalCnt, Db2Page[] dataExchanger) {
-			//easyUI的dataGrid方式  －－－－这部分可以提取成统一处理
-			String jsonTemp = "{\'total\':" + iTotalCnt + ",\'rows\':[";
-			for (int j = 0; j < mapList.size(); j++) {
-				Map<String, Object> m = mapList.get(j);
-				if (j > 0) {
+		public String getKey() {
+			return fieldPage;
+		}
+
+		/**
+		 * 取页面表示对应的值
+		 * 
+		 * @param mapDB
+		 *            : 从数据库直接取得的结果集(一条数据的MAP)
+		 * @return Object : 页面表示对应的值
+		 */
+		public Object getData(Map mapDB) {
+			Object objValue = mapDB.get(columnDB);
+
+			// 新增的
+			if (objValue == null && dataExchanger != null) {
+				return dataExchanger.exchange(objValue);
+			}
+
+			if (objValue == null) {
+				return null;
+			} else {
+				if (dataExchanger != null) {
+					return dataExchanger.exchange(objValue);
+				} else {
+					return objValue;
+				}
+			}
+		}
+	}
+
+	// 性别的数据变换实体
+	public class MyDataExchangerSex implements IMyDataExchanger {
+		@Override
+		public Object exchange(Object value) {
+			if (value == null) {
+				return "";
+			} else if ("0".equals(value.toString())) {
+				return "男";
+			} else {
+				return "女";
+			}
+		}
+	}
+
+	/**
+	 * 返回easyUI的DataGrid数据格式的JSONObject对象
+	 * 
+	 * @param mapList
+	 *            : 从数据库直接取得的结果集列表
+	 * @param iTotalCnt
+	 *            : 从数据库直接取得的结果集总数据条数
+	 * @param dataExchanger
+	 *            : 页面表示数据与数据库字段的对应关系列表
+	 * @return JSONObject
+	 */
+	public JSONObject getJsonDatagridEasyUI(List<Map<String, Object>> mapList, int iTotalCnt, Db2Page[] dataExchanger) {
+		// easyUI的dataGrid方式 －－－－这部分可以提取成统一处理
+		String jsonTemp = "{\'total\':" + iTotalCnt + ",\'rows\':[";
+		for (int j = 0; j < mapList.size(); j++) {
+			Map<String, Object> m = mapList.get(j);
+			if (j > 0) {
+				jsonTemp += ",";
+			}
+			jsonTemp += "{";
+			for (int i = 0; i < dataExchanger.length; i++) {
+				if (i > 0) {
 					jsonTemp += ",";
 				}
-				jsonTemp += "{";
-				for (int i = 0; i < dataExchanger.length; i++) {
-					if (i > 0) {
-						jsonTemp += ",";
-					}
-					jsonTemp += "'" + dataExchanger[i].getKey() + "'" + ":";
-					Object objValue = dataExchanger[i].getData(m);
-					if (objValue == null) {
-						jsonTemp += "null";
-					} else {
-						String val = (objValue + "" ).replace("\n","\\s").replace("\r","\\s");
-						jsonTemp += "'" + val + "'";
-					}
+				jsonTemp += "'" + dataExchanger[i].getKey() + "'" + ":";
+				Object objValue = dataExchanger[i].getData(m);
+				if (objValue == null) {
+					jsonTemp += "null";
+				} else {
+					String val = (objValue + "").replace("\n", "\\s").replace("\r", "\\s");
+					jsonTemp += "'" + val + "'";
 				}
-				jsonTemp += "}";
 			}
-			jsonTemp += "]}";
-			JSONObject jObject = JSONObject.fromObject(jsonTemp);
-			return jObject;
+			jsonTemp += "}";
 		}
+		jsonTemp += "]}";
+		JSONObject jObject = JSONObject.fromObject(jsonTemp);
+		return jObject;
+	}
 }
